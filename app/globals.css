@@ -1,0 +1,119 @@
+/* ─── Reset ────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ─── Design tokens — Dark (default) ───────────────────────── */
+:root {
+  --bg:        #0f1117;
+  --surface:   #161b27;
+  --surface2:  #1e2535;
+  --border:    rgba(255,255,255,0.08);
+  --border2:   rgba(255,255,255,0.04);
+  --text1:     #f1f5f9;
+  --text2:     #94a3b8;
+  --text3:     #64748b;
+  --accent:    #818cf8;   /* indigo — distinct from billing's teal */
+  --accdim:    rgba(129,140,248,0.10);
+  --accborder: rgba(129,140,248,0.25);
+  --danger:    #f87171;
+  --dangerdim: rgba(248,113,113,0.10);
+  --success:   #4ade80;
+  --warn:      #fbbf24;
+  --radius:    10px;
+  --shadow:    0 4px 24px rgba(0,0,0,0.4);
+}
+
+/* ─── Light theme override ──────────────────────────────────── */
+body.light {
+  --bg:        #f8fafc;
+  --surface:   #ffffff;
+  --surface2:  #f1f5f9;
+  --border:    rgba(0,0,0,0.10);
+  --border2:   rgba(0,0,0,0.05);
+  --text1:     #0f172a;
+  --text2:     #475569;
+  --text3:     #94a3b8;
+  --accent:    #6366f1;
+  --accdim:    rgba(99,102,241,0.10);
+  --accborder: rgba(99,102,241,0.25);
+  --danger:    #dc2626;
+  --dangerdim: rgba(220,38,38,0.10);
+  --success:   #16a34a;
+  --warn:      #d97706;
+  --shadow:    0 4px 24px rgba(0,0,0,0.12);
+}
+
+/* ─── Base ─────────────────────────────────────────────────── */
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-inter, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text1);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100dvh;
+}
+
+h1,h2,h3,h4,h5,h6 { font-weight: 700; line-height: 1.2; }
+button, input, select, textarea { font-family: inherit; }
+
+input, select, textarea {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text1);
+  font-size: 13px;
+  padding: 8px 10px;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+  width: 100%;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accdim);
+}
+
+input::placeholder, textarea::placeholder { color: var(--text3); }
+select option { background: var(--surface2); color: var(--text1); }
+
+button { cursor: pointer; transition: opacity .15s, transform .1s; }
+button:disabled { opacity: .45; cursor: not-allowed; }
+button:active:not(:disabled) { transform: scale(.97); }
+
+a { color: var(--accent); }
+a:hover { opacity: .85; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+@keyframes fadeIn  { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+@keyframes slideIn { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:none; } }
+@keyframes spin    { to { transform: rotate(360deg); } }
+@keyframes pulse   { 0%,100% { opacity:1; } 50% { opacity:.4; } }
+
+.animate-fade  { animation: fadeIn  .22s ease both; }
+.animate-slide { animation: slideIn .2s  ease both; }
+.spinner       { animation: spin 1s linear infinite; }
+.skeleton      { animation: pulse 1.4s ease infinite; background: var(--surface2); border-radius: 4px; }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+::selection    { background: var(--accdim); color: var(--accent); }
+
+.pg    { max-width: 1280px; margin: 0 auto; width: 100%; padding: 28px 24px 60px; }
+.pg-sm { max-width: 860px;  margin: 0 auto; width: 100%; padding: 28px 24px 60px; }
+
+@media (max-width: 768px) {
+  body { font-size: 13px; }
+  .hide-mobile { display: none !important; }
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff !important; color: #000 !important; font-size: 12px; }
+  a { color: inherit !important; text-decoration: none !important; }
+}
