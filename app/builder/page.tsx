@@ -3490,7 +3490,7 @@ export default function BuilderPage() {
           <div style={{ display: "flex", borderBottom: "1px solid var(--border)", flexShrink: 0, padding: "0 4px" }}>
             {([
               { id: "edit"      as const, icon: <Pencil size={12} />,      label: "Edit"     },
-              { id: "cover"     as const, icon: <Mail size={12} />,         label: "Cover"    },
+              { id: "cover"     as const, icon: <Mail size={12} />,         label: "Cover Letter"},
               { id: "templates" as const, icon: <Palette size={12} />,      label: "Templates"},
               { id: "order"     as const, icon: <LayoutList size={12} />,   label: "Order"    },
               { id: "jd"        as const, icon: <Target size={12} />,       label: "JD Match" },
