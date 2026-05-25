@@ -293,7 +293,7 @@ function PlanCard({ name, price, interval, badge, features, cta, ctaStyle, highl
       <button
         onClick={onCta}
         style={{
-          width: "100%", padding: "11px 0", borderRadius: 9, border: "none",
+          width: "100%", padding: "11px 0", borderRadius: 9,
           cursor: "pointer", fontFamily: "inherit", fontSize: 13, fontWeight: 800,
           marginBottom: 20,
           background: ctaStyle === "primary"
