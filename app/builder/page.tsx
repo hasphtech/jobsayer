@@ -1136,6 +1136,7 @@ export default function BuilderPage() {
   /* Resume identity + visibility */
   const [resumeName,     setResumeName]     = useState("Untitled Resume");
   const [nameEditing,    setNameEditing]    = useState(false);
+  const [showResumeMenu,  setShowResumeMenu]  = useState(false);
   const [hiddenSections, setHiddenSections] = useState<Set<string>>(new Set());
   /* Cloud saves */
   const [currentSaveId,  setCurrentSaveId]  = useState<string | null>(null);
@@ -1663,6 +1664,15 @@ export default function BuilderPage() {
   }
 
   /* ── Cloud saves ─────────────────────────────────────────────── */
+  async function handleCreateNew() {
+    setData(SAMPLE);
+    setTemplate("Classic");
+    setResumeName("Untitled Resume");
+    setCurrentSaveId(null);
+    setShowResumeMenu(false);
+    setStep(0);
+  }
+
   async function handleCloudSave() {
     if (!user || savingCloud) return;
     setSavingCloud(true);
@@ -3397,12 +3407,52 @@ export default function BuilderPage() {
             style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "3px 8px", outline: "none", fontFamily: "inherit", width: 180 }}
           />
         ) : (
-          <button onClick={() => setNameEditing(true)}
-            style={{ display: "flex", alignItems: "center", gap: 5, background: "none", border: "none", cursor: "pointer", padding: "3px 6px", borderRadius: 6, fontFamily: "inherit" }}>
-            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)", maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{resumeName}</span>
-            <Pencil size={10} style={{ color: "var(--text3)", flexShrink: 0 }} />
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 2, position: "relative" }}>
+            <button onClick={() => setNameEditing(true)}
+              style={{ display: "flex", alignItems: "center", gap: 5, background: "none", border: "none", cursor: "pointer", padding: "3px 6px", borderRadius: 6, fontFamily: "inherit" }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)", maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{resumeName}</span>
+              <Pencil size={10} style={{ color: "var(--text3)", flexShrink: 0 }} />
+            </button>
+            <button onClick={() => { setShowResumeMenu(!showResumeMenu); if (!showResumeMenu) handleLoadSavesList(); }}
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, background: "none", border: "none", cursor: "pointer", borderRadius: 4, color: "var(--text3)", padding: 0 }}>
+              <ChevronDown size={12} />
+            </button>
+
+            {showResumeMenu && (
+              <div style={{
+                position: "absolute", top: 28, left: 0, zIndex: 100,
+                background: "var(--surface)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)",
+                borderRadius: 8, boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                width: 200, maxHeight: 300, overflowY: "auto",
+                padding: "6px", display: "flex", flexDirection: "column", gap: 4,
+                fontFamily: "inherit"
+              }}>
+                <button onClick={handleCreateNew}
+                  style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 6, background: "none", border: "none", cursor: "pointer", color: "var(--text1)", fontSize: 12, fontWeight: 700, textAlign: "left" as const }}>
+                  <Plus size={12} /> Create New
+                </button>
+                <div style={{ height: 1, background: "var(--border)", margin: "4px 0" }} />
+                {user ? (
+                  loadingSaves ? (
+                    <div style={{ padding: "10px", fontSize: 11, color: "var(--text3)", textAlign: "center" }}>Loading…</div>
+                  ) : savesList.length === 0 ? (
+                    <div style={{ padding: "10px", fontSize: 11, color: "var(--text3)", textAlign: "center" }}>No saved resumes</div>
+                  ) : (
+                    savesList.map(r => (
+                      <button key={r.id} onClick={() => { handleLoadResume(r.id); setShowResumeMenu(false); }}
+                        style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 6, background: r.id === currentSaveId ? "var(--accdim)" : "none", border: "none", cursor: "pointer", color: r.id === currentSaveId ? "var(--accent)" : "var(--text2)", fontSize: 12, fontWeight: r.id === currentSaveId ? 700 : 600, textAlign: "left" as const }}>
+                        <FileText size={12} style={{ opacity: 0.6 }} /> {r.name}
+                      </button>
+                    ))
+                  )
+                ) : (
+                  <div style={{ padding: "10px", fontSize: 11, color: "var(--text3)", textAlign: "center" }}>Sign in to see your saves</div>
+                )}
+              </div>
+            )}
+          </div>
         )}
+
 
         <div style={{ width: 1, height: 20, background: "var(--border)", margin: "0 4px" }} />
 
