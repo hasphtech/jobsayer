@@ -1572,9 +1572,7 @@ export default function BuilderPage() {
   ) {
     if (aiLoading) return;
     if (plan.tier !== "pro") {
-      alert("AI features require the Pro plan.
-
-Upgrade at jobsayer.com/upgrade");
+      alert("AI features require the Pro plan. Upgrade at jobsayer.com/upgrade");
       return;
     }
     setAiLoading(action);
@@ -1598,9 +1596,7 @@ Upgrade at jobsayer.com/upgrade");
   async function handleCoverLetterGenerate() {
     if (coverAiLoading) return;
     if (plan.tier !== "pro") {
-      alert("AI features require the Pro plan.
-
-Upgrade at jobsayer.com/upgrade");
+      alert("AI features require the Pro plan. Upgrade at jobsayer.com/upgrade");
       return;
     }
     setCoverAiLoading(true);
@@ -1631,9 +1627,7 @@ Upgrade at jobsayer.com/upgrade");
   async function handleTailorToJd() {
     if (tailorLoading || !jdText.trim()) return;
     if (plan.tier !== "pro") {
-      alert("AI Tailor requires the Pro plan.
-
-Upgrade at jobsayer.com/upgrade");
+      alert("AI Tailor requires the Pro plan. Upgrade at jobsayer.com/upgrade");
       return;
     }
     setTailorLoading(true);
