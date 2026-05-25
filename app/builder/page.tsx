@@ -1146,7 +1146,7 @@ export default function BuilderPage() {
   const [mobileSavesOpen, setMobileSavesOpen] = useState(false);
 
   /* Two-panel desktop UI state — persisted across refresh */
-  const [leftTab,        setLeftTab]        = useState<"edit" | "cover letter" | "templates" | "order" | "jd">(() => {
+  const [leftTab,        setLeftTab]        = useState<"edit" | "cover" | "templates" | "order" | "jd">(() => {
     if (typeof window === "undefined") return "edit";
     const saved = localStorage.getItem("rb-left-tab");
     return (["edit","cover","templates","order","jd"].includes(saved ?? "")
