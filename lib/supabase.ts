@@ -1,13 +1,14 @@
 /**
- * @jobsayer/auth — Supabase client singleton
+ * jobSayer — Supabase client singleton
  *
- * Consumed by every EMI24 app (apps/web, apps/billing, apps/career, …).
- * Each Next.js app gets its own bundled copy — singleton state is per-app,
- * not shared across subdomains.
+ * Standalone project — fully independent from emi24.com.
+ * Requires:
+ *   NEXT_PUBLIC_SUPABASE_URL      — from your jobsayer Supabase project
+ *   NEXT_PUBLIC_SUPABASE_ANON_KEY — from your jobsayer Supabase project
  *
- * SSO across subdomains:
- *   Set NEXT_PUBLIC_AUTH_COOKIE_DOMAIN=.emi24.com in each app's Vercel env.
- *   Leave it unset in local dev (localhost doesn't support wildcard cookies).
+ * Each Next.js instance (dev / prod) gets its own singleton.
+ * No cross-domain SSO — jobsayer.com users are completely separate
+ * from any other product.
  */
 
 type SupabaseClient = Awaited<ReturnType<typeof import("@supabase/ssr").createBrowserClient>>;
@@ -24,21 +25,15 @@ export async function getSupabaseAsync(): Promise<SupabaseClient> {
 
   if (!url || !anon) {
     throw new Error(
-      "@jobsayer/auth: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY must be set",
+      "jobSayer: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY must be set.\n" +
+      "See SUPABASE_SETUP.md for instructions.",
     );
   }
 
-  // NEXT_PUBLIC_AUTH_COOKIE_DOMAIN should be ".emi24.com" in production.
-  // This makes the Supabase auth cookie valid on ALL subdomains, enabling
-  // seamless SSO: sign in on emi24.com → automatically authenticated on
-  // billing.emi24.com, career.emi24.com, etc.
-  const cookieDomain = process.env.NEXT_PUBLIC_AUTH_COOKIE_DOMAIN ?? undefined;
-
   _clientPromise = import("@supabase/ssr").then(async ({ createBrowserClient }) => {
     _client = createBrowserClient(url, anon, {
-      cookieOptions: cookieDomain ? { domain: cookieDomain, sameSite: "lax", secure: true } : {},
       global: {
-        headers: { "x-client-info": "emi24" },
+        headers: { "x-client-info": "jobsayer" },
       },
     });
 
@@ -48,8 +43,8 @@ export async function getSupabaseAsync(): Promise<SupabaseClient> {
 
     return _client;
   }).catch((err) => {
-    _clientPromise = null; // allow retry
-    console.error("@jobsayer/auth: failed to initialise Supabase client", err);
+    _clientPromise = null; // allow retry on next call
+    console.error("jobSayer: failed to initialise Supabase client", err);
     throw err;
   });
 
@@ -60,7 +55,8 @@ export async function getSupabaseAsync(): Promise<SupabaseClient> {
 export function getSupabase(): SupabaseClient {
   if (!_client) {
     throw new Error(
-      "@jobsayer/auth: getSupabase() called before getSupabaseAsync() resolved",
+      "jobSayer: getSupabase() called before getSupabaseAsync() resolved. " +
+      "Await getSupabaseAsync() first.",
     );
   }
   return _client;

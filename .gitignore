@@ -36,6 +36,10 @@ yarn-error.log*
 # Project files
 jobSayer_logo.pdf
 
+# Supabase — contains credentials and internal setup details
+SUPABASE_SETUP.md
+supabase/
+
 # Editor
 .vscode/
 .idea/
