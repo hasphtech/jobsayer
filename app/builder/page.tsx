@@ -1781,8 +1781,10 @@ export default function BuilderPage() {
 
           <div style={{ marginLeft: "auto", display: "flex", gap: 6, alignItems: "center" }}>
             <span style={{ fontSize: 9, fontWeight: 600, color: "var(--text3)", opacity: autoSaved ? 1 : 0, transition: "opacity .3s", pointerEvents: "none" }}>✓ Saved</span>
-            <a href="/score" style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>🎯 Score</a>
-            <a href="/jobs"  style={{ fontSize: 10, fontWeight: 700, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>💼 Jobs</a>
+            <a href="/score"      style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>🎯 Score</a>
+            <a href="/jobs"       style={{ fontSize: 10, fontWeight: 700, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>💼 Jobs</a>
+            <a href="/interview"  style={{ fontSize: 10, fontWeight: 700, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>🎤 Prep</a>
+            <a href="/career-gps" style={{ fontSize: 10, fontWeight: 700, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>🧭 GPS</a>
             {user
               ? <span style={{ fontSize: 10, fontWeight: 700, color: "var(--text3)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 5, padding: "2px 7px" }}>{plan.loading ? "…" : plan.planName}</span>
               : <button onClick={() => signInWithGoogle()} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontFamily: "inherit" }}>
@@ -3523,12 +3525,18 @@ export default function BuilderPage() {
             <Check size={10} style={{ color: "var(--accent)" }} /> Autosaved
           </span>
 
-          {/* Score & Jobs — always visible, no sign-in needed */}
+          {/* Score, Jobs, Interview, GPS — always visible, no sign-in needed */}
           <a href="/score" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "5px 10px", textDecoration: "none", whiteSpace: "nowrap" }}>
             🎯 My Score
           </a>
           <a href="/jobs" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 6, padding: "5px 10px", textDecoration: "none", whiteSpace: "nowrap" }}>
             💼 Jobs
+          </a>
+          <a href="/interview" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 6, padding: "5px 10px", textDecoration: "none", whiteSpace: "nowrap" }}>
+            🎤 Interview
+          </a>
+          <a href="/career-gps" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 6, padding: "5px 10px", textDecoration: "none", whiteSpace: "nowrap" }}>
+            🧭 Career GPS
           </a>
 
           {/* User / sign in */}

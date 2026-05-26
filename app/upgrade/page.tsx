@@ -9,8 +9,8 @@ import { Check, Zap, Star, Sparkles } from "lucide-react";
 import { PLAN_DEFAULTS } from "@/lib/resumePlan";
 
 const PRICES = {
-  starter: { monthly: 99,  annual: 999  },
-  pro:     { monthly: 299, annual: 2999 },
+  starter: { monthly: 199, annual: 1990 },
+  pro:     { monthly: 499, annual: 4990 },
 } as const;
 
 const FEATURES = {

@@ -12,7 +12,109 @@ import {
   TrendingUp, AlertTriangle, Lightbulb, CheckCircle2,
 } from "lucide-react";
 import { computeScore, type ScoreResult } from "@/lib/scoreEngine";
+import { matchJd, resumeToText } from "@/lib/jdMatcher";
 import type { ResumeData } from "@/lib/types";
+
+/* ── JD Match Panel ────────────────────────────────────────────── */
+function JdMatchPanel({ resumeText }: { resumeText: string }) {
+  const [jdText, setJdText] = useState("");
+  const [result, setResult] = useState<{ score: number; found: string[]; missing: string[] } | null>(null);
+
+  function handleMatch() {
+    if (!jdText.trim() || !resumeText.trim()) return;
+    const r = matchJd(resumeText, jdText);
+    setResult({ score: r.score, found: r.found, missing: r.missing.slice(0, 10) });
+  }
+
+  const matchColor = result
+    ? result.score >= 70 ? "#4ade80" : result.score >= 45 ? "#fbbf24" : "#f87171"
+    : "var(--text3)";
+
+  return (
+    <div style={{
+      background: "var(--surface)", border: "1px solid var(--border)",
+      borderRadius: 16, padding: "22px",
+    }}>
+      <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 14 }}>
+        🎯 Match Against a Specific JD
+      </div>
+      <textarea
+        value={jdText}
+        onChange={e => { setJdText(e.target.value); setResult(null); }}
+        placeholder="Paste a job description here to see how well your resume matches it — we'll highlight matched and missing keywords…"
+        rows={4}
+        style={{
+          width: "100%", padding: "12px 14px",
+          background: "var(--surface2)", border: "1px solid var(--border)",
+          borderRadius: 8, color: "var(--text1)", fontSize: 13,
+          resize: "vertical", lineHeight: 1.6, boxSizing: "border-box", marginBottom: 10,
+        }}
+      />
+      <button
+        onClick={handleMatch}
+        disabled={!jdText.trim() || !resumeText.trim()}
+        style={{
+          padding: "9px 22px", borderRadius: 8, border: "none",
+          background: jdText.trim() ? "var(--accent)" : "var(--surface2)",
+          color: jdText.trim() ? "#fff" : "var(--text3)",
+          fontSize: 13, fontWeight: 600,
+          cursor: jdText.trim() ? "pointer" : "not-allowed",
+          marginBottom: result ? 16 : 0,
+        }}
+      >
+        Compute Match
+      </button>
+
+      {result && (
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
+            <div style={{
+              width: 56, height: 56, borderRadius: "50%",
+              background: result.score >= 70 ? "rgba(74,222,128,.12)" : result.score >= 45 ? "rgba(251,191,36,.12)" : "rgba(248,113,113,.12)",
+              border: `2px solid ${matchColor}`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 18, fontWeight: 800, color: matchColor,
+            }}>{result.score}%</div>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: matchColor }}>
+                {result.score >= 70 ? "Strong match" : result.score >= 45 ? "Partial match" : "Low match"}
+              </div>
+              <div style={{ fontSize: 11, color: "var(--text3)" }}>{result.found.length} keywords matched · {result.missing.length} missing</div>
+            </div>
+          </div>
+
+          {result.found.length > 0 && (
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "#4ade80", marginBottom: 6 }}>✅ Matched</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                {result.found.slice(0, 10).map(s => (
+                  <span key={s} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(74,222,128,.08)", color: "#4ade80", border: "1px solid rgba(74,222,128,.2)", fontWeight: 500 }}>{s}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {result.missing.length > 0 && (
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "#f87171", marginBottom: 6 }}>❌ Missing from your resume</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                {result.missing.map(s => (
+                  <span key={s} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(248,113,113,.08)", color: "#f87171", border: "1px solid rgba(248,113,113,.2)", fontWeight: 500, textDecoration: "line-through", opacity: .8 }}>{s}</span>
+                ))}
+              </div>
+              <Link href="/builder" style={{
+                display: "inline-flex", alignItems: "center", gap: 4, marginTop: 10,
+                fontSize: 12, color: "var(--accent)", fontWeight: 600, textDecoration: "none",
+              }}>
+                ✏️ Add missing skills in Builder →
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 /* ── Gauge SVG ─────────────────────────────────────────────────── */
 function ScoreGauge({ score }: { score: number }) {
@@ -86,6 +188,7 @@ export default function ScorePage() {
   const router = useRouter();
   const [result, setResult] = useState<ScoreResult | null>(null);
   const [resumeName, setResumeName] = useState("Your resume");
+  const [resumeText, setResumeText] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -96,6 +199,7 @@ export default function ScorePage() {
         const data: ResumeData = parsed.data ?? parsed;
         const computed = computeScore(data);
         setResult(computed);
+        setResumeText(resumeToText(data));
         if (data.name) setResumeName(`${data.name}'s resume`);
       }
     } catch { /* ignore */ }
@@ -264,6 +368,11 @@ export default function ScorePage() {
             </div>
           </div>
         )}
+
+        {/* ── JD Match ── */}
+        <div style={{ marginBottom: 20 }}>
+          <JdMatchPanel resumeText={resumeText} />
+        </div>
 
         {/* ── Skills Map ── */}
         <div style={card}>
