@@ -1145,6 +1145,7 @@ export default function BuilderPage() {
   const [savingCloud,    setSavingCloud]    = useState(false);
   const [loadingSaves,   setLoadingSaves]   = useState(false);
   const [mobileSavesOpen, setMobileSavesOpen] = useState(false);
+  const [showScoreCta,   setShowScoreCta]   = useState(false);
 
   /* Two-panel desktop UI state — persisted across refresh */
   const [leftTab,        setLeftTab]        = useState<"edit" | "cover" | "templates" | "order" | "jd">(() => {
@@ -1686,6 +1687,7 @@ export default function BuilderPage() {
         const idx = prev.findIndex(r => r.id === id);
         return idx >= 0 ? prev.map((r, i) => i === idx ? updated : r) : [updated, ...prev];
       });
+      setShowScoreCta(true);
     } catch { /* ignore */ }
     setSavingCloud(false);
   }
@@ -1779,6 +1781,8 @@ export default function BuilderPage() {
 
           <div style={{ marginLeft: "auto", display: "flex", gap: 6, alignItems: "center" }}>
             <span style={{ fontSize: 9, fontWeight: 600, color: "var(--text3)", opacity: autoSaved ? 1 : 0, transition: "opacity .3s", pointerEvents: "none" }}>✓ Saved</span>
+            <a href="/score" style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>🎯 Score</a>
+            <a href="/jobs"  style={{ fontSize: 10, fontWeight: 700, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>💼 Jobs</a>
             {user
               ? <span style={{ fontSize: 10, fontWeight: 700, color: "var(--text3)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 5, padding: "2px 7px" }}>{plan.loading ? "…" : plan.planName}</span>
               : <button onClick={() => signInWithGoogle()} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontFamily: "inherit" }}>
@@ -3385,6 +3389,36 @@ export default function BuilderPage() {
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100vh", background: "var(--bg)", overflow: "hidden" }}>
 
+      {/* ── Score CTA Toast — appears after save ─────────────── */}
+      {showScoreCta && (
+        <div style={{
+          position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)",
+          zIndex: 9999, background: "var(--surface)", border: "1px solid var(--accborder)",
+          borderRadius: 16, padding: "16px 20px", boxShadow: "0 8px 32px rgba(0,0,0,.5)",
+          display: "flex", alignItems: "center", gap: 16, minWidth: 360, maxWidth: 480,
+        }}>
+          <div style={{ fontSize: 28 }}>🎉</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", marginBottom: 2 }}>Resume saved!</div>
+            <div style={{ fontSize: 12, color: "var(--text3)" }}>See your jobSayer Score and matched jobs.</div>
+          </div>
+          <div style={{ display: "flex", gap: 6 }}>
+            <a href="/score" style={{
+              padding: "8px 14px", background: "var(--accent)", borderRadius: 8,
+              color: "#fff", fontSize: 12, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap",
+            }}>View Score →</a>
+            <a href="/jobs" style={{
+              padding: "8px 14px", background: "var(--accdim)", border: "1px solid var(--accborder)",
+              borderRadius: 8, color: "var(--accent)", fontSize: 12, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap",
+            }}>Jobs →</a>
+            <button onClick={() => setShowScoreCta(false)} style={{
+              padding: "8px 10px", background: "none", border: "1px solid var(--border)",
+              borderRadius: 8, color: "var(--text3)", fontSize: 12, cursor: "pointer", fontFamily: "inherit",
+            }}>✕</button>
+          </div>
+        </div>
+      )}
+
       {/* Hidden file inputs */}
       <input ref={photoInputRef}    type="file" accept="image/*"                  style={{ display: "none" }} onChange={handlePhotoChange}    />
       <input ref={resumeInputRef}   type="file" accept=".pdf,.doc,.docx,.txt,.md" style={{ display: "none" }} onChange={handleResumeImport}   />
@@ -3488,6 +3522,14 @@ export default function BuilderPage() {
           }}>
             <Check size={10} style={{ color: "var(--accent)" }} /> Autosaved
           </span>
+
+          {/* Score & Jobs — always visible, no sign-in needed */}
+          <a href="/score" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "5px 10px", textDecoration: "none", whiteSpace: "nowrap" }}>
+            🎯 My Score
+          </a>
+          <a href="/jobs" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 6, padding: "5px 10px", textDecoration: "none", whiteSpace: "nowrap" }}>
+            💼 Jobs
+          </a>
 
           {/* User / sign in */}
           {user
