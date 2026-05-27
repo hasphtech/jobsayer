@@ -114,12 +114,6 @@ function analyseJd(jdText: string, resumeText: string): ScanResult {
   let resumeMatch: number | null = null;
   let matchFound: string[] = [];
   let matchMissing: string[] = [];
-  if (resumeText.trim()) {
-    const { matchJd: mj } = require("@/lib/jdMatcher");
-    // We import dynamically to avoid SSR issues, but since page is "use client" it's fine
-    // We'll handle this differently — inline
-    resumeMatch = 0; // will compute below
-  }
 
   // ── Verdict ──
   const clampedScore = Math.max(0, Math.min(100, trustScore));
@@ -143,7 +137,6 @@ function JdScannerTab({ resumeText }: { resumeText: string }) {
       const base = analyseJd(jdText, resumeText);
       // Compute resume match using matchJd
       if (resumeText.trim()) {
-        const { matchJd } = require("@/lib/jdMatcher");
         const mr = matchJd(resumeText, jdText);
         base.resumeMatch = mr.score;
         base.matchFound = mr.found;

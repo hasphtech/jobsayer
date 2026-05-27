@@ -8,27 +8,17 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { groqRewrite } from "@/lib/groq";
-
-/* ── Simple in-memory rate limiter (5 req / min per IP) ── */
-const RL = new Map<string, { count: number; reset: number }>();
-
-function rateLimit(ip: string): boolean {
-  const now = Date.now();
-  const entry = RL.get(ip);
-  if (!entry || now > entry.reset) {
-    RL.set(ip, { count: 1, reset: now + 60_000 });
-    return true;
-  }
-  if (entry.count >= 5) return false;
-  entry.count++;
-  return true;
-}
+import { rateLimit } from "@/lib/rateLimit";
 
 /* ── POST handler ── */
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ?? "anon";
-  if (!rateLimit(ip)) {
-    return NextResponse.json({ error: "Rate limit exceeded. Try again in a minute." }, { status: 429 });
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anon";
+  const { allowed, retryAfter } = await rateLimit(`interview:${ip}`, 5, 60_000);
+  if (!allowed) {
+    return NextResponse.json(
+      { error: `Rate limit exceeded. Try again in ${retryAfter}s.` },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } },
+    );
   }
 
   let body: Record<string, string>;

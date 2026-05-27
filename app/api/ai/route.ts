@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
             ?? req.headers.get("x-real-ip")
             ?? "unknown";
-    const { allowed: ipAllowed, retryAfter } = rateLimit(`ai-resume:${ip}`, RATE_LIMIT, RATE_WINDOW);
+    const { allowed: ipAllowed, retryAfter } = await rateLimit(`ai-resume:${ip}`, RATE_LIMIT, RATE_WINDOW);
     if (!ipAllowed) {
       return NextResponse.json(
         { error: `Too many requests. Please wait ${retryAfter}s before trying again.` },

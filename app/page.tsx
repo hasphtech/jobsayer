@@ -92,6 +92,7 @@ function Nav({ user, signIn }: { user: any; signIn: () => void }) {
                 <NavLink href="/jobs">Jobs</NavLink>
                 <NavLink href="/interview">Interview</NavLink>
                 <NavLink href="/career-gps">Career GPS</NavLink>
+                <NavLink href="/recruit">Recruiters</NavLink>
                 <Link href="/builder" style={primaryBtn}>Open Builder →</Link>
               </>
             ) : (
@@ -121,6 +122,7 @@ function Nav({ user, signIn }: { user: any; signIn: () => void }) {
               <MobileNavLink href="/jobs"       onClick={() => setMenuOpen(false)}>💼 Matched Jobs</MobileNavLink>
               <MobileNavLink href="/interview"  onClick={() => setMenuOpen(false)}>🎤 Interview Prep</MobileNavLink>
               <MobileNavLink href="/career-gps" onClick={() => setMenuOpen(false)}>🧭 Career GPS</MobileNavLink>
+              <MobileNavLink href="/recruit"    onClick={() => setMenuOpen(false)}>🏢 For Recruiters</MobileNavLink>
             </>
           ) : (
             <>

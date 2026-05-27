@@ -8,7 +8,7 @@ export type UploadType = "resume" | "photo";
 
 function monthKey(type: UploadType): string {
   const ym = new Date().toISOString().slice(0, 7); // "YYYY-MM"
-  return `emi24-resume-${type}-uploads-${ym}`;
+  return `jobsayer-${type}-uploads-${ym}`;
 }
 
 export function getUploadCount(type: UploadType): number {
