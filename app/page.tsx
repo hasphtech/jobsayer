@@ -49,7 +49,7 @@ const TRENDING = [
 /* ══════════════════════════════════════════════════════════════
    SHARED NAV
 ══════════════════════════════════════════════════════════════ */
-function Nav({ user, signIn }: { user: any; signIn: () => void }) {
+function Nav({ user, signIn }: { user: any; signIn: () => void; }) {
   const w = useWindowWidth();
   const mobile = w < 640;
   const [menuOpen, setMenuOpen] = useState(false);
@@ -100,7 +100,7 @@ function Nav({ user, signIn }: { user: any; signIn: () => void }) {
                 <NavLink href="#how">How it works</NavLink>
                 <NavLink href="#features">Features</NavLink>
                 <NavLink href="#pricing">Pricing</NavLink>
-                <button onClick={signIn} style={ghostBtn}>Sign in</button>
+                <button onClick={signIn} style={ghostBtn}>Sign in / Register</button>
                 <Link href="/builder" style={primaryBtn}>Try free →</Link>
               </>
             )}
@@ -129,7 +129,7 @@ function Nav({ user, signIn }: { user: any; signIn: () => void }) {
               <MobileNavLink href="#how"       onClick={() => setMenuOpen(false)}>How it works</MobileNavLink>
               <MobileNavLink href="#features"  onClick={() => setMenuOpen(false)}>Features</MobileNavLink>
               <MobileNavLink href="#pricing"   onClick={() => setMenuOpen(false)}>Pricing</MobileNavLink>
-              <button onClick={() => { signIn(); setMenuOpen(false); }} style={{ ...ghostBtn, width: "100%", padding: "11px" }}>Sign in with Google</button>
+              <button onClick={() => { signIn(); setMenuOpen(false); }} style={{ ...ghostBtn, width: "100%", padding: "11px" }}>Sign in / Register</button>
             </>
           )}
           <Link href="/builder" onClick={() => setMenuOpen(false)} style={{ ...primaryBtn, textAlign: "center", padding: "11px" }}>
@@ -154,6 +154,180 @@ function MobileNavLink({ href, children, onClick }: { href: string; children: Re
     <Link href={href} onClick={onClick} style={{ padding: "11px 14px", color: "var(--text1)", fontSize: 14, fontWeight: 500, textDecoration: "none", borderRadius: 8, background: "var(--surface2)", border: "1px solid var(--border)" }}>
       {children}
     </Link>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SIGN-IN MODAL  (Google OAuth + Email OTP)
+══════════════════════════════════════════════════════════════ */
+type OtpStep = "idle" | "sending" | "sent" | "verifying" | "error";
+
+function SignInModal({ onClose }: { onClose: () => void }) {
+  const { signInWithGoogle, signInWithOtp, verifyOtp } = useAuth();
+  const [email, setEmail]     = useState("");
+  const [otp, setOtp]         = useState("");
+  const [step, setStep]       = useState<OtpStep>("idle");
+  const [errMsg, setErrMsg]   = useState("");
+
+  // Close on backdrop click
+  function handleBackdrop(e: React.MouseEvent<HTMLDivElement>) {
+    if (e.target === e.currentTarget) onClose();
+  }
+  // Close on Escape
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  async function handleSendOtp() {
+    if (!email.trim() || !email.includes("@")) { setErrMsg("Enter a valid email address."); return; }
+    setStep("sending"); setErrMsg("");
+    const { error } = await signInWithOtp(email.trim().toLowerCase());
+    if (error) { setErrMsg(error); setStep("error"); }
+    else setStep("sent");
+  }
+
+  async function handleVerifyOtp() {
+    if (otp.trim().length < 4) { setErrMsg("Enter the 6-digit code from your email."); return; }
+    setStep("verifying"); setErrMsg("");
+    const { error } = await verifyOtp(email.trim().toLowerCase(), otp.trim());
+    if (error) { setErrMsg(error); setStep("sent"); }
+    else onClose(); // auth state change fires → user logged in
+  }
+
+  const overlay: React.CSSProperties = {
+    position: "fixed", inset: 0, zIndex: 200,
+    background: "rgba(0,0,0,.6)", backdropFilter: "blur(4px)",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    padding: "20px",
+  };
+  const card: React.CSSProperties = {
+    background: "var(--surface)", border: "1px solid var(--border)",
+    borderRadius: 18, padding: "32px 28px", width: "100%", maxWidth: 380,
+    position: "relative",
+  };
+  const inputStyle: React.CSSProperties = {
+    width: "100%", padding: "11px 14px", borderRadius: 9,
+    background: "var(--surface2)", border: "1px solid var(--border)",
+    color: "var(--text1)", fontSize: 14, fontFamily: "inherit", boxSizing: "border-box",
+    outline: "none",
+  };
+  const btnPrimary: React.CSSProperties = {
+    width: "100%", padding: "12px", borderRadius: 9, border: "none",
+    background: "var(--accent)", color: "#fff", fontSize: 14, fontWeight: 700,
+    cursor: "pointer", fontFamily: "inherit",
+  };
+  const btnGhost: React.CSSProperties = {
+    width: "100%", padding: "11px", borderRadius: 9,
+    border: "1px solid var(--border)", background: "var(--surface2)",
+    color: "var(--text1)", fontSize: 14, fontWeight: 600,
+    cursor: "pointer", fontFamily: "inherit", display: "flex",
+    alignItems: "center", justifyContent: "center", gap: 10,
+  };
+
+  return (
+    <div style={overlay} onClick={handleBackdrop}>
+      <div style={card}>
+        {/* Close */}
+        <button onClick={onClose} style={{
+          position: "absolute", top: 14, right: 14,
+          background: "none", border: "none", cursor: "pointer",
+          color: "var(--text3)", fontSize: 18, lineHeight: 1, padding: 4,
+        }}>✕</button>
+
+        {/* Header */}
+        <div style={{ textAlign: "center", marginBottom: 24 }}>
+          <div style={{
+            width: 44, height: 44, borderRadius: 12, background: "var(--accent)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 20, fontWeight: 900, color: "#fff", margin: "0 auto 12px",
+          }}>J</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: "var(--text1)", marginBottom: 4 }}>
+            Sign in to jobSayer
+          </div>
+          <div style={{ fontSize: 13, color: "var(--text3)" }}>
+            Build smarter resumes. Land better jobs.
+          </div>
+        </div>
+
+        {/* Google */}
+        <button onClick={signInWithGoogle} style={btnGhost}>
+          <svg width="18" height="18" viewBox="0 0 48 48">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            <path fill="none" d="M0 0h48v48H0z"/>
+          </svg>
+          Continue with Google
+        </button>
+
+        {/* Divider */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "18px 0" }}>
+          <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+          <span style={{ fontSize: 12, color: "var(--text3)", fontWeight: 500 }}>or continue with email</span>
+          <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+        </div>
+
+        {/* Email OTP */}
+        {step !== "sent" && step !== "verifying" ? (
+          <>
+            <div style={{ marginBottom: 10 }}>
+              <input
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={e => { setEmail(e.target.value); setErrMsg(""); }}
+                onKeyDown={e => e.key === "Enter" && handleSendOtp()}
+                style={inputStyle}
+                autoFocus
+              />
+            </div>
+            {errMsg && <p style={{ fontSize: 12, color: "var(--danger)", marginBottom: 8, margin: "0 0 8px" }}>{errMsg}</p>}
+            <button onClick={handleSendOtp} disabled={step === "sending"} style={btnPrimary}>
+              {step === "sending" ? "Sending…" : "Send OTP →"}
+            </button>
+          </>
+        ) : (
+          <>
+            <p style={{ fontSize: 13, color: "var(--text2)", marginBottom: 12, textAlign: "center" }}>
+              We sent a 6-digit code to <strong style={{ color: "var(--text1)" }}>{email}</strong>
+            </p>
+            <div style={{ marginBottom: 10 }}>
+              <input
+                type="text"
+                inputMode="numeric"
+                placeholder="Enter 6-digit code"
+                maxLength={6}
+                value={otp}
+                onChange={e => { setOtp(e.target.value.replace(/\D/g, "")); setErrMsg(""); }}
+                onKeyDown={e => e.key === "Enter" && handleVerifyOtp()}
+                style={{ ...inputStyle, letterSpacing: "0.3em", textAlign: "center", fontSize: 20, fontWeight: 700 }}
+                autoFocus
+              />
+            </div>
+            {errMsg && <p style={{ fontSize: 12, color: "var(--danger)", margin: "0 0 8px" }}>{errMsg}</p>}
+            <button onClick={handleVerifyOtp} disabled={step === "verifying"} style={btnPrimary}>
+              {step === "verifying" ? "Verifying…" : "Verify & Sign In →"}
+            </button>
+            <button onClick={() => { setStep("idle"); setOtp(""); setErrMsg(""); }} style={{
+              width: "100%", background: "none", border: "none", cursor: "pointer",
+              color: "var(--text3)", fontSize: 12, marginTop: 10, fontFamily: "inherit",
+            }}>
+              ← Use a different email
+            </button>
+          </>
+        )}
+
+        <p style={{ fontSize: 11, color: "var(--text3)", textAlign: "center", marginTop: 16, lineHeight: 1.5 }}>
+          By signing in you agree to our{" "}
+          <a href="/terms" style={{ color: "var(--accent)", textDecoration: "none" }}>Terms</a>
+          {" & "}
+          <a href="/privacy" style={{ color: "var(--accent)", textDecoration: "none" }}>Privacy Policy</a>.
+        </p>
+      </div>
+    </div>
   );
 }
 
@@ -804,14 +978,22 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
    ROOT
 ══════════════════════════════════════════════════════════════ */
 export default function HomePage() {
-  const { user, signInWithGoogle } = useAuth();
+  const { user } = useAuth();
+  const [showSignIn, setShowSignIn] = useState(false);
+  const openSignIn  = useCallback(() => setShowSignIn(true),  []);
+  const closeSignIn = useCallback(() => setShowSignIn(false), []);
+
+  // Auto-close modal once the user successfully signs in
+  useEffect(() => { if (user) setShowSignIn(false); }, [user]);
+
   return (
     <>
-      <Nav user={user} signIn={signInWithGoogle} />
+      <Nav user={user} signIn={openSignIn} />
       {user
         ? <Dashboard user={user} />
-        : <LandingPage signIn={signInWithGoogle} />
+        : <LandingPage signIn={openSignIn} />
       }
+      {showSignIn && <SignInModal onClose={closeSignIn} />}
     </>
   );
 }
