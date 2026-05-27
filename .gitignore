@@ -45,3 +45,4 @@ supabase/
 .idea/
 *.swp
 *.swo
+.claude/

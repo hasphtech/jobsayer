@@ -333,8 +333,33 @@ function JdScannerTab({ resumeText }: { resumeText: string }) {
   );
 }
 import { matchJd, resumeToText } from "@/lib/jdMatcher";
-import JOBS, { type Job } from "@/lib/jobPool";
+import JOBS, { type Job, type JdTrust, type WorkMode } from "@/lib/jobPool";
 import type { ResumeData } from "@/lib/types";
+
+/* ── DB → Job mapper ───────────────────────────────────────────── */
+function mapDbJob(j: Record<string, unknown>): Job {
+  const postedAt = j.posted_at ? new Date(j.posted_at as string) : new Date();
+  const postedDays = Math.max(0, Math.round((Date.now() - postedAt.getTime()) / 86_400_000));
+  return {
+    id:              String(j.id ?? ""),
+    title:           String(j.title ?? ""),
+    company:         String(j.company ?? ""),
+    logo:            String(j.logo ?? "🏢"),
+    location:        String(j.location ?? "India"),
+    mode:            ((j.mode as string) || "onsite") as WorkMode,
+    exp:             String(j.exp ?? ""),
+    salary:          String(j.salary ?? "Not disclosed"),
+    skills:          Array.isArray(j.skills) ? (j.skills as unknown[]).map(String) : [],
+    postedDays,
+    applicants:      Number(j.applicants ?? 0),
+    trust:           ((j.trust as string) || "medium") as JdTrust,
+    verified:        Boolean(j.verified),
+    ghost:           Boolean(j.ghost),
+    avgResponseDays: Number(j.avg_response_days ?? 30),
+    replyRate:       Number(j.reply_rate ?? 0),
+    jdText:          String(j.jd_text ?? j.description ?? ""),
+  };
+}
 
 /* ── Types ─────────────────────────────────────────────────────── */
 interface ScoredJob extends Job { matchPct: number }
@@ -554,10 +579,12 @@ type Tab = "jobs" | "scanner";
 export default function JobsPage() {
   const [resumeText, setResumeText] = useState("");
   const [filter, setFilter] = useState<Filter>("best");
+  const [jobs, setJobs] = useState<Job[]>(JOBS);
   const [selectedId, setSelectedId] = useState<string>(JOBS[0].id);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>("jobs");
 
+  // Load resume from localStorage
   useEffect(() => {
     try {
       const raw = localStorage.getItem("jobsayer-resume-draft");
@@ -572,14 +599,33 @@ export default function JobsPage() {
     setLoading(false);
   }, []);
 
+  // Fetch live jobs from Supabase — falls back to static JOBS if DB is empty
+  useEffect(() => {
+    let cancelled = false;
+    async function loadJobs() {
+      try {
+        const res = await fetch("/api/jobs");
+        if (!res.ok || cancelled) return;
+        const { jobs: dbJobs } = await res.json();
+        if (!cancelled && Array.isArray(dbJobs) && dbJobs.length > 0) {
+          const mapped = (dbJobs as Record<string, unknown>[]).map(mapDbJob);
+          setJobs(mapped);
+          setSelectedId(mapped[0].id);
+        }
+      } catch { /* keep static fallback */ }
+    }
+    loadJobs();
+    return () => { cancelled = true; };
+  }, []);
+
   const scored: ScoredJob[] = useMemo(() => {
-    return JOBS.map(job => {
+    return jobs.map(job => {
       const result = resumeText
         ? matchJd(resumeText, job.jdText)
         : { score: 0 };
       return { ...job, matchPct: result.score };
     }).sort((a, b) => b.matchPct - a.matchPct);
-  }, [resumeText]);
+  }, [resumeText, jobs]);
 
   const filtered = useMemo(() => {
     if (filter === "remote") return scored.filter(j => j.mode === "remote");
