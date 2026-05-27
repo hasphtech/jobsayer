@@ -1761,8 +1761,10 @@ export default function BuilderPage() {
 
         {/* ── Mobile top bar ─────────────────────────────────── */}
         <header style={{ height: 50, background: "var(--surface)", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", padding: "0 14px", gap: 10, flexShrink: 0, zIndex: 10 }}>
-          <div style={{ width: 28, height: 28, borderRadius: 8, background: "var(--text1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900, color: "var(--bg)", flexShrink: 0 }}>R</div>
-          <span style={{ fontSize: 13, fontWeight: 800, color: "var(--text1)" }}>Resume</span>
+          <a href="/" style={{ display: "flex", alignItems: "center", gap: 6, textDecoration: "none", flexShrink: 0 }}>
+            <div style={{ width: 28, height: 28, borderRadius: 8, background: "var(--text1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900, color: "var(--bg)" }}>J</div>
+            <span style={{ fontSize: 13, fontWeight: 800, color: "var(--text1)" }}>jobSayer</span>
+          </a>
 
           {/* ATS mini bar — clickable → ATS step */}
           <button onClick={() => setStep(STEP_ATS)} title="View ATS breakdown"
@@ -3429,8 +3431,11 @@ export default function BuilderPage() {
       {/* ── Top bar ───────────────────────────────────────────── */}
       <header className="no-print" style={{ height: 54, background: "var(--surface)", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", padding: "0 20px", gap: 14, flexShrink: 0, zIndex: 10 }}>
 
-        {/* Logo */}
-        <div style={{ width: 30, height: 30, borderRadius: 9, background: "var(--text1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "var(--bg)", flexShrink: 0 }}>R</div>
+        {/* Logo — links back to landing page */}
+        <a href="/" style={{ display: "flex", alignItems: "center", gap: 7, textDecoration: "none", flexShrink: 0 }}>
+          <div style={{ width: 30, height: 30, borderRadius: 9, background: "var(--text1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "var(--bg)" }}>J</div>
+          <span style={{ fontSize: 14, fontWeight: 800, color: "var(--text1)" }}>jobSayer</span>
+        </a>
 
         {/* Editable resume name */}
         {nameEditing ? (
