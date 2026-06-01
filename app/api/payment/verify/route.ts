@@ -73,21 +73,35 @@ export async function POST(req: NextRequest) {
     { auth: { persistSession: false } }
   );
 
-  const { error } = await serviceDb
-    .from("jobsayer_subscriptions")
-    .upsert({
-      user_id:              user.id,
-      tier:                 plan,
-      status:               "active",
-      interval,
-      expires_at:           expiresAt,
-      cancel_at_period_end: false,
-      updated_at:           new Date().toISOString(),
-    }, { onConflict: "user_id" });
+  const isEmployerPlan = plan === "growth" || plan === "scale";
 
-  if (error) {
-    console.error("Subscription upsert error:", error.message);
-    return NextResponse.json({ error: "Failed to activate subscription" }, { status: 500 });
+  if (isEmployerPlan) {
+    // Update employer_profiles.plan
+    const { error } = await serviceDb
+      .from("employer_profiles")
+      .update({ plan, updated_at: new Date().toISOString() })
+      .eq("user_id", user.id);
+    if (error) {
+      console.error("Employer plan update error:", error.message);
+      return NextResponse.json({ error: "Failed to activate employer plan" }, { status: 500 });
+    }
+  } else {
+    // Candidate subscription upsert
+    const { error } = await serviceDb
+      .from("jobsayer_subscriptions")
+      .upsert({
+        user_id:              user.id,
+        tier:                 plan,
+        status:               "active",
+        interval,
+        expires_at:           expiresAt,
+        cancel_at_period_end: false,
+        updated_at:           new Date().toISOString(),
+      }, { onConflict: "user_id" });
+    if (error) {
+      console.error("Subscription upsert error:", error.message);
+      return NextResponse.json({ error: "Failed to activate subscription" }, { status: 500 });
+    }
   }
 
   return NextResponse.json({ success: true, plan, expiresAt });

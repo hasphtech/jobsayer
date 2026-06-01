@@ -14,8 +14,12 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 const PRICES: Record<string, Record<string, number>> = {
-  starter: { monthly: 19900, annual: 199000 },  // paise (₹199 / ₹1990)
-  pro:     { monthly: 49900, annual: 499000 },  // paise (₹499 / ₹4990)
+  // Candidate plans
+  starter: { monthly:  19900, annual:  199000 },  // ₹199/mo  | ₹1990/yr
+  pro:     { monthly:  49900, annual:  499000 },  // ₹499/mo  | ₹4990/yr
+  // Employer plans
+  growth:  { monthly: 299900, annual: 2990000 },  // ₹2999/mo | ₹29900/yr
+  scale:   { monthly: 799900, annual: 7990000 },  // ₹7999/mo | ₹79900/yr
 };
 
 export async function POST(req: NextRequest) {
