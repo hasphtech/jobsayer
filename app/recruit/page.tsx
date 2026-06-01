@@ -262,10 +262,13 @@ function EmployerPricing({
   return (
     <div>
       <div style={{ textAlign: "center", marginBottom: 32 }}>
+        <div style={{ display: "inline-block", fontSize: 11, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--accent)", background: "var(--accdim)", border: "1px solid var(--accborder)", padding: "4px 14px", borderRadius: 20, marginBottom: 14 }}>
+          Employer Plans
+        </div>
         <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 10 }}>Simple, transparent pricing</h2>
-        <p style={{ fontSize: 14, color: "var(--text3)" }}>Scale your hiring without scaling your costs.</p>
+        <p style={{ fontSize: 14, color: "var(--text3)" }}>Start free. Scale when you're ready to hire more.</p>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 18, maxWidth: 900, margin: "0 auto" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 18, maxWidth: 960, margin: "0 auto" }}>
         {EMP_PLANS.map(plan => (
           <div key={plan.name} style={{
             background: plan.highlight ? "linear-gradient(145deg,rgba(129,140,248,.1),rgba(99,102,241,.06))" : "var(--surface)",
@@ -443,7 +446,7 @@ const MOCK_CANDIDATES = [
 /* ═══════════════════════════════════════════════════════════════
    RECRUITER DASHBOARD
 ═══════════════════════════════════════════════════════════════ */
-function RecruiterDashboard({ profile }: { profile: EmployerProfile }) {
+function RecruiterDashboard({ profile, onViewPricing }: { profile: EmployerProfile; onViewPricing: () => void }) {
   const card: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "20px" };
   const stats = [
     { icon: "💼", label: "Active Jobs",          value: "3",   trend: "+1 this week" },
@@ -467,11 +470,9 @@ function RecruiterDashboard({ profile }: { profile: EmployerProfile }) {
           <Link href="/verify" style={{ padding: "8px 16px", background: profile.plan !== "free" ? "rgba(74,222,128,.08)" : "var(--surface2)", border: `1px solid ${profile.plan !== "free" ? "rgba(74,222,128,.2)" : "var(--border)"}`, borderRadius: 8, color: profile.plan !== "free" ? "#4ade80" : "var(--text3)", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
             🏅 Verify Company
           </Link>
-          {profile.plan === "free" && (
-            <Link href="#pricing" style={{ padding: "8px 16px", background: "var(--accdim)", border: "1px solid var(--accborder)", borderRadius: 8, color: "var(--accent)", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
-              ⚡ Upgrade Plan
-            </Link>
-          )}
+          <button onClick={onViewPricing} style={{ padding: "8px 16px", background: "var(--accdim)", border: "1px solid var(--accborder)", borderRadius: 8, color: "var(--accent)", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+            ⚡ {profile.plan === "free" ? "Upgrade Plan" : "View Plans"}
+          </button>
         </div>
       </div>
 
@@ -627,8 +628,12 @@ export default function RecruitPage() {
           </button>
           {title && <><span style={{ color: "var(--border)", fontSize: 18 }}>›</span><span style={{ fontSize: 14, fontWeight: 600 }}>{title}</span></>}
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           {profile && <span style={{ fontSize: 12, color: "var(--text3)", padding: "6px 12px", background: "var(--surface2)", borderRadius: 7, border: "1px solid var(--border)" }}>🏢 {profile.company_name}</span>}
+          <button onClick={() => { setView("landing"); setTimeout(() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" }), 100); }}
+            style={{ padding: "7px 14px", borderRadius: 8, border: "none", background: "none", color: "var(--text2)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+            Pricing
+          </button>
           <button onClick={() => requireAuth(() => setView("post"))} style={{ padding: "7px 14px", borderRadius: 8, border: "none", background: "var(--accent)", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
             <Plus size={13} /> Post Job
           </button>
@@ -715,7 +720,7 @@ export default function RecruitPage() {
       <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
         <PageNav title="📊 Dashboard" />
         <div style={{ maxWidth: 1000, margin: "0 auto", padding: "28px 20px" }}>
-          <RecruiterDashboard profile={profile} />
+          <RecruiterDashboard profile={profile} onViewPricing={() => { setView("landing"); setTimeout(() => { document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" }); }, 100); }} />
         </div>
       </div>
     );
@@ -733,7 +738,15 @@ export default function RecruitPage() {
           <span style={{ color: "var(--border)", fontSize: 18 }}>›</span>
           <span style={{ fontSize: 14, fontWeight: 700 }}>🏢 For Employers</span>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {/* Pricing always visible in nav */}
+          <a
+            href="#pricing"
+            onClick={() => setView("landing")}
+            style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: "none", color: "var(--text2)", fontSize: 13, fontWeight: 600, cursor: "pointer", textDecoration: "none" }}
+          >
+            Pricing
+          </a>
           {profile ? (
             <button onClick={() => setView("dashboard")} style={{ padding: "7px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--surface2)", color: "var(--text2)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
               📊 Dashboard
@@ -809,7 +822,8 @@ export default function RecruitPage() {
         </div>
 
         {/* ── Pricing ── */}
-        <div id="pricing" style={{ marginBottom: 72 }}>
+        <div id="pricing" style={{ marginBottom: 72, scrollMarginTop: 72 }}>
+          <hr style={{ border: "none", borderTop: "1px solid var(--border)", marginBottom: 64 }} />
           {/* Interval toggle */}
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
             <div style={{ display: "flex", gap: 2, background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 10, padding: 4 }}>
