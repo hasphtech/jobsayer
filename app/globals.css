@@ -3,23 +3,27 @@
 
 /* ─── Design tokens — Dark (default) ───────────────────────── */
 :root {
-  --bg:        #0f1117;
-  --surface:   #161b27;
-  --surface2:  #1e2535;
-  --border:    rgba(255,255,255,0.08);
-  --border2:   rgba(255,255,255,0.04);
-  --text1:     #f1f5f9;
-  --text2:     #94a3b8;
-  --text3:     #64748b;
-  --accent:    #818cf8;   /* indigo — distinct from billing's teal */
-  --accdim:    rgba(129,140,248,0.10);
-  --accborder: rgba(129,140,248,0.25);
-  --danger:    #f87171;
-  --dangerdim: rgba(248,113,113,0.10);
-  --success:   #4ade80;
-  --warn:      #fbbf24;
+  --bg:        #08080c;
+  --surface:   #111118;
+  --surface2:  #18181f;
+  --border:    rgba(255,255,255,0.06);
+  --border2:   rgba(255,255,255,0.03);
+  --text1:     #fafafa;
+  --text2:     #a1a1aa;
+  --text3:     #71717a;
+  --accent:    #6366f1;   /* indigo-500 — sharper, more modern */
+  --accdim:    rgba(99,102,241,0.10);
+  --accborder: rgba(99,102,241,0.25);
+  --danger:    #ef4444;
+  --dangerdim: rgba(239,68,68,0.10);
+  --success:   #22c55e;
+  --warn:      #eab308;
   --radius:    10px;
-  --shadow:    0 4px 24px rgba(0,0,0,0.4);
+  --shadow:    0 4px 24px rgba(0,0,0,0.5);
+
+  /* new tokens */
+  --surface-hover: rgba(255,255,255,0.04);
+  --border-strong: rgba(255,255,255,0.12);
 }
 
 /* ─── Light theme override ──────────────────────────────────── */
@@ -56,13 +60,13 @@ body {
   min-height: 100dvh;
 }
 
-h1,h2,h3,h4,h5,h6 { font-weight: 700; line-height: 1.2; }
+h1,h2,h3,h4,h5,h6 { font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; }
 button, input, select, textarea { font-family: inherit; }
 
 input, select, textarea {
   background: var(--surface2);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 8px;
   color: var(--text1);
   font-size: 13px;
   padding: 8px 10px;
@@ -106,6 +110,32 @@ a:hover { opacity: .85; }
 
 .pg    { max-width: 1280px; margin: 0 auto; width: 100%; padding: 28px 24px 60px; }
 .pg-sm { max-width: 860px;  margin: 0 auto; width: 100%; padding: 28px 24px 60px; }
+
+/* ─── Utility ─────────────────────────────────────────────── */
+.grad-text {
+  background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 12px; border-radius: 99px;
+  font-size: 12px; font-weight: 500;
+  border: 1px solid var(--border); color: var(--text3);
+  background: none; cursor: pointer; transition: all .18s;
+  white-space: nowrap; font-family: inherit;
+}
+.pill:hover { background: var(--surface-hover); color: var(--text1); border-color: rgba(255,255,255,.12); }
+.pill.active { background: var(--accdim); border-color: var(--accborder); color: var(--accent); }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+}
+.score-ring { transform: rotate(-90deg); }
+@keyframes ringIn { from { stroke-dashoffset: 999; } }
 
 @media (max-width: 768px) {
   body { font-size: 13px; }

@@ -271,7 +271,7 @@ function EmployerPricing({
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 18, maxWidth: 960, margin: "0 auto" }}>
         {EMP_PLANS.map(plan => (
           <div key={plan.name} style={{
-            background: plan.highlight ? "linear-gradient(145deg,rgba(129,140,248,.1),rgba(99,102,241,.06))" : "var(--surface)",
+            background: plan.highlight ? "linear-gradient(145deg,rgba(99,102,241,.1),rgba(99,102,241,.06))" : "var(--surface)",
             border: `1.5px solid ${plan.highlight ? "var(--accborder)" : "var(--border)"}`,
             borderRadius: 16, padding: "28px 22px", position: "relative",
             display: "flex", flexDirection: "column",
@@ -298,7 +298,7 @@ function EmployerPricing({
                 )}
               </div>
               {plan.price.monthly > 0 && interval === "annual" && (
-                <div style={{ fontSize: 11, color: "#4ade80", marginTop: 4 }}>
+                <div style={{ fontSize: 11, color: "var(--success)", marginTop: 4 }}>
                   Billed ₹{plan.price.annual}/yr — save {Math.round((plan.price.monthly * 12 - plan.price.annual) / (plan.price.monthly * 12) * 100)}%
                 </div>
               )}
@@ -318,7 +318,7 @@ function EmployerPricing({
               disabled={!!payLoading || plan.price.monthly === 0}
               style={{
                 width: "100%", padding: "12px", borderRadius: 9, border: plan.ctaStyle === "ghost" ? "1px solid var(--border)" : "none",
-                background: plan.ctaStyle === "primary" ? "var(--accent)" : plan.ctaStyle === "secondary" ? "rgba(129,140,248,.15)" : "var(--surface2)",
+                background: plan.ctaStyle === "primary" ? "var(--accent)" : plan.ctaStyle === "secondary" ? "rgba(99,102,241,.15)" : "var(--surface2)",
                 color: plan.ctaStyle === "primary" ? "#fff" : plan.ctaStyle === "secondary" ? "var(--accent)" : "var(--text2)",
                 fontSize: 14, fontWeight: 700, cursor: plan.price.monthly === 0 ? "default" : "pointer",
                 fontFamily: "inherit",
@@ -417,8 +417,8 @@ function PostJobForm({ onSuccess }: { onSuccess: () => void }) {
           rows={7} placeholder="Describe the role, responsibilities, and ideal candidate… (50+ words required)"
           style={{ ...input, resize: "vertical", lineHeight: 1.6 }} />
       </div>
-      {error && <div style={{ fontSize: 13, color: "var(--danger)", padding: "10px 14px", background: "rgba(248,113,113,.08)", borderRadius: 8 }}>{error}</div>}
-      <div style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(129,140,248,.06)", border: "1px solid var(--accborder)", fontSize: 12, color: "var(--text2)" }}>
+      {error && <div style={{ fontSize: 13, color: "var(--danger)", padding: "10px 14px", background: "rgba(239,68,68,.08)", borderRadius: 8 }}>{error}</div>}
+      <div style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(99,102,241,.06)", border: "1px solid var(--accborder)", fontSize: 12, color: "var(--text2)" }}>
         🤖 jobSayer AI will match your JD against our candidate pool and rank by fit score. Your job goes live after admin review (usually within 24 hours).
       </div>
       <button type="submit" disabled={submitting} style={{
@@ -454,7 +454,7 @@ function RecruiterDashboard({ profile, onViewPricing }: { profile: EmployerProfi
     { icon: "📨", label: "Interview Invites",    value: "18",  trend: "5 pending reply" },
     { icon: "✅", label: "Offers Extended",      value: "2",   trend: "1 accepted" },
   ];
-  const planColor = profile.plan === "scale" ? "var(--accent)" : profile.plan === "growth" ? "#fbbf24" : "var(--text3)";
+  const planColor = profile.plan === "scale" ? "var(--accent)" : profile.plan === "growth" ? "var(--warn)" : "var(--text3)";
   return (
     <div>
       {/* Welcome strip */}
@@ -467,7 +467,7 @@ function RecruiterDashboard({ profile, onViewPricing }: { profile: EmployerProfi
           </div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <Link href="/verify" style={{ padding: "8px 16px", background: profile.plan !== "free" ? "rgba(74,222,128,.08)" : "var(--surface2)", border: `1px solid ${profile.plan !== "free" ? "rgba(74,222,128,.2)" : "var(--border)"}`, borderRadius: 8, color: profile.plan !== "free" ? "#4ade80" : "var(--text3)", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
+          <Link href="/verify" style={{ padding: "8px 16px", background: profile.plan !== "free" ? "rgba(34,197,94,.08)" : "var(--surface2)", border: `1px solid ${profile.plan !== "free" ? "rgba(34,197,94,.2)" : "var(--border)"}`, borderRadius: 8, color: profile.plan !== "free" ? "var(--success)" : "var(--text3)", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
             🏅 Verify Company
           </Link>
           <button onClick={onViewPricing} style={{ padding: "8px 16px", background: "var(--accdim)", border: "1px solid var(--accborder)", borderRadius: 8, color: "var(--accent)", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
@@ -483,7 +483,7 @@ function RecruiterDashboard({ profile, onViewPricing }: { profile: EmployerProfi
             <div style={{ fontSize: 24, marginBottom: 6 }}>{s.icon}</div>
             <div style={{ fontSize: 26, fontWeight: 800, color: "var(--text1)", lineHeight: 1 }}>{s.value}</div>
             <div style={{ fontSize: 12, color: "var(--text2)", marginTop: 4, fontWeight: 600 }}>{s.label}</div>
-            <div style={{ fontSize: 11, color: "#4ade80", marginTop: 2 }}>{s.trend}</div>
+            <div style={{ fontSize: 11, color: "var(--success)", marginTop: 2 }}>{s.trend}</div>
           </div>
         ))}
       </div>
@@ -589,7 +589,7 @@ export default function RecruitPage() {
           description: `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan (${interval})`,
           image: "/logo.png",
           prefill: { email: user.email ?? "", name: user.user_metadata?.full_name ?? profile?.company_name ?? "" },
-          theme: { color: "#818cf8" },
+          theme: { color: "var(--accent)" },
           handler: async (resp: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
             const verifyRes = await fetch("/api/payment/verify", {
               method: "POST", headers: { "Content-Type": "application/json" },
@@ -682,7 +682,7 @@ export default function RecruitPage() {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             {filteredCandidates.map(c => {
-              const scoreColor = c.score >= 80 ? "#4ade80" : c.score >= 70 ? "#fbbf24" : "#f87171";
+              const scoreColor = c.score >= 80 ? "var(--success)" : c.score >= 70 ? "var(--warn)" : "var(--danger)";
               return (
                 <div key={c.id} style={{ ...card, borderRadius: 14 }}>
                   <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
@@ -698,7 +698,7 @@ export default function RecruitPage() {
                     </div>
                   </div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 12 }}>
-                    {c.skills.map(s => <span key={s} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, fontWeight: 500, background: "rgba(129,140,248,.08)", color: "var(--accent)", border: "1px solid var(--accborder)" }}>{s}</span>)}
+                    {c.skills.map(s => <span key={s} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, fontWeight: 500, background: "rgba(99,102,241,.08)", color: "var(--accent)", border: "1px solid var(--accborder)" }}>{s}</span>)}
                   </div>
                   <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
                     <button style={{ padding: "6px 14px", border: "1px solid var(--border)", borderRadius: 7, fontSize: 12, fontWeight: 600, color: "var(--text2)", background: "var(--surface2)", cursor: "pointer" }}>View Profile</button>
@@ -841,14 +841,14 @@ export default function RecruitPage() {
           </div>
           <EmployerPricing interval={interval} onUpgrade={handleUpgrade} payLoading={payLoading} />
           {payError && (
-            <div style={{ maxWidth: 500, margin: "16px auto 0", padding: "12px 16px", background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.3)", borderRadius: 10, fontSize: 13, color: "#f87171", textAlign: "center" }}>
+            <div style={{ maxWidth: 500, margin: "16px auto 0", padding: "12px 16px", background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.3)", borderRadius: 10, fontSize: 13, color: "var(--danger)", textAlign: "center" }}>
               {payError}
             </div>
           )}
         </div>
 
         {/* Bottom CTA */}
-        <div style={{ ...card, textAlign: "center", padding: "48px", background: "linear-gradient(135deg,rgba(129,140,248,.08),rgba(99,102,241,.04))", borderColor: "var(--accborder)" }}>
+        <div style={{ ...card, textAlign: "center", padding: "48px", background: "linear-gradient(135deg,rgba(99,102,241,.08),rgba(99,102,241,.04))", borderColor: "var(--accborder)" }}>
           <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 12 }}>Start hiring smarter today</h2>
           <p style={{ fontSize: 14, color: "var(--text3)", marginBottom: 24 }}>Post your first job in under 5 minutes — free to start, no credit card required.</p>
           <button onClick={() => requireAuth(() => setView("post"))} style={{ padding: "14px 36px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>

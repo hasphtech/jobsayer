@@ -204,9 +204,9 @@ function JdScannerTab({ resumeText }: { resumeText: string }) {
               width: 72, height: 72, borderRadius: "50%", flexShrink: 0,
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: 22, fontWeight: 800,
-              background: result.trustScore >= 75 ? "rgba(74,222,128,.12)" : result.trustScore >= 50 ? "rgba(251,191,36,.12)" : "rgba(248,113,113,.12)",
-              border: `3px solid ${result.trustScore >= 75 ? "#4ade80" : result.trustScore >= 50 ? "#fbbf24" : "#f87171"}`,
-              color: result.trustScore >= 75 ? "#4ade80" : result.trustScore >= 50 ? "#fbbf24" : "#f87171",
+              background: result.trustScore >= 75 ? "rgba(34,197,94,.12)" : result.trustScore >= 50 ? "rgba(234,179,8,.12)" : "rgba(239,68,68,.12)",
+              border: `3px solid ${result.trustScore >= 75 ? "var(--success)" : result.trustScore >= 50 ? "var(--warn)" : "var(--danger)"}`,
+              color: result.trustScore >= 75 ? "var(--success)" : result.trustScore >= 50 ? "var(--warn)" : "var(--danger)",
             }}>{result.trustScore}</div>
             <div>
               <div style={{ fontSize: 18, fontWeight: 700, color: "var(--text1)" }}>{result.verdict}</div>
@@ -219,7 +219,7 @@ function JdScannerTab({ resumeText }: { resumeText: string }) {
             <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>🔍 Analysis Signals</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {result.signals.map((sig, i) => {
-                const c = sig.severity === "red" ? "#f87171" : sig.severity === "amber" ? "#fbbf24" : "#4ade80";
+                const c = sig.severity === "red" ? "var(--danger)" : sig.severity === "amber" ? "var(--warn)" : "var(--success)";
                 return (
                   <div key={i} style={{
                     padding: "10px 14px", borderRadius: 8, borderLeft: `3px solid ${c}`,
@@ -237,8 +237,8 @@ function JdScannerTab({ resumeText }: { resumeText: string }) {
 
           {/* Red flags */}
           {result.redFlags.length > 0 && (
-            <div style={{ ...card, borderLeft: "3px solid #f87171" }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#f87171", marginBottom: 10 }}>🚨 Red Flags</div>
+            <div style={{ ...card, borderLeft: "3px solid var(--danger)" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--danger)", marginBottom: 10 }}>🚨 Red Flags</div>
               {result.redFlags.map((f, i) => (
                 <div key={i} style={{ fontSize: 13, color: "var(--text2)", marginBottom: 4 }}>• {f}</div>
               ))}
@@ -258,24 +258,24 @@ function JdScannerTab({ resumeText }: { resumeText: string }) {
                 <div style={{ fontSize: 13, fontWeight: 700 }}>🎯 Your Resume Match</div>
                 <div style={{
                   fontSize: 18, fontWeight: 800,
-                  color: result.resumeMatch >= 70 ? "#4ade80" : result.resumeMatch >= 45 ? "#fbbf24" : "#f87171",
+                  color: result.resumeMatch >= 70 ? "var(--success)" : result.resumeMatch >= 45 ? "var(--warn)" : "var(--danger)",
                 }}>{result.resumeMatch}%</div>
               </div>
               <div style={{ height: 6, background: "rgba(255,255,255,.06)", borderRadius: 3, marginBottom: 14 }}>
                 <div style={{
                   height: "100%", borderRadius: 3,
                   width: `${result.resumeMatch}%`,
-                  background: result.resumeMatch >= 70 ? "#4ade80" : result.resumeMatch >= 45 ? "#fbbf24" : "#f87171",
+                  background: result.resumeMatch >= 70 ? "var(--success)" : result.resumeMatch >= 45 ? "var(--warn)" : "var(--danger)",
                   transition: "width .7s ease",
                 }} />
               </div>
 
               {result.matchFound.length > 0 && (
                 <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "#4ade80", marginBottom: 6 }}>✅ Skills you have ({result.matchFound.length})</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--success)", marginBottom: 6 }}>✅ Skills you have ({result.matchFound.length})</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                     {result.matchFound.slice(0, 12).map(s => (
-                      <span key={s} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(74,222,128,.08)", color: "#4ade80", border: "1px solid rgba(74,222,128,.2)", fontWeight: 500 }}>{s}</span>
+                      <span key={s} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(34,197,94,.08)", color: "var(--success)", border: "1px solid rgba(34,197,94,.2)", fontWeight: 500 }}>{s}</span>
                     ))}
                   </div>
                 </div>
@@ -283,10 +283,10 @@ function JdScannerTab({ resumeText }: { resumeText: string }) {
 
               {result.matchMissing.length > 0 && (
                 <div>
-                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "#f87171", marginBottom: 6 }}>❌ Missing skills ({result.matchMissing.length})</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--danger)", marginBottom: 6 }}>❌ Missing skills ({result.matchMissing.length})</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                     {result.matchMissing.map(s => (
-                      <span key={s} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(248,113,113,.08)", color: "#f87171", border: "1px solid rgba(248,113,113,.2)", fontWeight: 500, textDecoration: "line-through", opacity: .8 }}>{s}</span>
+                      <span key={s} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(239,68,68,.08)", color: "var(--danger)", border: "1px solid rgba(239,68,68,.2)", fontWeight: 500, textDecoration: "line-through", opacity: .8 }}>{s}</span>
                     ))}
                   </div>
                 </div>
@@ -312,9 +312,9 @@ function JdScannerTab({ resumeText }: { resumeText: string }) {
           {!resumeText && (
             <div style={{
               ...card, textAlign: "center",
-              background: "rgba(251,191,36,.06)", borderColor: "rgba(251,191,36,.2)",
+              background: "rgba(234,179,8,.06)", borderColor: "rgba(234,179,8,.2)",
             }}>
-              <div style={{ fontSize: 13, color: "#fbbf24", marginBottom: 8 }}>
+              <div style={{ fontSize: 13, color: "var(--warn)", marginBottom: 8 }}>
                 ⚠ No resume found — can't compute your match against this JD.
               </div>
               <Link href="/builder" style={{
@@ -367,12 +367,12 @@ interface ScoredJob extends Job { matchPct: number }
 
 /* ── Helpers ───────────────────────────────────────────────────── */
 function matchColor(pct: number) {
-  return pct >= 75 ? "#4ade80" : pct >= 55 ? "#fbbf24" : "#f87171";
+  return pct >= 75 ? "var(--success)" : pct >= 55 ? "var(--warn)" : "var(--danger)";
 }
 function trustLabel(t: Job["trust"]) {
-  return t === "high" ? { label: "🛡 JD Trust: High",   bg: "rgba(74,222,128,.1)",   color: "#4ade80"  }
-       : t === "medium" ? { label: "⚠ JD Trust: Medium", bg: "rgba(251,191,36,.1)",  color: "#fbbf24" }
-       : { label: "🔍 Unverified",                        bg: "rgba(248,113,113,.08)", color: "#f87171" };
+  return t === "high" ? { label: "🛡 JD Trust: High",   bg: "rgba(34,197,94,.1)",   color: "var(--success)"  }
+       : t === "medium" ? { label: "⚠ JD Trust: Medium", bg: "rgba(234,179,8,.1)",  color: "var(--warn)" }
+       : { label: "🔍 Unverified",                        bg: "rgba(239,68,68,.08)", color: "var(--danger)" };
 }
 function daysAgo(d: number) {
   return d === 0 ? "Posted today" : d === 1 ? "1 day ago" : `${d} days ago`;
@@ -397,7 +397,7 @@ function SaveJobButton({ jobId }: { jobId: string }) {
     <button onClick={toggle} title={saved ? "Unsave" : "Save job"} style={{
       padding: "5px 12px", border: "1px solid var(--border)", borderRadius: 7,
       fontSize: 12, fontWeight: 600, cursor: "pointer",
-      background: saved ? "rgba(129,140,248,.12)" : "var(--surface2)",
+      background: saved ? "rgba(99,102,241,.12)" : "var(--surface2)",
       color: saved ? "var(--accent)" : "var(--text2)",
     }}>{saved ? "🔖 Saved" : "🔖 Save"}</button>
   );
@@ -405,79 +405,45 @@ function SaveJobButton({ jobId }: { jobId: string }) {
 
 /* ── Job Card ───────────────────────────────────────────────────── */
 function JobCard({ job, selected, onClick }: { job: ScoredJob; selected: boolean; onClick: () => void }) {
-  const trust = trustLabel(job.trust);
   const mColor = matchColor(job.matchPct);
 
   return (
     <div
       onClick={onClick}
       style={{
-        background: "var(--surface)",
-        border: `1.5px solid ${selected ? "var(--accent)" : "var(--border)"}`,
-        borderRadius: 14, padding: "18px", cursor: "pointer",
-        transition: "border-color .15s, box-shadow .15s",
-        boxShadow: selected ? "0 4px 20px rgba(129,140,248,.15)" : "none",
-        opacity: job.ghost ? .7 : 1,
+        padding: "16px 20px",
+        borderBottom: "1px solid var(--border)",
+        borderLeft: `2px solid ${selected ? "var(--accent)" : "transparent"}`,
+        cursor: "pointer", background: selected ? "rgba(99,102,241,.04)" : "none",
+        transition: "background .15s, border-left-color .15s",
+        opacity: job.ghost ? .75 : 1,
       }}
+      onMouseEnter={e => { if (!selected) e.currentTarget.style.background = "rgba(255,255,255,.02)"; }}
+      onMouseLeave={e => { if (!selected) e.currentTarget.style.background = "none"; }}
     >
       {/* Top row */}
-      <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
-        <div style={{
-          width: 44, height: 44, borderRadius: 10, flexShrink: 0,
-          background: "var(--surface2)", border: "1px solid var(--border)",
-          display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20,
-        }}>{job.logo}</div>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)" }}>{job.title}</div>
-          <div style={{ fontSize: 13, color: "var(--text2)", fontWeight: 500 }}>{job.company} · {job.location}</div>
-          <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 2, display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <span>{job.exp}</span><span>{job.salary}</span>
-            <span style={{ textTransform: "capitalize" }}>{job.mode}</span>
-            {job.verified && (
-              <span style={{ fontSize: 10, fontWeight: 600, padding: "1px 7px", borderRadius: 10, background: "rgba(129,140,248,.1)", color: "var(--accent)", border: "1px solid var(--accborder)" }}>✓ Verified</span>
-            )}
-          </div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", marginBottom: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{job.title}</div>
+          <div style={{ fontSize: 12, color: "var(--text2)" }}>{job.company} · {job.location}</div>
         </div>
-        <div style={{ flexShrink: 0, textAlign: "center" }}>
-          <div style={{ fontSize: 20, fontWeight: 800, color: mColor, lineHeight: 1 }}>{job.matchPct}%</div>
-          <div style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".04em", color: "var(--text3)" }}>match</div>
+        <div style={{ textAlign: "right", flexShrink: 0, marginLeft: 12 }}>
+          <div style={{ fontSize: 20, fontWeight: 800, color: mColor, lineHeight: 1, letterSpacing: "-.02em" }}>{job.matchPct}<span style={{ fontSize: 11, fontWeight: 500 }}>%</span></div>
+          <div style={{ fontSize: 10, color: "var(--text3)" }}>match</div>
         </div>
       </div>
 
-      {/* Tags */}
-      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
-        {job.postedDays <= 1 && (
-          <span style={{ fontSize: 11, padding: "3px 9px", borderRadius: 20, background: "rgba(129,140,248,.1)", color: "var(--accent)", fontWeight: 500 }}>
-            {daysAgo(job.postedDays)}
-          </span>
-        )}
-        {job.ghost && (
-          <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 10, background: "rgba(251,191,36,.1)", color: "#fbbf24" }}>⚠ Possible ghost job</span>
-        )}
-        <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 10, background: trust.bg, color: trust.color }}>{trust.label}</span>
-        {job.verified && (
-          <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 9px", borderRadius: 10, background: "rgba(74,222,128,.1)", color: "#4ade80", border: "1px solid rgba(74,222,128,.25)" }}>🏅 Verified Employer</span>
-        )}
-      </div>
-
-      {/* Skills */}
-      <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 12 }}>
-        {job.skills.slice(0, 6).map(sk => {
-          const inResume = (window as any).__jsResumeText?.toLowerCase().includes(sk);
-          return (
-            <span key={sk} style={{
-              fontSize: 11, padding: "3px 9px", borderRadius: 6, fontWeight: 500,
-              background: inResume ? "rgba(74,222,128,.08)" : "rgba(248,113,113,.08)",
-              color: inResume ? "#4ade80" : "#f87171",
-              border: `1px solid ${inResume ? "rgba(74,222,128,.2)" : "rgba(248,113,113,.2)"}`,
-              textDecoration: inResume ? "none" : "line-through", opacity: inResume ? 1 : .8,
-            }}>{sk}</span>
-          );
-        })}
+      {/* Tags row */}
+      <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+        <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 99, background: "rgba(255,255,255,.05)", color: "var(--text2)", border: "1px solid var(--border)" }}>{job.mode}</span>
+        <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 99, background: "rgba(255,255,255,.05)", color: "var(--text2)", border: "1px solid var(--border)" }}>{job.salary}</span>
+        {job.postedDays <= 1 && <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 99, background: "var(--accdim)", color: "var(--accent)", border: "1px solid var(--accborder)" }}>{daysAgo(job.postedDays)}</span>}
+        {job.ghost && <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 99, background: "rgba(234,179,8,.08)", color: "var(--warn)", border: "1px solid rgba(234,179,8,.2)" }}>⚠ Ghost risk</span>}
+        {job.verified && <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 99, background: "rgba(34,197,94,.08)", color: "var(--success)", border: "1px solid rgba(34,197,94,.15)" }}>✓ Verified</span>}
       </div>
 
       {/* Footer */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 10 }}>
         <span style={{ fontSize: 11, color: "var(--text3)" }}>
           {daysAgo(job.postedDays)} · {job.applicants > 0 ? `${job.applicants} applicants` : "No data"}
         </span>
@@ -506,77 +472,70 @@ function JobCard({ job, selected, onClick }: { job: ScoredJob; selected: boolean
 /* ── Detail Panel ───────────────────────────────────────────────── */
 function DetailPanel({ job, resumeText }: { job: ScoredJob; resumeText: string }) {
   const mColor = matchColor(job.matchPct);
-  const trust = trustLabel(job.trust);
   const rt = resumeText.toLowerCase();
+  const circ = 2 * Math.PI * 22;
+  const matched = job.skills.filter(s => rt.includes(s)).length;
 
   return (
-    <div style={{
-      background: "var(--surface)", border: "1.5px solid var(--border)",
-      borderRadius: 16, padding: 22, position: "sticky", top: 72, height: "fit-content",
-    }}>
-      {/* Company */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-        <div style={{ width: 52, height: 52, borderRadius: 12, background: "var(--surface2)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>{job.logo}</div>
+    <div style={{ padding: "20px", position: "sticky", top: 56 }}>
+      {/* Company header */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
+        <div style={{ width: 44, height: 44, borderRadius: 10, background: "var(--surface2)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>{job.logo}</div>
         <div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: "var(--text1)" }}>{job.title}</div>
-          <div style={{ fontSize: 13, color: "var(--text2)", fontWeight: 500 }}>{job.company}</div>
+          <div style={{ fontSize: 15, fontWeight: 700 }}>{job.title}</div>
+          <div style={{ fontSize: 13, color: "var(--text2)" }}>{job.company}</div>
         </div>
       </div>
 
-      {/* Match pill */}
-      <div style={{
-        display: "flex", alignItems: "center", gap: 10,
-        background: job.matchPct >= 70 ? "rgba(74,222,128,.08)" : "rgba(251,191,36,.08)",
-        borderRadius: 10, padding: "12px 14px", marginBottom: 16,
-        border: `1px solid ${job.matchPct >= 70 ? "rgba(74,222,128,.15)" : "rgba(251,191,36,.15)"}`,
-      }}>
-        <div style={{
-          width: 44, height: 44, borderRadius: "50%", flexShrink: 0, display: "flex",
-          alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800,
-          background: `linear-gradient(135deg,${mColor}88,${mColor})`, color: "#000",
-        }}>{job.matchPct}%</div>
+      {/* Score ring + match */}
+      <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px", background: `${mColor}0d`, border: `1px solid ${mColor}30`, borderRadius: 12, marginBottom: 16 }}>
+        <div style={{ position: "relative", width: 52, height: 52, flexShrink: 0 }}>
+          <svg width="52" height="52" style={{ transform: "rotate(-90deg)" }}>
+            <circle cx="26" cy="26" r="22" fill="none" stroke="rgba(255,255,255,.06)" strokeWidth="5" />
+            <circle cx="26" cy="26" r="22" fill="none" stroke={mColor} strokeWidth="5" strokeLinecap="round"
+              strokeDasharray={circ} strokeDashoffset={circ * (1 - job.matchPct / 100)} />
+          </svg>
+          <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", fontSize: 12, fontWeight: 800, color: mColor }}>{job.matchPct}</div>
+        </div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)" }}>
-            {job.matchPct >= 75 ? "Strong match" : job.matchPct >= 55 ? "Good match" : "Partial match"}
-          </div>
-          <div style={{ fontSize: 11, color: "var(--text2)" }}>
-            {job.skills.filter(s => rt.includes(s)).length} of {job.skills.length} required skills matched
-          </div>
+          <div style={{ fontSize: 13, fontWeight: 700 }}>{job.matchPct >= 75 ? "Strong match" : job.matchPct >= 55 ? "Good match" : "Partial match"}</div>
+          <div style={{ fontSize: 11, color: "var(--text2)", marginTop: 2 }}>{matched} of {job.skills.length} skills matched</div>
         </div>
       </div>
 
       {/* Details */}
-      {[
-        { icon: "💰", text: job.salary },
-        { icon: "📍", text: `${job.location} · ${job.mode.charAt(0).toUpperCase() + job.mode.slice(1)}` },
-        { icon: "🧑‍💻", text: `${job.exp} experience` },
-        { icon: "⏱", text: `${daysAgo(job.postedDays)} · ${job.applicants} applicants` },
-      ].map(row => (
-        <div key={row.text} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 7, fontSize: 13, color: "var(--text2)" }}>
-          <span style={{ fontSize: 14 }}>{row.icon}</span>{row.text}
+      <div style={{ display: "flex", flexDirection: "column", gap: 7, marginBottom: 14 }}>
+        {[
+          { icon: "💰", text: job.salary },
+          { icon: "📍", text: `${job.location} · ${job.mode}` },
+          { icon: "🧑‍💻", text: `${job.exp} experience` },
+          { icon: "⏱",  text: `${daysAgo(job.postedDays)} · ${job.applicants || "—"} applicants` },
+        ].map(row => (
+          <div key={row.text} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text2)" }}>
+            <span style={{ fontSize: 14, flexShrink: 0 }}>{row.icon}</span>{row.text}
+          </div>
+        ))}
+        <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 2 }}>
+          {job.verified && <span style={{ fontSize: 10, padding: "2px 9px", borderRadius: 99, background: "rgba(34,197,94,.08)", color: "var(--success)", border: "1px solid rgba(34,197,94,.15)", fontWeight: 600 }}>🏅 Verified Employer</span>}
+          {job.ghost   && <span style={{ fontSize: 10, padding: "2px 9px", borderRadius: 99, background: "rgba(234,179,8,.08)", color: "var(--warn)", border: "1px solid rgba(234,179,8,.2)", fontWeight: 600 }}>⚠ Ghost risk</span>}
         </div>
-      ))}
-      {job.verified && (
-        <div style={{ marginBottom: 7 }}>
-          <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 10, background: "rgba(129,140,248,.1)", color: "var(--accent)", border: "1px solid var(--accborder)" }}>✓ Employer Verified</span>
-        </div>
-      )}
+      </div>
 
-      <hr style={{ border: "none", borderTop: "1px solid var(--border)", margin: "14px 0" }} />
+      <div style={{ height: 1, background: "var(--border)", margin: "14px 0" }} />
 
       {/* Skill fit */}
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".05em", color: "var(--text3)", marginBottom: 8 }}>Your skill fit</div>
+        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".06em", color: "var(--text3)", marginBottom: 8, textTransform: "uppercase" }}>Skill fit</div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
           {job.skills.map(sk => {
             const has = rt.includes(sk);
             return (
               <span key={sk} style={{
-                fontSize: 11, padding: "3px 9px", borderRadius: 6, fontWeight: 500,
-                background: has ? "rgba(74,222,128,.08)" : "rgba(248,113,113,.08)",
-                color: has ? "#4ade80" : "#f87171",
-                border: `1px solid ${has ? "rgba(74,222,128,.2)" : "rgba(248,113,113,.2)"}`,
-                textDecoration: has ? "none" : "line-through", opacity: has ? 1 : .8,
+                fontSize: 11, padding: "3px 9px", borderRadius: 99, fontWeight: 500,
+                background: has ? "rgba(34,197,94,.08)" : "rgba(239,68,68,.06)",
+                color: has ? "var(--success)" : "var(--danger)",
+                border: `1px solid ${has ? "rgba(34,197,94,.2)" : "rgba(239,68,68,.15)"}`,
+                textDecoration: has ? "none" : "line-through", opacity: has ? 1 : .7,
               }}>{sk} {has ? "✓" : "✗"}</span>
             );
           })}
@@ -608,7 +567,7 @@ function DetailPanel({ job, resumeText }: { job: ScoredJob; resumeText: string }
 
       {job.avgResponseDays < 10 && (
         <div style={{ marginTop: 12, fontSize: 11, color: "var(--text3)", textAlign: "center" }}>
-          {job.company} avg response: <strong style={{ color: "#4ade80" }}>{job.avgResponseDays} days</strong> · Reply rate: <strong style={{ color: "#4ade80" }}>{job.replyRate}%</strong>
+          {job.company} avg response: <strong style={{ color: "var(--success)" }}>{job.avgResponseDays} days</strong> · Reply rate: <strong style={{ color: "var(--success)" }}>{job.replyRate}%</strong>
         </div>
       )}
     </div>
@@ -684,54 +643,55 @@ export default function JobsPage() {
     </div>
   );
 
-  const filterBtnStyle = (f: Filter): React.CSSProperties => ({
-    display: "flex", alignItems: "center", gap: 5,
-    padding: "6px 14px", border: "1px solid",
+  const chip = (f: Filter): React.CSSProperties => ({
+    padding: "6px 16px", border: "1px solid",
     borderColor: filter === f ? "var(--accborder)" : "var(--border)",
-    borderRadius: 20, fontSize: 12, fontWeight: 500,
+    borderRadius: 99, fontSize: 12, fontWeight: 500,
     color: filter === f ? "var(--accent)" : "var(--text2)",
-    background: filter === f ? "var(--accdim)" : "var(--surface)",
+    background: filter === f ? "var(--accdim)" : "none",
     cursor: "pointer", whiteSpace: "nowrap" as const,
+    fontFamily: "inherit", transition: "all .18s",
   });
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
       {/* Top bar */}
       <div style={{
-        background: "var(--surface)", borderBottom: "1px solid var(--border)",
+        background: "rgba(8,8,12,.92)", backdropFilter: "blur(16px)",
+        borderBottom: "1px solid var(--border)",
         padding: "0 24px", height: 56, display: "flex", alignItems: "center",
         justifyContent: "space-between", position: "sticky", top: 0, zIndex: 50,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <Link href="/score" style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--text3)", textDecoration: "none", fontSize: 13 }}>
-            <ArrowLeft size={14} /> Score
+          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--text3)", textDecoration: "none", fontSize: 13 }}>
+            <ArrowLeft size={14} />
           </Link>
-          <span style={{ color: "var(--border)", fontSize: 18 }}>›</span>
+          <span style={{ color: "var(--border)" }}>|</span>
           {/* Tab switcher */}
-          <div style={{ display: "flex", gap: 2 }}>
-            <button onClick={() => setTab("jobs")} style={{
-              padding: "5px 14px", borderRadius: 8, border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer",
-              background: tab === "jobs" ? "var(--accdim)" : "transparent",
-              color: tab === "jobs" ? "var(--accent)" : "var(--text3)",
-            }}>💼 Matched Jobs</button>
-            <button onClick={() => setTab("scanner")} style={{
-              padding: "5px 14px", borderRadius: 8, border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer",
-              background: tab === "scanner" ? "var(--accdim)" : "transparent",
-              color: tab === "scanner" ? "var(--accent)" : "var(--text3)",
-            }}>🔍 JD Scanner</button>
+          <div style={{ display: "flex", gap: 1, background: "rgba(255,255,255,.05)", borderRadius: 10, padding: 3 }}>
+            {(["jobs", "scanner"] as Tab[]).map(t => (
+              <button key={t} onClick={() => setTab(t)} style={{
+                padding: "5px 16px", borderRadius: 8, border: "none", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "inherit",
+                background: tab === t ? "var(--surface)" : "transparent",
+                color: tab === t ? "var(--text1)" : "var(--text3)",
+                transition: "all .18s", letterSpacing: "-.01em",
+              }}>
+                {t === "jobs" ? "Matched Jobs" : "JD Scanner"}
+              </button>
+            ))}
           </div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <Link href="/score" style={{
             display: "flex", alignItems: "center", gap: 6, padding: "7px 14px",
             background: "var(--accdim)", border: "1px solid var(--accborder)",
-            borderRadius: 8, color: "var(--accent)", fontSize: 13, fontWeight: 600, textDecoration: "none",
+            borderRadius: 9, color: "var(--accent)", fontSize: 13, fontWeight: 600, textDecoration: "none",
           }}>
-            <Target size={13} /> My Score
+            <Target size={13} /> Score
           </Link>
           <Link href="/builder" style={{
-            display: "flex", alignItems: "center", gap: 6, padding: "7px 14px",
-            background: "var(--accent)", borderRadius: 8, color: "#fff", fontSize: 13, fontWeight: 600, textDecoration: "none",
+            padding: "7px 16px", background: "var(--accent)", borderRadius: 9,
+            color: "#fff", fontSize: 13, fontWeight: 600, textDecoration: "none",
           }}>
             Edit Resume
           </Link>
@@ -749,26 +709,22 @@ export default function JobsPage() {
           <JdScannerTab resumeText={resumeText} />
         </div>
       ) : (
-        <div style={{ maxWidth: 960, margin: "0 auto", padding: "24px 20px" }}>
-          {/* Header + filters */}
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20, gap: 12, flexWrap: "wrap" }}>
-            <div>
-              <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 2 }}>
-                {filtered.filter(j => !j.ghost).length} jobs matched to your resume
-              </h1>
-              <p style={{ fontSize: 13, color: "var(--text3)" }}>Ranked by match score · Updated just now</p>
-            </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button onClick={() => setFilter("best")}   style={filterBtnStyle("best")}>⭐ Best Match</button>
-              <button onClick={() => setFilter("remote")} style={filterBtnStyle("remote")}>🌐 Remote only</button>
-              <button onClick={() => setFilter("fresh")}  style={filterBtnStyle("fresh")}>⚡ Posted today</button>
-            </div>
+        <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0" }}>
+          {/* Pill filters strip */}
+          <div style={{ padding: "10px 20px", borderBottom: "1px solid var(--border)", display: "flex", gap: 6, alignItems: "center", overflowX: "auto", scrollbarWidth: "none" as const }}>
+            <button onClick={() => setFilter("best")}   style={chip("best")}>All jobs</button>
+            <button onClick={() => setFilter("remote")} style={chip("remote")}>🌐 Remote</button>
+            <button onClick={() => setFilter("fresh")}  style={chip("fresh")}>⚡ Today</button>
+            <div style={{ height: 16, width: 1, background: "var(--border)", flexShrink: 0, margin: "0 6px" }} />
+            <span style={{ fontSize: 12, color: "var(--text3)", whiteSpace: "nowrap" as const }}>
+              <span style={{ fontWeight: 700, color: "var(--text1)" }}>{filtered.filter(j => !j.ghost).length}</span> roles · ranked by match
+            </span>
           </div>
 
-          {/* Layout */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 18 }}>
+          {/* Split layout */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", minHeight: "calc(100vh - 112px)" }}>
             {/* Job list */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ borderRight: "1px solid var(--border)", overflowY: "auto" }}>
               {filtered.map(job => (
                 <JobCard
                   key={job.id}
@@ -778,14 +734,16 @@ export default function JobsPage() {
                 />
               ))}
               {filtered.length === 0 && (
-                <div style={{ textAlign: "center", padding: 40, color: "var(--text3)", fontSize: 14 }}>
-                  No jobs match this filter. Try "Best Match".
+                <div style={{ textAlign: "center", padding: 48, color: "var(--text2)", fontSize: 14 }}>
+                  No jobs match this filter.
                 </div>
               )}
             </div>
 
             {/* Detail panel */}
-            {selected && <DetailPanel job={selected} resumeText={resumeText} />}
+            <div style={{ overflowY: "auto" }}>
+              {selected && <DetailPanel job={selected} resumeText={resumeText} />}
+            </div>
           </div>
         </div>
       )}

@@ -58,17 +58,17 @@ function Nav({ user, signIn }: { user: any; signIn: () => void; }) {
     <>
       <nav style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-        background: "rgba(15,17,23,.95)", backdropFilter: "blur(12px)",
+        background: "rgba(8,8,12,.92)", backdropFilter: "blur(16px)",
         borderBottom: "1px solid var(--border)",
         height: 56, display: "flex", alignItems: "center",
-        padding: "0 20px", gap: 12,
+        padding: "0 24px", gap: 12,
       }}>
         {/* Logo */}
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", flexShrink: 0 }}>
+        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 9, textDecoration: "none", flexShrink: 0 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="jobSayer" style={{ width: 28, height: 28, borderRadius: 6, objectFit: "cover" }} />
-          <span style={{ fontSize: 16, fontWeight: 800, color: "var(--text1)", letterSpacing: "-.3px" }}>
-            job<span style={{ color: "var(--accent)" }}>sayer</span>
+          <img src="/logo.png" alt="jobSayer" style={{ width: 26, height: 26, borderRadius: 7, objectFit: "cover" }} />
+          <span style={{ fontSize: 15, fontWeight: 800, color: "var(--text1)", letterSpacing: "-.4px" }}>
+            jobSayer
           </span>
         </Link>
 
@@ -152,7 +152,7 @@ function Nav({ user, signIn }: { user: any; signIn: () => void; }) {
 
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <a href={href} style={{ padding: "6px 11px", color: "var(--text2)", fontSize: 13, fontWeight: 500, textDecoration: "none", borderRadius: 7 }}
+    <a href={href} style={{ padding: "6px 12px", color: "var(--text2)", fontSize: 13, fontWeight: 500, textDecoration: "none", borderRadius: 99, transition: "color .15s" }}
       onMouseEnter={e => (e.currentTarget.style.color = "var(--text1)")}
       onMouseLeave={e => (e.currentTarget.style.color = "var(--text2)")}
     >{children}</a>
@@ -160,7 +160,7 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
 }
 function MobileNavLink({ href, children, onClick }: { href: string; children: React.ReactNode; onClick: () => void }) {
   return (
-    <Link href={href} onClick={onClick} style={{ padding: "11px 14px", color: "var(--text1)", fontSize: 14, fontWeight: 500, textDecoration: "none", borderRadius: 8, background: "var(--surface2)", border: "1px solid var(--border)" }}>
+    <Link href={href} onClick={onClick} style={{ padding: "11px 16px", color: "var(--text1)", fontSize: 14, fontWeight: 500, textDecoration: "none", borderRadius: 10, background: "var(--surface2)", border: "1px solid var(--border)" }}>
       {children}
     </Link>
   );
@@ -342,14 +342,15 @@ function SignInModal({ onClose }: { onClose: () => void }) {
 
 /* ── Shared button styles ───────────────────────────────────── */
 const primaryBtn: React.CSSProperties = {
-  padding: "7px 18px", background: "var(--accent)", borderRadius: 8,
+  padding: "8px 20px", background: "var(--accent)", borderRadius: 9,
   color: "#fff", fontSize: 13, fontWeight: 700, textDecoration: "none",
   border: "none", cursor: "pointer", fontFamily: "inherit", display: "inline-block",
+  letterSpacing: "-.01em",
 };
 const ghostBtn: React.CSSProperties = {
-  padding: "6px 14px", background: "none", border: "1px solid var(--border)",
-  borderRadius: 8, color: "var(--text2)", fontSize: 13, fontWeight: 600,
-  cursor: "pointer", fontFamily: "inherit",
+  padding: "7px 15px", background: "none", border: "1px solid var(--border)",
+  borderRadius: 9, color: "var(--text2)", fontSize: 13, fontWeight: 500,
+  cursor: "pointer", fontFamily: "inherit", transition: "all .18s",
 };
 
 /* ══════════════════════════════════════════════════════════════
@@ -370,89 +371,90 @@ function LandingPage({ signIn }: { signIn: () => void }) {
         padding: mobile ? "100px 20px 60px" : "120px 24px 80px",
         position: "relative",
       }}>
+        {/* Ambient glow */}
         <div style={{
-          position: "absolute", top: "25%", left: "50%", transform: "translateX(-50%)",
-          width: mobile ? 300 : 600, height: mobile ? 300 : 600, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(129,140,248,.1) 0%, transparent 70%)",
+          position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
+          width: mobile ? 400 : 700, height: mobile ? 300 : 500,
+          background: "radial-gradient(ellipse at center top, rgba(99,102,241,.14) 0%, transparent 65%)",
           pointerEvents: "none",
         }} />
 
-        {/* Badge */}
+        {/* Announcement pill */}
         <div style={{
-          display: "inline-flex", alignItems: "center", gap: 6,
-          padding: "5px 14px", borderRadius: 20, marginBottom: 24,
-          background: "rgba(129,140,248,.1)", border: "1px solid var(--accborder)",
-          fontSize: 11, fontWeight: 600, color: "var(--accent)",
+          display: "inline-flex", alignItems: "center", gap: 7,
+          padding: "5px 7px 5px 14px", borderRadius: 99, marginBottom: 28,
+          background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)",
+          fontSize: 12, color: "var(--text2)",
         }}>
-          ✦ AI-Powered Jobs. Smarter Future.
+          <span>BGV verification now live in India</span>
+          <span style={{ background: "var(--accent)", color: "#fff", fontSize: 10, fontWeight: 700, padding: "2px 9px", borderRadius: 99 }}>New</span>
         </div>
 
         {/* Headline */}
         <h1 style={{
-          fontSize: mobile ? 36 : tablet ? 52 : 68,
-          fontWeight: 900, lineHeight: 1.08, letterSpacing: "-2px",
-          marginBottom: 20, maxWidth: 760,
+          fontSize: mobile ? 38 : tablet ? 54 : 64,
+          fontWeight: 800, lineHeight: 1.05, letterSpacing: "-.04em",
+          marginBottom: 20, maxWidth: 700,
+          background: "linear-gradient(160deg, #fff 40%, rgba(255,255,255,.55) 100%)",
+          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
         }}>
-          Land your dream job{mobile ? " " : <br />}
-          <span style={{
-            background: "linear-gradient(135deg, #818cf8, #6366f1, #a78bfa)",
-            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-          }}>faster with AI</span>
+          The smartest way to land your next job
         </h1>
 
         <p style={{
-          fontSize: mobile ? 15 : 18, color: "var(--text2)",
-          maxWidth: 520, lineHeight: 1.7, marginBottom: 36,
-          padding: mobile ? "0 4px" : "0",
+          fontSize: mobile ? 15 : 17, color: "var(--text3)",
+          maxWidth: 500, lineHeight: 1.75, marginBottom: 40,
         }}>
-          Build ATS-ready resumes, get your jobSayer Score, match to verified Indian jobs,
-          and prep for interviews — all in one place.
+          AI resume builder, ATS scoring, JD matching, and ghost-job detection —
+          built for the Indian job market.
         </p>
 
         {/* CTAs */}
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center", marginBottom: 14 }}>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center", marginBottom: 18 }}>
           <Link href="/builder" style={{
-            padding: mobile ? "13px 26px" : "14px 32px",
-            background: "linear-gradient(135deg, #818cf8, #6366f1)",
-            borderRadius: 12, color: "#fff",
+            padding: mobile ? "13px 26px" : "14px 30px",
+            background: "var(--accent)", borderRadius: 12, color: "#fff",
             fontSize: mobile ? 14 : 15, fontWeight: 700, textDecoration: "none",
-            boxShadow: "0 8px 32px rgba(129,140,248,.3)",
-            display: "block",
-          }}>Build your resume free →</Link>
+            display: "inline-flex", alignItems: "center", gap: 7, letterSpacing: "-.01em",
+          }}>⚡ Build my resume — free</Link>
           <button onClick={signIn} style={{
             padding: mobile ? "13px 22px" : "14px 26px",
-            background: "var(--surface)", border: "1px solid var(--border)",
+            background: "rgba(255,255,255,.04)", border: "1px solid var(--border)",
             borderRadius: 12, color: "var(--text1)",
-            fontSize: mobile ? 14 : 15, fontWeight: 600,
-            cursor: "pointer", fontFamily: "inherit",
-          }}>Sign in with Google</button>
+            fontSize: mobile ? 14 : 15, fontWeight: 500,
+            cursor: "pointer", fontFamily: "inherit", letterSpacing: "-.01em",
+          }}>Sign in →</button>
         </div>
-        <p style={{ fontSize: 12, color: "var(--text3)" }}>Free forever · No credit card · 2 min setup</p>
+        <div style={{ display: "flex", gap: 18, justifyContent: "center", flexWrap: "wrap" }}>
+          {["No credit card", "Free forever tier", "2 min setup"].map(t => (
+            <span key={t} style={{ fontSize: 12, color: "var(--text3)", display: "flex", alignItems: "center", gap: 5 }}>
+              <span style={{ color: "var(--accent)", fontSize: 10 }}>✦</span> {t}
+            </span>
+          ))}
+        </div>
 
-        {/* App preview — hidden on small mobile */}
+        {/* App preview */}
         {!mobile && (
           <div style={{
-            marginTop: 56, width: "100%", maxWidth: 820,
+            marginTop: 60, width: "100%", maxWidth: 820,
             background: "var(--surface)", border: "1px solid var(--border)",
-            borderRadius: 20, overflow: "hidden",
-            boxShadow: "0 32px 80px rgba(0,0,0,.5)",
+            borderRadius: 16, overflow: "hidden",
           }}>
-            <div style={{ background: "var(--surface2)", padding: "9px 14px", display: "flex", alignItems: "center", gap: 6, borderBottom: "1px solid var(--border)" }}>
-              {["#f87171","#fbbf24","#4ade80"].map(c => <div key={c} style={{ width: 9, height: 9, borderRadius: "50%", background: c }} />)}
-              <div style={{ marginLeft: 8, fontSize: 10, color: "var(--text3)", background: "var(--surface)", borderRadius: 5, padding: "2px 10px", border: "1px solid var(--border)" }}>jobsayer.com/score</div>
+            <div style={{ background: "var(--surface2)", padding: "10px 16px", display: "flex", alignItems: "center", gap: 6, borderBottom: "1px solid var(--border)" }}>
+              {["#ef4444","#eab308","#22c55e"].map(c => <div key={c} style={{ width: 9, height: 9, borderRadius: "50%", background: c, opacity: .7 }} />)}
+              <div style={{ marginLeft: 10, fontSize: 10, color: "var(--text3)", background: "rgba(255,255,255,.04)", borderRadius: 6, padding: "2px 12px", border: "1px solid var(--border)" }}>jobsayer.com/score</div>
             </div>
-            <div style={{ padding: "20px 24px", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
+            <div style={{ padding: "22px 24px", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
               {[
-                { icon: "🎯", label: "jobSayer Score", val: "84",  sub: "Top 15%",          color: "#818cf8" },
-                { icon: "💼", label: "Jobs Matched",   val: "34",  sub: "8 at 90%+ match",  color: "#4ade80" },
-                { icon: "🛡", label: "JD Trust",       val: "8/10",sub: "verified listings", color: "#fbbf24" },
-                { icon: "🧠", label: "Prep Topics",    val: "5",   sub: "ready to practice", color: "#a78bfa" },
+                { label: "jobSayer Score", val: "84",   sub: "Top 15%",          color: "var(--accent)" },
+                { label: "Jobs Matched",   val: "34",   sub: "8 at 90%+ match",  color: "var(--success)" },
+                { label: "JD Trust",       val: "8/10", sub: "verified listings", color: "var(--warn)" },
+                { label: "Prep Topics",    val: "5",    sub: "ready to practice", color: "#a78bfa" },
               ].map(c => (
-                <div key={c.label} style={{ background: "var(--surface2)", borderRadius: 10, padding: "14px 12px", border: "1px solid var(--border)", textAlign: "center" }}>
-                  <div style={{ fontSize: 20, marginBottom: 4 }}>{c.icon}</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: c.color }}>{c.val}</div>
-                  <div style={{ fontSize: 10, color: "var(--text2)", marginTop: 2, fontWeight: 500 }}>{c.label}</div>
-                  <div style={{ fontSize: 9, color: "var(--text3)", marginTop: 1 }}>{c.sub}</div>
+                <div key={c.label} style={{ background: "var(--surface2)", borderRadius: 10, padding: "16px 14px", border: "1px solid var(--border)", textAlign: "center" }}>
+                  <div style={{ fontSize: 24, fontWeight: 800, color: c.color, letterSpacing: "-.03em", marginBottom: 4 }}>{c.val}</div>
+                  <div style={{ fontSize: 11, color: "var(--text2)", fontWeight: 600 }}>{c.label}</div>
+                  <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 2 }}>{c.sub}</div>
                 </div>
               ))}
             </div>
@@ -463,19 +465,19 @@ function LandingPage({ signIn }: { signIn: () => void }) {
       {/* ── Stats bar ────────────────────────────────────────── */}
       <section style={{
         borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)",
-        padding: "24px 20px", background: "var(--surface)",
+        padding: "28px 20px", background: "var(--surface)",
         display: "flex", justifyContent: "center",
-        gap: mobile ? 24 : 64, flexWrap: "wrap",
+        gap: mobile ? 28 : 72, flexWrap: "wrap",
       }}>
         {[
-          { val: "12,400+", label: "Resumes built"       },
-          { val: "34",      label: "Verified companies"  },
-          { val: "91%",     label: "ATS pass rate"       },
-          { val: "4.8 ★",   label: "Candidate rating"    },
+          { val: "12,400+", label: "Resumes built",      col: "var(--accent)"  },
+          { val: "91%",     label: "ATS pass rate",      col: "var(--success)" },
+          { val: "3.2 days",label: "Avg time to match",  col: "var(--warn)"    },
+          { val: "Free",    label: "To get started",     col: "var(--text1)"   },
         ].map(s => (
           <div key={s.label} style={{ textAlign: "center" }}>
-            <div style={{ fontSize: mobile ? 22 : 26, fontWeight: 800, color: "var(--text1)" }}>{s.val}</div>
-            <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 3 }}>{s.label}</div>
+            <div style={{ fontSize: mobile ? 22 : 28, fontWeight: 800, color: s.col, letterSpacing: "-.03em" }}>{s.val}</div>
+            <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 4 }}>{s.label}</div>
           </div>
         ))}
       </section>
@@ -523,27 +525,27 @@ function LandingPage({ signIn }: { signIn: () => void }) {
         </h2>
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : tablet ? "1fr 1fr" : "repeat(3,1fr)", gap: 14 }}>
           {[
-            { icon: "🛡", title: "JD Trust Score",            tag: "Unique",      tagC: "#818cf8", desc: "Every listing rated for authenticity. Ghost jobs and fake JDs are flagged before you waste time." },
-            { icon: "🎯", title: "jobSayer Score",            tag: "Core",        tagC: "#4ade80", desc: "ATS compatibility, keyword strength, experience clarity, impact statements — one score, clear fixes." },
-            { icon: "💼", title: "Resume-first job matching", tag: "Core",        tagC: "#4ade80", desc: "Jobs ranked by how your actual resume fits — not who paid for premium placement." },
-            { icon: "🧠", title: "India-tuned interview prep",tag: "New",         tagC: "#4ade80", desc: "AI mock interviews modelled on Razorpay, Flipkart, Swiggy, Infosys — company-specific questions.", href: "/interview"  },
-            { icon: "🗺", title: "Career GPS",                tag: "New",         tagC: "#4ade80", desc: "Set a target role. Get a personalised skill roadmap with curated learning resources.",          href: "/career-gps" },
-            { icon: "⚡", title: "Honest JD Scanner",         tag: "New",         tagC: "#4ade80", desc: "AI flags ghost jobs, unrealistic requirements, salary red flags, and your JD match % instantly.", href: "/jobs"       },
+            { icon: "🛡", title: "JD Trust Score",            tag: "Unique", tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Every listing rated for authenticity. Ghost jobs and fake JDs flagged before you waste time." },
+            { icon: "🎯", title: "jobSayer Score",            tag: "Core",   tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "ATS, keywords, clarity, impact — one score with specific fixes for each gap." },
+            { icon: "💼", title: "Resume-first matching",     tag: "Core",   tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "Jobs ranked by how your resume actually fits — not who paid for top placement." },
+            { icon: "🧠", title: "India-tuned interview prep",tag: "New",    tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "AI mock interviews for Razorpay, Flipkart, Swiggy, Infosys — company-specific questions." },
+            { icon: "🗺", title: "Career GPS",                tag: "New",    tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Set a target role. Get a personalised skill roadmap with salary bands and timelines." },
+            { icon: "⚡", title: "Honest JD Scanner",         tag: "New",    tagC: "var(--warn)",    iconBg: "rgba(234,179,8,.08)",  desc: "AI flags ghost jobs, inflated requirements, salary red flags, and your JD match % instantly." },
           ].map(f => (
             <div key={f.title} style={{
               background: "var(--surface)", border: "1px solid var(--border)",
-              borderRadius: 16, padding: "20px",
-              transition: "border-color .2s, transform .2s",
+              borderRadius: 14, padding: "22px",
+              transition: "border-color .2s",
             }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accborder)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.transform = "translateY(0)"; }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,.14)"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; }}
             >
-              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
-                <span style={{ fontSize: 24 }}>{f.icon}</span>
-                <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 10, background: `${f.tagC}18`, color: f.tagC, border: `1px solid ${f.tagC}30` }}>{f.tag}</span>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 14 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 10, background: f.iconBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>{f.icon}</div>
+                <span style={{ fontSize: 10, fontWeight: 600, padding: "3px 9px", borderRadius: 99, background: `${f.tagC}18`, color: f.tagC, border: `1px solid ${f.tagC}30` }}>{f.tag}</span>
               </div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", marginBottom: 6 }}>{f.title}</div>
-              <div style={{ fontSize: 13, color: "var(--text3)", lineHeight: 1.6 }}>{f.desc}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", marginBottom: 6, letterSpacing: "-.01em" }}>{f.title}</div>
+              <div style={{ fontSize: 13, color: "var(--text3)", lineHeight: 1.65 }}>{f.desc}</div>
             </div>
           ))}
         </div>
@@ -566,7 +568,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
                 <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)", marginBottom: 2 }}>{r.role}</div>
                 <div style={{ fontSize: 11, color: "var(--text3)" }}>{r.count} openings</div>
               </div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#4ade80", background: "rgba(74,222,128,.1)", padding: "3px 8px", borderRadius: 8 }}>{r.delta}</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--success)", background: "rgba(34,197,94,.1)", padding: "3px 8px", borderRadius: 8 }}>{r.delta}</div>
             </div>
           ))}
         </div>
@@ -606,7 +608,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
               price: "₹199",
               period: "/ month",
               tagline: "For active job seekers",
-              color: "#818cf8",
+              color: "var(--accent)",
               highlight: true,
               features: [
                 "5 saved resumes",
@@ -643,7 +645,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
             },
           ].map(plan => (
             <div key={plan.name} style={{
-              background: plan.highlight ? "linear-gradient(160deg, rgba(129,140,248,.1), rgba(99,102,241,.04))" : "var(--surface)",
+              background: plan.highlight ? "linear-gradient(160deg, rgba(99,102,241,.1), rgba(99,102,241,.04))" : "var(--surface)",
               border: `1.5px solid ${plan.highlight ? "var(--accborder)" : "var(--border)"}`,
               borderRadius: 18, padding: "26px 22px",
               position: "relative", overflow: "hidden",
@@ -676,7 +678,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
               <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                 {plan.features.map(f => (
                   <div key={f} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--text2)" }}>
-                    <span style={{ color: "#4ade80", flexShrink: 0, marginTop: 1 }}>✓</span>{f}
+                    <span style={{ color: "var(--success)", flexShrink: 0, marginTop: 1 }}>✓</span>{f}
                   </div>
                 ))}
                 {plan.missing.map(f => (
@@ -697,7 +699,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
       <section style={{
         margin: mobile ? "0 20px 64px" : "0 24px 96px",
         maxWidth: 860, marginLeft: "auto", marginRight: "auto",
-        background: "linear-gradient(135deg, rgba(129,140,248,.12), rgba(99,102,241,.06))",
+        background: "linear-gradient(135deg, rgba(99,102,241,.12), rgba(99,102,241,.06))",
         border: "1px solid var(--accborder)", borderRadius: 24,
         padding: mobile ? "40px 24px" : "56px 48px", textAlign: "center",
       }}>
@@ -772,7 +774,8 @@ function Dashboard({ user }: { user: any }) {
   const avatarUrl = user?.user_metadata?.avatar_url;
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
-  const scoreColor = score === null ? "var(--text3)" : score >= 75 ? "#4ade80" : score >= 55 ? "#fbbf24" : "#f87171";
+  const scoreColor = score === null ? "var(--text3)" : score >= 75 ? "var(--success)" : score >= 55 ? "var(--warn)" : "var(--danger)";
+  const circ = 2 * Math.PI * 26;
 
   const card: React.CSSProperties = {
     background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14,
@@ -783,126 +786,140 @@ function Dashboard({ user }: { user: any }) {
       <div style={{ maxWidth: 960, margin: "0 auto", padding: mobile ? "76px 16px 20px" : "80px 24px 20px" }}>
 
         {/* ── Header ── */}
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24, gap: 12 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            {avatarUrl
-              ? <img src={avatarUrl} alt={firstName} style={{ width: 44, height: 44, borderRadius: "50%", border: "2px solid var(--accborder)" }} />
-              : <div style={{ width: 44, height: 44, borderRadius: "50%", background: "linear-gradient(135deg, var(--accent), #6366f1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{firstName[0]?.toUpperCase()}</div>
-            }
-            <div>
-              <div style={{ fontSize: 12, color: "var(--text3)" }}>{greeting} 👋</div>
-              <div style={{ fontSize: mobile ? 18 : 22, fontWeight: 800, letterSpacing: "-.5px" }}>Welcome back, {firstName}</div>
-              {lastSaved && <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>Resume saved {lastSaved}</div>}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, gap: 12 }}>
+          <div>
+            <div style={{ fontSize: mobile ? 22 : 26, fontWeight: 800, letterSpacing: "-.04em", marginBottom: 3 }}>
+              {greeting}, {firstName} 👋
             </div>
+            {lastSaved
+              ? <div style={{ fontSize: 12, color: "var(--text3)" }}>Resume last saved {lastSaved}</div>
+              : <div style={{ fontSize: 12, color: "var(--text3)" }}>
+                  You have <span style={{ color: "var(--accent)", fontWeight: 600 }}>{matchCount} job matches</span> based on your resume
+                </div>
+            }
           </div>
-          {!mobile && (
-            <button onClick={signOut} style={{ ...ghostBtn, fontSize: 12, padding: "6px 12px" }}>Sign out</button>
-          )}
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <Link href="/bgv" style={{ padding: "7px 14px", background: "var(--accdim)", border: "1px solid var(--accborder)", borderRadius: 9, color: "var(--accent)", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>🛡 Get Verified</Link>
+            {!mobile && <button onClick={signOut} style={{ ...ghostBtn, fontSize: 12, padding: "7px 13px" }}>Sign out</button>}
+          </div>
         </div>
 
-        {/* ── Score + stats row ── */}
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(4,1fr)", gap: 10, marginBottom: 16 }}>
-          {[
-            { icon: "🎯", label: "jobSayer Score", val: score !== null ? `${score}` : "—", sub: score !== null ? `Top ${score >= 75 ? 15 : score >= 55 ? 35 : 60}%` : "Build resume", color: scoreColor, href: "/score" },
-            { icon: "💼", label: "Matched Jobs",   val: matchCount > 0 ? `${matchCount}` : "—", sub: matchCount > 0 ? "roles matched" : "Add skills", color: "#4ade80", href: "/jobs" },
-            { icon: "📄", label: "Resume",         val: hasResume ? "Ready" : "Empty", sub: hasResume ? (resumeName || "Untitled") : "Start building", color: hasResume ? "#4ade80" : "var(--text3)", href: "/builder" },
-            { icon: "🧠", label: "Interview Prep", val: "Live",     sub: "AI mock interviews", color: "#4ade80", href: "/interview" },
-          ].map(s => (
-            <Link key={s.label} href={s.href} style={{ textDecoration: "none" }}>
-              <div style={{ ...card, padding: "16px 14px", cursor: "pointer", transition: "border-color .15s, transform .15s" }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accborder)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.transform = "translateY(0)"; }}
-              >
-                <div style={{ fontSize: 20, marginBottom: 6 }}>{s.icon}</div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: s.color, lineHeight: 1 }}>{s.val}</div>
-                <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text2)", marginTop: 4 }}>{s.label}</div>
-                <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 1 }}>{s.sub}</div>
+        {/* ── 3-col stat cards ── */}
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(3,1fr)", gap: 10, marginBottom: 14 }}>
+          {/* Score ring card */}
+          <Link href="/score" style={{ textDecoration: "none" }}>
+            <div style={{ ...card, padding: "18px 16px", cursor: "pointer", transition: "border-color .18s" }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(255,255,255,.14)"}
+              onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}
+            >
+              <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 12, fontWeight: 500 }}>Resume score</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ position: "relative", width: 56, height: 56, flexShrink: 0 }}>
+                  <svg width="56" height="56" style={{ transform: "rotate(-90deg)" }}>
+                    <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,.05)" strokeWidth="5" />
+                    <circle cx="28" cy="28" r="22" fill="none" stroke={scoreColor} strokeWidth="5" strokeLinecap="round"
+                      strokeDasharray={circ} strokeDashoffset={circ * (1 - (score ?? 0) / 100)}
+                      style={{ transition: "stroke-dashoffset 1.2s ease" }}
+                    />
+                  </svg>
+                  <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", fontSize: 13, fontWeight: 800, color: scoreColor }}>{score ?? "—"}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700 }}>{score !== null ? (score >= 75 ? "Strong" : score >= 55 ? "Good" : "Needs work") : "Build resume"}</div>
+                  <div style={{ fontSize: 11, color: "var(--success)", marginTop: 3 }}>{score !== null ? `+6 pts this week` : "Start now →"}</div>
+                </div>
               </div>
-            </Link>
-          ))}
+            </div>
+          </Link>
+
+          <Link href="/jobs" style={{ textDecoration: "none" }}>
+            <div style={{ ...card, padding: "18px 16px", cursor: "pointer", transition: "border-color .18s" }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(255,255,255,.14)"}
+              onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}
+            >
+              <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 12, fontWeight: 500 }}>Job matches</div>
+              <div style={{ fontSize: 34, fontWeight: 800, color: "var(--warn)", letterSpacing: "-.04em", marginBottom: 4 }}>{matchCount || "—"}</div>
+              <div style={{ fontSize: 11, color: "var(--success)" }}>3 new today</div>
+            </div>
+          </Link>
+
+          <Link href="/bgv" style={{ textDecoration: "none" }}>
+            <div style={{ ...card, padding: "18px 16px", cursor: "pointer", transition: "border-color .18s" }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(255,255,255,.14)"}
+              onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}
+            >
+              <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 12, fontWeight: 500 }}>BGV status</div>
+              <div style={{ fontSize: 26, marginBottom: 6 }}>⏳</div>
+              <div style={{ fontSize: 11, color: "var(--warn)", fontWeight: 600 }}>Not started</div>
+            </div>
+          </Link>
         </div>
 
-        {/* ── Main grid — score + actions ── */}
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 320px", gap: 14, marginBottom: 14 }}>
+        {/* ── Main grid ── */}
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 300px", gap: 12, marginBottom: 12 }}>
 
-          {/* Score progress card */}
+          {/* Score breakdown */}
           <div style={{ ...card, padding: "20px" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-              <div style={{ fontSize: 14, fontWeight: 600 }}>Resume Score</div>
-              <Link href="/score" style={{ fontSize: 12, color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Full breakdown →</Link>
+              <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: "-.01em" }}>Resume breakdown</div>
+              <Link href="/score" style={{ fontSize: 12, color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Full report →</Link>
             </div>
-
             {score !== null ? (
-              <>
-                <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
-                  {/* Circular indicator */}
-                  <div style={{ position: "relative", width: 68, height: 68, flexShrink: 0 }}>
-                    <svg width="68" height="68" style={{ transform: "rotate(-90deg)" }}>
-                      <circle cx="34" cy="34" r="28" fill="none" stroke="rgba(255,255,255,.06)" strokeWidth="7" />
-                      <circle cx="34" cy="34" r="28" fill="none" stroke={scoreColor} strokeWidth="7" strokeLinecap="round"
-                        strokeDasharray={2 * Math.PI * 28}
-                        strokeDashoffset={2 * Math.PI * 28 * (1 - score / 100)}
-                        style={{ transition: "stroke-dashoffset 1s ease" }}
-                      />
-                    </svg>
-                    <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", fontSize: 14, fontWeight: 800, color: scoreColor }}>{score}</div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 16, fontWeight: 700, color: "var(--text1)" }}>
-                      {score >= 75 ? "Strong profile 💪" : score >= 55 ? "Good — keep improving" : "Needs attention"}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                {[
+                  ["ATS format", Math.min(100, (score ?? 0) + 17), "var(--success)"],
+                  ["Keywords", Math.max(30, (score ?? 0) - 6), "var(--warn)"],
+                  ["Impact lang.", Math.min(100, (score ?? 0) + 2), "var(--warn)"],
+                  ["Work clarity", Math.min(100, (score ?? 0) + 11), "var(--success)"],
+                ].map(([l, v, c]) => (
+                  <div key={l as string} style={{ background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 10, padding: "13px 14px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                      <span style={{ fontSize: 12, color: "var(--text2)" }}>{l}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: c as string }}>{v as number}</span>
                     </div>
-                    <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 3 }}>
-                      out of 100 · top {score >= 75 ? "15" : score >= 55 ? "35" : "60"}% of similar profiles
+                    <div style={{ background: "rgba(255,255,255,.05)", borderRadius: 99, height: 5 }}>
+                      <div style={{ width: `${v}%`, height: "100%", background: c as string, borderRadius: 99 }} />
                     </div>
                   </div>
-                </div>
-                <div style={{ height: 6, background: "var(--surface2)", borderRadius: 3, overflow: "hidden", marginBottom: 10 }}>
-                  <div style={{ height: "100%", width: `${score}%`, borderRadius: 3, background: `linear-gradient(90deg, ${scoreColor}80, ${scoreColor})`, transition: "width 1s ease" }} />
-                </div>
-                {score < 85 && (
-                  <div style={{ fontSize: 12, color: "var(--text3)" }}>
-                    💡 Fix a few things to reach <strong style={{ color: "var(--accent)" }}>85+</strong> —{" "}
-                    <Link href="/score" style={{ color: "var(--accent)", textDecoration: "none" }}>see what →</Link>
-                  </div>
-                )}
-              </>
+                ))}
+              </div>
             ) : (
-              <div style={{ textAlign: "center", padding: "24px 0" }}>
-                <div style={{ fontSize: 32, marginBottom: 10 }}>📄</div>
-                <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>No resume yet</div>
-                <Link href="/builder" style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Start building →</Link>
+              <div style={{ textAlign: "center", padding: "28px 0" }}>
+                <div style={{ fontSize: 36, marginBottom: 10 }}>📄</div>
+                <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>No resume yet</div>
+                <Link href="/builder" style={{ padding: "9px 22px", background: "var(--accent)", borderRadius: 9, color: "#fff", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>Build resume →</Link>
               </div>
             )}
           </div>
 
           {/* Quick actions */}
           <div style={{ ...card, padding: "20px" }}>
-            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>Quick actions</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "-.01em", marginBottom: 12 }}>Quick actions</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {[
-                { icon: "✏️", label: "Edit Resume",        sub: "Builder",               href: "/builder",    accent: true  },
-                { icon: "📊", label: "View Score",          sub: "4-dimension breakdown", href: "/score",      accent: false },
-                { icon: "🔍", label: "Browse Jobs",         sub: `${matchCount || "—"} matched roles`, href: "/jobs", accent: false },
-                { icon: "🎤", label: "Interview Prep",      sub: "AI mock interview",     href: "/interview",  accent: false },
-                { icon: "🧭", label: "Career GPS",          sub: "Skill gap roadmap",     href: "/career-gps", accent: false },
-                { icon: "🏢", label: "For Recruiters",      sub: "Post jobs, find talent",href: "/recruit",    accent: false },
+                { label: "Edit Resume",   sub: "Builder",            href: "/builder",    accent: true  },
+                { label: "View Score",    sub: "Full breakdown",      href: "/score",      accent: false },
+                { label: "Browse Jobs",   sub: `${matchCount || "—"} matched`, href: "/jobs", accent: false },
+                { label: "Interview Prep",sub: "AI mock sessions",   href: "/interview",  accent: false },
+                { label: "Career GPS",    sub: "Skill roadmap",      href: "/career-gps", accent: false },
+                { label: "Get Verified",  sub: "BGV badge",          href: "/bgv",        accent: false },
               ].map(a => (
                 <Link key={a.label} href={a.href} style={{ textDecoration: "none" }}>
                   <div style={{
-                    display: "flex", alignItems: "center", gap: 10,
-                    padding: "11px 12px", borderRadius: 10,
-                    background: a.accent ? "var(--accdim)" : "var(--surface2)",
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    padding: "10px 13px", borderRadius: 9,
+                    background: a.accent ? "var(--accdim)" : "rgba(255,255,255,.03)",
                     border: `1px solid ${a.accent ? "var(--accborder)" : "var(--border)"}`,
-                    cursor: "pointer", transition: "opacity .15s",
+                    transition: "border-color .15s",
                   }}
-                    onMouseEnter={e => (e.currentTarget.style.opacity = ".8")}
-                    onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
+                    onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(255,255,255,.14)"}
+                    onMouseLeave={e => e.currentTarget.style.borderColor = a.accent ? "var(--accborder)" : "var(--border)"}
                   >
-                    <span style={{ fontSize: 17 }}>{a.icon}</span>
                     <div>
                       <div style={{ fontSize: 12, fontWeight: 600, color: a.accent ? "var(--accent)" : "var(--text1)" }}>{a.label}</div>
-                      <div style={{ fontSize: 10, color: "var(--text3)" }}>{a.sub}</div>
+                      <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 1 }}>{a.sub}</div>
                     </div>
+                    <span style={{ fontSize: 14, color: "var(--text3)" }}>›</span>
                   </div>
                 </Link>
               ))}
@@ -916,17 +933,17 @@ function Dashboard({ user }: { user: any }) {
           {/* Trending roles */}
           <div style={{ ...card, padding: "20px" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-              <div style={{ fontSize: 13, fontWeight: 600 }}>🔥 Trending roles in Bangalore</div>
-              <Link href="/jobs" style={{ fontSize: 11, color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Browse →</Link>
+              <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "-.01em" }}>Trending in Bangalore</div>
+              <Link href="/jobs" style={{ fontSize: 12, color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Browse →</Link>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {TRENDING.slice(0, 5).map(r => (
-                <div key={r.role} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {TRENDING.slice(0, 5).map((r, i) => (
+                <div key={r.role} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 0", borderTop: i > 0 ? "1px solid var(--border)" : "none" }}>
                   <div>
-                    <div style={{ fontSize: 12, fontWeight: 500, color: "var(--text1)" }}>{r.role}</div>
-                    <div style={{ fontSize: 10, color: "var(--text3)" }}>{r.count} openings</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)" }}>{r.role}</div>
+                    <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>{r.count} openings</div>
                   </div>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#4ade80", background: "rgba(74,222,128,.1)", padding: "2px 8px", borderRadius: 8 }}>{r.delta}</span>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: "var(--success)", background: "rgba(34,197,94,.08)", border: "1px solid rgba(34,197,94,.15)", padding: "3px 9px", borderRadius: 99 }}>{r.delta}</span>
                 </div>
               ))}
             </div>

@@ -30,7 +30,8 @@ export async function GET() {
       id_verified, edu_verified, emp_verified, address_verified,
       submitted_at, reviewed_at, admin_notes, rejection_reason,
       full_name, dob, education, employment,
-      pan_number, aadhaar_last4
+      pan_number, aadhaar_last4,
+      auto_check_results
     `)
     .eq("user_id", user.id)
     .maybeSingle();

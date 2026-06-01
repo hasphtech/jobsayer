@@ -54,11 +54,11 @@ interface AnswerState {
 /* ── Score badge ── */
 function ScoreBadge({ score, verdict }: { score: number; verdict: string }) {
   const color =
-    score >= 8 ? "#4ade80" :
-    score >= 6 ? "#fbbf24" : "#f87171";
+    score >= 8 ? "var(--success)" :
+    score >= 6 ? "var(--warn)" : "var(--danger)";
   const bg =
-    score >= 8 ? "rgba(74,222,128,.12)" :
-    score >= 6 ? "rgba(251,191,36,.12)" : "rgba(248,113,113,.12)";
+    score >= 8 ? "rgba(34,197,94,.12)" :
+    score >= 6 ? "rgba(234,179,8,.12)" : "rgba(239,68,68,.12)";
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -86,7 +86,7 @@ function ProgressDots({ total, current, answers }: { total: number; current: num
         return (
           <div key={i} style={{
             width: active ? 24 : 8, height: 8, borderRadius: 4,
-            background: done ? "#4ade80" : active ? "var(--accent)" : "rgba(255,255,255,.12)",
+            background: done ? "var(--success)" : active ? "var(--accent)" : "rgba(255,255,255,.12)",
             transition: "all .3s ease",
           }} />
         );
@@ -294,7 +294,7 @@ export default function InterviewPage() {
             {resumeSkills && (
               <div style={{
                 padding: "10px 14px", borderRadius: 8, marginBottom: 20,
-                background: "rgba(129,140,248,.08)", border: "1px solid rgba(129,140,248,.2)",
+                background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)",
                 fontSize: 12, color: "var(--text3)",
               }}>
                 ✅ Using skills from your resume for tailored questions
@@ -351,7 +351,7 @@ export default function InterviewPage() {
   /* ── Done screen ── */
   if (stage === "done" || allDone) {
     const verdictColor =
-      avgScore >= 8 ? "#4ade80" : avgScore >= 6 ? "#fbbf24" : "#f87171";
+      avgScore >= 8 ? "var(--success)" : avgScore >= 6 ? "var(--warn)" : "var(--danger)";
 
     return (
       <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
@@ -391,7 +391,7 @@ export default function InterviewPage() {
             {questions.map((q, i) => {
               const a = answers[i];
               const fb = a?.feedback;
-              const sColor = fb ? (fb.score >= 8 ? "#4ade80" : fb.score >= 6 ? "#fbbf24" : "#f87171") : "var(--text3)";
+              const sColor = fb ? (fb.score >= 8 ? "var(--success)" : fb.score >= 6 ? "var(--warn)" : "var(--danger)") : "var(--text3)";
               return (
                 <div key={i} style={card}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
@@ -402,13 +402,13 @@ export default function InterviewPage() {
                   </div>
                   {fb && (
                     <>
-                      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "#4ade80", marginBottom: 4 }}>Strengths</div>
+                      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--success)", marginBottom: 4 }}>Strengths</div>
                       {fb.strengths.map((s, j) => (
                         <div key={j} style={{ fontSize: 12, color: "var(--text2)", paddingLeft: 12, marginBottom: 2 }}>✓ {s}</div>
                       ))}
                       {fb.improvements.length > 0 && (
                         <>
-                          <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "#fbbf24", marginTop: 8, marginBottom: 4 }}>Improve</div>
+                          <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--warn)", marginTop: 8, marginBottom: 4 }}>Improve</div>
                           {fb.improvements.map((s, j) => (
                             <div key={j} style={{ fontSize: 12, color: "var(--text2)", paddingLeft: 12, marginBottom: 2 }}>→ {s}</div>
                           ))}
@@ -534,10 +534,10 @@ export default function InterviewPage() {
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {/* Strengths */}
               {fb.strengths.length > 0 && (
-                <div style={{ ...card, borderLeft: "3px solid #4ade80" }}>
+                <div style={{ ...card, borderLeft: "3px solid var(--success)" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                    <CheckCircle2 size={15} color="#4ade80" />
-                    <span style={{ fontSize: 13, fontWeight: 700, color: "#4ade80" }}>What worked well</span>
+                    <CheckCircle2 size={15} color="var(--success)" />
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--success)" }}>What worked well</span>
                   </div>
                   {fb.strengths.map((s, i) => (
                     <div key={i} style={{ fontSize: 13, color: "var(--text2)", paddingLeft: 4, marginBottom: 4, lineHeight: 1.5 }}>
@@ -549,10 +549,10 @@ export default function InterviewPage() {
 
               {/* Improvements */}
               {fb.improvements.length > 0 && (
-                <div style={{ ...card, borderLeft: "3px solid #fbbf24" }}>
+                <div style={{ ...card, borderLeft: "3px solid var(--warn)" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                    <AlertTriangle size={15} color="#fbbf24" />
-                    <span style={{ fontSize: 13, fontWeight: 700, color: "#fbbf24" }}>Areas to improve</span>
+                    <AlertTriangle size={15} color="var(--warn)" />
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--warn)" }}>Areas to improve</span>
                   </div>
                   {fb.improvements.map((s, i) => (
                     <div key={i} style={{ fontSize: 13, color: "var(--text2)", paddingLeft: 4, marginBottom: 4, lineHeight: 1.5 }}>
@@ -627,7 +627,7 @@ export default function InterviewPage() {
               style={{
                 display: "flex", alignItems: "center", gap: 6,
                 padding: "10px 18px", borderRadius: 8,
-                background: "#4ade80", color: "#000",
+                background: "var(--success)", color: "#000",
                 border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer",
               }}
             >

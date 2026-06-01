@@ -81,7 +81,7 @@ export default function ProfilePage() {
 
   const tierColors: Record<string, string> = {
     free: "var(--text3)",
-    starter: "#fbbf24",
+    starter: "var(--warn)",
     pro: "var(--accent)",
   };
   const tierLabels: Record<string, string> = {
@@ -182,21 +182,21 @@ export default function ProfilePage() {
         <div style={{ ...card, marginBottom: 20 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: bgv ? 14 : 0 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)" }}>🛡 Background Verification</div>
-            <Link href="/bgv" style={{ padding: "7px 16px", background: bgv?.status === "verified" ? "rgba(74,222,128,.1)" : "var(--accdim)", border: `1px solid ${bgv?.status === "verified" ? "rgba(74,222,128,.3)" : "var(--accborder)"}`, borderRadius: 8, color: bgv?.status === "verified" ? "#4ade80" : "var(--accent)", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
+            <Link href="/bgv" style={{ padding: "7px 16px", background: bgv?.status === "verified" ? "rgba(34,197,94,.1)" : "var(--accdim)", border: `1px solid ${bgv?.status === "verified" ? "rgba(34,197,94,.3)" : "var(--accborder)"}`, borderRadius: 8, color: bgv?.status === "verified" ? "var(--success)" : "var(--accent)", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
               {bgv ? "View / Update →" : "Start BGV →"}
             </Link>
           </div>
           {bgv ? (
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: bgv.status === "verified" ? "#4ade80" : bgv.status === "failed" ? "#f87171" : "#fbbf24", padding: "3px 10px", borderRadius: 8, background: bgv.status === "verified" ? "rgba(74,222,128,.1)" : bgv.status === "failed" ? "rgba(248,113,113,.1)" : "rgba(251,191,36,.1)", textTransform: "capitalize" }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: bgv.status === "verified" ? "var(--success)" : bgv.status === "failed" ? "var(--danger)" : "var(--warn)", padding: "3px 10px", borderRadius: 8, background: bgv.status === "verified" ? "rgba(34,197,94,.1)" : bgv.status === "failed" ? "rgba(239,68,68,.1)" : "rgba(234,179,8,.1)", textTransform: "capitalize" }}>
                   {bgv.status === "in_progress" ? "🔍 In Progress" : bgv.status === "verified" ? "🛡 Verified" : bgv.status === "failed" ? "✗ Failed" : "⏳ Pending Review"}
                 </span>
                 {bgv.verification_score != null && <span style={{ fontSize: 12, color: "var(--text3)" }}>Score: <strong style={{ color: "var(--text1)" }}>{bgv.verification_score}/100</strong></span>}
               </div>
               <div style={{ display: "flex", gap: 8 }}>
                 {[["🪪 ID", bgv.id_verified], ["🎓 Education", bgv.edu_verified], ["💼 Employment", bgv.emp_verified]].map(([l, v]) => (
-                  <span key={l as string} style={{ fontSize: 11, padding: "3px 10px", borderRadius: 6, fontWeight: 600, background: v ? "rgba(74,222,128,.08)" : "var(--surface2)", color: v ? "#4ade80" : "var(--text3)", border: `1px solid ${v ? "rgba(74,222,128,.2)" : "var(--border)"}` }}>
+                  <span key={l as string} style={{ fontSize: 11, padding: "3px 10px", borderRadius: 6, fontWeight: 600, background: v ? "rgba(34,197,94,.08)" : "var(--surface2)", color: v ? "var(--success)" : "var(--text3)", border: `1px solid ${v ? "rgba(34,197,94,.2)" : "var(--border)"}` }}>
                     {l as string} {v ? "✓" : "○"}
                   </span>
                 ))}
@@ -271,8 +271,8 @@ export default function ProfilePage() {
         </div>
 
         {/* Danger zone */}
-        <div style={{ ...card, borderColor: "rgba(248,113,113,.2)" }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: "#f87171", marginBottom: 10 }}>Danger Zone</div>
+        <div style={{ ...card, borderColor: "rgba(239,68,68,.2)" }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--danger)", marginBottom: 10 }}>Danger Zone</div>
           {!deleteConfirm ? (
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
               <div>
@@ -285,8 +285,8 @@ export default function ProfilePage() {
                 onClick={() => setDeleteConfirm(true)}
                 style={{
                   padding: "8px 18px", borderRadius: 8,
-                  border: "1px solid rgba(248,113,113,.4)", background: "rgba(248,113,113,.06)",
-                  color: "#f87171", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                  border: "1px solid rgba(239,68,68,.4)", background: "rgba(239,68,68,.06)",
+                  color: "var(--danger)", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                 }}
               >
                 Delete Account
@@ -303,7 +303,7 @@ export default function ProfilePage() {
                   disabled={deleting}
                   style={{
                     padding: "9px 20px", borderRadius: 8, border: "none",
-                    background: "#f87171", color: "#fff", fontSize: 13, fontWeight: 700,
+                    background: "var(--danger)", color: "#fff", fontSize: 13, fontWeight: 700,
                     cursor: "pointer", fontFamily: "inherit",
                   }}
                 >

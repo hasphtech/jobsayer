@@ -30,11 +30,11 @@ interface VerificationRecord {
 }
 
 const STATUS_CFG: Record<string, { label: string; color: string; bg: string; icon: string }> = {
-  pending:            { label: "Pending Review",      color: "#fbbf24", bg: "rgba(251,191,36,.1)",  icon: "⏳" },
+  pending:            { label: "Pending Review",      color: "var(--warn)", bg: "rgba(234,179,8,.1)",  icon: "⏳" },
   in_progress:        { label: "Verification In Progress", color: "var(--accent)", bg: "var(--accdim)", icon: "🔍" },
-  verified:           { label: "Fully Verified ✓",    color: "#4ade80", bg: "rgba(74,222,128,.1)",  icon: "🏅" },
-  partially_verified: { label: "Partially Verified",  color: "#fbbf24", bg: "rgba(251,191,36,.1)",  icon: "⚠" },
-  failed:             { label: "Verification Failed", color: "#f87171", bg: "rgba(248,113,113,.1)", icon: "✗" },
+  verified:           { label: "Fully Verified ✓",    color: "var(--success)", bg: "rgba(34,197,94,.1)",  icon: "🏅" },
+  partially_verified: { label: "Partially Verified",  color: "var(--warn)", bg: "rgba(234,179,8,.1)",  icon: "⚠" },
+  failed:             { label: "Verification Failed", color: "var(--danger)", bg: "rgba(239,68,68,.1)", icon: "✗" },
 };
 
 export default function VerifyPage() {
@@ -184,9 +184,9 @@ export default function VerifyPage() {
                       { label: "GSTIN",     done: existing.is_gst_verified, detail: existing.gst_status === "active" ? `Active · ${existing.gst_trade_name ?? ""}` : (existing.gst_status ?? "Pending") },
                       { label: "PAN",       done: !!existing.pan,           detail: existing.pan ? "Submitted" : "Not provided" },
                     ].map(c => (
-                      <div key={c.label} style={{ padding: "10px 12px", borderRadius: 9, background: c.done ? "rgba(74,222,128,.06)" : "var(--surface2)", border: `1px solid ${c.done ? "rgba(74,222,128,.2)" : "var(--border)"}` }}>
+                      <div key={c.label} style={{ padding: "10px 12px", borderRadius: 9, background: c.done ? "rgba(34,197,94,.06)" : "var(--surface2)", border: `1px solid ${c.done ? "rgba(34,197,94,.2)" : "var(--border)"}` }}>
                         <div style={{ fontSize: 18, marginBottom: 4 }}>{c.done ? "✅" : "⭕"}</div>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: c.done ? "#4ade80" : "var(--text2)", marginBottom: 2 }}>{c.label}</div>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: c.done ? "var(--success)" : "var(--text2)", marginBottom: 2 }}>{c.label}</div>
                         <div style={{ fontSize: 10, color: "var(--text3)" }}>{c.detail}</div>
                       </div>
                     ))}
@@ -194,8 +194,8 @@ export default function VerifyPage() {
 
                   {/* GST live data */}
                   {existing.gst_trade_name && (
-                    <div style={{ padding: "12px 14px", background: "rgba(74,222,128,.06)", border: "1px solid rgba(74,222,128,.15)", borderRadius: 9, fontSize: 13 }}>
-                      <div style={{ fontWeight: 700, color: "#4ade80", marginBottom: 6 }}>✓ GST Portal Verified</div>
+                    <div style={{ padding: "12px 14px", background: "rgba(34,197,94,.06)", border: "1px solid rgba(34,197,94,.15)", borderRadius: 9, fontSize: 13 }}>
+                      <div style={{ fontWeight: 700, color: "var(--success)", marginBottom: 6 }}>✓ GST Portal Verified</div>
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                         {[
                           ["Trade Name",   existing.gst_trade_name],
@@ -235,57 +235,57 @@ export default function VerifyPage() {
 
               <div>
                 <label style={{ ...lbl, textTransform: "none" as React.CSSProperties["textTransform"] }}>COMPANY NAME *</label>
-                <input style={{ ...inp, textTransform: "none" as React.CSSProperties["textTransform"], borderColor: errors.company_name ? "#f87171" : "" }}
+                <input style={{ ...inp, textTransform: "none" as React.CSSProperties["textTransform"], borderColor: errors.company_name ? "var(--danger)" : "" }}
                   value={form.company_name} onChange={e => setField("company_name", e.target.value)}
                   placeholder="e.g. Razorpay Software Private Limited" />
-                {errors.company_name && <div style={{ fontSize: 12, color: "#f87171", marginTop: 4 }}>{errors.company_name}</div>}
+                {errors.company_name && <div style={{ fontSize: 12, color: "var(--danger)", marginTop: 4 }}>{errors.company_name}</div>}
               </div>
 
               <div>
                 <label style={lbl}>CIN — Company Identification Number (MCA)</label>
-                <input style={{ ...inp, fontFamily: "monospace", borderColor: errors.cin ? "#f87171" : "" }}
+                <input style={{ ...inp, fontFamily: "monospace", borderColor: errors.cin ? "var(--danger)" : "" }}
                   value={form.cin} onChange={e => setField("cin", e.target.value)} placeholder="L17110MH1973PLC019786" maxLength={21} />
                 {liveCheck.cin
-                  ? <div style={{ fontSize: 12, color: liveCheck.cin.startsWith("✓") ? "#4ade80" : "#f87171", marginTop: 4 }}>{liveCheck.cin}</div>
+                  ? <div style={{ fontSize: 12, color: liveCheck.cin.startsWith("✓") ? "var(--success)" : "var(--danger)", marginTop: 4 }}>{liveCheck.cin}</div>
                   : <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 4 }}>
                       Format: L/U + 5 digits + State (2) + Year (4) + Company type + 6 digits ·{" "}
                       <a href="https://www.mca.gov.in/mcafoportal/showSearchResults.do" target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent)" }}>Search on MCA Portal ↗</a>
                     </div>
                 }
-                {errors.cin && <div style={{ fontSize: 12, color: "#f87171", marginTop: 4 }}>{errors.cin}</div>}
+                {errors.cin && <div style={{ fontSize: 12, color: "var(--danger)", marginTop: 4 }}>{errors.cin}</div>}
               </div>
 
               <div>
                 <label style={lbl}>GSTIN — GST Identification Number</label>
-                <input style={{ ...inp, fontFamily: "monospace", borderColor: errors.gstin ? "#f87171" : "" }}
+                <input style={{ ...inp, fontFamily: "monospace", borderColor: errors.gstin ? "var(--danger)" : "" }}
                   value={form.gstin} onChange={e => setField("gstin", e.target.value)} placeholder="29ABCDE1234F1Z5" maxLength={15} />
                 {liveCheck.gstin
-                  ? <div style={{ fontSize: 12, color: liveCheck.gstin.startsWith("✓") ? "#4ade80" : "#f87171", marginTop: 4 }}>{liveCheck.gstin}</div>
+                  ? <div style={{ fontSize: 12, color: liveCheck.gstin.startsWith("✓") ? "var(--success)" : "var(--danger)", marginTop: 4 }}>{liveCheck.gstin}</div>
                   : <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 4 }}>
                       15 characters · We perform a live check on the GST portal ·{" "}
                       <a href="https://www.gst.gov.in/userregistration/gstreg/findgstin" target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent)" }}>Verify on GST Portal ↗</a>
                     </div>
                 }
-                {errors.gstin && <div style={{ fontSize: 12, color: "#f87171", marginTop: 4 }}>{errors.gstin}</div>}
+                {errors.gstin && <div style={{ fontSize: 12, color: "var(--danger)", marginTop: 4 }}>{errors.gstin}</div>}
               </div>
 
               <div>
                 <label style={lbl}>Company PAN (optional)</label>
-                <input style={{ ...inp, fontFamily: "monospace", borderColor: errors.pan ? "#f87171" : "" }}
+                <input style={{ ...inp, fontFamily: "monospace", borderColor: errors.pan ? "var(--danger)" : "" }}
                   value={form.pan} onChange={e => setField("pan", e.target.value)} placeholder="AAABC1234D" maxLength={10} />
                 {liveCheck.pan
-                  ? <div style={{ fontSize: 12, color: liveCheck.pan.startsWith("✓") ? "#4ade80" : "#f87171", marginTop: 4 }}>{liveCheck.pan}</div>
+                  ? <div style={{ fontSize: 12, color: liveCheck.pan.startsWith("✓") ? "var(--success)" : "var(--danger)", marginTop: 4 }}>{liveCheck.pan}</div>
                   : <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 4 }}>Optional — helps cross-verify with MCA and GST records</div>
                 }
               </div>
 
               {result?.error && (
-                <div style={{ padding: "11px 14px", background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.3)", borderRadius: 9, fontSize: 13, color: "#f87171" }}>
+                <div style={{ padding: "11px 14px", background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.3)", borderRadius: 9, fontSize: 13, color: "var(--danger)" }}>
                   {result.error}
                 </div>
               )}
               {result?.message && !result.error && (
-                <div style={{ padding: "11px 14px", background: "rgba(74,222,128,.06)", border: "1px solid rgba(74,222,128,.2)", borderRadius: 9, fontSize: 13, color: "#4ade80" }}>
+                <div style={{ padding: "11px 14px", background: "rgba(34,197,94,.06)", border: "1px solid rgba(34,197,94,.2)", borderRadius: 9, fontSize: 13, color: "var(--success)" }}>
                   {result.message}
                   {result.mcaLink && <> · <a href={result.mcaLink} target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent)" }}>Check MCA Portal ↗</a></>}
                 </div>
@@ -308,7 +308,7 @@ export default function VerifyPage() {
         )}
 
         {/* Benefits */}
-        <div style={{ ...card, marginTop: 28, background: "linear-gradient(135deg,rgba(129,140,248,.06),rgba(99,102,241,.03))", borderColor: "var(--accborder)" }}>
+        <div style={{ ...card, marginTop: 28, background: "linear-gradient(135deg,rgba(99,102,241,.06),rgba(99,102,241,.03))", borderColor: "var(--accborder)" }}>
           <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 14 }}>🏅 Benefits of Verification</h3>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
             {[

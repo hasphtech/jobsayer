@@ -9,11 +9,12 @@
  *   employment: [{company, role, from_date, to_date, manager_name, manager_email}]
  * }
  */
-import { NextRequest, NextResponse } from "next/server";
-import { createServerClient }        from "@supabase/ssr";
-import { createClient }              from "@supabase/supabase-js";
-import { cookies }                   from "next/headers";
-import { validatePAN }               from "@/lib/bgvUtils";
+import { NextRequest, NextResponse }    from "next/server";
+import { createServerClient }           from "@supabase/ssr";
+import { createClient }                 from "@supabase/supabase-js";
+import { cookies }                      from "next/headers";
+import { validatePAN }                  from "@/lib/bgvUtils";
+import { runCandidateBgvAutoChecks }    from "@/lib/bgvAutoCheck";
 
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
@@ -54,22 +55,48 @@ export async function POST(req: NextRequest) {
     { auth: { persistSession: false } }
   );
 
+  const eduArr = Array.isArray(education) ? education : [];
+  const empArr = Array.isArray(employment) ? employment : [];
+
+  // Run automated checks immediately on submit
+  const autoChecks = runCandidateBgvAutoChecks({
+    full_name:     String(full_name),
+    dob:           dob ? String(dob) : null,
+    pan_number:    pan_number ? String(pan_number).toUpperCase() : null,
+    aadhaar_last4: aadhaar_last4 ? String(aadhaar_last4) : null,
+    education:     eduArr as Parameters<typeof runCandidateBgvAutoChecks>[0]["education"],
+    employment:    empArr as Parameters<typeof runCandidateBgvAutoChecks>[0]["employment"],
+  });
+
+  // Status: in_progress if checks are good, pending otherwise
+  const autoStatus = autoChecks.autoScore >= 40 ? "in_progress" : "pending";
+
   const { data, error } = await serviceDb
     .from("candidate_bgv")
     .upsert({
-      user_id:       user.id,
-      full_name:     String(full_name),
-      dob:           dob ? String(dob) : null,
-      pan_number:    pan_number ? String(pan_number).toUpperCase() : null,
-      aadhaar_last4: aadhaar_last4 ? String(aadhaar_last4) : null,
-      education:     Array.isArray(education) ? education : [],
-      employment:    Array.isArray(employment) ? employment : [],
-      status:        "pending",
-      updated_at:    new Date().toISOString(),
+      user_id:            user.id,
+      full_name:          String(full_name),
+      dob:                dob ? String(dob) : null,
+      pan_number:         pan_number ? String(pan_number).toUpperCase() : null,
+      aadhaar_last4:      aadhaar_last4 ? String(aadhaar_last4) : null,
+      education:          eduArr,
+      employment:         empArr,
+      status:             autoStatus,
+      auto_check_results: autoChecks,
+      id_verified:        autoChecks.idAutoVerified,
+      edu_verified:       autoChecks.eduAutoVerified,
+      submitted_at:       new Date().toISOString(),
+      updated_at:         new Date().toISOString(),
     }, { onConflict: "user_id" })
     .select()
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ bgv: data, message: "BGV submitted. Verification takes 2–5 business days." }, { status: 201 });
+  return NextResponse.json({
+    bgv: data,
+    autoScore: autoChecks.autoScore,
+    message: autoChecks.autoScore >= 70
+      ? "BGV submitted and auto-checks passed ✓ — final review in 1–2 business days."
+      : "BGV submitted. Verification takes 2–5 business days.",
+  }, { status: 201 });
 }

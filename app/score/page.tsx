@@ -27,7 +27,7 @@ function JdMatchPanel({ resumeText }: { resumeText: string }) {
   }
 
   const matchColor = result
-    ? result.score >= 70 ? "#4ade80" : result.score >= 45 ? "#fbbf24" : "#f87171"
+    ? result.score >= 70 ? "var(--success)" : result.score >= 45 ? "var(--warn)" : "var(--danger)"
     : "var(--text3)";
 
   return (
@@ -70,7 +70,7 @@ function JdMatchPanel({ resumeText }: { resumeText: string }) {
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
             <div style={{
               width: 56, height: 56, borderRadius: "50%",
-              background: result.score >= 70 ? "rgba(74,222,128,.12)" : result.score >= 45 ? "rgba(251,191,36,.12)" : "rgba(248,113,113,.12)",
+              background: result.score >= 70 ? "rgba(34,197,94,.12)" : result.score >= 45 ? "rgba(234,179,8,.12)" : "rgba(239,68,68,.12)",
               border: `2px solid ${matchColor}`,
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: 18, fontWeight: 800, color: matchColor,
@@ -85,10 +85,10 @@ function JdMatchPanel({ resumeText }: { resumeText: string }) {
 
           {result.found.length > 0 && (
             <div style={{ marginBottom: 10 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "#4ade80", marginBottom: 6 }}>✅ Matched</div>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--success)", marginBottom: 6 }}>✅ Matched</div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                 {result.found.slice(0, 10).map(s => (
-                  <span key={s} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(74,222,128,.08)", color: "#4ade80", border: "1px solid rgba(74,222,128,.2)", fontWeight: 500 }}>{s}</span>
+                  <span key={s} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(34,197,94,.08)", color: "var(--success)", border: "1px solid rgba(34,197,94,.2)", fontWeight: 500 }}>{s}</span>
                 ))}
               </div>
             </div>
@@ -96,10 +96,10 @@ function JdMatchPanel({ resumeText }: { resumeText: string }) {
 
           {result.missing.length > 0 && (
             <div>
-              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "#f87171", marginBottom: 6 }}>❌ Missing from your resume</div>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--danger)", marginBottom: 6 }}>❌ Missing from your resume</div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                 {result.missing.map(s => (
-                  <span key={s} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(248,113,113,.08)", color: "#f87171", border: "1px solid rgba(248,113,113,.2)", fontWeight: 500, textDecoration: "line-through", opacity: .8 }}>{s}</span>
+                  <span key={s} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(239,68,68,.08)", color: "var(--danger)", border: "1px solid rgba(239,68,68,.2)", fontWeight: 500, textDecoration: "line-through", opacity: .8 }}>{s}</span>
                 ))}
               </div>
               <Link href="/builder" style={{
@@ -124,8 +124,8 @@ function ScoreGauge({ score }: { score: number }) {
   const offset = circ - filled;
 
   const color =
-    score >= 75 ? "#4ade80" :
-    score >= 55 ? "#fbbf24" : "#f87171";
+    score >= 75 ? "var(--success)" :
+    score >= 55 ? "var(--warn)" : "var(--danger)";
 
   const label =
     score >= 75 ? "Strong" :
@@ -137,7 +137,7 @@ function ScoreGauge({ score }: { score: number }) {
         <svg width="160" height="160" style={{ transform: "rotate(-90deg)" }}>
           <defs>
             <linearGradient id="gaugeFill" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#818cf8" />
+              <stop offset="0%" stopColor="var(--accent)" />
               <stop offset="100%" stopColor={color} />
             </linearGradient>
           </defs>
@@ -160,7 +160,7 @@ function ScoreGauge({ score }: { score: number }) {
       <div style={{
         display: "inline-block", fontSize: 12, fontWeight: 600,
         padding: "4px 14px", borderRadius: 20,
-        background: score >= 75 ? "rgba(74,222,128,.12)" : score >= 55 ? "rgba(251,191,36,.12)" : "rgba(248,113,113,.12)",
+        background: score >= 75 ? "rgba(34,197,94,.12)" : score >= 55 ? "rgba(234,179,8,.12)" : "rgba(239,68,68,.12)",
         color,
       }}>{label}</div>
     </div>
@@ -170,8 +170,8 @@ function ScoreGauge({ score }: { score: number }) {
 /* ── Bar ───────────────────────────────────────────────────────── */
 function DimBar({ pct, status }: { pct: number; status: string }) {
   const color =
-    status === "green" ? "#4ade80" :
-    status === "amber" ? "#fbbf24" : "#f87171";
+    status === "green" ? "var(--success)" :
+    status === "amber" ? "var(--warn)" : "var(--danger)";
   return (
     <div style={{ height: 6, background: "rgba(255,255,255,.06)", borderRadius: 3, overflow: "hidden" }}>
       <div style={{
@@ -280,7 +280,7 @@ export default function ScorePage() {
             <hr style={{ border: "none", borderTop: "1px solid var(--border)", margin: "16px 0" }} />
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <div style={{ textAlign: "center" }}>
-                <div style={{ fontSize: 18, fontWeight: 700, color: "#4ade80" }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: "var(--success)" }}>
                   +{result.improvements.reduce((s, i) => s + i.points, 0)}
                 </div>
                 <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>pts achievable</div>
@@ -294,7 +294,7 @@ export default function ScorePage() {
                 <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>skills detected</div>
               </div>
               <div style={{ textAlign: "center" }}>
-                <div style={{ fontSize: 18, fontWeight: 700, color: "#f87171" }}>{result.improvements.filter(i => i.severity === "critical").length}</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: "var(--danger)" }}>{result.improvements.filter(i => i.severity === "critical").length}</div>
                 <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>critical issues</div>
               </div>
             </div>
@@ -308,8 +308,8 @@ export default function ScorePage() {
             </div>
             {result.dimensions.map(dim => {
               const scoreColor =
-                dim.status === "green" ? "#4ade80" :
-                dim.status === "amber" ? "#fbbf24" : "#f87171";
+                dim.status === "green" ? "var(--success)" :
+                dim.status === "amber" ? "var(--warn)" : "var(--danger)";
               return (
                 <div key={dim.label} style={{ marginBottom: 18 }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
@@ -335,8 +335,8 @@ export default function ScorePage() {
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {result.improvements.map((imp, i) => {
                 const borderColor =
-                  imp.severity === "critical" ? "#f87171" :
-                  imp.severity === "warning" ? "#fbbf24" : "#818cf8";
+                  imp.severity === "critical" ? "var(--danger)" :
+                  imp.severity === "warning" ? "var(--warn)" : "var(--accent)";
                 const Icon =
                   imp.severity === "critical" ? AlertTriangle :
                   imp.severity === "warning"  ? TrendingUp   : Lightbulb;
@@ -359,7 +359,7 @@ export default function ScorePage() {
                       </div>
                     </div>
                     <div style={{ flexShrink: 0, textAlign: "right" }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: "#4ade80" }}>+{imp.points}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "var(--success)" }}>+{imp.points}</div>
                       <div style={{ fontSize: 10, color: "var(--text3)" }}>pts</div>
                     </div>
                   </div>
@@ -390,7 +390,7 @@ export default function ScorePage() {
                   : result.matchedSkills.map(s => (
                     <span key={s} style={{
                       fontSize: 12, padding: "4px 10px", borderRadius: 20, fontWeight: 500,
-                      background: "rgba(74,222,128,.1)", color: "#4ade80", border: "1px solid rgba(74,222,128,.2)",
+                      background: "rgba(34,197,94,.1)", color: "var(--success)", border: "1px solid rgba(34,197,94,.2)",
                     }}>{s}</span>
                   ))}
               </div>
@@ -401,11 +401,11 @@ export default function ScorePage() {
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                 {result.missingSkills.length === 0
-                  ? <span style={{ fontSize: 12, color: "#4ade80" }}>All key skills covered! 🎉</span>
+                  ? <span style={{ fontSize: 12, color: "var(--success)" }}>All key skills covered! 🎉</span>
                   : result.missingSkills.map(s => (
                     <span key={s} style={{
                       fontSize: 12, padding: "4px 10px", borderRadius: 20, fontWeight: 500,
-                      background: "rgba(248,113,113,.08)", color: "#f87171", border: "1px solid rgba(248,113,113,.2)",
+                      background: "rgba(239,68,68,.08)", color: "var(--danger)", border: "1px solid rgba(239,68,68,.2)",
                       textDecoration: "line-through", opacity: .8,
                     }}>{s}</span>
                   ))}

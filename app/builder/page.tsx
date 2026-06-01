@@ -1790,7 +1790,7 @@ export default function BuilderPage() {
 
           {/* Page count badge */}
           <span title={pageCount > 1 ? "Recruiters prefer 1-page resumes" : "Fits on 1 page"}
-            style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 5, borderWidth: 1, borderStyle: "solid", borderColor: pageCount > 1 ? "#fbbf24" : "var(--border)", background: pageCount > 1 ? "#fffbeb" : "var(--surface2)", color: pageCount > 1 ? "#b45309" : "var(--text3)" }}>
+            style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 5, borderWidth: 1, borderStyle: "solid", borderColor: pageCount > 1 ? "var(--warn)" : "var(--border)", background: pageCount > 1 ? "#fffbeb" : "var(--surface2)", color: pageCount > 1 ? "#b45309" : "var(--text3)" }}>
             {pageCount}p
           </span>
 
@@ -1847,7 +1847,7 @@ export default function BuilderPage() {
             ))}
             {/* Page length indicator */}
             <span title={pageCount > 1 ? `~${pageCount} pages — recruiters prefer 1 page` : "Fits on 1 page"}
-              style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 3, padding: "5px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap", borderWidth: 1.5, borderStyle: "solid", borderColor: pageCount > 1 ? "#fbbf24" : "var(--border)", background: pageCount > 1 ? "#fffbeb" : "var(--surface2)", color: pageCount > 1 ? "#b45309" : "var(--text3)" }}>
+              style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 3, padding: "5px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap", borderWidth: 1.5, borderStyle: "solid", borderColor: pageCount > 1 ? "var(--warn)" : "var(--border)", background: pageCount > 1 ? "#fffbeb" : "var(--surface2)", color: pageCount > 1 ? "#b45309" : "var(--text3)" }}>
               {pageCount > 1 ? "⚠" : "✓"} {pageCount}p
             </span>
 
@@ -2209,7 +2209,7 @@ export default function BuilderPage() {
           </div>
 
           {/* Page length card */}
-          <div style={{ display: "flex", alignItems: "center", gap: 14, background: pageCount > 1 ? "#fffbeb" : "var(--bg)", borderWidth: 1.5, borderStyle: "solid", borderColor: pageCount > 1 ? "#fbbf24" : "var(--border)", borderRadius: 12, padding: "14px 16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, background: pageCount > 1 ? "#fffbeb" : "var(--bg)", borderWidth: 1.5, borderStyle: "solid", borderColor: pageCount > 1 ? "var(--warn)" : "var(--border)", borderRadius: 12, padding: "14px 16px" }}>
             <span style={{ fontSize: 28, lineHeight: 1 }}>{pageCount > 2 ? "📄📄📄" : pageCount > 1 ? "📄📄" : "📄"}</span>
             <div>
               <div style={{ fontSize: 14, fontWeight: 800, color: pageCount > 1 ? "#b45309" : "var(--text1)" }}>
@@ -4289,15 +4289,15 @@ export default function BuilderPage() {
                           <MiniPreview t={t} active={active} />
                           {/* Recommended badge */}
                           {isRec && (
-                            <div style={{ position: "absolute" as const, top: 5, left: 5, background: "#fbbf24", color: "#78350f", fontSize: 9, fontWeight: 800, padding: "1px 5px", borderRadius: 4, letterSpacing: ".3px" }}>
+                            <div style={{ position: "absolute" as const, top: 5, left: 5, background: "var(--warn)", color: "#78350f", fontSize: 9, fontWeight: 800, padding: "1px 5px", borderRadius: 4, letterSpacing: ".3px" }}>
                               ⭐ FOR YOU
                             </div>
                           )}
                           {/* Premium badge (no blur — all users can preview) */}
                           {!hasAccess && (
                             <div style={{ position: "absolute" as const, bottom: 5, right: 5, display: "flex", alignItems: "center", gap: 3, background: "rgba(0,0,0,.55)", borderRadius: 5, padding: "2px 6px" }}>
-                              <Lock size={9} color="#fbbf24" />
-                              <span style={{ fontSize: 9, fontWeight: 700, color: "#fbbf24", letterSpacing: ".3px" }}>PRO</span>
+                              <Lock size={9} color="var(--warn)" />
+                              <span style={{ fontSize: 9, fontWeight: 700, color: "var(--warn)", letterSpacing: ".3px" }}>PRO</span>
                             </div>
                           )}
                           {/* Active checkmark */}
@@ -4595,13 +4595,13 @@ export default function BuilderPage() {
             {isPremiumLocked && (
               <div style={{ width: "100%", maxWidth: 600, marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "9px 14px", background: "linear-gradient(135deg, #1a1a2e, #2d1b69)", borderRadius: 10, boxShadow: "0 2px 12px rgba(0,0,0,.3)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <Lock size={13} color="#fbbf24" />
+                  <Lock size={13} color="var(--warn)" />
                   <div>
-                    <div style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>You&apos;re previewing <span style={{ color: "#fbbf24" }}>{template}</span></div>
+                    <div style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>You&apos;re previewing <span style={{ color: "var(--warn)" }}>{template}</span></div>
                     <div style={{ fontSize: 10, color: "rgba(255,255,255,.6)" }}>Upgrade to export with this template</div>
                   </div>
                 </div>
-                <a href="/upgrade" style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 12px", borderRadius: 7, background: "#fbbf24", color: "#78350f", fontSize: 11, fontWeight: 800, textDecoration: "none", flexShrink: 0, whiteSpace: "nowrap" as const }}>
+                <a href="/upgrade" style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 12px", borderRadius: 7, background: "var(--warn)", color: "#78350f", fontSize: 11, fontWeight: 800, textDecoration: "none", flexShrink: 0, whiteSpace: "nowrap" as const }}>
                   Upgrade ↗
                 </a>
               </div>
@@ -4610,7 +4610,7 @@ export default function BuilderPage() {
             {/* Page badge + autosave pill */}
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
               <span title={pageCount > 1 ? "Recruiters prefer 1-page resumes" : "Fits on 1 page"}
-                style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 5, borderWidth: 1, borderStyle: "solid", borderColor: pageCount > 1 ? "#fbbf24" : "rgba(255,255,255,.3)", background: pageCount > 1 ? "#fffbeb" : "rgba(0,0,0,.2)", color: pageCount > 1 ? "#b45309" : "rgba(255,255,255,.8)" }}>
+                style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 5, borderWidth: 1, borderStyle: "solid", borderColor: pageCount > 1 ? "var(--warn)" : "rgba(255,255,255,.3)", background: pageCount > 1 ? "#fffbeb" : "rgba(0,0,0,.2)", color: pageCount > 1 ? "#b45309" : "rgba(255,255,255,.8)" }}>
                 {pageCount === 1 ? "✓ 1 page" : `~${pageCount} pages`}
               </span>
               <span style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,.7)", opacity: autoSaved ? 1 : 0, transition: "opacity .3s", pointerEvents: "none" as const }}>

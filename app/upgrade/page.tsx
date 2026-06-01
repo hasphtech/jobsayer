@@ -113,7 +113,7 @@ export default function UpgradePage() {
             email: user.email ?? "",
             name:  user.user_metadata?.full_name ?? "",
           },
-          theme: { color: "#818cf8" },
+          theme: { color: "var(--accent)" },
           handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
             // 4. Verify payment server-side
             const verifyRes = await fetch("/api/payment/verify", {
@@ -266,8 +266,8 @@ export default function UpgradePage() {
         {payError && (
           <div style={{
             maxWidth: 500, margin: "16px auto 0", padding: "12px 16px",
-            background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.3)",
-            borderRadius: 10, fontSize: 13, color: "#f87171", textAlign: "center",
+            background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.3)",
+            borderRadius: 10, fontSize: 13, color: "var(--danger)", textAlign: "center",
           }}>
             {payError}
           </div>

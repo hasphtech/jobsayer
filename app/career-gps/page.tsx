@@ -233,9 +233,9 @@ type ResourceType = "free" | "paid" | "cert";
 
 function ResourceBadge({ type }: { type: ResourceType }) {
   const config: Record<ResourceType, { label: string; color: string; bg: string }> = {
-    free: { label: "Free", color: "#4ade80", bg: "rgba(74,222,128,.1)" },
-    paid: { label: "Paid", color: "#fbbf24", bg: "rgba(251,191,36,.1)" },
-    cert: { label: "Cert", color: "#818cf8", bg: "rgba(129,140,248,.1)" },
+    free: { label: "Free", color: "var(--success)", bg: "rgba(34,197,94,.1)" },
+    paid: { label: "Paid", color: "var(--warn)", bg: "rgba(234,179,8,.1)" },
+    cert: { label: "Cert", color: "var(--accent)", bg: "rgba(99,102,241,.1)" },
   };
   const c = config[type];
   return (
@@ -299,11 +299,11 @@ export default function CareerGpsPage() {
             {!resumeLoaded && (
               <div style={{
                 marginTop: 12, padding: "10px 16px", borderRadius: 8,
-                background: "rgba(251,191,36,.08)", border: "1px solid rgba(251,191,36,.2)",
-                fontSize: 12, color: "#fbbf24", display: "flex", alignItems: "center", gap: 8,
+                background: "rgba(234,179,8,.08)", border: "1px solid rgba(234,179,8,.2)",
+                fontSize: 12, color: "var(--warn)", display: "flex", alignItems: "center", gap: 8,
               }}>
                 <AlertCircle size={13} />
-                <span>Build your resume first for personalised gap analysis. <Link href="/builder" style={{ color: "#fbbf24", fontWeight: 600 }}>Go to Builder →</Link></span>
+                <span>Build your resume first for personalised gap analysis. <Link href="/builder" style={{ color: "var(--warn)", fontWeight: 600 }}>Go to Builder →</Link></span>
               </div>
             )}
           </div>
@@ -318,7 +318,7 @@ export default function CareerGpsPage() {
                   const total = role.skills.length;
                   const matched = role.skills.filter(s => skillMatch(s.name, userSkills)).length;
                   const pct = resumeLoaded ? Math.round((matched / total) * 100) : null;
-                  const demandColor = role.demand === "very high" ? "#4ade80" : role.demand === "high" ? "#fbbf24" : "var(--text3)";
+                  const demandColor = role.demand === "very high" ? "var(--success)" : role.demand === "high" ? "var(--warn)" : "var(--text3)";
 
                   return (
                     <button key={role.title} onClick={() => setSelectedRole(role)} style={{
@@ -343,13 +343,13 @@ export default function CareerGpsPage() {
                         <div>
                           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--text3)", marginBottom: 4 }}>
                             <span>Skill match</span>
-                            <span style={{ fontWeight: 600, color: pct >= 60 ? "#4ade80" : pct >= 30 ? "#fbbf24" : "#f87171" }}>{pct}%</span>
+                            <span style={{ fontWeight: 600, color: pct >= 60 ? "var(--success)" : pct >= 30 ? "var(--warn)" : "var(--danger)" }}>{pct}%</span>
                           </div>
                           <div style={{ height: 5, background: "rgba(255,255,255,.06)", borderRadius: 3, overflow: "hidden" }}>
                             <div style={{
                               height: "100%", borderRadius: 3,
                               width: `${pct}%`,
-                              background: pct >= 60 ? "#4ade80" : pct >= 30 ? "#fbbf24" : "#f87171",
+                              background: pct >= 60 ? "var(--success)" : pct >= 30 ? "var(--warn)" : "var(--danger)",
                               transition: "width .5s ease",
                             }} />
                           </div>
@@ -423,11 +423,11 @@ export default function CareerGpsPage() {
             <div style={{ textAlign: "center" }}>
               <div style={{
                 width: 72, height: 72, borderRadius: "50%",
-                background: matchPct >= 60 ? "rgba(74,222,128,.12)" : matchPct >= 30 ? "rgba(251,191,36,.12)" : "rgba(248,113,113,.12)",
-                border: `3px solid ${matchPct >= 60 ? "#4ade80" : matchPct >= 30 ? "#fbbf24" : "#f87171"}`,
+                background: matchPct >= 60 ? "rgba(34,197,94,.12)" : matchPct >= 30 ? "rgba(234,179,8,.12)" : "rgba(239,68,68,.12)",
+                border: `3px solid ${matchPct >= 60 ? "var(--success)" : matchPct >= 30 ? "var(--warn)" : "var(--danger)"}`,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 22, fontWeight: 800,
-                color: matchPct >= 60 ? "#4ade80" : matchPct >= 30 ? "#fbbf24" : "#f87171",
+                color: matchPct >= 60 ? "var(--success)" : matchPct >= 30 ? "var(--warn)" : "var(--danger)",
               }}>{matchPct}%</div>
               <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 6 }}>skill match</div>
             </div>
@@ -438,8 +438,8 @@ export default function CareerGpsPage() {
         {resumeLoaded && (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 20 }}>
             {[
-              { label: "Skills you have", value: matchedSkills.length, color: "#4ade80" },
-              { label: "Skill gaps", value: gapSkills.length, color: "#f87171" },
+              { label: "Skills you have", value: matchedSkills.length, color: "var(--success)" },
+              { label: "Skill gaps", value: gapSkills.length, color: "var(--danger)" },
               { label: "Total required", value: totalSkills, color: "var(--text1)" },
             ].map(({ label, value, color }) => (
               <div key={label} style={{ ...card, textAlign: "center", padding: "16px" }}>
@@ -470,24 +470,24 @@ export default function CareerGpsPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {displaySkills.map(skill => {
             const have = skillMatch(skill.name, userSkills);
-            const levelColor = skill.level === "core" ? "#f87171" : skill.level === "advanced" ? "#fbbf24" : "#818cf8";
+            const levelColor = skill.level === "core" ? "var(--danger)" : skill.level === "advanced" ? "var(--warn)" : "var(--accent)";
 
             return (
               <div key={skill.name} style={{
                 ...card,
-                borderLeft: `3px solid ${have ? "#4ade80" : levelColor}`,
+                borderLeft: `3px solid ${have ? "var(--success)" : levelColor}`,
                 opacity: have ? 0.85 : 1,
               }}>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     {have
-                      ? <CheckCircle2 size={16} color="#4ade80" style={{ flexShrink: 0 }} />
+                      ? <CheckCircle2 size={16} color="var(--success)" style={{ flexShrink: 0 }} />
                       : <div style={{ width: 16, height: 16, borderRadius: "50%", border: `2px solid ${levelColor}`, flexShrink: 0 }} />
                     }
                     <div>
                       <span style={{ fontSize: 14, fontWeight: 600, color: have ? "var(--text3)" : "var(--text1)" }}>
                         {skill.name}
-                        {have && <span style={{ fontSize: 11, color: "#4ade80", marginLeft: 6 }}>✓ You have this</span>}
+                        {have && <span style={{ fontSize: 11, color: "var(--success)", marginLeft: 6 }}>✓ You have this</span>}
                       </span>
                     </div>
                   </div>

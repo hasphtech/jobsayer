@@ -521,7 +521,7 @@ function ManageView({ jobs, token, loading, onRefresh, flash }: {
                 <td style={{ padding: "10px 10px" }}>
                   <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 4, fontWeight: 600,
                     background: j.is_approved && j.is_active ? "#14532d" : "#7f1d1d",
-                    color: j.is_approved && j.is_active ? "#4ade80" : "#f87171",
+                    color: j.is_approved && j.is_active ? "var(--success)" : "var(--danger)",
                   }}>
                     {j.is_approved && j.is_active ? "Live" : !j.is_active ? "Inactive" : "Pending"}
                   </span>
@@ -545,149 +545,465 @@ function ManageView({ jobs, token, loading, onRefresh, flash }: {
 }
 
 // ── BGV Admin View ────────────────────────────────────────────────────────────
+
+interface AutoCheckResult {
+  category: string; check: string; status: "pass" | "fail" | "warn" | "skip"; detail: string;
+}
+interface AutoCheckSummary {
+  checks: AutoCheckResult[];
+  autoScore: number;
+  idAutoVerified: boolean;
+  eduAutoVerified: boolean;
+  empAutoVerified: boolean;
+  requiresManualReview: string[];
+  runAt: string;
+}
+interface EduEntry { degree: string; institution: string; year: string; result: string }
+interface EmpEntry { company: string; role: string; from_date: string; to_date: string; manager_name: string; manager_email: string }
+
 interface BgvRow {
   id: string; user_id: string; full_name: string; status: string;
-  pan_number: string | null; verification_score: number | null;
-  id_verified: boolean; edu_verified: boolean; emp_verified: boolean;
-  submitted_at: string; education: unknown[]; employment: unknown[];
+  pan_number: string | null; aadhaar_last4: string | null; dob: string | null;
+  verification_score: number | null;
+  id_verified: boolean; edu_verified: boolean; emp_verified: boolean; address_verified: boolean;
+  submitted_at: string; education: EduEntry[]; employment: EmpEntry[];
+  auto_check_results: AutoCheckSummary | null;
+  admin_notes: string | null; rejection_reason: string | null;
 }
 
+type BgvFilter = "all" | "pending" | "in_progress" | "verified" | "failed";
+
+const STATUS_CFG: Record<string, { color: string; bg: string; label: string; icon: string }> = {
+  pending:     { color: "var(--warn)",    bg: "rgba(234,179,8,.12)",   label: "Pending",     icon: "⏳" },
+  in_progress: { color: "var(--accent)",  bg: "rgba(99,102,241,.12)",  label: "In Progress", icon: "🔍" },
+  verified:    { color: "var(--success)", bg: "rgba(34,197,94,.12)",   label: "Verified",    icon: "✅" },
+  partial:     { color: "var(--warn)",    bg: "rgba(234,179,8,.12)",   label: "Partial",     icon: "⚠" },
+  failed:      { color: "var(--danger)",  bg: "rgba(239,68,68,.12)",   label: "Failed",      icon: "✗"  },
+};
+
+const CHECK_ICON: Record<string, string> = { pass: "✅", fail: "❌", warn: "⚠️", skip: "⏭" };
+const CHECK_COLOR: Record<string, string> = {
+  pass: "var(--success)", fail: "var(--danger)", warn: "var(--warn)", skip: "var(--text3)",
+};
+
 function BgvAdminView({ token, flash }: { token: string; flash: (m: string) => void }) {
-  const [rows, setRows]     = useState<BgvRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [rows, setRows]         = useState<BgvRow[]>([]);
+  const [loading, setLoading]   = useState(true);
+  const [filter, setFilter]     = useState<BgvFilter>("all");
   const [selected, setSelected] = useState<BgvRow | null>(null);
-  const [notes, setNotes]   = useState("");
-  const [saving, setSaving] = useState(false);
+  const [notes, setNotes]       = useState("");
+  const [rejReason, setRejReason] = useState("");
+  const [score, setScore]       = useState(0);
+  const [checks, setChecks]     = useState({ id: false, edu: false, emp: false });
+  const [saving, setSaving]     = useState(false);
+  const [running, setRunning]   = useState(false);
 
   const load = async () => {
     setLoading(true);
     try {
-      const { createClient } = await import("@supabase/supabase-js");
-      // Use anon key — admin page already verified admin status via /api/admin/check
-      const sb = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-      const { data } = await sb.from("candidate_bgv").select("*").order("submitted_at", { ascending: false });
-      setRows(data ?? []);
+      const res = await fetch("/api/admin/bgv", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const json = await res.json();
+      if (res.ok) setRows(json.bgvRecords ?? []);
+      else flash(json.error ?? "Failed to load BGV records");
     } catch { flash("Failed to load BGV records"); }
     setLoading(false);
   };
-
   useEffect(() => { load(); }, []); // eslint-disable-line
 
-  async function updateBgv(id: string, patch: Record<string, unknown>) {
+  function openReview(r: BgvRow) {
+    setSelected(r);
+    setNotes(r.admin_notes ?? "");
+    setRejReason(r.rejection_reason ?? "");
+    setScore(r.verification_score ?? (r.auto_check_results?.autoScore ?? 0));
+    setChecks({ id: r.id_verified, edu: r.edu_verified, emp: r.emp_verified });
+  }
+
+  async function runAutoCheck(id: string) {
+    setRunning(true);
+    try {
+      const res = await fetch("/api/admin/bgv/run-check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ id }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        flash("✓ Auto-checks complete");
+        await load();
+        // Re-open with fresh data
+        setSelected(data.bgv);
+        const acr = data.bgv?.auto_check_results as AutoCheckSummary | null;
+        setChecks({ id: data.bgv?.id_verified ?? false, edu: data.bgv?.edu_verified ?? false, emp: data.bgv?.emp_verified ?? false });
+        setScore(acr?.autoScore ?? 0);
+      } else {
+        flash(data.error ?? "Auto-check failed");
+      }
+    } catch { flash("Network error"); }
+    setRunning(false);
+  }
+
+  async function approveBgv(newStatus: string) {
+    if (!selected) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/admin/bgv`, {
+      const res = await fetch("/api/admin/bgv", {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ id, ...patch }),
+        body: JSON.stringify({
+          id: selected.id,
+          status: newStatus,
+          verification_score: score,
+          id_verified:   checks.id,
+          edu_verified:  checks.edu,
+          emp_verified:  checks.emp,
+          admin_notes:   notes || null,
+          rejection_reason: newStatus === "failed" ? (rejReason || "Did not meet verification requirements") : null,
+          reviewed_at:   new Date().toISOString(),
+        }),
       });
-      if (res.ok) { flash("✓ BGV updated"); await load(); setSelected(null); }
+      if (res.ok) { flash(`✓ BGV marked as ${newStatus}`); await load(); setSelected(null); }
       else flash("Update failed");
     } catch { flash("Network error"); }
     setSaving(false);
   }
 
-  const statusColor: Record<string, string> = {
-    pending: "#fbbf24", in_progress: "var(--accent)", verified: "#4ade80", partial: "#fbbf24", failed: "#f87171",
-  };
+  const filtered = filter === "all" ? rows : rows.filter(r => r.status === filter);
+  const counts = Object.fromEntries(
+    (["all", "pending", "in_progress", "verified", "partial", "failed"] as const).map(s => [
+      s, s === "all" ? rows.length : rows.filter(r => r.status === s).length,
+    ])
+  );
 
   return (
     <div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-        <h2 style={{ fontSize: 16, fontWeight: 700 }}>🛡 Candidate BGV Submissions ({rows.length})</h2>
+      {/* Header + filter tabs */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 700 }}>🛡 Candidate BGV Queue</h2>
         <button onClick={load} style={btn()}>↻ Refresh</button>
       </div>
 
-      {loading ? <div style={{ color: "var(--text3)", fontSize: 13 }}>Loading…</div> : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {rows.length === 0 && <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>No BGV submissions yet.</div>}
-          {rows.map(r => (
-            <div key={r.id} style={{ ...card, display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 700 }}>{r.full_name}</div>
-                <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 2 }}>
-                  PAN: {r.pan_number || "—"} · Submitted: {new Date(r.submitted_at).toLocaleDateString("en-IN")}
-                  · Score: {r.verification_score ?? "—"}
+      <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+        {(["all", "pending", "in_progress", "verified", "failed"] as BgvFilter[]).map(f => {
+          const active = filter === f;
+          const cfg = STATUS_CFG[f];
+          return (
+            <button key={f} onClick={() => setFilter(f)} style={{
+              padding: "5px 12px", borderRadius: 99, border: `1px solid ${active ? (cfg?.color ?? "var(--accent)") : "var(--border)"}`,
+              background: active ? (cfg?.bg ?? "var(--accdim)") : "none",
+              color: active ? (cfg?.color ?? "var(--accent)") : "var(--text3)",
+              fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+            }}>
+              {f === "all" ? "All" : (STATUS_CFG[f]?.label ?? f)} ({counts[f] ?? 0})
+            </button>
+          );
+        })}
+      </div>
+
+      {loading
+        ? <div style={{ color: "var(--text3)", fontSize: 13, padding: 40, textAlign: "center" }}>Loading…</div>
+        : filtered.length === 0
+          ? <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>No BGV submissions in this category.</div>
+          : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {filtered.map(r => {
+                const s = STATUS_CFG[r.status] ?? STATUS_CFG.pending;
+                const acr = r.auto_check_results;
+                const needsCheck = !acr;
+                return (
+                  <div key={r.id} style={{ ...card, padding: "14px 18px" }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
+
+                      {/* Status icon */}
+                      <div style={{ width: 38, height: 38, borderRadius: 10, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                        {s.icon}
+                      </div>
+
+                      {/* Main info */}
+                      <div style={{ flex: 1, minWidth: 180 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                          <span style={{ fontSize: 14, fontWeight: 700 }}>{r.full_name}</span>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: s.color, padding: "2px 8px", borderRadius: 99, background: s.bg }}>
+                            {s.label}
+                          </span>
+                          {needsCheck && (
+                            <span style={{ fontSize: 10, fontWeight: 600, color: "var(--warn)", padding: "2px 8px", borderRadius: 99, background: "rgba(234,179,8,.08)", border: "1px solid rgba(234,179,8,.2)" }}>
+                              ⚡ Checks not run
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 3 }}>
+                          PAN: {r.pan_number || "—"}
+                          {r.dob ? ` · DOB: ${r.dob}` : ""}
+                          {" · "}Submitted: {new Date(r.submitted_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                        </div>
+                        {/* Check pills */}
+                        <div style={{ display: "flex", gap: 6, marginTop: 7, flexWrap: "wrap" }}>
+                          {[
+                            { label: "ID",    done: r.id_verified  },
+                            { label: "Edu",   done: r.edu_verified },
+                            { label: "Emp",   done: r.emp_verified },
+                          ].map(c => (
+                            <span key={c.label} style={{
+                              fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 6,
+                              background: c.done ? "rgba(34,197,94,.1)" : "var(--surface2)",
+                              color: c.done ? "var(--success)" : "var(--text3)",
+                              border: `1px solid ${c.done ? "rgba(34,197,94,.2)" : "var(--border)"}`,
+                            }}>{c.label} {c.done ? "✓" : "—"}</span>
+                          ))}
+                          {acr && (
+                            <span style={{
+                              fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 6,
+                              background: acr.autoScore >= 70 ? "rgba(34,197,94,.1)" : acr.autoScore >= 45 ? "rgba(234,179,8,.1)" : "rgba(239,68,68,.1)",
+                              color: acr.autoScore >= 70 ? "var(--success)" : acr.autoScore >= 45 ? "var(--warn)" : "var(--danger)",
+                            }}>
+                              Auto Score: {acr.autoScore}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                        <button onClick={() => openReview(r)} style={btn(true)}>Review →</button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )
+      }
+
+      {/* ── Review drawer/modal ── */}
+      {selected && (() => {
+        const acr = selected.auto_check_results;
+        const s   = STATUS_CFG[selected.status] ?? STATUS_CFG.pending;
+        const edu = (selected.education ?? []) as EduEntry[];
+        const emp = (selected.employment ?? []) as EmpEntry[];
+
+        // Group auto-check results by category
+        const grouped: Record<string, AutoCheckResult[]> = {};
+        (acr?.checks ?? []).forEach(c => {
+          if (!grouped[c.category]) grouped[c.category] = [];
+          grouped[c.category].push(c);
+        });
+
+        return (
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.65)", zIndex: 300, display: "flex", alignItems: "flex-start", justifyContent: "flex-end", padding: 0 }}
+            onClick={e => { if (e.target === e.currentTarget) setSelected(null); }}>
+            <div style={{ width: "100%", maxWidth: 600, height: "100vh", background: "var(--surface)", borderLeft: "1px solid var(--border)", overflowY: "auto", padding: "28px 28px 60px", display: "flex", flexDirection: "column", gap: 20 }}>
+
+              {/* Header */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div>
+                  <div style={{ fontSize: 17, fontWeight: 800 }}>{selected.full_name}</div>
+                  <div style={{ fontSize: 12, color: s.color, marginTop: 3, fontWeight: 600 }}>{s.icon} {s.label}</div>
                 </div>
-                <div style={{ fontSize: 11, marginTop: 4, display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {[["ID", r.id_verified], ["Edu", r.edu_verified], ["Emp", r.emp_verified]].map(([l, v]) => (
-                    <span key={l as string} style={{ padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 600, background: v ? "rgba(74,222,128,.1)" : "var(--surface2)", color: v ? "#4ade80" : "var(--text3)" }}>{l as string} {v ? "✓" : "✗"}</span>
-                  ))}
-                </div>
+                <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 20, padding: 4 }}>✕</button>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: statusColor[r.status] ?? "var(--text3)", padding: "3px 10px", borderRadius: 8, background: `${statusColor[r.status]}22` }}>
-                  {r.status}
-                </span>
-                <button onClick={() => { setSelected(r); setNotes(r.status === "verified" ? "Verification complete." : ""); }} style={btn(true)}>Review</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
 
-      {/* Review modal */}
-      {selected && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-          <div style={{ ...card, width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
-              <div style={{ fontSize: 15, fontWeight: 700 }}>Review: {selected.full_name}</div>
-              <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18 }}>✕</button>
-            </div>
-
-            <div style={{ fontSize: 13, color: "var(--text2)", marginBottom: 14 }}>
-              <div>PAN: {selected.pan_number || "—"}</div>
-              <div style={{ marginTop: 4 }}>Education entries: {(selected.education as unknown[])?.length ?? 0}</div>
-              <div style={{ marginTop: 4 }}>Employment entries: {(selected.employment as unknown[])?.length ?? 0}</div>
-            </div>
-
-            <div style={{ marginBottom: 14 }}>
-              <label style={label}>Checks Passed</label>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
-                {["id_verified", "edu_verified", "emp_verified"].map(k => (
-                  <label key={k} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
-                    <input type="checkbox" defaultChecked={!!(selected as unknown as Record<string, boolean>)[k]}
-                      id={`chk_${k}`} style={{ width: 14, height: 14 }} />
-                    {k.replace("_verified", "").replace("_", " ").toUpperCase()}
-                  </label>
+              {/* Identity summary */}
+              <div style={{ background: "var(--surface2)", borderRadius: 12, padding: "14px 16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 13 }}>
+                {[
+                  ["PAN",            selected.pan_number || "—"],
+                  ["Aadhaar",        selected.aadhaar_last4 ? `XXXX XXXX XXXX ${selected.aadhaar_last4}` : "—"],
+                  ["Date of Birth",  selected.dob || "—"],
+                  ["Submitted",      new Date(selected.submitted_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })],
+                ].map(([k, v]) => (
+                  <div key={k}>
+                    <div style={{ fontSize: 10, color: "var(--text3)", fontWeight: 700, textTransform: "uppercase", marginBottom: 2 }}>{k}</div>
+                    <div style={{ color: "var(--text1)", fontWeight: 600 }}>{v}</div>
+                  </div>
                 ))}
               </div>
-            </div>
 
-            <div style={{ marginBottom: 14 }}>
-              <label style={label}>Verification Score (0–100)</label>
-              <input type="number" min={0} max={100} id="bgv_score" defaultValue={selected.verification_score ?? 0}
-                style={{ ...input, width: 100 }} />
-            </div>
+              {/* Auto-check results */}
+              <div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700 }}>⚡ Automated Check Results</div>
+                  <button
+                    onClick={() => runAutoCheck(selected.id)}
+                    disabled={running}
+                    style={{ ...btn(), fontSize: 12, padding: "5px 12px" }}
+                  >
+                    {running ? "Running…" : acr ? "↻ Re-run Checks" : "▶ Run Checks"}
+                  </button>
+                </div>
 
-            <div style={{ marginBottom: 14 }}>
-              <label style={label}>Admin Notes</label>
-              <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3}
-                style={{ ...input, resize: "vertical" }} placeholder="Internal notes for this BGV…" />
-            </div>
+                {!acr && (
+                  <div style={{ padding: "14px", borderRadius: 10, background: "rgba(234,179,8,.06)", border: "1px solid rgba(234,179,8,.2)", fontSize: 13, color: "var(--warn)", textAlign: "center" }}>
+                    Auto-checks haven&apos;t been run yet. Click <strong>▶ Run Checks</strong> to start.
+                  </div>
+                )}
 
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {[
-                { status: "verified",     label: "✓ Mark Verified",    accent: true  },
-                { status: "partial",      label: "⚠ Partial Verify",  accent: false },
-                { status: "in_progress",  label: "🔍 Mark In Progress",accent: false },
-                { status: "failed",       label: "✗ Mark Failed",     accent: false },
-              ].map(a => (
-                <button key={a.status} disabled={saving} onClick={() => {
-                  const score = parseInt((document.getElementById("bgv_score") as HTMLInputElement)?.value ?? "0");
-                  const idV   = (document.getElementById("chk_id_verified") as HTMLInputElement)?.checked ?? false;
-                  const eduV  = (document.getElementById("chk_edu_verified") as HTMLInputElement)?.checked ?? false;
-                  const empV  = (document.getElementById("chk_emp_verified") as HTMLInputElement)?.checked ?? false;
-                  updateBgv(selected.id, { status: a.status, verification_score: score, id_verified: idV, edu_verified: eduV, emp_verified: empV, admin_notes: notes, reviewed_at: new Date().toISOString() });
-                }} style={btn(a.accent)}>{a.label}</button>
-              ))}
+                {acr && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {/* Score bar */}
+                    <div style={{ background: "var(--surface2)", borderRadius: 10, padding: "12px 14px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                        <span style={{ fontSize: 12, color: "var(--text3)" }}>Auto Score</span>
+                        <span style={{ fontSize: 16, fontWeight: 800, color: acr.autoScore >= 70 ? "var(--success)" : acr.autoScore >= 45 ? "var(--warn)" : "var(--danger)" }}>
+                          {acr.autoScore}/100
+                        </span>
+                      </div>
+                      <div style={{ height: 6, background: "rgba(255,255,255,.06)", borderRadius: 3 }}>
+                        <div style={{ height: "100%", borderRadius: 3, width: `${acr.autoScore}%`, transition: "width .6s",
+                          background: acr.autoScore >= 70 ? "var(--success)" : acr.autoScore >= 45 ? "var(--warn)" : "var(--danger)" }} />
+                      </div>
+                      <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 5 }}>
+                        Ran: {new Date(acr.runAt).toLocaleString("en-IN")}
+                      </div>
+                    </div>
+
+                    {/* Items needing manual review */}
+                    {acr.requiresManualReview.length > 0 && (
+                      <div style={{ background: "rgba(234,179,8,.06)", border: "1px solid rgba(234,179,8,.2)", borderRadius: 10, padding: "12px 14px" }}>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--warn)", marginBottom: 8 }}>⚠ Needs Manual Review</div>
+                        {acr.requiresManualReview.map((item, i) => (
+                          <div key={i} style={{ fontSize: 12, color: "var(--text2)", marginBottom: 4 }}>• {item}</div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Check results grouped */}
+                    {(["identity", "education", "employment", "completeness"] as const).map(cat => {
+                      const catChecks = grouped[cat];
+                      if (!catChecks?.length) return null;
+                      const catLabel = { identity: "🪪 Identity", education: "🎓 Education", employment: "💼 Employment", completeness: "📋 Completeness" }[cat];
+                      return (
+                        <div key={cat} style={{ background: "var(--surface2)", borderRadius: 10, overflow: "hidden" }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text3)", padding: "8px 14px", borderBottom: "1px solid var(--border)", textTransform: "uppercase", letterSpacing: ".04em" }}>
+                            {catLabel}
+                          </div>
+                          {catChecks.map((c, i) => (
+                            <div key={i} style={{ display: "flex", gap: 10, padding: "8px 14px", borderBottom: i < catChecks.length - 1 ? "1px solid var(--border)" : "none", alignItems: "flex-start" }}>
+                              <span style={{ fontSize: 13, flexShrink: 0, marginTop: 1 }}>{CHECK_ICON[c.status]}</span>
+                              <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: 12, fontWeight: 600, color: CHECK_COLOR[c.status] }}>{c.check}</div>
+                                <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>{c.detail}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Education entries */}
+              {edu.length > 0 && (
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>🎓 Education ({edu.length})</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {edu.map((e, i) => (
+                      <div key={i} style={{ background: "var(--surface2)", borderRadius: 10, padding: "10px 14px", fontSize: 13 }}>
+                        <div style={{ fontWeight: 700, color: "var(--text1)" }}>{e.degree}</div>
+                        <div style={{ color: "var(--text2)", marginTop: 2 }}>{e.institution}</div>
+                        <div style={{ color: "var(--text3)", fontSize: 11, marginTop: 2 }}>{e.year}{e.result ? ` · ${e.result}` : ""}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Employment entries */}
+              {emp.length > 0 && (
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>💼 Employment ({emp.length})</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {emp.map((e, i) => (
+                      <div key={i} style={{ background: "var(--surface2)", borderRadius: 10, padding: "10px 14px", fontSize: 13 }}>
+                        <div style={{ fontWeight: 700, color: "var(--text1)" }}>{e.role} <span style={{ color: "var(--text3)", fontWeight: 400 }}>@ {e.company}</span></div>
+                        <div style={{ color: "var(--text3)", fontSize: 11, marginTop: 2 }}>{e.from_date} → {e.to_date || "Present"}</div>
+                        {e.manager_email && (
+                          <div style={{ marginTop: 6, padding: "6px 10px", background: "rgba(99,102,241,.06)", borderRadius: 7, fontSize: 11, color: "var(--text2)" }}>
+                            📧 Reference: {e.manager_name || "—"} · <a href={`mailto:${e.manager_email}`} style={{ color: "var(--accent)" }}>{e.manager_email}</a>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ── Final approval section ── */}
+              <div style={{ background: "var(--bg)", borderRadius: 12, padding: "18px", border: "1px solid var(--border)" }}>
+                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14 }}>✍ Admin Decision</div>
+
+                {/* Manual check overrides */}
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", marginBottom: 8 }}>Verification Checks</div>
+                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                    {[
+                      { key: "id",  label: "🪪 Identity" },
+                      { key: "edu", label: "🎓 Education" },
+                      { key: "emp", label: "💼 Employment" },
+                    ].map(({ key, label }) => (
+                      <label key={key} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer", padding: "6px 12px", borderRadius: 8, border: `1px solid ${checks[key as keyof typeof checks] ? "var(--accborder)" : "var(--border)"}`, background: checks[key as keyof typeof checks] ? "var(--accdim)" : "none" }}>
+                        <input type="checkbox"
+                          checked={checks[key as keyof typeof checks]}
+                          onChange={e => setChecks(p => ({ ...p, [key]: e.target.checked }))}
+                          style={{ width: 14, height: 14 }} />
+                        {label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Score */}
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", marginBottom: 6 }}>Verification Score (0–100)</div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <input type="range" min={0} max={100} value={score} onChange={e => setScore(Number(e.target.value))}
+                      style={{ flex: 1 }} />
+                    <span style={{ fontSize: 16, fontWeight: 800, minWidth: 40, color: score >= 70 ? "var(--success)" : score >= 45 ? "var(--warn)" : "var(--danger)" }}>
+                      {score}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Notes */}
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", marginBottom: 6 }}>Admin Notes (visible to candidate)</div>
+                  <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2}
+                    style={{ ...input, resize: "vertical", fontSize: 13 }} placeholder="Optional note shown to candidate…" />
+                </div>
+
+                {/* Rejection reason — shown only for failed action */}
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", marginBottom: 6 }}>Rejection Reason (if rejecting)</div>
+                  <input value={rejReason} onChange={e => setRejReason(e.target.value)}
+                    style={{ ...input, fontSize: 13 }} placeholder="e.g. Could not verify employment at XYZ Corp" />
+                </div>
+
+                {/* Action buttons */}
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  <button disabled={saving} onClick={() => approveBgv("verified")} style={{
+                    ...btn(true), background: "var(--success)", flex: 1,
+                  }}>
+                    ✅ Approve & Verify
+                  </button>
+                  <button disabled={saving} onClick={() => approveBgv("partial")} style={{ ...btn(), flex: 1 }}>
+                    ⚠ Partial
+                  </button>
+                  <button disabled={saving} onClick={() => approveBgv("in_progress")} style={{ ...btn(), flex: 1 }}>
+                    🔍 Keep In Progress
+                  </button>
+                  <button disabled={saving} onClick={() => approveBgv("failed")} style={{
+                    ...btn(), background: "rgba(239,68,68,.1)", color: "var(--danger)", border: "1px solid rgba(239,68,68,.2)", flex: 1,
+                  }}>
+                    ✗ Reject
+                  </button>
+                </div>
+              </div>
+
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
@@ -734,8 +1050,8 @@ function CompanyVerifyAdminView({ token, flash }: { token: string; flash: (m: st
   }
 
   const statusColor: Record<string, string> = {
-    pending: "#fbbf24", in_progress: "var(--accent)", verified: "#4ade80",
-    partially_verified: "#fbbf24", failed: "#f87171",
+    pending: "var(--warn)", in_progress: "var(--accent)", verified: "var(--success)",
+    partially_verified: "var(--warn)", failed: "var(--danger)",
   };
 
   return (
@@ -756,10 +1072,10 @@ function CompanyVerifyAdminView({ token, flash }: { token: string; flash: (m: st
                   CIN: {r.cin || "—"} · GSTIN: {r.gstin || "—"} · Submitted: {new Date(r.created_at).toLocaleDateString("en-IN")}
                 </div>
                 <div style={{ fontSize: 11, marginTop: 4, display: "flex", gap: 8 }}>
-                  <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 600, background: r.is_gst_verified ? "rgba(74,222,128,.1)" : "var(--surface2)", color: r.is_gst_verified ? "#4ade80" : "var(--text3)" }}>
+                  <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 600, background: r.is_gst_verified ? "rgba(34,197,94,.1)" : "var(--surface2)", color: r.is_gst_verified ? "var(--success)" : "var(--text3)" }}>
                     GST {r.is_gst_verified ? "✓" : "⏳"}
                   </span>
-                  <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 600, background: r.is_mca_verified ? "rgba(74,222,128,.1)" : "var(--surface2)", color: r.is_mca_verified ? "#4ade80" : "var(--text3)" }}>
+                  <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 600, background: r.is_mca_verified ? "rgba(34,197,94,.1)" : "var(--surface2)", color: r.is_mca_verified ? "var(--success)" : "var(--text3)" }}>
                     MCA {r.is_mca_verified ? "✓" : "⏳"}
                   </span>
                   {r.gst_trade_name && <span style={{ fontSize: 10, color: "var(--text3)" }}>{r.gst_trade_name}</span>}
@@ -794,7 +1110,7 @@ function CompanyVerifyAdminView({ token, flash }: { token: string; flash: (m: st
             <div style={{ fontSize: 13, color: "var(--text2)", marginBottom: 14 }}>
               <div>CIN: {selected.cin || "—"}</div>
               <div style={{ marginTop: 4 }}>GSTIN: {selected.gstin || "—"} {selected.is_gst_verified ? "✅" : "⏳"}</div>
-              {selected.gst_trade_name && <div style={{ marginTop: 4, color: "#4ade80" }}>GST Trade Name: {selected.gst_trade_name}</div>}
+              {selected.gst_trade_name && <div style={{ marginTop: 4, color: "var(--success)" }}>GST Trade Name: {selected.gst_trade_name}</div>}
             </div>
 
             <div style={{ marginBottom: 14 }}>

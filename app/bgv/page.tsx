@@ -12,7 +12,7 @@ import { validatePAN } from "@/lib/bgvUtils";
 /* ── Types ─────────────────────────────────────────────────── */
 interface EduEntry  { degree: string; institution: string; year: string; result: string }
 interface EmpEntry  { company: string; role: string; from_date: string; to_date: string; manager_name: string; manager_email: string }
-interface BgvRecord { status: string; verification_score: number | null; id_verified: boolean; edu_verified: boolean; emp_verified: boolean; address_verified: boolean; submitted_at: string; admin_notes: string | null; rejection_reason: string | null }
+interface BgvRecord { status: string; verification_score: number | null; id_verified: boolean; edu_verified: boolean; emp_verified: boolean; address_verified: boolean; submitted_at: string; admin_notes: string | null; rejection_reason: string | null; auto_check_results?: { autoScore: number } | null }
 
 type Step = "identity" | "education" | "employment" | "review" | "submitted";
 
@@ -45,11 +45,11 @@ const cardStyle: React.CSSProperties = {
 /* ── Status badge ───────────────────────────────────────────── */
 function StatusBadge({ bgv }: { bgv: BgvRecord }) {
   const cfg: Record<string, { color: string; bg: string; label: string; icon: string }> = {
-    pending:     { color: "#fbbf24", bg: "rgba(251,191,36,.1)",  label: "Pending Review",    icon: "⏳" },
+    pending:     { color: "var(--warn)", bg: "rgba(234,179,8,.1)",  label: "Pending Review",    icon: "⏳" },
     in_progress: { color: "var(--accent)", bg: "var(--accdim)", label: "In Progress",        icon: "🔍" },
-    verified:    { color: "#4ade80", bg: "rgba(74,222,128,.1)",  label: "Verified ✓",         icon: "🛡" },
-    partial:     { color: "#fbbf24", bg: "rgba(251,191,36,.1)",  label: "Partially Verified", icon: "⚠" },
-    failed:      { color: "#f87171", bg: "rgba(248,113,113,.1)", label: "Verification Failed","icon": "✗" },
+    verified:    { color: "var(--success)", bg: "rgba(34,197,94,.1)",  label: "Verified ✓",         icon: "🛡" },
+    partial:     { color: "var(--warn)", bg: "rgba(234,179,8,.1)",  label: "Partially Verified", icon: "⚠" },
+    failed:      { color: "var(--danger)", bg: "rgba(239,68,68,.1)", label: "Verification Failed","icon": "✗" },
   };
   const s = cfg[bgv.status] ?? cfg.pending;
   const checks = [
@@ -74,11 +74,11 @@ function StatusBadge({ bgv }: { bgv: BgvRecord }) {
         {checks.map(c => (
           <div key={c.label} style={{
             padding: "10px 12px", borderRadius: 9, textAlign: "center",
-            background: c.done ? "rgba(74,222,128,.08)" : "var(--surface2)",
-            border: `1px solid ${c.done ? "rgba(74,222,128,.2)" : "var(--border)"}`,
+            background: c.done ? "rgba(34,197,94,.08)" : "var(--surface2)",
+            border: `1px solid ${c.done ? "rgba(34,197,94,.2)" : "var(--border)"}`,
           }}>
             <div style={{ fontSize: 18, marginBottom: 4 }}>{c.done ? "✅" : "⭕"}</div>
-            <div style={{ fontSize: 11, color: c.done ? "#4ade80" : "var(--text3)", fontWeight: 600 }}>{c.label}</div>
+            <div style={{ fontSize: 11, color: c.done ? "var(--success)" : "var(--text3)", fontWeight: 600 }}>{c.label}</div>
           </div>
         ))}
       </div>
@@ -88,7 +88,7 @@ function StatusBadge({ bgv }: { bgv: BgvRecord }) {
         </div>
       )}
       {bgv.rejection_reason && (
-        <div style={{ marginTop: 10, padding: "10px 14px", background: "rgba(248,113,113,.08)", borderRadius: 9, fontSize: 13, color: "#f87171", border: "1px solid rgba(248,113,113,.2)" }}>
+        <div style={{ marginTop: 10, padding: "10px 14px", background: "rgba(239,68,68,.08)", borderRadius: 9, fontSize: 13, color: "var(--danger)", border: "1px solid rgba(239,68,68,.2)" }}>
           ✗ {bgv.rejection_reason}
         </div>
       )}
@@ -106,8 +106,8 @@ function StepBar({ current }: { current: Step }) {
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: 72 }}>
             <div style={{
               width: 36, height: 36, borderRadius: "50%",
-              background: i < idx ? "#4ade80" : i === idx ? "var(--accent)" : "var(--surface2)",
-              border: `2px solid ${i < idx ? "#4ade80" : i === idx ? "var(--accent)" : "var(--border)"}`,
+              background: i < idx ? "var(--success)" : i === idx ? "var(--accent)" : "var(--surface2)",
+              border: `2px solid ${i < idx ? "var(--success)" : i === idx ? "var(--accent)" : "var(--border)"}`,
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: i < idx ? 14 : 16, color: i <= idx ? "#fff" : "var(--text3)",
               fontWeight: 700,
@@ -117,7 +117,7 @@ function StepBar({ current }: { current: Step }) {
             <div style={{ fontSize: 11, color: i === idx ? "var(--accent)" : "var(--text3)", marginTop: 5, fontWeight: i === idx ? 700 : 400 }}>{s.label}</div>
           </div>
           {i < STEPS.length - 1 && (
-            <div style={{ flex: 1, height: 2, background: i < idx ? "#4ade80" : "var(--border)", margin: "0 4px 20px" }} />
+            <div style={{ flex: 1, height: 2, background: i < idx ? "var(--success)" : "var(--border)", margin: "0 4px 20px" }} />
           )}
         </React.Fragment>
       ))}
@@ -136,6 +136,7 @@ export default function BgvPage() {
 
   // Form state
   const [step, setStep]           = useState<Step>("identity");
+  const [submitMsg, setSubmitMsg] = useState<string>("");
   const [identity, setIdentity]   = useState({ full_name: "", dob: "", pan_number: "", aadhaar_last4: "" });
   const [education, setEducation] = useState<EduEntry[]>([emptyEdu()]);
   const [employment, setEmployment] = useState<EmpEntry[]>([emptyEmp()]);
@@ -205,9 +206,12 @@ export default function BgvPage() {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...identity, education, employment }),
       });
-      const data = await res.json() as { bgv?: BgvRecord; error?: string };
-      if (data.bgv) { setExisting(data.bgv as unknown as BgvRecord); setStep("submitted"); }
-      else alert(data.error ?? "Submission failed");
+      const data = await res.json() as { bgv?: BgvRecord; error?: string; autoScore?: number; message?: string };
+      if (data.bgv) {
+        setExisting(data.bgv as unknown as BgvRecord);
+        setSubmitMsg(data.message ?? "");
+        setStep("submitted");
+      } else alert(data.error ?? "Submission failed");
     } catch { alert("Network error. Please try again."); }
     finally { setSubmitting(false); }
   }
@@ -281,10 +285,19 @@ export default function BgvPage() {
           <div style={{ ...cardStyle, textAlign: "center", padding: "48px" }}>
             <div style={{ fontSize: 56, marginBottom: 16 }}>🛡</div>
             <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 10 }}>BGV Submitted Successfully!</h2>
-            <p style={{ fontSize: 14, color: "var(--text3)", marginBottom: 24, lineHeight: 1.7 }}>
-              Our verification team will review your details within 2–5 business days.
-              You'll receive an email once your BGV is complete.
+            <p style={{ fontSize: 14, color: "var(--text3)", marginBottom: 16, lineHeight: 1.7 }}>
+              {submitMsg || "Our verification team will review your details within 2–5 business days. You'll receive an email once your BGV is complete."}
             </p>
+            {existing?.auto_check_results?.autoScore != null && (
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 18px", borderRadius: 99, marginBottom: 24,
+                background: existing.auto_check_results.autoScore >= 70 ? "rgba(34,197,94,.1)" : "rgba(234,179,8,.1)",
+                border: `1px solid ${existing.auto_check_results.autoScore >= 70 ? "rgba(34,197,94,.25)" : "rgba(234,179,8,.25)"}`,
+                color: existing.auto_check_results.autoScore >= 70 ? "var(--success)" : "var(--warn)",
+                fontSize: 13, fontWeight: 700,
+              }}>
+                ⚡ Auto-check score: {existing.auto_check_results.autoScore}/100
+              </div>
+            )}
             <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
               <Link href="/profile" style={{ padding: "11px 24px", background: "var(--accent)", borderRadius: 9, color: "#fff", fontSize: 14, fontWeight: 700, textDecoration: "none" }}>View My Profile</Link>
               <Link href="/jobs" style={{ padding: "11px 24px", border: "1px solid var(--border)", borderRadius: 9, color: "var(--text2)", fontSize: 14, fontWeight: 600, textDecoration: "none" }}>Browse Jobs</Link>
@@ -304,10 +317,10 @@ export default function BgvPage() {
                 <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                   <div>
                     <label style={labelStyle}>Full Name (as per ID) *</label>
-                    <input style={{ ...inputStyle, borderColor: errors.full_name ? "#f87171" : "" }}
+                    <input style={{ ...inputStyle, borderColor: errors.full_name ? "var(--danger)" : "" }}
                       value={identity.full_name} onChange={e => setId("full_name", e.target.value)}
                       placeholder="Priya Sharma" />
-                    {errors.full_name && <div style={{ fontSize: 12, color: "#f87171", marginTop: 4 }}>{errors.full_name}</div>}
+                    {errors.full_name && <div style={{ fontSize: 12, color: "var(--danger)", marginTop: 4 }}>{errors.full_name}</div>}
                   </div>
                   <div>
                     <label style={labelStyle}>Date of Birth</label>
@@ -316,22 +329,22 @@ export default function BgvPage() {
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                     <div>
                       <label style={labelStyle}>PAN Number</label>
-                      <input style={{ ...inputStyle, borderColor: errors.pan_number ? "#f87171" : "", textTransform: "uppercase" }}
+                      <input style={{ ...inputStyle, borderColor: errors.pan_number ? "var(--danger)" : "", textTransform: "uppercase" }}
                         value={identity.pan_number} onChange={e => setId("pan_number", e.target.value.toUpperCase())}
                         placeholder="ABCDE1234F" maxLength={10} />
-                      {errors.pan_number ? <div style={{ fontSize: 12, color: "#f87171", marginTop: 4 }}>{errors.pan_number}</div>
+                      {errors.pan_number ? <div style={{ fontSize: 12, color: "var(--danger)", marginTop: 4 }}>{errors.pan_number}</div>
                         : <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 4 }}>5 letters + 4 digits + 1 letter</div>}
                     </div>
                     <div>
                       <label style={labelStyle}>Aadhaar — Last 4 Digits Only</label>
-                      <input style={{ ...inputStyle, borderColor: errors.aadhaar_last4 ? "#f87171" : "" }}
+                      <input style={{ ...inputStyle, borderColor: errors.aadhaar_last4 ? "var(--danger)" : "" }}
                         value={identity.aadhaar_last4} onChange={e => setId("aadhaar_last4", e.target.value.replace(/\D/g, "").slice(0, 4))}
                         placeholder="XXXX" maxLength={4} inputMode="numeric" />
-                      {errors.aadhaar_last4 ? <div style={{ fontSize: 12, color: "#f87171", marginTop: 4 }}>{errors.aadhaar_last4}</div>
+                      {errors.aadhaar_last4 ? <div style={{ fontSize: 12, color: "var(--danger)", marginTop: 4 }}>{errors.aadhaar_last4}</div>
                         : <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 4 }}>We never store your full Aadhaar number</div>}
                     </div>
                   </div>
-                  <div style={{ padding: "12px 14px", background: "rgba(129,140,248,.06)", border: "1px solid var(--accborder)", borderRadius: 9, fontSize: 12, color: "var(--text2)" }}>
+                  <div style={{ padding: "12px 14px", background: "rgba(99,102,241,.06)", border: "1px solid var(--accborder)", borderRadius: 9, fontSize: 12, color: "var(--text2)" }}>
                     🔒 <strong>Privacy:</strong> Only the last 4 digits of Aadhaar are stored. PAN is used for identity matching only and is never shared with third parties.
                   </div>
                 </div>
@@ -347,7 +360,7 @@ export default function BgvPage() {
                       <h3 style={{ fontSize: 14, fontWeight: 700 }}>🎓 Education {i + 1}</h3>
                       {education.length > 1 && (
                         <button onClick={() => setEducation(p => p.filter((_, j) => j !== i))}
-                          style={{ background: "none", border: "none", cursor: "pointer", color: "#f87171", fontSize: 12, fontWeight: 600 }}>
+                          style={{ background: "none", border: "none", cursor: "pointer", color: "var(--danger)", fontSize: 12, fontWeight: 600 }}>
                           Remove
                         </button>
                       )}
@@ -356,10 +369,10 @@ export default function BgvPage() {
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                         <div>
                           <label style={labelStyle}>Degree / Qualification *</label>
-                          <input style={{ ...inputStyle, borderColor: errors[`edu_${i}_degree`] ? "#f87171" : "" }}
+                          <input style={{ ...inputStyle, borderColor: errors[`edu_${i}_degree`] ? "var(--danger)" : "" }}
                             value={ed.degree} onChange={e => setEdu(i, "degree", e.target.value)}
                             placeholder="B.Tech Computer Science" />
-                          {errors[`edu_${i}_degree`] && <div style={{ fontSize: 12, color: "#f87171", marginTop: 4 }}>{errors[`edu_${i}_degree`]}</div>}
+                          {errors[`edu_${i}_degree`] && <div style={{ fontSize: 12, color: "var(--danger)", marginTop: 4 }}>{errors[`edu_${i}_degree`]}</div>}
                         </div>
                         <div>
                           <label style={labelStyle}>Year of Passing</label>
@@ -368,10 +381,10 @@ export default function BgvPage() {
                       </div>
                       <div>
                         <label style={labelStyle}>Institution / University *</label>
-                        <input style={{ ...inputStyle, borderColor: errors[`edu_${i}_institution`] ? "#f87171" : "" }}
+                        <input style={{ ...inputStyle, borderColor: errors[`edu_${i}_institution`] ? "var(--danger)" : "" }}
                           value={ed.institution} onChange={e => setEdu(i, "institution", e.target.value)}
                           placeholder="IIT Delhi / Anna University" />
-                        {errors[`edu_${i}_institution`] && <div style={{ fontSize: 12, color: "#f87171", marginTop: 4 }}>{errors[`edu_${i}_institution`]}</div>}
+                        {errors[`edu_${i}_institution`] && <div style={{ fontSize: 12, color: "var(--danger)", marginTop: 4 }}>{errors[`edu_${i}_institution`]}</div>}
                       </div>
                       <div>
                         <label style={labelStyle}>Result / Grade (optional)</label>
@@ -401,7 +414,7 @@ export default function BgvPage() {
                       <h3 style={{ fontSize: 14, fontWeight: 700 }}>💼 Employment {i + 1} {i === 0 ? "(Most Recent)" : ""}</h3>
                       {employment.length > 1 && (
                         <button onClick={() => setEmployment(p => p.filter((_, j) => j !== i))}
-                          style={{ background: "none", border: "none", cursor: "pointer", color: "#f87171", fontSize: 12, fontWeight: 600 }}>
+                          style={{ background: "none", border: "none", cursor: "pointer", color: "var(--danger)", fontSize: 12, fontWeight: 600 }}>
                           Remove
                         </button>
                       )}
@@ -410,15 +423,15 @@ export default function BgvPage() {
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                         <div>
                           <label style={labelStyle}>Company Name *</label>
-                          <input style={{ ...inputStyle, borderColor: errors[`emp_${i}_company`] ? "#f87171" : "" }}
+                          <input style={{ ...inputStyle, borderColor: errors[`emp_${i}_company`] ? "var(--danger)" : "" }}
                             value={em.company} onChange={e => setEmp(i, "company", e.target.value)} placeholder="Razorpay / Infosys" />
-                          {errors[`emp_${i}_company`] && <div style={{ fontSize: 12, color: "#f87171", marginTop: 4 }}>{errors[`emp_${i}_company`]}</div>}
+                          {errors[`emp_${i}_company`] && <div style={{ fontSize: 12, color: "var(--danger)", marginTop: 4 }}>{errors[`emp_${i}_company`]}</div>}
                         </div>
                         <div>
                           <label style={labelStyle}>Role / Designation *</label>
-                          <input style={{ ...inputStyle, borderColor: errors[`emp_${i}_role`] ? "#f87171" : "" }}
+                          <input style={{ ...inputStyle, borderColor: errors[`emp_${i}_role`] ? "var(--danger)" : "" }}
                             value={em.role} onChange={e => setEmp(i, "role", e.target.value)} placeholder="Senior Engineer" />
-                          {errors[`emp_${i}_role`] && <div style={{ fontSize: 12, color: "#f87171", marginTop: 4 }}>{errors[`emp_${i}_role`]}</div>}
+                          {errors[`emp_${i}_role`] && <div style={{ fontSize: 12, color: "var(--danger)", marginTop: 4 }}>{errors[`emp_${i}_role`]}</div>}
                         </div>
                       </div>
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -488,7 +501,7 @@ export default function BgvPage() {
                   ))}
                 </Section>
 
-                <div style={{ padding: "12px 14px", background: "rgba(74,222,128,.06)", border: "1px solid rgba(74,222,128,.2)", borderRadius: 9, fontSize: 12, color: "var(--text2)", marginBottom: 20 }}>
+                <div style={{ padding: "12px 14px", background: "rgba(34,197,94,.06)", border: "1px solid rgba(34,197,94,.2)", borderRadius: 9, fontSize: 12, color: "var(--text2)", marginBottom: 20 }}>
                   By submitting, I confirm all information provided is accurate and I consent to jobSayer verifying these details with the respective institutions and employers.
                 </div>
               </div>
