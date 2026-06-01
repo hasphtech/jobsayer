@@ -30,17 +30,15 @@ export async function getSupabaseAsync(): Promise<SupabaseClient> {
     );
   }
 
-  _clientPromise = import("@supabase/ssr").then(async ({ createBrowserClient }) => {
+  _clientPromise = import("@supabase/ssr").then(({ createBrowserClient }) => {
+    // Do NOT call getSession() here — it fires INITIAL_SESSION before
+    // AuthProvider's onAuthStateChange listener is set up, causing Google
+    // OAuth sessions to be silently lost. Let AuthProvider own the first call.
     _client = createBrowserClient(url, anon, {
       global: {
         headers: { "x-client-info": "jobsayer" },
       },
     });
-
-    if (typeof document !== "undefined") {
-      await _client.auth.getSession();
-    }
-
     return _client;
   }).catch((err) => {
     _clientPromise = null; // allow retry on next call

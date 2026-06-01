@@ -261,7 +261,7 @@ function SignInModal({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Google */}
-        <button onClick={signInWithGoogle} style={btnGhost}>
+        <button onClick={() => signInWithGoogle()} style={btnGhost}>
           <svg width="18" height="18" viewBox="0 0 48 48">
             <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
             <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
@@ -1005,16 +1005,43 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 ══════════════════════════════════════════════════════════════ */
 export default function HomePage() {
   const { user } = useAuth();
-  const [showSignIn, setShowSignIn] = useState(false);
+  const [showSignIn, setShowSignIn]   = useState(false);
+  const [authError,  setAuthError]    = useState<string | null>(null);
   const openSignIn  = useCallback(() => setShowSignIn(true),  []);
   const closeSignIn = useCallback(() => setShowSignIn(false), []);
 
   // Auto-close modal once the user successfully signs in
   useEffect(() => { if (user) setShowSignIn(false); }, [user]);
 
+  // Surface ?auth_error= from failed OAuth callback
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const err = params.get("auth_error");
+    if (err) {
+      setAuthError(err);
+      // Clean the param from the URL without a reload
+      const clean = new URL(window.location.href);
+      clean.searchParams.delete("auth_error");
+      window.history.replaceState({}, "", clean.toString());
+    }
+  }, []);
+
   return (
     <>
       <Nav user={user} signIn={openSignIn} />
+      {authError && (
+        <div style={{
+          position: "fixed", top: 64, left: "50%", transform: "translateX(-50%)",
+          zIndex: 500, padding: "10px 20px", borderRadius: 10,
+          background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)",
+          color: "var(--danger)", fontSize: 13, fontWeight: 600,
+          display: "flex", alignItems: "center", gap: 10,
+          boxShadow: "0 4px 20px rgba(0,0,0,.3)",
+        }}>
+          ⚠ {authError}
+          <button onClick={() => setAuthError(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--danger)", fontSize: 16, padding: 0 }}>✕</button>
+        </div>
+      )}
       {user
         ? <Dashboard user={user} />
         : <LandingPage signIn={openSignIn} />

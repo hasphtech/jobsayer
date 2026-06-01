@@ -159,7 +159,7 @@ function EmployerAuthModal({
           /* Method selection */
           <>
             {/* Google */}
-            <button onClick={signInWithGoogle} style={{
+            <button onClick={() => signInWithGoogle()} style={{
               width: "100%", padding: "11px", borderRadius: 9,
               border: "1px solid var(--border)", background: "var(--surface2)",
               color: "var(--text1)", fontSize: 14, fontWeight: 600,
