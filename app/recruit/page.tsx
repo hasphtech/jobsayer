@@ -464,6 +464,9 @@ function RecruiterDashboard({ profile }: { profile: EmployerProfile }) {
           </div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
+          <Link href="/verify" style={{ padding: "8px 16px", background: profile.plan !== "free" ? "rgba(74,222,128,.08)" : "var(--surface2)", border: `1px solid ${profile.plan !== "free" ? "rgba(74,222,128,.2)" : "var(--border)"}`, borderRadius: 8, color: profile.plan !== "free" ? "#4ade80" : "var(--text3)", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
+            🏅 Verify Company
+          </Link>
           {profile.plan === "free" && (
             <Link href="#pricing" style={{ padding: "8px 16px", background: "var(--accdim)", border: "1px solid var(--accborder)", borderRadius: 8, color: "var(--accent)", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
               ⚡ Upgrade Plan

@@ -455,6 +455,9 @@ function JobCard({ job, selected, onClick }: { job: ScoredJob; selected: boolean
           <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 10, background: "rgba(251,191,36,.1)", color: "#fbbf24" }}>⚠ Possible ghost job</span>
         )}
         <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 10, background: trust.bg, color: trust.color }}>{trust.label}</span>
+        {job.verified && (
+          <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 9px", borderRadius: 10, background: "rgba(74,222,128,.1)", color: "#4ade80", border: "1px solid rgba(74,222,128,.25)" }}>🏅 Verified Employer</span>
+        )}
       </div>
 
       {/* Skills */}

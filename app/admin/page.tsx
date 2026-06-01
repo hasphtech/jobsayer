@@ -27,7 +27,7 @@ interface AdminJob {
   posted_at: string;
 }
 
-type View = "add" | "scrape" | "queue" | "manage";
+type View = "add" | "scrape" | "queue" | "manage" | "bgv" | "companies";
 
 const EMPTY_FORM: Omit<AdminJob, "id" | "posted_at" | "is_active" | "is_approved"> = {
   title: "", company: "", location: "Bengaluru", mode: "hybrid",
@@ -144,23 +144,25 @@ export default function AdminPage() {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: "flex", gap: 4, marginBottom: 20, borderBottom: "1px solid var(--border)", paddingBottom: 0 }}>
-          {(["add", "scrape", "queue", "manage"] as View[]).map(v => (
+        <div style={{ display: "flex", gap: 2, marginBottom: 20, borderBottom: "1px solid var(--border)", flexWrap: "wrap" }}>
+          {(["add", "scrape", "queue", "manage", "bgv", "companies"] as View[]).map(v => (
             <button key={v} onClick={() => { setView(v); if (v === "queue") loadJobs("pending"); if (v === "manage") loadJobs("all"); }}
-              style={{ padding: "9px 18px", fontSize: 13, fontWeight: 700, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
+              style={{ padding: "9px 16px", fontSize: 13, fontWeight: 700, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
                 color: view === v ? "var(--accent)" : "var(--text3)",
                 borderBottom: view === v ? "2px solid var(--accent)" : "2px solid transparent",
               }}>
-              {{ add: "➕ Add Job", scrape: "🤖 Scrape", queue: `🔍 Review Queue ${pending > 0 ? `(${pending})` : ""}`, manage: "📋 Manage" }[v]}
+              {{ add: "➕ Add Job", scrape: "🤖 Scrape", queue: `🔍 Queue ${pending > 0 ? `(${pending})` : ""}`, manage: "📋 Manage", bgv: "🛡 BGV", companies: "🏅 Companies" }[v]}
             </button>
           ))}
         </div>
 
         {/* Views */}
-        {view === "add"     && <AddView     token={token!} onSaved={() => { loadJobs("all"); flash("✓ Job added — go to Review Queue to approve."); }} />}
-        {view === "scrape"  && <ScrapeView  token={token!} onImported={() => { loadJobs("all"); flash("✓ Jobs added to review queue."); setView("queue"); loadJobs("pending"); }} />}
-        {view === "queue"   && <QueueView   jobs={jobs.filter(j => !j.is_approved && j.is_active)} token={token!} loading={loading} onRefresh={() => loadJobs("pending")} flash={flash} />}
-        {view === "manage"  && <ManageView  jobs={jobs} token={token!} loading={loading} onRefresh={() => loadJobs("all")} flash={flash} />}
+        {view === "add"       && <AddView       token={token!} onSaved={() => { loadJobs("all"); flash("✓ Job added — go to Review Queue to approve."); }} />}
+        {view === "scrape"    && <ScrapeView    token={token!} onImported={() => { loadJobs("all"); flash("✓ Jobs added to review queue."); setView("queue"); loadJobs("pending"); }} />}
+        {view === "queue"     && <QueueView     jobs={jobs.filter(j => !j.is_approved && j.is_active)} token={token!} loading={loading} onRefresh={() => loadJobs("pending")} flash={flash} />}
+        {view === "manage"    && <ManageView    jobs={jobs} token={token!} loading={loading} onRefresh={() => loadJobs("all")} flash={flash} />}
+        {view === "bgv"       && <BgvAdminView  token={token!} flash={flash} />}
+        {view === "companies" && <CompanyVerifyAdminView token={token!} flash={flash} />}
       </div>
     </div>
   );
@@ -538,6 +540,305 @@ function ManageView({ jobs, token, loading, onRefresh, flash }: {
         </table>
         {!filtered.length && <div style={{ textAlign: "center", padding: 40, color: "var(--text3)" }}>No jobs found.</div>}
       </div>
+    </div>
+  );
+}
+
+// ── BGV Admin View ────────────────────────────────────────────────────────────
+interface BgvRow {
+  id: string; user_id: string; full_name: string; status: string;
+  pan_number: string | null; verification_score: number | null;
+  id_verified: boolean; edu_verified: boolean; emp_verified: boolean;
+  submitted_at: string; education: unknown[]; employment: unknown[];
+}
+
+function BgvAdminView({ token, flash }: { token: string; flash: (m: string) => void }) {
+  const [rows, setRows]     = useState<BgvRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<BgvRow | null>(null);
+  const [notes, setNotes]   = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const { createClient } = await import("@supabase/supabase-js");
+      // Use anon key — admin page already verified admin status via /api/admin/check
+      const sb = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data } = await sb.from("candidate_bgv").select("*").order("submitted_at", { ascending: false });
+      setRows(data ?? []);
+    } catch { flash("Failed to load BGV records"); }
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, []); // eslint-disable-line
+
+  async function updateBgv(id: string, patch: Record<string, unknown>) {
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/admin/bgv`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ id, ...patch }),
+      });
+      if (res.ok) { flash("✓ BGV updated"); await load(); setSelected(null); }
+      else flash("Update failed");
+    } catch { flash("Network error"); }
+    setSaving(false);
+  }
+
+  const statusColor: Record<string, string> = {
+    pending: "#fbbf24", in_progress: "var(--accent)", verified: "#4ade80", partial: "#fbbf24", failed: "#f87171",
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 700 }}>🛡 Candidate BGV Submissions ({rows.length})</h2>
+        <button onClick={load} style={btn()}>↻ Refresh</button>
+      </div>
+
+      {loading ? <div style={{ color: "var(--text3)", fontSize: 13 }}>Loading…</div> : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {rows.length === 0 && <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>No BGV submissions yet.</div>}
+          {rows.map(r => (
+            <div key={r.id} style={{ ...card, display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, fontWeight: 700 }}>{r.full_name}</div>
+                <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 2 }}>
+                  PAN: {r.pan_number || "—"} · Submitted: {new Date(r.submitted_at).toLocaleDateString("en-IN")}
+                  · Score: {r.verification_score ?? "—"}
+                </div>
+                <div style={{ fontSize: 11, marginTop: 4, display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {[["ID", r.id_verified], ["Edu", r.edu_verified], ["Emp", r.emp_verified]].map(([l, v]) => (
+                    <span key={l as string} style={{ padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 600, background: v ? "rgba(74,222,128,.1)" : "var(--surface2)", color: v ? "#4ade80" : "var(--text3)" }}>{l as string} {v ? "✓" : "✗"}</span>
+                  ))}
+                </div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: statusColor[r.status] ?? "var(--text3)", padding: "3px 10px", borderRadius: 8, background: `${statusColor[r.status]}22` }}>
+                  {r.status}
+                </span>
+                <button onClick={() => { setSelected(r); setNotes(r.status === "verified" ? "Verification complete." : ""); }} style={btn(true)}>Review</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Review modal */}
+      {selected && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+          <div style={{ ...card, width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+              <div style={{ fontSize: 15, fontWeight: 700 }}>Review: {selected.full_name}</div>
+              <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18 }}>✕</button>
+            </div>
+
+            <div style={{ fontSize: 13, color: "var(--text2)", marginBottom: 14 }}>
+              <div>PAN: {selected.pan_number || "—"}</div>
+              <div style={{ marginTop: 4 }}>Education entries: {(selected.education as unknown[])?.length ?? 0}</div>
+              <div style={{ marginTop: 4 }}>Employment entries: {(selected.employment as unknown[])?.length ?? 0}</div>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={label}>Checks Passed</label>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
+                {["id_verified", "edu_verified", "emp_verified"].map(k => (
+                  <label key={k} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
+                    <input type="checkbox" defaultChecked={!!(selected as unknown as Record<string, boolean>)[k]}
+                      id={`chk_${k}`} style={{ width: 14, height: 14 }} />
+                    {k.replace("_verified", "").replace("_", " ").toUpperCase()}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={label}>Verification Score (0–100)</label>
+              <input type="number" min={0} max={100} id="bgv_score" defaultValue={selected.verification_score ?? 0}
+                style={{ ...input, width: 100 }} />
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={label}>Admin Notes</label>
+              <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3}
+                style={{ ...input, resize: "vertical" }} placeholder="Internal notes for this BGV…" />
+            </div>
+
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {[
+                { status: "verified",     label: "✓ Mark Verified",    accent: true  },
+                { status: "partial",      label: "⚠ Partial Verify",  accent: false },
+                { status: "in_progress",  label: "🔍 Mark In Progress",accent: false },
+                { status: "failed",       label: "✗ Mark Failed",     accent: false },
+              ].map(a => (
+                <button key={a.status} disabled={saving} onClick={() => {
+                  const score = parseInt((document.getElementById("bgv_score") as HTMLInputElement)?.value ?? "0");
+                  const idV   = (document.getElementById("chk_id_verified") as HTMLInputElement)?.checked ?? false;
+                  const eduV  = (document.getElementById("chk_edu_verified") as HTMLInputElement)?.checked ?? false;
+                  const empV  = (document.getElementById("chk_emp_verified") as HTMLInputElement)?.checked ?? false;
+                  updateBgv(selected.id, { status: a.status, verification_score: score, id_verified: idV, edu_verified: eduV, emp_verified: empV, admin_notes: notes, reviewed_at: new Date().toISOString() });
+                }} style={btn(a.accent)}>{a.label}</button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Company Verify Admin View ─────────────────────────────────────────────────
+interface CompanyRow {
+  id: string; company_name: string; cin: string | null; gstin: string | null;
+  verification_status: string; is_mca_verified: boolean; is_gst_verified: boolean;
+  trust_score: number | null; gst_trade_name: string | null; gst_status: string | null;
+  created_at: string; admin_notes: string | null;
+}
+
+function CompanyVerifyAdminView({ token, flash }: { token: string; flash: (m: string) => void }) {
+  const [rows, setRows]       = useState<CompanyRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<CompanyRow | null>(null);
+  const [notes, setNotes]     = useState("");
+  const [saving, setSaving]   = useState(false);
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const { createClient } = await import("@supabase/supabase-js");
+      const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      const { data } = await sb.from("company_verifications").select("*").order("created_at", { ascending: false });
+      setRows(data ?? []);
+    } catch { flash("Failed to load company verifications"); }
+    setLoading(false);
+  };
+  useEffect(() => { load(); }, []); // eslint-disable-line
+
+  async function updateCompany(id: string, patch: Record<string, unknown>) {
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/admin/company-verify`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ id, ...patch }),
+      });
+      if (res.ok) { flash("✓ Company verification updated"); await load(); setSelected(null); }
+      else flash("Update failed");
+    } catch { flash("Network error"); }
+    setSaving(false);
+  }
+
+  const statusColor: Record<string, string> = {
+    pending: "#fbbf24", in_progress: "var(--accent)", verified: "#4ade80",
+    partially_verified: "#fbbf24", failed: "#f87171",
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 700 }}>🏅 Company Verifications ({rows.length})</h2>
+        <button onClick={load} style={btn()}>↻ Refresh</button>
+      </div>
+
+      {loading ? <div style={{ color: "var(--text3)", fontSize: 13 }}>Loading…</div> : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {rows.length === 0 && <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>No company verification requests yet.</div>}
+          {rows.map(r => (
+            <div key={r.id} style={{ ...card, display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, fontWeight: 700 }}>{r.company_name}</div>
+                <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 2 }}>
+                  CIN: {r.cin || "—"} · GSTIN: {r.gstin || "—"} · Submitted: {new Date(r.created_at).toLocaleDateString("en-IN")}
+                </div>
+                <div style={{ fontSize: 11, marginTop: 4, display: "flex", gap: 8 }}>
+                  <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 600, background: r.is_gst_verified ? "rgba(74,222,128,.1)" : "var(--surface2)", color: r.is_gst_verified ? "#4ade80" : "var(--text3)" }}>
+                    GST {r.is_gst_verified ? "✓" : "⏳"}
+                  </span>
+                  <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 600, background: r.is_mca_verified ? "rgba(74,222,128,.1)" : "var(--surface2)", color: r.is_mca_verified ? "#4ade80" : "var(--text3)" }}>
+                    MCA {r.is_mca_verified ? "✓" : "⏳"}
+                  </span>
+                  {r.gst_trade_name && <span style={{ fontSize: 10, color: "var(--text3)" }}>{r.gst_trade_name}</span>}
+                </div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: statusColor[r.verification_status] ?? "var(--text3)", padding: "3px 10px", borderRadius: 8, background: `${statusColor[r.verification_status]}22` }}>
+                  {r.verification_status}
+                </span>
+                {r.cin && (
+                  <a href={`https://www.mca.gov.in/mcafoportal/showSearchResults.do?company=${encodeURIComponent(r.company_name)}`}
+                    target="_blank" rel="noopener noreferrer"
+                    style={{ fontSize: 11, color: "var(--accent)", textDecoration: "none", padding: "4px 10px", border: "1px solid var(--accborder)", borderRadius: 6 }}>
+                    MCA ↗
+                  </a>
+                )}
+                <button onClick={() => { setSelected(r); setNotes(r.admin_notes ?? ""); }} style={btn(true)}>Review</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {selected && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+          <div style={{ ...card, width: "100%", maxWidth: 500 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+              <div style={{ fontSize: 15, fontWeight: 700 }}>Review: {selected.company_name}</div>
+              <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18 }}>✕</button>
+            </div>
+
+            <div style={{ fontSize: 13, color: "var(--text2)", marginBottom: 14 }}>
+              <div>CIN: {selected.cin || "—"}</div>
+              <div style={{ marginTop: 4 }}>GSTIN: {selected.gstin || "—"} {selected.is_gst_verified ? "✅" : "⏳"}</div>
+              {selected.gst_trade_name && <div style={{ marginTop: 4, color: "#4ade80" }}>GST Trade Name: {selected.gst_trade_name}</div>}
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={label}>Manual Checks</label>
+              <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+                <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
+                  <input type="checkbox" id="chk_mca" defaultChecked={selected.is_mca_verified} style={{ width: 14, height: 14 }} />
+                  MCA / CIN Verified
+                </label>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={label}>Trust Score (0–100)</label>
+              <input type="number" min={0} max={100} id="co_score" defaultValue={selected.trust_score ?? 0} style={{ ...input, width: 100 }} />
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <label style={label}>Admin Notes</label>
+              <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3} style={{ ...input, resize: "vertical" }} placeholder="e.g. MCA check confirmed — active company, 5 directors" />
+            </div>
+
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {[
+                { status: "verified",           label: "✓ Fully Verified",     accent: true  },
+                { status: "partially_verified",  label: "⚠ Partially Verified", accent: false },
+                { status: "in_progress",         label: "🔍 In Progress",       accent: false },
+                { status: "failed",              label: "✗ Failed",             accent: false },
+              ].map(a => (
+                <button key={a.status} disabled={saving} onClick={() => {
+                  const score = parseInt((document.getElementById("co_score") as HTMLInputElement)?.value ?? "0");
+                  const mcaV  = (document.getElementById("chk_mca") as HTMLInputElement)?.checked ?? false;
+                  updateCompany(selected.id, {
+                    verification_status: a.status, trust_score: score,
+                    is_mca_verified: mcaV, admin_notes: notes,
+                    verified_at: a.status === "verified" ? new Date().toISOString() : null,
+                    updated_at: new Date().toISOString(),
+                  });
+                }} style={btn(a.accent)}>{a.label}</button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

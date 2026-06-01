@@ -15,6 +15,13 @@ interface SaveMeta {
   name: string;
   updated_at: string;
 }
+interface BgvStatus {
+  status: string;
+  verification_score: number | null;
+  id_verified: boolean;
+  edu_verified: boolean;
+  emp_verified: boolean;
+}
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -22,6 +29,7 @@ export default function ProfilePage() {
   const plan = useResumePlan();
   const [saves, setSaves] = useState<SaveMeta[]>([]);
   const [savesLoading, setSavesLoading] = useState(true);
+  const [bgv, setBgv] = useState<BgvStatus | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -45,6 +53,8 @@ export default function ProfilePage() {
       } catch { /* ignore */ }
       finally { setSavesLoading(false); }
     })();
+    // Load BGV status
+    fetch("/api/bgv/status").then(r => r.json()).then(d => { if (d.bgv) setBgv(d.bgv); }).catch(() => {});
   }, [user]);
 
   async function handleDeleteAccount() {
@@ -168,6 +178,37 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {/* BGV status */}
+        <div style={{ ...card, marginBottom: 20 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: bgv ? 14 : 0 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)" }}>🛡 Background Verification</div>
+            <Link href="/bgv" style={{ padding: "7px 16px", background: bgv?.status === "verified" ? "rgba(74,222,128,.1)" : "var(--accdim)", border: `1px solid ${bgv?.status === "verified" ? "rgba(74,222,128,.3)" : "var(--accborder)"}`, borderRadius: 8, color: bgv?.status === "verified" ? "#4ade80" : "var(--accent)", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
+              {bgv ? "View / Update →" : "Start BGV →"}
+            </Link>
+          </div>
+          {bgv ? (
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: bgv.status === "verified" ? "#4ade80" : bgv.status === "failed" ? "#f87171" : "#fbbf24", padding: "3px 10px", borderRadius: 8, background: bgv.status === "verified" ? "rgba(74,222,128,.1)" : bgv.status === "failed" ? "rgba(248,113,113,.1)" : "rgba(251,191,36,.1)", textTransform: "capitalize" }}>
+                  {bgv.status === "in_progress" ? "🔍 In Progress" : bgv.status === "verified" ? "🛡 Verified" : bgv.status === "failed" ? "✗ Failed" : "⏳ Pending Review"}
+                </span>
+                {bgv.verification_score != null && <span style={{ fontSize: 12, color: "var(--text3)" }}>Score: <strong style={{ color: "var(--text1)" }}>{bgv.verification_score}/100</strong></span>}
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                {[["🪪 ID", bgv.id_verified], ["🎓 Education", bgv.edu_verified], ["💼 Employment", bgv.emp_verified]].map(([l, v]) => (
+                  <span key={l as string} style={{ fontSize: 11, padding: "3px 10px", borderRadius: 6, fontWeight: 600, background: v ? "rgba(74,222,128,.08)" : "var(--surface2)", color: v ? "#4ade80" : "var(--text3)", border: `1px solid ${v ? "rgba(74,222,128,.2)" : "var(--border)"}` }}>
+                    {l as string} {v ? "✓" : "○"}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <p style={{ fontSize: 13, color: "var(--text3)", marginTop: 10 }}>
+              Get your identity, education, and employment verified. A BGV badge boosts your profile trust with employers.
+            </p>
+          )}
+        </div>
+
         {/* Saved resumes */}
         <div style={{ ...card, marginBottom: 20 }}>
           <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", marginBottom: 14 }}>
@@ -217,6 +258,7 @@ export default function ProfilePage() {
               { href: "/jobs",       label: "💼 Matched Jobs" },
               { href: "/interview",  label: "🎤 Interview Prep" },
               { href: "/career-gps", label: "🧭 Career GPS" },
+              { href: "/bgv",        label: "🛡 Background Verify" },
               { href: "/upgrade",    label: "⚡ Upgrade Plan" },
             ].map(l => (
               <Link key={l.href} href={l.href} style={{
