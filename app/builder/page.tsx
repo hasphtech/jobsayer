@@ -1517,9 +1517,22 @@ export default function BuilderPage() {
     }
   }
 
-  function handleAiSummary() {
+  async function handleAiSummary() {
     if (!plan.hasAiFeatures) { window.open("/upgrade", "_blank"); return; }
-    alert("AI summary — coming soon");
+    // Build context from existing resume data
+    const workContext = data.work.slice(0, 3).map(w =>
+      `${w.role} at ${w.company} (${w.from}–${w.to || "present"}): ${w.desc?.split("\n")[0] ?? ""}`
+    ).join("\n");
+    const context = [
+      `Name: ${data.name || "the candidate"}`,
+      `Current title: ${data.title || ""}`,
+      `Skills: ${data.skills || ""}`,
+      `Work experience:\n${workContext || "Not provided"}`,
+      data.summary ? `Existing summary (improve this): ${data.summary}` : "",
+    ].filter(Boolean).join("\n");
+    await handleAiEnhance("summary_generate", context, (result) => {
+      set("summary", result);
+    });
   }
 
   const uploadLimit = plan.loading ? "…" : plan.resumeUploadsPerMonth;

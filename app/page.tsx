@@ -93,6 +93,14 @@ function Nav({ user, signIn }: { user: any; signIn: () => void; }) {
                 <NavLink href="/interview">Interview</NavLink>
                 <NavLink href="/career-gps">Career GPS</NavLink>
                 <NavLink href="/recruit">Recruiters</NavLink>
+                <Link href="/profile" style={{ ...ghostBtn, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px" }}>
+                  {user.user_metadata?.avatar_url
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    ? <img src={user.user_metadata.avatar_url} alt="" style={{ width: 22, height: 22, borderRadius: "50%", objectFit: "cover" }} />
+                    : <span style={{ width: 22, height: 22, borderRadius: "50%", background: "var(--accdim)", border: "1px solid var(--accborder)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "var(--accent)" }}>{(user.email?.[0] ?? "?").toUpperCase()}</span>
+                  }
+                  {user.user_metadata?.full_name?.split(" ")[0] || user.email?.split("@")[0]}
+                </Link>
                 <Link href="/builder" style={primaryBtn}>Open Builder →</Link>
               </>
             ) : (
@@ -123,6 +131,7 @@ function Nav({ user, signIn }: { user: any; signIn: () => void; }) {
               <MobileNavLink href="/interview"  onClick={() => setMenuOpen(false)}>🎤 Interview Prep</MobileNavLink>
               <MobileNavLink href="/career-gps" onClick={() => setMenuOpen(false)}>🧭 Career GPS</MobileNavLink>
               <MobileNavLink href="/recruit"    onClick={() => setMenuOpen(false)}>🏢 For Recruiters</MobileNavLink>
+              <MobileNavLink href="/profile"    onClick={() => setMenuOpen(false)}>👤 My Account</MobileNavLink>
             </>
           ) : (
             <>

@@ -2,11 +2,25 @@
 /**
  * /upgrade — JobSayer pricing page
  * Three tiers: Free · Starter · Pro
+ * Payments via Razorpay checkout popup.
  */
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Zap, Star, Sparkles } from "lucide-react";
 import { PLAN_DEFAULTS } from "@/lib/resumePlan";
+import { useAuth } from "@/lib/auth";
+
+/* ── Razorpay script loader ─────────────────────────────────── */
+function loadRazorpay(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if ((window as any).Razorpay) { resolve(true); return; }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload  = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
 
 const PRICES = {
   starter: { monthly: 199, annual: 1990 },
@@ -49,8 +63,11 @@ const FEATURES = {
 } as const;
 
 export default function UpgradePage() {
-  const router  = useRouter();
+  const router   = useRouter();
+  const { user } = useAuth();
   const [interval, setInterval] = useState<"monthly" | "annual">("monthly");
+  const [payLoading, setPayLoading] = useState<string | null>(null);
+  const [payError,   setPayError]   = useState("");
 
   const annualSavingStarter = Math.round(
     (PRICES.starter.monthly * 12 - PRICES.starter.annual) / (PRICES.starter.monthly * 12) * 100
@@ -62,6 +79,69 @@ export default function UpgradePage() {
   function getPrice(tier: "starter" | "pro") {
     return interval === "monthly" ? PRICES[tier].monthly : Math.round(PRICES[tier].annual / 12);
   }
+
+  const handleUpgrade = useCallback(async (plan: "starter" | "pro") => {
+    setPayError("");
+    if (!user) { router.push("/"); return; }
+
+    setPayLoading(plan);
+    try {
+      // 1. Create Razorpay order server-side
+      const orderRes = await fetch("/api/payment/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan, interval }),
+      });
+      const orderData = await orderRes.json() as { orderId?: string; amount?: number; currency?: string; key?: string; error?: string };
+      if (!orderData.orderId) throw new Error(orderData.error ?? "Could not create order");
+
+      // 2. Load Razorpay checkout
+      const loaded = await loadRazorpay();
+      if (!loaded) throw new Error("Razorpay failed to load. Check your connection.");
+
+      // 3. Open checkout popup
+      await new Promise<void>((resolve, reject) => {
+        const rzp = new (window as any).Razorpay({
+          key:         orderData.key,
+          amount:      orderData.amount,
+          currency:    orderData.currency ?? "INR",
+          order_id:    orderData.orderId,
+          name:        "jobSayer",
+          description: `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan (${interval})`,
+          image:       "/logo.png",
+          prefill: {
+            email: user.email ?? "",
+            name:  user.user_metadata?.full_name ?? "",
+          },
+          theme: { color: "#818cf8" },
+          handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
+            // 4. Verify payment server-side
+            const verifyRes = await fetch("/api/payment/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ...response, plan, interval }),
+            });
+            const verifyData = await verifyRes.json() as { success?: boolean; error?: string };
+            if (verifyData.success) {
+              resolve();
+              router.push("/profile?upgraded=1");
+            } else {
+              reject(new Error(verifyData.error ?? "Payment verification failed"));
+            }
+          },
+          modal: {
+            ondismiss: () => reject(new Error("dismissed")),
+          },
+        });
+        rzp.open();
+      });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Payment failed";
+      if (msg !== "dismissed") setPayError(msg);
+    } finally {
+      setPayLoading(null);
+    }
+  }, [user, interval, router]);
 
   return (
     <div style={{
@@ -162,12 +242,9 @@ export default function UpgradePage() {
             interval={interval}
             badge={interval === "annual" ? `Save ${annualSavingStarter}%` : null}
             features={FEATURES.starter}
-            cta="Upgrade to Starter"
+            cta={payLoading === "starter" ? "Opening checkout…" : "Upgrade to Starter"}
             ctaStyle="secondary"
-            onCta={() => {
-              // TODO: integrate payment — for now open contact/email
-              window.open("mailto:hello@jobsayer.com?subject=JobSayer Starter Plan", "_blank");
-            }}
+            onCta={() => handleUpgrade("starter")}
           />
 
           {/* Pro — highlighted */}
@@ -177,16 +254,24 @@ export default function UpgradePage() {
             interval={interval}
             badge="Most popular"
             features={FEATURES.pro}
-            cta="Upgrade to Pro"
+            cta={payLoading === "pro" ? "Opening checkout…" : "Upgrade to Pro"}
             ctaStyle="primary"
             highlight
             icon={<Star size={14} fill="currentColor" />}
-            onCta={() => {
-              // TODO: integrate payment — for now open contact/email
-              window.open("mailto:hello@jobsayer.com?subject=JobSayer Pro Plan", "_blank");
-            }}
+            onCta={() => handleUpgrade("pro")}
           />
         </div>
+
+        {/* Payment error */}
+        {payError && (
+          <div style={{
+            maxWidth: 500, margin: "16px auto 0", padding: "12px 16px",
+            background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.3)",
+            borderRadius: 10, fontSize: 13, color: "#f87171", textAlign: "center",
+          }}>
+            {payError}
+          </div>
+        )}
 
         {/* ── FAQ strip ── */}
         <div style={{ maxWidth: 600, margin: "48px auto 0", textAlign: "left" }}>
@@ -199,7 +284,7 @@ export default function UpgradePage() {
             ["What happens to my resumes if I downgrade?",
               "Your saved resumes stay intact. You'll just be limited to editing 2 at a time on Free."],
             ["Is payment secure?",
-              "Payments are processed via Cashfree — a PCI DSS compliant gateway. We never store card details."],
+              "Payments are processed via Razorpay — a PCI DSS Level 1 certified gateway trusted by 10M+ businesses. We never store your card details."],
             ["Can I cancel anytime?",
               "Yes. Cancel before the next billing cycle and you won't be charged again. Access continues until the period ends."],
             ["Can I share my resume without signing up?",

@@ -24,6 +24,7 @@ export interface Job {
   avgResponseDays: number;
   replyRate: number;      // 0–100
   jdText: string;         // full JD text for matching
+  applyUrl?: string;      // direct application link
 }
 
 const JOBS: Job[] = [

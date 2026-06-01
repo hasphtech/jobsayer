@@ -77,6 +77,16 @@ const SYSTEM_PROMPTS: Record<string, { prompt: string; quick?: boolean }> = {
       "Tailor the seniority and domain to the title (e.g. senior roles get strategic bullets, junior roles get execution bullets). " +
       "Return ONLY the 4 bullets, one per line, each starting with •",
   },
+  /* Generate summary from scratch using title + work experience */
+  summary_generate: {
+    prompt:
+      "You are a professional resume writer specialising in the Indian job market. " +
+      "Given the candidate's job title and work experience details, write a compelling professional " +
+      "summary in 3–4 sentences (50–70 words). Lead with years of experience and specialisation. " +
+      "Include 1–2 concrete achievements or impact metrics. End with what they bring to their next role. " +
+      "Tone: confident, factual, no fluff. India-focused: mention ₹ if salary context is given. " +
+      "Return ONLY the summary text — no preamble, no quotes.",
+  },
   /* Quick chip suggestions */
   suggest_skills: {
     prompt:

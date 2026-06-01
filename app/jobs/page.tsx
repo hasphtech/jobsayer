@@ -358,6 +358,7 @@ function mapDbJob(j: Record<string, unknown>): Job {
     avgResponseDays: Number(j.avg_response_days ?? 30),
     replyRate:       Number(j.reply_rate ?? 0),
     jdText:          String(j.jd_text ?? j.description ?? ""),
+    applyUrl:        String(j.apply_url ?? j.source_url ?? ""),
   };
 }
 
@@ -375,6 +376,31 @@ function trustLabel(t: Job["trust"]) {
 }
 function daysAgo(d: number) {
   return d === 0 ? "Posted today" : d === 1 ? "1 day ago" : `${d} days ago`;
+}
+
+/* ── Save Job Button ────────────────────────────────────────────── */
+const LS_SAVED = "jobsayer-saved-jobs";
+function getSaved(): string[] {
+  try { return JSON.parse(localStorage.getItem(LS_SAVED) ?? "[]"); } catch { return []; }
+}
+function SaveJobButton({ jobId }: { jobId: string }) {
+  const [saved, setSaved] = useState(false);
+  useEffect(() => { setSaved(getSaved().includes(jobId)); }, [jobId]);
+  function toggle(e: React.MouseEvent) {
+    e.stopPropagation();
+    const list = getSaved();
+    const next = list.includes(jobId) ? list.filter(id => id !== jobId) : [...list, jobId];
+    localStorage.setItem(LS_SAVED, JSON.stringify(next));
+    setSaved(!list.includes(jobId));
+  }
+  return (
+    <button onClick={toggle} title={saved ? "Unsave" : "Save job"} style={{
+      padding: "5px 12px", border: "1px solid var(--border)", borderRadius: 7,
+      fontSize: 12, fontWeight: 600, cursor: "pointer",
+      background: saved ? "rgba(129,140,248,.12)" : "var(--surface2)",
+      color: saved ? "var(--accent)" : "var(--text2)",
+    }}>{saved ? "🔖 Saved" : "🔖 Save"}</button>
+  );
 }
 
 /* ── Job Card ───────────────────────────────────────────────────── */
@@ -453,17 +479,21 @@ function JobCard({ job, selected, onClick }: { job: ScoredJob; selected: boolean
           {daysAgo(job.postedDays)} · {job.applicants > 0 ? `${job.applicants} applicants` : "No data"}
         </span>
         <div style={{ display: "flex", gap: 6 }}>
-          <button style={{
-            padding: "5px 12px", border: "1px solid var(--border)", borderRadius: 7,
-            fontSize: 12, fontWeight: 600, color: "var(--text2)", background: "var(--surface2)", cursor: "pointer",
-          }}>🔖 Save</button>
-          <button style={{
-            padding: "5px 14px", border: "none", borderRadius: 7,
-            fontSize: 12, fontWeight: 600, color: "#fff",
-            background: job.ghost ? "var(--text3)" : "var(--accent)", cursor: "pointer",
-          }}>
+          <SaveJobButton jobId={job.id} />
+          <a
+            href={job.applyUrl || "#"}
+            target={job.applyUrl ? "_blank" : undefined}
+            rel="noopener noreferrer"
+            onClick={e => { if (!job.applyUrl) e.preventDefault(); }}
+            style={{
+              padding: "5px 14px", border: "none", borderRadius: 7,
+              fontSize: 12, fontWeight: 600, color: "#fff", textDecoration: "none",
+              background: job.ghost ? "var(--text3)" : "var(--accent)", cursor: "pointer",
+              opacity: job.applyUrl ? 1 : 0.5, display: "inline-flex", alignItems: "center",
+            }}
+          >
             {job.ghost ? "View ›" : "Apply →"}
-          </button>
+          </a>
         </div>
       </div>
     </div>
@@ -550,12 +580,22 @@ function DetailPanel({ job, resumeText }: { job: ScoredJob; resumeText: string }
         </div>
       </div>
 
-      <button style={{
-        width: "100%", padding: "12px", border: "none", borderRadius: 10,
-        fontSize: 14, fontWeight: 700, color: "#fff",
-        background: "linear-gradient(135deg,var(--accent),#6366f1)",
-        cursor: "pointer", marginBottom: 8,
-      }}>⚡ Quick Apply with jobSayer</button>
+      <a
+        href={job.applyUrl || "#"}
+        target={job.applyUrl ? "_blank" : undefined}
+        rel="noopener noreferrer"
+        onClick={e => { if (!job.applyUrl) e.preventDefault(); }}
+        style={{
+          display: "block", width: "100%", padding: "12px", border: "none", borderRadius: 10,
+          fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center",
+          background: job.applyUrl ? "linear-gradient(135deg,var(--accent),#6366f1)" : "var(--surface2)",
+          cursor: job.applyUrl ? "pointer" : "not-allowed", marginBottom: 8,
+          opacity: job.applyUrl ? 1 : 0.5,
+          boxSizing: "border-box" as const,
+        }}
+      >
+        {job.applyUrl ? "⚡ Apply Now →" : "⚡ No Apply Link"}
+      </a>
 
       <Link href="/builder" style={{
         display: "block", width: "100%", padding: "10px", textAlign: "center",
