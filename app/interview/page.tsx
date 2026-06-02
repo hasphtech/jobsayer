@@ -9,6 +9,7 @@ import {
   ArrowLeft, Mic, ChevronRight, ChevronLeft,
   CheckCircle2, AlertTriangle, Lightbulb, RotateCcw, Star,
 } from "lucide-react";
+import AppNav from "@/components/AppNav";
 import type { ResumeData } from "@/lib/types";
 
 /* ── Constants ── */
@@ -200,19 +201,7 @@ export default function InterviewPage() {
   if (stage === "setup") {
     return (
       <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-        {/* Top bar */}
-        <div style={{
-          background: "var(--surface)", borderBottom: "1px solid var(--border)",
-          padding: "0 24px", height: 56, display: "flex", alignItems: "center", gap: 12,
-          position: "sticky", top: 0, zIndex: 50,
-        }}>
-          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--text3)", textDecoration: "none", fontSize: 13 }}>
-            <ArrowLeft size={14} /> Home
-          </Link>
-          <span style={{ color: "var(--border)", fontSize: 18 }}>›</span>
-          <span style={{ fontSize: 14, fontWeight: 600 }}>🎤 Interview Prep</span>
-        </div>
-
+        <AppNav />
         <div style={{ maxWidth: 640, margin: "0 auto", padding: "40px 20px" }}>
           {/* Hero */}
           <div style={{ textAlign: "center", marginBottom: 36 }}>
@@ -355,18 +344,12 @@ export default function InterviewPage() {
 
     return (
       <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-        <div style={{
-          background: "var(--surface)", borderBottom: "1px solid var(--border)",
-          padding: "0 24px", height: 56, display: "flex", alignItems: "center", gap: 12,
-          position: "sticky", top: 0, zIndex: 50,
-        }}>
+        <AppNav actions={
           <button onClick={() => { setStage("setup"); setQuestions([]); setAnswers([]); }}
-            style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--text3)", background: "none", border: "none", cursor: "pointer", fontSize: 13 }}>
-            <RotateCcw size={14} /> New Session
+            style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text2)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+            <RotateCcw size={12} /> New Session
           </button>
-          <span style={{ color: "var(--border)", fontSize: 18 }}>›</span>
-          <span style={{ fontSize: 14, fontWeight: 600 }}>Interview Results</span>
-        </div>
+        } />
 
         <div style={{ maxWidth: 720, margin: "0 auto", padding: "36px 20px" }}>
           {/* Overall score card */}

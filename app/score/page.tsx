@@ -8,9 +8,10 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  ArrowLeft, RefreshCw, Briefcase, ChevronRight,
+  RefreshCw, Briefcase, ChevronRight,
   TrendingUp, AlertTriangle, Lightbulb, CheckCircle2,
 } from "lucide-react";
+import AppNav from "@/components/AppNav";
 import { computeScore, type ScoreResult } from "@/lib/scoreEngine";
 import { matchJd, resumeToText } from "@/lib/jdMatcher";
 import type { ResumeData } from "@/lib/types";
@@ -232,36 +233,16 @@ export default function ScorePage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-      {/* ── Top bar ── */}
-      <div style={{
-        background: "var(--surface)", borderBottom: "1px solid var(--border)",
-        padding: "0 24px", height: 56, display: "flex", alignItems: "center",
-        justifyContent: "space-between", position: "sticky", top: 0, zIndex: 50,
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <Link href="/builder" style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--text3)", textDecoration: "none", fontSize: 13 }}>
-            <ArrowLeft size={14} /> Builder
-          </Link>
-          <span style={{ color: "var(--border)", fontSize: 18 }}>›</span>
-          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text1)" }}>jobSayer Score</span>
-        </div>
+      <AppNav actions={
         <div style={{ display: "flex", gap: 8 }}>
-          <Link href="/jobs" style={{
-            display: "flex", alignItems: "center", gap: 6,
-            padding: "7px 16px", background: "var(--accdim)", border: "1px solid var(--accborder)",
-            borderRadius: 8, color: "var(--accent)", fontSize: 13, fontWeight: 600, textDecoration: "none",
-          }}>
-            <Briefcase size={13} /> View Matched Jobs
+          <Link href="/jobs" style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", background: "var(--accdim)", border: "1px solid var(--accborder)", borderRadius: 8, color: "var(--accent)", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>
+            <Briefcase size={12} /> Matched Jobs
           </Link>
-          <Link href="/builder" style={{
-            display: "flex", alignItems: "center", gap: 6,
-            padding: "7px 16px", background: "var(--accent)",
-            borderRadius: 8, color: "#fff", fontSize: 13, fontWeight: 600, textDecoration: "none",
-          }}>
-            Fix Issues in Builder
+          <Link href="/builder" style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", background: "var(--accent)", borderRadius: 8, color: "#fff", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>
+            Fix in Builder
           </Link>
         </div>
-      </div>
+      } />
 
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "28px 20px" }}>
 

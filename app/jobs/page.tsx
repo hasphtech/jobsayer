@@ -9,7 +9,8 @@
 import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Target, Shield, AlertTriangle, Clock, Users, MapPin, Briefcase, RefreshCw, Search, ChevronRight } from "lucide-react";
+import { Target, Shield, AlertTriangle, Clock, Users, MapPin, Briefcase, RefreshCw, Search, ChevronRight } from "lucide-react";
+import AppNav from "@/components/AppNav";
 
 /* ── JD Scanner ─────────────────────────────────────────────────── */
 
@@ -655,48 +656,20 @@ export default function JobsPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-      {/* Top bar */}
-      <div style={{
-        background: "rgba(8,8,12,.92)", backdropFilter: "blur(16px)",
-        borderBottom: "1px solid var(--border)",
-        padding: "0 24px", height: 56, display: "flex", alignItems: "center",
-        justifyContent: "space-between", position: "sticky", top: 0, zIndex: 50,
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--text3)", textDecoration: "none", fontSize: 13 }}>
-            <ArrowLeft size={14} />
-          </Link>
-          <span style={{ color: "var(--border)" }}>|</span>
-          {/* Tab switcher */}
-          <div style={{ display: "flex", gap: 1, background: "rgba(255,255,255,.05)", borderRadius: 10, padding: 3 }}>
-            {(["jobs", "scanner"] as Tab[]).map(t => (
-              <button key={t} onClick={() => setTab(t)} style={{
-                padding: "5px 16px", borderRadius: 8, border: "none", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "inherit",
-                background: tab === t ? "var(--surface)" : "transparent",
-                color: tab === t ? "var(--text1)" : "var(--text3)",
-                transition: "all .18s", letterSpacing: "-.01em",
-              }}>
-                {t === "jobs" ? "Matched Jobs" : "JD Scanner"}
-              </button>
-            ))}
-          </div>
+      <AppNav actions={
+        <div style={{ display: "flex", gap: 1, background: "rgba(255,255,255,.05)", borderRadius: 9, padding: 3 }}>
+          {(["jobs", "scanner"] as Tab[]).map(t => (
+            <button key={t} onClick={() => setTab(t)} style={{
+              padding: "4px 14px", borderRadius: 7, border: "none", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "inherit",
+              background: tab === t ? "var(--surface)" : "transparent",
+              color: tab === t ? "var(--text1)" : "var(--text3)",
+              transition: "all .15s",
+            }}>
+              {t === "jobs" ? "Matched Jobs" : "JD Scanner"}
+            </button>
+          ))}
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <Link href="/score" style={{
-            display: "flex", alignItems: "center", gap: 6, padding: "7px 14px",
-            background: "var(--accdim)", border: "1px solid var(--accborder)",
-            borderRadius: 9, color: "var(--accent)", fontSize: 13, fontWeight: 600, textDecoration: "none",
-          }}>
-            <Target size={13} /> Score
-          </Link>
-          <Link href="/builder" style={{
-            padding: "7px 16px", background: "var(--accent)", borderRadius: 9,
-            color: "#fff", fontSize: 13, fontWeight: 600, textDecoration: "none",
-          }}>
-            Edit Resume
-          </Link>
-        </div>
-      </div>
+      } />
 
       {tab === "scanner" ? (
         <div style={{ maxWidth: 960, margin: "0 auto", padding: "24px 20px" }}>

@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, ChevronRight, ExternalLink, CheckCircle2, AlertCircle } from "lucide-react";
+import AppNav from "@/components/AppNav";
 import type { ResumeData } from "@/lib/types";
 
 /* ── Role definitions with required skills & resources ── */
@@ -278,17 +279,7 @@ export default function CareerGpsPage() {
 
     return (
       <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-        <div style={{
-          background: "var(--surface)", borderBottom: "1px solid var(--border)",
-          padding: "0 24px", height: 56, display: "flex", alignItems: "center", gap: 12,
-          position: "sticky", top: 0, zIndex: 50,
-        }}>
-          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--text3)", textDecoration: "none", fontSize: 13 }}>
-            <ArrowLeft size={14} /> Home
-          </Link>
-          <span style={{ color: "var(--border)", fontSize: 18 }}>›</span>
-          <span style={{ fontSize: 14, fontWeight: 600 }}>🧭 Career GPS</span>
-        </div>
+        <AppNav />
 
         <div style={{ maxWidth: 900, margin: "0 auto", padding: "36px 20px" }}>
           <div style={{ marginBottom: 32 }}>

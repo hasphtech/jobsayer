@@ -92,7 +92,7 @@ function Nav({ user, signIn }: { user: any; signIn: () => void; }) {
                 <NavLink href="/jobs">Jobs</NavLink>
                 <NavLink href="/interview">Interview</NavLink>
                 <NavLink href="/career-gps">Career GPS</NavLink>
-                <NavLink href="/recruit">Recruiters</NavLink>
+                <NavLink href="/bgv">BGV</NavLink>
                 <Link href="/profile" style={{ ...ghostBtn, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px" }}>
                   {user.user_metadata?.avatar_url
                     /* eslint-disable-next-line @next/next/no-img-element */
@@ -130,7 +130,7 @@ function Nav({ user, signIn }: { user: any; signIn: () => void; }) {
               <MobileNavLink href="/jobs"       onClick={() => setMenuOpen(false)}>💼 Matched Jobs</MobileNavLink>
               <MobileNavLink href="/interview"  onClick={() => setMenuOpen(false)}>🎤 Interview Prep</MobileNavLink>
               <MobileNavLink href="/career-gps" onClick={() => setMenuOpen(false)}>🧭 Career GPS</MobileNavLink>
-              <MobileNavLink href="/recruit"    onClick={() => setMenuOpen(false)}>🏢 For Recruiters</MobileNavLink>
+              <MobileNavLink href="/bgv"        onClick={() => setMenuOpen(false)}>🛡 BGV Badge</MobileNavLink>
               <MobileNavLink href="/profile"    onClick={() => setMenuOpen(false)}>👤 My Account</MobileNavLink>
             </>
           ) : (

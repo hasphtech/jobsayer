@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { useResumePlan } from "@/lib/resumePlan";
 import { getSupabaseAsync } from "@/lib/auth";
+import AppNav from "@/components/AppNav";
 
 interface SaveMeta {
   id: string;
@@ -97,23 +98,7 @@ export default function ProfilePage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-      {/* Top bar */}
-      <nav style={{
-        position: "sticky", top: 0, zIndex: 50,
-        background: "rgba(15,17,23,.95)", backdropFilter: "blur(12px)",
-        borderBottom: "1px solid var(--border)",
-        height: 56, display: "flex", alignItems: "center", padding: "0 24px", gap: 12,
-      }}>
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="jobSayer" style={{ width: 26, height: 26, borderRadius: 6, objectFit: "cover" }} />
-          <span style={{ fontSize: 15, fontWeight: 800, color: "var(--text1)" }}>
-            job<span style={{ color: "var(--accent)" }}>Sayer</span>
-          </span>
-        </Link>
-        <div style={{ flex: 1 }} />
-        <Link href="/builder" style={{ fontSize: 13, color: "var(--text3)", textDecoration: "none" }}>← Builder</Link>
-      </nav>
+      <AppNav />
 
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "40px 20px 80px" }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 28 }}>My Account</h1>
