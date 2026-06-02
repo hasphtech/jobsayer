@@ -110,9 +110,13 @@ function EmployerAuthModal({
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 24 }}>
           <div style={{ fontSize: 28, marginBottom: 8 }}>🏢</div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: "var(--text1)" }}>Employer Sign In</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: "var(--text1)" }}>
+            {step === "company" ? "Set up your employer account" : "Sign in as Recruiter"}
+          </div>
           <div style={{ fontSize: 13, color: "var(--text3)", marginTop: 4 }}>
-            {step === "company" ? "Almost there — tell us about your company" : "Post jobs and reach top candidates"}
+            {step === "company"
+              ? "You're signed in — just tell us your company name to start posting jobs"
+              : "Sign in or create an account to post jobs and reach top candidates"}
           </div>
         </div>
 
@@ -159,7 +163,7 @@ function EmployerAuthModal({
           /* Method selection */
           <>
             {/* Google */}
-            <button onClick={() => signInWithGoogle()} style={{
+            <button onClick={() => signInWithGoogle("/recruit")} style={{
               width: "100%", padding: "11px", borderRadius: 9,
               border: "1px solid var(--border)", background: "var(--surface2)",
               color: "var(--text1)", fontSize: 14, fontWeight: 600,
