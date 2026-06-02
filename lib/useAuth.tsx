@@ -69,7 +69,11 @@ export function AuthProvider({
   // ── signInWithGoogle ─────────────────────────────────────────────────────
   const signInWithGoogle = useCallback(async (redirectTo?: string) => {
     const sb = await getSupabaseAsync();
-    const callbackBase = `${window.location.origin}/auth/callback`;
+    // Use NEXT_PUBLIC_SITE_URL for a consistent redirectTo — avoids www vs
+    // non-www mismatches that cause Supabase bad_oauth_state errors.
+    // Falls back to window.location.origin only in local dev.
+    const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? window.location.origin;
+    const callbackBase = `${siteUrl}/auth/callback`;
     const callbackUrl  = redirectTo
       ? `${callbackBase}?next=${encodeURIComponent(redirectTo)}`
       : callbackBase;
@@ -78,7 +82,6 @@ export function AuthProvider({
         provider: "google",
         options: {
           redirectTo: callbackUrl,
-          queryParams: { access_type: "offline", prompt: "consent" },
         },
       });
     } catch (err) {
@@ -89,11 +92,12 @@ export function AuthProvider({
   // ── signInWithOtp ────────────────────────────────────────────────────────
   const signInWithOtp = useCallback(async (email: string) => {
     const sb = await getSupabaseAsync();
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? window.location.origin;
     const { error } = await sb.auth.signInWithOtp({
       email,
       options: {
         shouldCreateUser: true,
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${siteUrl}/auth/callback`,
       },
     });
     return { error: error?.message ?? null };

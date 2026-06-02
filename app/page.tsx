@@ -1013,15 +1013,23 @@ export default function HomePage() {
   // Auto-close modal once the user successfully signs in
   useEffect(() => { if (user) setShowSignIn(false); }, [user]);
 
-  // Surface ?auth_error= from failed OAuth callback
+  // Surface auth errors from two sources:
+  //   ?auth_error=   — our own callback route failure
+  //   ?error=&error_code=&error_description= — Supabase redirects OAuth errors
+  //                    to the Site URL (e.g. bad_oauth_state, invalid_request)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const err = params.get("auth_error");
+    const err =
+      params.get("auth_error") ||
+      params.get("error_description") ||
+      params.get("error");
     if (err) {
-      setAuthError(err);
-      // Clean the param from the URL without a reload
+      setAuthError(decodeURIComponent(err).replace(/\+/g, " "));
       const clean = new URL(window.location.href);
       clean.searchParams.delete("auth_error");
+      clean.searchParams.delete("error");
+      clean.searchParams.delete("error_code");
+      clean.searchParams.delete("error_description");
       window.history.replaceState({}, "", clean.toString());
     }
   }, []);
