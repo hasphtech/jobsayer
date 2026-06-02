@@ -842,14 +842,15 @@ interface BgvStatus { status: string; id_verified: boolean; edu_verified: boolea
 function Dashboard({ user }: { user: any }) {
   const w = useWindowWidth();
   const mobile = w < 640;
-  const [score, setScore]           = useState<number | null>(null);
-  const [scoreDims, setScoreDims]   = useState<ScoreDim[]>([]);
-  const [matchCount, setMatchCount] = useState(0);
-  const [hasResume, setHasResume]   = useState(false);
-  const [lastSaved, setLastSaved]   = useState("");
-  const [tipIdx]                    = useState(() => Math.floor(Math.random() * TIPS.length));
-  const [bgv, setBgv]               = useState<BgvStatus | null>(null);
-  const { signOut }                 = useAuth();
+  const [score, setScore]               = useState<number | null>(null);
+  const [scoreDims, setScoreDims]       = useState<ScoreDim[]>([]);
+  const [matchCount, setMatchCount]     = useState(0);
+  const [hasResume, setHasResume]       = useState(false);
+  const [lastSaved, setLastSaved]       = useState("");
+  const [tipIdx]                        = useState(() => Math.floor(Math.random() * TIPS.length));
+  const [bgv, setBgv]                   = useState<BgvStatus | null>(null);
+  const [employerProfile, setEmployerProfile] = useState<{ company_name: string } | null>(null);
+  const { signOut }                     = useAuth();
 
   useEffect(() => {
     // Load resume from localStorage
@@ -877,6 +878,12 @@ function Dashboard({ user }: { user: any }) {
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d?.bgv) setBgv(d.bgv); })
       .catch(() => {});
+
+    // Check if this user also has an employer profile (dual-role)
+    fetch("/api/employer/profile")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.profile?.company_name) setEmployerProfile(d.profile); })
+      .catch(() => {});
   }, []);
 
   const firstName = user?.user_metadata?.full_name?.split(" ")[0] ?? user?.email?.split("@")[0] ?? "there";
@@ -893,6 +900,23 @@ function Dashboard({ user }: { user: any }) {
   return (
     <div style={{ background: "var(--bg)", color: "var(--text1)", minHeight: "100vh", paddingBottom: 60 }}>
       <div style={{ maxWidth: 960, margin: "0 auto", padding: mobile ? "76px 16px 20px" : "80px 24px 20px" }}>
+
+        {/* ── Dual-role banner ── */}
+        {employerProfile && (
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "10px 16px", borderRadius: 10, marginBottom: 14,
+            background: "rgba(99,102,241,.06)", border: "1px solid var(--accborder)",
+            flexWrap: "wrap", gap: 8,
+          }}>
+            <span style={{ fontSize: 13, color: "var(--text2)" }}>
+              🏢 You also have a recruiter account — <strong style={{ color: "var(--text1)" }}>{employerProfile.company_name}</strong>
+            </span>
+            <Link href="/recruit" style={{ fontSize: 12, fontWeight: 700, color: "var(--accent)", textDecoration: "none", padding: "5px 12px", borderRadius: 7, background: "var(--accdim)", border: "1px solid var(--accborder)" }}>
+              Switch to Recruiter →
+            </Link>
+          </div>
+        )}
 
         {/* ── Header ── */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, gap: 12 }}>

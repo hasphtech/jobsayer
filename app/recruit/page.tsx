@@ -14,7 +14,9 @@ import { useAuth } from "@/lib/auth";
    EMPLOYER AUTH MODAL
 ═══════════════════════════════════════════════════════════════ */
 interface EmployerProfile { id: string; company_name: string; plan: string }
-type AuthStep = "method" | "otp_sent" | "company" | "done";
+type AuthStep = "method" | "checking" | "otp_sent" | "company" | "done";
+
+const EMPLOYER_SIGNUP_KEY = "jobsayer_employer_signup";
 
 function EmployerAuthModal({
   onClose,
@@ -23,18 +25,22 @@ function EmployerAuthModal({
   onClose: () => void;
   onProfile: (p: EmployerProfile) => void;
 }) {
-  const { user, signInWithGoogle, signInWithOtp, verifyOtp } = useAuth();
-  const [step, setStep]         = useState<AuthStep>("method");
+  const { user, loading: authLoading, signInWithGoogle, signInWithOtp, verifyOtp } = useAuth();
+  // If already signed in, skip straight to "checking" — avoids flashing auth form
+  const [step, setStep]         = useState<AuthStep>(user ? "checking" : "method");
   const [email, setEmail]       = useState("");
   const [otp, setOtp]           = useState("");
   const [company, setCompany]   = useState("");
   const [website, setWebsite]   = useState("");
   const [busy, setBusy]         = useState(false);
   const [err, setErr]           = useState("");
+  // Prevent the profile-check effect from running more than once per auth
+  const profileChecked = React.useRef(false);
 
-  // Once signed in → check / create employer profile
+  // Once signed in → check / create employer profile (runs once per auth)
   useEffect(() => {
-    if (!user || step === "done") return;
+    if (!user || profileChecked.current) return;
+    profileChecked.current = true;
     (async () => {
       const res = await fetch("/api/employer/profile");
       if (res.ok) {
@@ -43,7 +49,7 @@ function EmployerAuthModal({
         else setStep("company");
       }
     })();
-  }, [user, step, onProfile]);
+  }, [user, onProfile]);
 
   async function handleSendOtp() {
     if (!email.includes("@")) { setErr("Enter a valid work email."); return; }
@@ -58,7 +64,7 @@ function EmployerAuthModal({
     setBusy(true); setErr("");
     const { error } = await verifyOtp(email.trim().toLowerCase(), otp.trim());
     if (error) { setErr(error); setBusy(false); }
-    // useEffect above handles the rest once user changes
+    else setBusy(false); // auth state change → useEffect above fires
   }
 
   async function handleCompany() {
@@ -108,17 +114,28 @@ function EmployerAuthModal({
         <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18 }}>✕</button>
 
         {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: 24 }}>
+        <div style={{ textAlign: "center", marginBottom: step === "checking" ? 0 : 24 }}>
           <div style={{ fontSize: 28, marginBottom: 8 }}>🏢</div>
           <div style={{ fontSize: 18, fontWeight: 700, color: "var(--text1)" }}>
-            {step === "company" ? "Set up your employer account" : "Sign in as Recruiter"}
+            {step === "checking" ? "Checking your account…"
+              : step === "company" ? "Set up your employer account"
+              : "Sign in as Recruiter"}
           </div>
-          <div style={{ fontSize: 13, color: "var(--text3)", marginTop: 4 }}>
-            {step === "company"
-              ? "You're signed in — just tell us your company name to start posting jobs"
-              : "Sign in or create an account to post jobs and reach top candidates"}
-          </div>
+          {step !== "checking" && (
+            <div style={{ fontSize: 13, color: "var(--text3)", marginTop: 4 }}>
+              {step === "company"
+                ? <>Your candidate account works here too — just add your company name</>
+                : <>Same account for both candidate and recruiter — no separate login needed</>}
+            </div>
+          )}
         </div>
+
+        {/* Checking state — spinner while profile loads */}
+        {step === "checking" && (
+          <div style={{ textAlign: "center", padding: "24px 0 8px" }}>
+            <div style={{ fontSize: 12, color: "var(--text3)" }}>Loading your profile…</div>
+          </div>
+        )}
 
         {step === "company" ? (
           /* Company name step */
@@ -163,7 +180,11 @@ function EmployerAuthModal({
           /* Method selection */
           <>
             {/* Google */}
-            <button onClick={() => signInWithGoogle("/recruit")} style={{
+            <button onClick={() => {
+              // Flag that we're in employer signup so the page auto-opens modal on return
+              sessionStorage.setItem(EMPLOYER_SIGNUP_KEY, "1");
+              signInWithGoogle("/recruit");
+            }} style={{
               width: "100%", padding: "11px", borderRadius: 9,
               border: "1px solid var(--border)", background: "var(--surface2)",
               color: "var(--text1)", fontSize: 14, fontWeight: 600,
@@ -559,12 +580,20 @@ export default function RecruitPage() {
   const [payLoading, setPayLoading]   = useState<string | null>(null);
   const [payError, setPayError]       = useState("");
 
-  // Load employer profile if signed in
+  // Load employer profile when signed in; auto-open modal if returning from Google OAuth
   useEffect(() => {
     if (!user) { setProfile(null); return; }
     fetch("/api/employer/profile")
       .then(r => r.json())
-      .then((d: { profile: EmployerProfile | null }) => setProfile(d.profile))
+      .then((d: { profile: EmployerProfile | null }) => {
+        setProfile(d.profile);
+        // If user just came back from employer Google OAuth and has no profile yet,
+        // auto-open the modal so they land on the company-name step immediately.
+        if (!d.profile && sessionStorage.getItem(EMPLOYER_SIGNUP_KEY)) {
+          sessionStorage.removeItem(EMPLOYER_SIGNUP_KEY);
+          setAuthModal(true);
+        }
+      })
       .catch(() => {});
   }, [user]);
 
@@ -634,10 +663,8 @@ export default function RecruitPage() {
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           {profile && <span style={{ fontSize: 12, color: "var(--text3)", padding: "6px 12px", background: "var(--surface2)", borderRadius: 7, border: "1px solid var(--border)" }}>🏢 {profile.company_name}</span>}
-          <button onClick={() => { setView("landing"); setTimeout(() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" }), 100); }}
-            style={{ padding: "7px 14px", borderRadius: 8, border: "none", background: "none", color: "var(--text2)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-            Pricing
-          </button>
+          {/* Dual-role: if also a candidate, show switch link */}
+          {user && <Link href="/" style={{ padding: "6px 12px", borderRadius: 7, border: "1px solid var(--border)", background: "none", color: "var(--text3)", fontSize: 12, fontWeight: 500, textDecoration: "none" }}>👤 Candidate view</Link>}
           <button onClick={() => requireAuth(() => setView("post"))} style={{ padding: "7px 14px", borderRadius: 8, border: "none", background: "var(--accent)", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
             <Plus size={13} /> Post Job
           </button>
