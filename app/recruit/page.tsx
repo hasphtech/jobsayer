@@ -739,32 +739,35 @@ export default function RecruitPage() {
           <span style={{ fontSize: 14, fontWeight: 700 }}>🏢 For Employers</span>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          {/* Pricing always visible in nav */}
-          <a
-            href="#pricing"
-            onClick={() => setView("landing")}
-            style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: "none", color: "var(--text2)", fontSize: 13, fontWeight: 600, cursor: "pointer", textDecoration: "none" }}
-          >
+          <a href="#pricing" style={{ padding: "6px 14px", borderRadius: 8, background: "none", color: "var(--text2)", fontSize: 13, fontWeight: 600, cursor: "pointer", textDecoration: "none" }}>
             Pricing
           </a>
           {profile ? (
-            <button onClick={() => setView("dashboard")} style={{ padding: "7px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--surface2)", color: "var(--text2)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-              📊 Dashboard
-            </button>
+            <>
+              <button onClick={() => setView("dashboard")} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--surface2)", color: "var(--text2)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                📊 Dashboard
+              </button>
+              <button onClick={() => requireAuth(() => setView("post"))} style={{ padding: "7px 16px", borderRadius: 8, border: "none", background: "var(--accent)", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                Post a Job →
+              </button>
+            </>
           ) : (
-            <button onClick={() => setAuthModal(true)} style={{ padding: "7px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--surface2)", color: "var(--text2)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-              Employer Login
-            </button>
+            <>
+              <button onClick={() => setAuthModal(true)} style={{ padding: "7px 16px", borderRadius: 8, border: "1px solid var(--accborder)", background: "var(--accdim)", color: "var(--accent)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                Sign in as Recruiter
+              </button>
+              <button onClick={() => requireAuth(() => setView("post"))} style={{ padding: "7px 16px", borderRadius: 8, border: "none", background: "var(--accent)", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                Post a Job →
+              </button>
+            </>
           )}
-          <button onClick={() => requireAuth(() => setView("post"))} style={{ padding: "7px 16px", borderRadius: 8, border: "none", background: "var(--accent)", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-            Post a Job →
-          </button>
         </div>
       </div>
 
       <div style={{ maxWidth: 1000, margin: "0 auto", padding: "60px 24px" }}>
-        {/* Hero */}
-        <div style={{ textAlign: "center", marginBottom: 60 }}>
+
+        {/* ── Hero ── */}
+        <div style={{ textAlign: "center", marginBottom: 48 }}>
           <div style={{ display: "inline-block", fontSize: 11, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--accent)", background: "var(--accdim)", border: "1px solid var(--accborder)", padding: "4px 14px", borderRadius: 20, marginBottom: 20 }}>
             For Hiring Teams
           </div>
@@ -774,58 +777,49 @@ export default function RecruitPage() {
               AI-matched, not spam-filtered
             </span>
           </h1>
-          <p style={{ fontSize: 16, color: "var(--text3)", lineHeight: 1.7, maxWidth: 600, margin: "0 auto 36px" }}>
-            Every candidate in our pool has a verified resume score. Match your JD against pre-scored profiles and reach candidates who <em>actually</em> fit.
+          <p style={{ fontSize: 16, color: "var(--text3)", lineHeight: 1.7, maxWidth: 560, margin: "0 auto 36px" }}>
+            Every candidate has a verified resume score. Match your JD against pre-scored profiles and reach candidates who <em>actually</em> fit.
           </p>
-          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            <button onClick={() => requireAuth(() => setView("post"))} style={{ display: "flex", alignItems: "center", gap: 8, padding: "15px 32px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
-              <Plus size={16} /> Post a Job — Free
-            </button>
-            <button onClick={() => setView("pool")} style={{ display: "flex", alignItems: "center", gap: 8, padding: "15px 32px", borderRadius: 12, border: "1px solid var(--border)", background: "var(--surface)", color: "var(--text1)", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>
-              <Users size={16} /> Browse Candidates
-            </button>
-          </div>
-        </div>
 
-        {/* Stats */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 60 }}>
-          {[
-            { value: "2,400+", label: "Scored Candidates" },
-            { value: "91%",    label: "ATS Pass Rate" },
-            { value: "3.2 days", label: "Avg Time to Match" },
-            { value: "78%",    label: "Candidate Reply Rate" },
-          ].map(s => (
-            <div key={s.label} style={{ ...card, textAlign: "center" }}>
-              <div style={{ fontSize: 28, fontWeight: 900, color: "var(--accent)", marginBottom: 4 }}>{s.value}</div>
-              <div style={{ fontSize: 13, color: "var(--text3)" }}>{s.label}</div>
+          {/* ── Auth / action CTAs ── */}
+          {profile ? (
+            /* Already an employer — quick actions */
+            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+              <button onClick={() => requireAuth(() => setView("post"))} style={{ display: "flex", alignItems: "center", gap: 8, padding: "14px 28px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
+                <Plus size={16} /> Post a Job
+              </button>
+              <button onClick={() => setView("dashboard")} style={{ display: "flex", alignItems: "center", gap: 8, padding: "14px 28px", borderRadius: 12, border: "1px solid var(--border)", background: "var(--surface)", color: "var(--text1)", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>
+                📊 Go to Dashboard
+              </button>
             </div>
-          ))}
-        </div>
-
-        {/* Features */}
-        <h2 style={{ fontSize: 22, fontWeight: 700, textAlign: "center", marginBottom: 24 }}>Why recruiters choose jobSayer</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 72 }}>
-          {[
-            { icon: "🎯", title: "AI-Scored Profiles",      desc: "Every candidate has a resume score (0–100) across ATS compatibility, keywords, and impact language." },
-            { icon: "🔍", title: "JD-to-Profile Matching",  desc: "Paste your JD and instantly see ranked candidate match % — no manual shortlisting." },
-            { icon: "👻", title: "Ghost-Proof Posting",      desc: "We flag JDs with ghost signals. Your posts are reviewed so candidates trust your openings." },
-            { icon: "⚡", title: "Fast Response Pool",       desc: "Candidates are actively job hunting — average reply rate 78%, 3× higher than job boards." },
-            { icon: "📊", title: "Hiring Analytics",         desc: "Track applicant flow, funnel conversion, and competitor salary benchmarks." },
-            { icon: "🆓", title: "Free to Start",            desc: "Post your first 3 jobs free. Upgrade when you need scale." },
-          ].map(f => (
-            <div key={f.title} style={card}>
-              <div style={{ fontSize: 28, marginBottom: 10 }}>{f.icon}</div>
-              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{f.title}</div>
-              <div style={{ fontSize: 13, color: "var(--text3)", lineHeight: 1.6 }}>{f.desc}</div>
+          ) : (
+            /* Not logged in — prominent sign-in + secondary actions */
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+              <button
+                onClick={() => setAuthModal(true)}
+                style={{ display: "flex", alignItems: "center", gap: 10, padding: "16px 40px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#fff", fontSize: 16, fontWeight: 800, cursor: "pointer" }}
+              >
+                🏢 Sign in as Recruiter — it&apos;s free
+              </button>
+              <div style={{ display: "flex", gap: 12 }}>
+                <button onClick={() => setView("pool")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: 9, border: "1px solid var(--border)", background: "var(--surface)", color: "var(--text2)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                  <Users size={14} /> Browse Candidates
+                </button>
+                <a href="#pricing" style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: 9, border: "1px solid var(--border)", background: "var(--surface)", color: "var(--text2)", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
+                  See Pricing ↓
+                </a>
+              </div>
+              <p style={{ fontSize: 12, color: "var(--text3)", margin: 0 }}>
+                Free plan includes 3 job posts · No credit card required
+              </p>
             </div>
-          ))}
+          )}
         </div>
 
-        {/* ── Pricing ── */}
-        <div id="pricing" style={{ marginBottom: 72, scrollMarginTop: 72 }}>
-          <hr style={{ border: "none", borderTop: "1px solid var(--border)", marginBottom: 64 }} />
+        {/* ── Pricing — moved up so users see it without scrolling ── */}
+        <div id="pricing" style={{ marginBottom: 56, scrollMarginTop: 72 }}>
           {/* Interval toggle */}
-          <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 28 }}>
             <div style={{ display: "flex", gap: 2, background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 10, padding: 4 }}>
               {(["monthly", "annual"] as const).map(i => (
                 <button key={i} onClick={() => setInterval(i)} style={{
@@ -847,13 +841,53 @@ export default function RecruitPage() {
           )}
         </div>
 
+        {/* ── Stats ── */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 56 }}>
+          {[
+            { value: "2,400+", label: "Scored Candidates" },
+            { value: "91%",    label: "ATS Pass Rate" },
+            { value: "3.2 days", label: "Avg Time to Match" },
+            { value: "78%",    label: "Candidate Reply Rate" },
+          ].map(s => (
+            <div key={s.label} style={{ ...card, textAlign: "center" }}>
+              <div style={{ fontSize: 28, fontWeight: 900, color: "var(--accent)", marginBottom: 4 }}>{s.value}</div>
+              <div style={{ fontSize: 13, color: "var(--text3)" }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* ── Features ── */}
+        <h2 style={{ fontSize: 22, fontWeight: 700, textAlign: "center", marginBottom: 24 }}>Why recruiters choose jobSayer</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 56 }}>
+          {[
+            { icon: "🎯", title: "AI-Scored Profiles",      desc: "Every candidate has a resume score (0–100) across ATS compatibility, keywords, and impact language." },
+            { icon: "🔍", title: "JD-to-Profile Matching",  desc: "Paste your JD and instantly see ranked candidate match % — no manual shortlisting." },
+            { icon: "👻", title: "Ghost-Proof Posting",      desc: "We flag JDs with ghost signals. Your posts are reviewed so candidates trust your openings." },
+            { icon: "⚡", title: "Fast Response Pool",       desc: "Candidates are actively job hunting — average reply rate 78%, 3× higher than job boards." },
+            { icon: "📊", title: "Hiring Analytics",         desc: "Track applicant flow, funnel conversion, and competitor salary benchmarks." },
+            { icon: "🆓", title: "Free to Start",            desc: "Post your first 3 jobs free. Upgrade when you need scale." },
+          ].map(f => (
+            <div key={f.title} style={card}>
+              <div style={{ fontSize: 28, marginBottom: 10 }}>{f.icon}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{f.title}</div>
+              <div style={{ fontSize: 13, color: "var(--text3)", lineHeight: 1.6 }}>{f.desc}</div>
+            </div>
+          ))}
+        </div>
+
         {/* Bottom CTA */}
-        <div style={{ ...card, textAlign: "center", padding: "48px", background: "linear-gradient(135deg,rgba(99,102,241,.08),rgba(99,102,241,.04))", borderColor: "var(--accborder)" }}>
-          <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 12 }}>Start hiring smarter today</h2>
+        <div style={{ ...card, textAlign: "center", padding: "48px", background: "linear-gradient(135deg,rgba(99,102,241,.08),rgba(99,102,241,.04))", borderColor: "var(--accborder)", marginBottom: 40 }}>
+          <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 12 }}>Ready to hire smarter?</h2>
           <p style={{ fontSize: 14, color: "var(--text3)", marginBottom: 24 }}>Post your first job in under 5 minutes — free to start, no credit card required.</p>
-          <button onClick={() => requireAuth(() => setView("post"))} style={{ padding: "14px 36px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
-            Post a Job Free →
-          </button>
+          {profile ? (
+            <button onClick={() => requireAuth(() => setView("post"))} style={{ padding: "14px 36px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
+              Post a Job →
+            </button>
+          ) : (
+            <button onClick={() => setAuthModal(true)} style={{ padding: "14px 36px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
+              🏢 Sign in as Recruiter — Free →
+            </button>
+          )}
         </div>
       </div>
 
