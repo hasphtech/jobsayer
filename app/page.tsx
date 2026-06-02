@@ -1013,24 +1013,34 @@ export default function HomePage() {
   // Auto-close modal once the user successfully signs in
   useEffect(() => { if (user) setShowSignIn(false); }, [user]);
 
-  // Surface auth errors from two sources:
-  //   ?auth_error=   — our own callback route failure
-  //   ?error=&error_code=&error_description= — Supabase redirects OAuth errors
-  //                    to the Site URL (e.g. bad_oauth_state, invalid_request)
+  // Surface auth errors from three sources:
+  //   ?auth_error=        — our own callback route
+  //   ?error_description= — Supabase query-param style (bad_oauth_state etc.)
+  //   #error=             — Supabase hash-fragment style (server_error etc.)
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const err =
-      params.get("auth_error") ||
-      params.get("error_description") ||
-      params.get("error");
-    if (err) {
-      setAuthError(decodeURIComponent(err).replace(/\+/g, " "));
+    // Query params
+    const qp = new URLSearchParams(window.location.search);
+    // Hash fragment (strip leading #)
+    const hp = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+
+    const raw =
+      qp.get("auth_error") ||
+      qp.get("error_description") ||
+      qp.get("error") ||
+      hp.get("error_description") ||
+      hp.get("error");
+
+    if (raw) {
+      // Double-decode: Supabase sometimes double-encodes (%253A → %3A → :)
+      let msg = raw;
+      try { msg = decodeURIComponent(decodeURIComponent(raw)).replace(/\+/g, " "); } catch {
+        try { msg = decodeURIComponent(raw).replace(/\+/g, " "); } catch { /* use raw */ }
+      }
+      setAuthError(msg);
+      // Clean the URL without reload
       const clean = new URL(window.location.href);
-      clean.searchParams.delete("auth_error");
-      clean.searchParams.delete("error");
-      clean.searchParams.delete("error_code");
-      clean.searchParams.delete("error_description");
-      window.history.replaceState({}, "", clean.toString());
+      ["auth_error", "error", "error_code", "error_description", "sb"].forEach(k => clean.searchParams.delete(k));
+      window.history.replaceState({}, "", clean.pathname + (clean.search !== "?" ? clean.search : ""));
     }
   }, []);
 
