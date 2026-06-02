@@ -105,10 +105,10 @@ function Nav({ user, signIn }: { user: any; signIn: () => void; }) {
               </>
             ) : (
               <>
-                <NavLink href="#how">How it works</NavLink>
                 <NavLink href="#features">Features</NavLink>
                 <NavLink href="#pricing">Pricing</NavLink>
-                <button onClick={signIn} style={ghostBtn}>Sign in / Register</button>
+                <NavLink href="/recruit">For Recruiters</NavLink>
+                <button onClick={signIn} style={ghostBtn}>Sign in</button>
                 <Link href="/builder" style={primaryBtn}>Try free →</Link>
               </>
             )}
@@ -551,29 +551,6 @@ function LandingPage({ signIn }: { signIn: () => void }) {
         </div>
       </section>
 
-      {/* ── Trending roles ───────────────────────────────────── */}
-      <section style={{ padding: mobile ? "0 20px 64px" : "0 24px 80px", maxWidth: 960, margin: "0 auto" }}>
-        <SectionLabel>Market pulse</SectionLabel>
-        <h2 style={{ fontSize: mobile ? 24 : 34, fontWeight: 800, textAlign: "center", marginBottom: 32, letterSpacing: "-1px" }}>
-          Trending roles in Bangalore right now
-        </h2>
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(3,1fr)", gap: 10 }}>
-          {TRENDING.map(r => (
-            <div key={r.role} style={{
-              background: "var(--surface)", border: "1px solid var(--border)",
-              borderRadius: 12, padding: "14px 16px",
-              display: "flex", alignItems: "center", justifyContent: "space-between",
-            }}>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)", marginBottom: 2 }}>{r.role}</div>
-                <div style={{ fontSize: 11, color: "var(--text3)" }}>{r.count} openings</div>
-              </div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--success)", background: "rgba(34,197,94,.1)", padding: "3px 8px", borderRadius: 8 }}>{r.delta}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ── Pricing ──────────────────────────────────────────── */}
       <section id="pricing" style={{ padding: mobile ? "0 20px 64px" : "0 24px 80px", maxWidth: 960, margin: "0 auto" }}>
         <SectionLabel>Pricing</SectionLabel>
@@ -596,11 +573,10 @@ function LandingPage({ signIn }: { signIn: () => void }) {
                 "4 basic templates",
                 "PDF export",
                 "Public share link",
-                "2 resume uploads / mo",
                 "jobSayer Score",
                 "Matched jobs feed",
               ],
-              missing: ["DOCX export","All 20+ templates","AI writing assistant","JSON export"],
+              missing: ["DOCX export", "All 20+ templates", "AI writing assistant", "Interview prep (AI)", "Career GPS roadmap", "Priority support"],
               cta: "Start free", ctaHref: "/builder",
             },
             {
@@ -615,11 +591,12 @@ function LandingPage({ signIn }: { signIn: () => void }) {
                 "All 20+ templates",
                 "PDF + DOCX export",
                 "Public share link",
-                "5 resume uploads / mo",
                 "jobSayer Score",
                 "Matched jobs feed",
+                "Interview prep (AI)",
+                "Career GPS roadmap",
               ],
-              missing: ["JSON export","AI writing assistant"],
+              missing: ["AI writing assistant", "Priority support"],
               cta: "Get Starter", ctaHref: "/upgrade",
             },
             {
@@ -632,11 +609,12 @@ function LandingPage({ signIn }: { signIn: () => void }) {
               features: [
                 "10 saved resumes",
                 "All 20+ templates",
-                "PDF + DOCX + JSON export",
+                "PDF + DOCX export",
                 "Public share link",
-                "20 resume uploads / mo",
                 "jobSayer Score",
                 "Matched jobs feed",
+                "Interview prep (AI)",
+                "Career GPS roadmap",
                 "AI writing assistant",
                 "Priority support",
               ],
@@ -695,6 +673,63 @@ function LandingPage({ signIn }: { signIn: () => void }) {
         </p>
       </section>
 
+      {/* ── Trending roles ───────────────────────────────────── */}
+      <section style={{ padding: mobile ? "0 20px 64px" : "0 24px 80px", maxWidth: 960, margin: "0 auto" }}>
+        <SectionLabel>Market pulse</SectionLabel>
+        <h2 style={{ fontSize: mobile ? 24 : 34, fontWeight: 800, textAlign: "center", marginBottom: 32, letterSpacing: "-1px" }}>
+          Trending roles in Bangalore right now
+        </h2>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(3,1fr)", gap: 10 }}>
+          {TRENDING.map(r => (
+            <div key={r.role} style={{
+              background: "var(--surface)", border: "1px solid var(--border)",
+              borderRadius: 12, padding: "14px 16px",
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+            }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)", marginBottom: 2 }}>{r.role}</div>
+                <div style={{ fontSize: 11, color: "var(--text3)" }}>{r.count} openings</div>
+              </div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--success)", background: "rgba(34,197,94,.1)", padding: "3px 8px", borderRadius: 8 }}>{r.delta}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Recruiter crosssell ──────────────────────────────── */}
+      <section style={{ padding: mobile ? "0 20px 64px" : "0 24px 80px", maxWidth: 960, margin: "0 auto" }}>
+        <div style={{
+          display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 14,
+          background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 18, overflow: "hidden",
+        }}>
+          <div style={{ padding: mobile ? "28px 24px" : "36px 40px" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", color: "var(--accent)", marginBottom: 12 }}>For Employers</div>
+            <h3 style={{ fontSize: mobile ? 20 : 26, fontWeight: 800, marginBottom: 12, letterSpacing: "-.02em" }}>
+              Hire AI-scored<br />candidates faster
+            </h3>
+            <p style={{ fontSize: 13, color: "var(--text3)", lineHeight: 1.7, marginBottom: 20 }}>
+              Post jobs, get AI-matched candidates ranked by fit score, and skip the ghost-job noise. Verified employers get priority placement.
+            </p>
+            <Link href="/recruit" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "11px 22px", background: "var(--accent)", borderRadius: 9, color: "#fff", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
+              🏢 Start hiring free →
+            </Link>
+          </div>
+          <div style={{ padding: mobile ? "0 24px 28px" : "36px 40px 36px 0", display: "flex", flexDirection: "column", gap: 10, justifyContent: "center" }}>
+            {[
+              { icon: "🎯", text: "AI matches JDs to pre-scored candidate pool" },
+              { icon: "👻", text: "Ghost-proof listings — admin-reviewed before going live" },
+              { icon: "🛡", text: "Verified company badge builds candidate trust" },
+              { icon: "🆓", text: "Free to start — 3 job posts, no card needed" },
+            ].map(p => (
+              <div key={p.text} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 14px", background: "rgba(255,255,255,.03)", borderRadius: 10, border: "1px solid var(--border)" }}>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>{p.icon}</span>
+                <span style={{ fontSize: 13, color: "var(--text2)", lineHeight: 1.5 }}>{p.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── CTA banner ───────────────────────────────────────── */}
       <section style={{
         margin: mobile ? "0 20px 64px" : "0 24px 96px",
@@ -722,16 +757,77 @@ function LandingPage({ signIn }: { signIn: () => void }) {
 
       {/* ── Footer ───────────────────────────────────────────── */}
       <footer style={{
-        borderTop: "1px solid var(--border)", padding: mobile ? "20px" : "20px 32px",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        flexWrap: "wrap", gap: 10,
+        borderTop: "1px solid var(--border)",
+        padding: mobile ? "32px 20px 24px" : "40px 48px 28px",
+        background: "var(--surface)",
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <img src="/logo.png" alt="jobSayer" style={{ width: 20, height: 20, borderRadius: 4, objectFit: "cover" }} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text2)" }}>job<span style={{ color: "var(--accent)" }}>sayer</span></span>
-          {!mobile && <span style={{ fontSize: 11, color: "var(--text3)" }}>— AI-Powered Jobs. Smarter Future.</span>}
+        <div style={{ maxWidth: 960, margin: "0 auto" }}>
+          {/* Top row */}
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "2fr 1fr 1fr 1fr", gap: mobile ? 28 : 40, marginBottom: 32 }}>
+            {/* Brand */}
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo.png" alt="jobSayer" style={{ width: 22, height: 22, borderRadius: 5, objectFit: "cover" }} />
+                <span style={{ fontSize: 14, fontWeight: 800, color: "var(--text1)" }}>jobSayer</span>
+              </div>
+              <p style={{ fontSize: 12, color: "var(--text3)", lineHeight: 1.6, maxWidth: 240, margin: 0 }}>
+                AI-powered resume builder and job platform built for the Indian job market.
+              </p>
+            </div>
+            {/* Candidates */}
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--text3)", marginBottom: 12 }}>For Candidates</div>
+              {[
+                { label: "Resume Builder", href: "/builder" },
+                { label: "Resume Score",   href: "/score" },
+                { label: "Matched Jobs",   href: "/jobs" },
+                { label: "Interview Prep", href: "/interview" },
+                { label: "Career GPS",     href: "/career-gps" },
+                { label: "BGV Badge",      href: "/bgv" },
+              ].map(l => (
+                <Link key={l.label} href={l.href} style={{ display: "block", fontSize: 12, color: "var(--text3)", textDecoration: "none", marginBottom: 7, lineHeight: 1 }}
+                  onMouseEnter={e => (e.currentTarget.style.color = "var(--text1)")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "var(--text3)")}
+                >{l.label}</Link>
+              ))}
+            </div>
+            {/* Employers */}
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--text3)", marginBottom: 12 }}>For Employers</div>
+              {[
+                { label: "Post a Job",        href: "/recruit" },
+                { label: "Browse Candidates", href: "/recruit" },
+                { label: "Employer Pricing",  href: "/recruit#pricing" },
+                { label: "Company Verify",    href: "/verify" },
+              ].map(l => (
+                <Link key={l.label} href={l.href} style={{ display: "block", fontSize: 12, color: "var(--text3)", textDecoration: "none", marginBottom: 7, lineHeight: 1 }}
+                  onMouseEnter={e => (e.currentTarget.style.color = "var(--text1)")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "var(--text3)")}
+                >{l.label}</Link>
+              ))}
+            </div>
+            {/* Legal */}
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--text3)", marginBottom: 12 }}>Company</div>
+              {[
+                { label: "Terms of Service", href: "/terms" },
+                { label: "Privacy Policy",   href: "/privacy" },
+                { label: "Upgrade",          href: "/upgrade" },
+              ].map(l => (
+                <Link key={l.label} href={l.href} style={{ display: "block", fontSize: 12, color: "var(--text3)", textDecoration: "none", marginBottom: 7, lineHeight: 1 }}
+                  onMouseEnter={e => (e.currentTarget.style.color = "var(--text1)")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "var(--text3)")}
+                >{l.label}</Link>
+              ))}
+            </div>
+          </div>
+          {/* Bottom bar */}
+          <div style={{ borderTop: "1px solid var(--border)", paddingTop: 18, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
+            <span style={{ fontSize: 11, color: "var(--text3)" }}>© 2026 jobSayer. All rights reserved. Prices in INR incl. GST.</span>
+            <span style={{ fontSize: 11, color: "var(--text3)" }}>Made with ❤ in India 🇮🇳</span>
+          </div>
         </div>
-        <div style={{ fontSize: 11, color: "var(--text3)" }}>© 2026 jobSayer. All rights reserved.</div>
       </footer>
     </div>
   );
@@ -740,34 +836,47 @@ function LandingPage({ signIn }: { signIn: () => void }) {
 /* ══════════════════════════════════════════════════════════════
    DASHBOARD (signed-in)
 ══════════════════════════════════════════════════════════════ */
+interface ScoreDim { label: string; score: number; status: string }
+interface BgvStatus { status: string; id_verified: boolean; edu_verified: boolean; emp_verified: boolean }
+
 function Dashboard({ user }: { user: any }) {
   const w = useWindowWidth();
   const mobile = w < 640;
-  const [score, setScore]         = useState<number | null>(null);
+  const [score, setScore]           = useState<number | null>(null);
+  const [scoreDims, setScoreDims]   = useState<ScoreDim[]>([]);
   const [matchCount, setMatchCount] = useState(0);
-  const [resumeName, setResumeName] = useState("");
   const [hasResume, setHasResume]   = useState(false);
   const [lastSaved, setLastSaved]   = useState("");
   const [tipIdx]                    = useState(() => Math.floor(Math.random() * TIPS.length));
+  const [bgv, setBgv]               = useState<BgvStatus | null>(null);
   const { signOut }                 = useAuth();
 
   useEffect(() => {
+    // Load resume from localStorage
     try {
       const raw = localStorage.getItem("jobsayer-resume-draft");
-      if (!raw) return;
-      const parsed = JSON.parse(raw);
-      const data: ResumeData = parsed.data ?? parsed;
-      if (data.name) { setResumeName(data.name); setHasResume(true); }
-      const result = computeScore(data);
-      setScore(result.total);
-      const rt = resumeToText(data).toLowerCase();
-      const matched = JOBS.filter(j => !j.ghost && j.skills.filter(s => rt.includes(s)).length / j.skills.length > 0.3);
-      setMatchCount(matched.length);
-      if (parsed.ts) {
-        const d = new Date(parsed.ts);
-        setLastSaved(d.toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }));
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const data: ResumeData = parsed.data ?? parsed;
+        if (data.name) { setHasResume(true); }
+        const result = computeScore(data);
+        setScore(result.total);
+        setScoreDims(result.dimensions.map(d => ({ label: d.label, score: d.score, status: d.status })));
+        const rt = resumeToText(data).toLowerCase();
+        const matched = JOBS.filter(j => !j.ghost && j.skills.filter(s => rt.includes(s)).length / j.skills.length > 0.3);
+        setMatchCount(matched.length);
+        if (parsed.ts) {
+          const d = new Date(parsed.ts);
+          setLastSaved(d.toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }));
+        }
       }
     } catch { /* ignore */ }
+
+    // Fetch real BGV status
+    fetch("/api/bgv/status")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.bgv) setBgv(d.bgv); })
+      .catch(() => {});
   }, []);
 
   const firstName = user?.user_metadata?.full_name?.split(" ")[0] ?? user?.email?.split("@")[0] ?? "there";
@@ -849,8 +958,27 @@ function Dashboard({ user }: { user: any }) {
               onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}
             >
               <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 12, fontWeight: 500 }}>BGV status</div>
-              <div style={{ fontSize: 26, marginBottom: 6 }}>⏳</div>
-              <div style={{ fontSize: 11, color: "var(--warn)", fontWeight: 600 }}>Not started</div>
+              {(() => {
+                if (!bgv) return <>
+                  <div style={{ fontSize: 26, marginBottom: 6 }}>🛡</div>
+                  <div style={{ fontSize: 11, color: "var(--text3)", fontWeight: 600 }}>Not started</div>
+                  <div style={{ fontSize: 10, color: "var(--accent)", marginTop: 3 }}>Get verified →</div>
+                </>;
+                const cfg: Record<string, { icon: string; label: string; col: string }> = {
+                  pending:     { icon: "⏳", label: "Pending review",    col: "var(--warn)" },
+                  in_progress: { icon: "🔍", label: "In progress",       col: "var(--accent)" },
+                  verified:    { icon: "✅", label: "Verified",           col: "var(--success)" },
+                  partial:     { icon: "⚠",  label: "Partially verified", col: "var(--warn)" },
+                  failed:      { icon: "✗",   label: "Failed",            col: "var(--danger)" },
+                };
+                const s = cfg[bgv.status] ?? cfg.pending;
+                const checks = [bgv.id_verified, bgv.edu_verified, bgv.emp_verified].filter(Boolean).length;
+                return <>
+                  <div style={{ fontSize: 22, marginBottom: 5 }}>{s.icon}</div>
+                  <div style={{ fontSize: 11, color: s.col, fontWeight: 700 }}>{s.label}</div>
+                  <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 3 }}>{checks}/3 checks passed</div>
+                </>;
+              })()}
             </div>
           </Link>
         </div>
@@ -864,24 +992,23 @@ function Dashboard({ user }: { user: any }) {
               <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: "-.01em" }}>Resume breakdown</div>
               <Link href="/score" style={{ fontSize: 12, color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Full report →</Link>
             </div>
-            {score !== null ? (
+            {score !== null && scoreDims.length > 0 ? (
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                {[
-                  ["ATS format", Math.min(100, (score ?? 0) + 17), "var(--success)"],
-                  ["Keywords", Math.max(30, (score ?? 0) - 6), "var(--warn)"],
-                  ["Impact lang.", Math.min(100, (score ?? 0) + 2), "var(--warn)"],
-                  ["Work clarity", Math.min(100, (score ?? 0) + 11), "var(--success)"],
-                ].map(([l, v, c]) => (
-                  <div key={l as string} style={{ background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 10, padding: "13px 14px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                      <span style={{ fontSize: 12, color: "var(--text2)" }}>{l}</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: c as string }}>{v as number}</span>
+                {scoreDims.map(dim => {
+                  const c = dim.status === "green" ? "var(--success)" : dim.status === "amber" ? "var(--warn)" : "var(--danger)";
+                  const pct = Math.round((dim.score / 25) * 100);
+                  return (
+                    <div key={dim.label} style={{ background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 10, padding: "13px 14px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                        <span style={{ fontSize: 12, color: "var(--text2)" }}>{dim.label}</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: c }}>{dim.score}<span style={{ fontSize: 10, color: "var(--text3)" }}>/25</span></span>
+                      </div>
+                      <div style={{ background: "rgba(255,255,255,.05)", borderRadius: 99, height: 5 }}>
+                        <div style={{ width: `${pct}%`, height: "100%", background: c, borderRadius: 99 }} />
+                      </div>
                     </div>
-                    <div style={{ background: "rgba(255,255,255,.05)", borderRadius: 99, height: 5 }}>
-                      <div style={{ width: `${v}%`, height: "100%", background: c as string, borderRadius: 99 }} />
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div style={{ textAlign: "center", padding: "28px 0" }}>
