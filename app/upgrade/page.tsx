@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { Check, Zap, Star, Sparkles } from "lucide-react";
 import { PLAN_DEFAULTS } from "@/lib/resumePlan";
 import { useAuth } from "@/lib/auth";
+import AppNav from "@/components/AppNav";
 
 /* ── Razorpay script loader ─────────────────────────────────── */
 function loadRazorpay(): Promise<boolean> {
@@ -151,8 +152,9 @@ export default function UpgradePage() {
       fontFamily: "inherit",
       padding: "0 16px 60px",
     }}>
+      <AppNav />
       {/* ── Header ── */}
-      <div style={{ maxWidth: 900, margin: "0 auto", paddingTop: 52, textAlign: "center" }}>
+      <div style={{ maxWidth: 900, margin: "0 auto", paddingTop: 32, textAlign: "center" }}>
         <button
           onClick={() => router.back()}
           style={{

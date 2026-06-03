@@ -1825,11 +1825,17 @@ export default function BuilderPage() {
 
           <div style={{ marginLeft: "auto", display: "flex", gap: 6, alignItems: "center" }}>
             <span style={{ fontSize: 9, fontWeight: 600, color: "var(--text3)", opacity: autoSaved ? 1 : 0, transition: "opacity .3s", pointerEvents: "none" }}>✓ Saved</span>
-            <a href="/score"      style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)",   borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>Score</a>
-            <a href="/jobs"       style={{ fontSize: 10, fontWeight: 600, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)",    borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>Jobs</a>
-            <a href="/interview"  style={{ fontSize: 10, fontWeight: 600, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)",    borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>Interview</a>
-            <a href="/career-gps" style={{ fontSize: 10, fontWeight: 600, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)",    borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>GPS</a>
-            <a href="/bgv"        style={{ fontSize: 10, fontWeight: 600, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)",    borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>BGV</a>
+            {[
+              { href: "/score",        label: "Score",     accent: true  },
+              { href: "/jobs",         label: "Jobs",      accent: false },
+              { href: "/applications", label: "Tracker",   accent: false },
+              { href: "/interview",    label: "Interview", accent: false },
+              { href: "/career-gps",   label: "GPS",       accent: false },
+              { href: "/bgv",          label: "BGV",       accent: false },
+              { href: "/salary",       label: "Salaries",  accent: false },
+            ].map(l => (
+              <a key={l.href} href={l.href} style={{ fontSize: 10, fontWeight: l.accent ? 700 : 600, color: l.accent ? "var(--accent)" : "var(--text2)", background: l.accent ? "var(--accdim)" : "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: l.accent ? "var(--accborder)" : "var(--border)", borderRadius: 6, padding: "3px 8px", textDecoration: "none", whiteSpace: "nowrap" }}>{l.label}</a>
+            ))}
             {user
               ? <span style={{ fontSize: 10, fontWeight: 700, color: "var(--text3)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 5, padding: "2px 7px" }}>{plan.loading ? "…" : plan.planName}</span>
               : <button onClick={() => signInWithGoogle()} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontFamily: "inherit" }}>
@@ -3576,11 +3582,13 @@ export default function BuilderPage() {
           {/* Nav links — consistent with AppNav style */}
           <div style={{ display: "flex", gap: 1, alignItems: "center" }}>
             {[
-              { href: "/score",      label: "Score",      active: true  },
-              { href: "/jobs",       label: "Jobs",       active: false },
-              { href: "/interview",  label: "Interview",  active: false },
-              { href: "/career-gps", label: "Career GPS", active: false },
-              { href: "/bgv",        label: "BGV",        active: false },
+              { href: "/score",        label: "Score",      active: true  },
+              { href: "/jobs",         label: "Jobs",       active: false },
+              { href: "/applications", label: "Tracker",    active: false },
+              { href: "/interview",    label: "Interview",  active: false },
+              { href: "/career-gps",   label: "Career GPS", active: false },
+              { href: "/bgv",          label: "BGV",        active: false },
+              { href: "/salary",       label: "Salaries",   active: false },
             ].map(l => (
               <a key={l.href} href={l.href} style={{
                 padding: "4px 10px", borderRadius: 7, fontSize: 12, fontWeight: l.active ? 700 : 400,
