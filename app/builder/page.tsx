@@ -23,7 +23,8 @@ import { exportDocx } from "@/lib/docxExport";
 import {
   saveDraft, loadDraft, createShare,
   saveNamedResume, listResumes, loadResumeSave, deleteResumeSave,
-  type ResumeRecord,
+  createResumeVersion, listResumeVersions, loadResumeVersion,
+  type ResumeRecord, type ResumeVersion,
 } from "@/lib/resumeDb";
 import { canUpload, recordUpload } from "@/lib/uploadUsage";
 import { parseResumeFile } from "@/lib/resumeParser";
@@ -1146,6 +1147,11 @@ export default function BuilderPage() {
   const [loadingSaves,   setLoadingSaves]   = useState(false);
   const [mobileSavesOpen, setMobileSavesOpen] = useState(false);
   const [showScoreCta,   setShowScoreCta]   = useState(false);
+  /* Version history */
+  const [versions,       setVersions]       = useState<ResumeVersion[]>([]);
+  const [showVersions,   setShowVersions]   = useState(false);
+  const [loadingVersions, setLoadingVersions] = useState(false);
+  const [versionCount,   setVersionCount]   = useState(0);
 
   /* Two-panel desktop UI state — persisted across refresh */
   const [leftTab,        setLeftTab]        = useState<"edit" | "cover" | "templates" | "order" | "jd">(() => {
@@ -1701,8 +1707,31 @@ export default function BuilderPage() {
         return idx >= 0 ? prev.map((r, i) => i === idx ? updated : r) : [updated, ...prev];
       });
       setShowScoreCta(true);
+      // Create a version snapshot (fire-and-forget — don't block save UX)
+      const nextCount = versionCount + 1;
+      setVersionCount(nextCount);
+      createResumeVersion(id, user.id, data, template, nextCount).catch(() => {});
     } catch { /* ignore */ }
     setSavingCloud(false);
+  }
+
+  async function handleLoadVersions() {
+    if (!currentSaveId || !user || loadingVersions) return;
+    setLoadingVersions(true);
+    const list = await listResumeVersions(currentSaveId, user.id);
+    setVersions(list);
+    setLoadingVersions(false);
+    setShowVersions(true);
+  }
+
+  async function handleRestoreVersion(versionId: string) {
+    if (!user) return;
+    const v = await loadResumeVersion(versionId, user.id);
+    if (!v) return;
+    // Restore data and template
+    Object.assign(data, v.data); // triggers re-render via existing data reference
+    setStep(0);
+    setShowVersions(false);
   }
 
   async function handleLoadSavesList() {
@@ -3695,8 +3724,54 @@ export default function BuilderPage() {
                           </button>
                         </div>
                       )}
+                      {/* Version history button */}
+                      {currentSaveId && (
+                        <div style={{ padding: "6px 12px 10px", borderTop: "1px solid var(--border)" }}>
+                          <button onClick={() => { handleLoadVersions(); setSavesOpen(false); }}
+                            style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 5, fontSize: 11, fontWeight: 600, color: "var(--text2)", background: "none", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 7, padding: "6px 0", cursor: "pointer", fontFamily: "inherit" }}>
+                            🕒 Version history {versionCount > 0 ? `(${Math.min(versionCount, 10)})` : ""}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* ── Version history panel ── */}
+              {showVersions && (
+                <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+                  onClick={e => { if (e.target === e.currentTarget) setShowVersions(false); }}>
+                  <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "24px", width: "100%", maxWidth: 420, maxHeight: "70vh", overflowY: "auto" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                      <div style={{ fontSize: 15, fontWeight: 700 }}>🕒 Version History</div>
+                      <button onClick={() => setShowVersions(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18 }}>✕</button>
+                    </div>
+                    <p style={{ fontSize: 12, color: "var(--text3)", marginBottom: 14, lineHeight: 1.6 }}>
+                      Each time you save, a snapshot is created. Restore any version — your current work will be replaced.
+                    </p>
+                    {loadingVersions ? (
+                      <div style={{ textAlign: "center", padding: "20px", color: "var(--text3)", fontSize: 13 }}>Loading…</div>
+                    ) : versions.length === 0 ? (
+                      <div style={{ textAlign: "center", padding: "20px", color: "var(--text3)", fontSize: 13 }}>
+                        No versions yet. Save your resume to create the first snapshot.
+                      </div>
+                    ) : versions.map((v, i) => (
+                      <div key={v.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 9, border: "1px solid var(--border)", marginBottom: 8, background: i === 0 ? "var(--accdim)" : "var(--surface2)" }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)" }}>{v.label}</div>
+                          <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>Template: {v.template}{i === 0 ? " · Latest" : ""}</div>
+                        </div>
+                        {i > 0 && (
+                          <button onClick={() => { if (confirm(`Restore "${v.label}"? Your current work will be replaced.`)) handleRestoreVersion(v.id); }}
+                            style={{ fontSize: 11, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit", flexShrink: 0 }}>
+                            Restore
+                          </button>
+                        )}
+                        {i === 0 && <span style={{ fontSize: 10, color: "var(--accent)", fontWeight: 700, flexShrink: 0 }}>Current</span>}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 

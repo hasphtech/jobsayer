@@ -92,9 +92,11 @@ function Nav({ user, signIn }: { user: any; signIn: () => void; }) {
                 <NavLink href="/builder">Builder</NavLink>
                 <NavLink href="/score">Score</NavLink>
                 <NavLink href="/jobs">Jobs</NavLink>
+                <NavLink href="/applications">Tracker</NavLink>
                 <NavLink href="/interview">Interview</NavLink>
                 <NavLink href="/career-gps">Career GPS</NavLink>
                 <NavLink href="/bgv">BGV</NavLink>
+                <NavLink href="/salary">Salaries</NavLink>
                 <Link href="/profile" style={{ ...ghostBtn, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px" }}>
                   {user.user_metadata?.avatar_url
                     /* eslint-disable-next-line @next/next/no-img-element */
@@ -129,13 +131,15 @@ function Nav({ user, signIn }: { user: any; signIn: () => void; }) {
         }}>
           {user ? (
             <>
-              <MobileNavLink href="/builder"    onClick={() => setMenuOpen(false)}>✏️ Resume Builder</MobileNavLink>
-              <MobileNavLink href="/score"      onClick={() => setMenuOpen(false)}>🎯 My Score</MobileNavLink>
-              <MobileNavLink href="/jobs"       onClick={() => setMenuOpen(false)}>💼 Matched Jobs</MobileNavLink>
-              <MobileNavLink href="/interview"  onClick={() => setMenuOpen(false)}>🎤 Interview Prep</MobileNavLink>
-              <MobileNavLink href="/career-gps" onClick={() => setMenuOpen(false)}>🧭 Career GPS</MobileNavLink>
-              <MobileNavLink href="/bgv"        onClick={() => setMenuOpen(false)}>🛡 BGV Badge</MobileNavLink>
-              <MobileNavLink href="/profile"    onClick={() => setMenuOpen(false)}>👤 My Account</MobileNavLink>
+              <MobileNavLink href="/builder"      onClick={() => setMenuOpen(false)}>✏️ Resume Builder</MobileNavLink>
+              <MobileNavLink href="/score"        onClick={() => setMenuOpen(false)}>🎯 My Score</MobileNavLink>
+              <MobileNavLink href="/jobs"         onClick={() => setMenuOpen(false)}>💼 Matched Jobs</MobileNavLink>
+              <MobileNavLink href="/applications" onClick={() => setMenuOpen(false)}>📋 Application Tracker</MobileNavLink>
+              <MobileNavLink href="/interview"    onClick={() => setMenuOpen(false)}>🎤 Interview Prep</MobileNavLink>
+              <MobileNavLink href="/career-gps"   onClick={() => setMenuOpen(false)}>🧭 Career GPS</MobileNavLink>
+              <MobileNavLink href="/bgv"          onClick={() => setMenuOpen(false)}>🛡 BGV Badge</MobileNavLink>
+              <MobileNavLink href="/salary"       onClick={() => setMenuOpen(false)}>💰 Salary Insights</MobileNavLink>
+              <MobileNavLink href="/profile"      onClick={() => setMenuOpen(false)}>👤 My Account</MobileNavLink>
             </>
           ) : (
             <>
@@ -1143,13 +1147,14 @@ function Dashboard({ user }: { user: any }) {
             <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "-.01em", marginBottom: 12 }}>Quick actions</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {[
-                { label: "Edit Resume",      sub: "Builder",            href: "/builder",      accent: true  },
-                { label: "View Score",       sub: "Full breakdown",      href: "/score",        accent: false },
-                { label: "Browse Jobs",      sub: `${matchCount || "—"} matched`, href: "/jobs", accent: false },
-                { label: "Track Applications",sub: "Application tracker", href: "/applications", accent: false },
-                { label: "Interview Prep",   sub: "AI mock sessions",    href: "/interview",    accent: false },
-                { label: "Career GPS",       sub: "Skill roadmap",       href: "/career-gps",   accent: false },
-                { label: "Get Verified",     sub: "BGV badge",           href: "/bgv",          accent: false },
+                { label: "Edit Resume",       sub: "Builder",             href: "/builder",      accent: true  },
+                { label: "View Score",        sub: "Full breakdown",       href: "/score",        accent: false },
+                { label: "Browse Jobs",       sub: `${matchCount || "—"} matched`, href: "/jobs", accent: false },
+                { label: "Track Applications",sub: "Kanban board",         href: "/applications", accent: false },
+                { label: "Interview Prep",    sub: "AI mock sessions",     href: "/interview",    accent: false },
+                { label: "Career GPS",        sub: "Skill roadmap",        href: "/career-gps",   accent: false },
+                { label: "Salary Insights",   sub: "2025 market data",     href: "/salary",       accent: false },
+                { label: "Get Verified",      sub: "BGV badge",            href: "/bgv",          accent: false },
               ].map(a => (
                 <Link key={a.label} href={a.href} style={{ textDecoration: "none" }}>
                   <div style={{

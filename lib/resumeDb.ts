@@ -159,6 +159,106 @@ export async function deleteResumeSave(id: string, userId: string): Promise<void
   await supabase.from("resume_saves").delete().eq("id", id).eq("user_id", userId);
 }
 
+/* ── Version history ─────────────────────────────────────── */
+
+export interface ResumeVersion {
+  id:           string;
+  resumeSaveId: string;
+  label:        string;   // "v3 · 2 Jun 3:45 PM"
+  template:     string;
+  createdAt:    string;
+}
+
+/**
+ * Create a version snapshot for a saved resume.
+ * Automatically prunes to keep only the last 10 versions per save.
+ *
+ * SQL (run once in Supabase):
+ *   create table if not exists resume_versions (
+ *     id              uuid primary key default gen_random_uuid(),
+ *     resume_save_id  uuid not null references resume_saves(id) on delete cascade,
+ *     user_id         uuid not null references auth.users(id) on delete cascade,
+ *     label           text not null,
+ *     data            jsonb not null,
+ *     template        text not null,
+ *     created_at      timestamptz default now()
+ *   );
+ *   alter table resume_versions enable row level security;
+ *   create policy "Users manage own versions" on resume_versions
+ *     for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+ *   create index on resume_versions(resume_save_id, created_at desc);
+ */
+export async function createResumeVersion(
+  resumeSaveId: string,
+  userId:       string,
+  data:         ResumeData,
+  template:     string,
+  versionNum:   number,
+): Promise<void> {
+  const supabase = await getSupabaseAsync();
+  const label = `v${versionNum} · ${new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}`;
+
+  // Insert the new version
+  await supabase.from("resume_versions").insert({
+    resume_save_id: resumeSaveId,
+    user_id:        userId,
+    label,
+    data,
+    template,
+  });
+
+  // Prune: keep only the 10 most recent versions
+  const { data: rows } = await supabase
+    .from("resume_versions")
+    .select("id")
+    .eq("resume_save_id", resumeSaveId)
+    .order("created_at", { ascending: false });
+
+  const toDelete = (rows ?? []).slice(10).map((r: { id: string }) => r.id);
+  if (toDelete.length > 0) {
+    await supabase.from("resume_versions").delete().in("id", toDelete);
+  }
+}
+
+/** List all versions for a saved resume (metadata only, no data). */
+export async function listResumeVersions(resumeSaveId: string, userId: string): Promise<ResumeVersion[]> {
+  const supabase = await getSupabaseAsync();
+  const { data, error } = await supabase
+    .from("resume_versions")
+    .select("id, resume_save_id, label, template, created_at")
+    .eq("resume_save_id", resumeSaveId)
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+  if (error || !data) return [];
+  return data.map((r: { id: string; resume_save_id: string; label: string; template: string; created_at: string }) => ({
+    id:           r.id,
+    resumeSaveId: r.resume_save_id,
+    label:        r.label,
+    template:     r.template,
+    createdAt:    r.created_at,
+  }));
+}
+
+/** Load the full data of a specific version. */
+export async function loadResumeVersion(
+  versionId: string,
+  userId:    string,
+): Promise<{ data: ResumeData; template: string; label: string } | null> {
+  const supabase = await getSupabaseAsync();
+  const { data, error } = await supabase
+    .from("resume_versions")
+    .select("data, template, label")
+    .eq("id", versionId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error || !data) return null;
+  return {
+    data:     (data as { data: ResumeData; template: string; label: string }).data,
+    template: (data as { data: ResumeData; template: string; label: string }).template,
+    label:    (data as { data: ResumeData; template: string; label: string }).label,
+  };
+}
+
 /* ── Supabase share ───────────────────────────────────────── */
 
 export interface ShareResult {

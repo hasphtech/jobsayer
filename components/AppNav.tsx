@@ -31,6 +31,7 @@ const NAV_LINKS = [
   { href: "/interview",    label: "Interview",  icon: "🎤" },
   { href: "/career-gps",   label: "Career GPS", icon: "🧭" },
   { href: "/bgv",          label: "BGV",        icon: "🛡" },
+  { href: "/salary",       label: "Salaries",   icon: "💰" },
 ];
 
 export default function AppNav({ actions }: { actions?: React.ReactNode }) {
