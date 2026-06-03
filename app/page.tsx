@@ -9,6 +9,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth";
+import { useTheme } from "@/lib/useTheme";
 import { computeScore } from "@/lib/scoreEngine";
 import { resumeToText } from "@/lib/jdMatcher";
 import JOBS from "@/lib/jobPool";
@@ -53,6 +54,7 @@ function Nav({ user, signIn }: { user: any; signIn: () => void; }) {
   const w = useWindowWidth();
   const mobile = w < 640;
   const [menuOpen, setMenuOpen] = useState(false);
+  const { dark, toggle: toggleTheme } = useTheme();
 
   return (
     <>
@@ -102,12 +104,14 @@ function Nav({ user, signIn }: { user: any; signIn: () => void; }) {
                   {user.user_metadata?.full_name?.split(" ")[0] || user.email?.split("@")[0]}
                 </Link>
                 <Link href="/builder" style={primaryBtn}>Open Builder →</Link>
+                <button onClick={toggleTheme} title={dark ? "Light mode" : "Dark mode"} style={{ ...ghostBtn, padding: "6px 10px" }}>{dark ? "☀" : "🌙"}</button>
               </>
             ) : (
               <>
                 <NavLink href="#features">Features</NavLink>
                 <NavLink href="#pricing">Pricing</NavLink>
                 <NavLink href="/recruit">For Recruiters</NavLink>
+                <button onClick={toggleTheme} title={dark ? "Light mode" : "Dark mode"} style={{ ...ghostBtn, padding: "6px 10px" }}>{dark ? "☀" : "🌙"}</button>
                 <button onClick={signIn} style={ghostBtn}>Sign in</button>
                 <Link href="/builder" style={primaryBtn}>Try free →</Link>
               </>
@@ -480,6 +484,97 @@ function LandingPage({ signIn }: { signIn: () => void }) {
             <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 4 }}>{s.label}</div>
           </div>
         ))}
+      </section>
+
+      {/* ── Social proof — company logos ─────────────────────── */}
+      <section style={{ padding: mobile ? "40px 20px" : "56px 24px", maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
+        <p style={{ fontSize: 12, fontWeight: 600, color: "var(--text3)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 24 }}>
+          Candidates placed at
+        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: mobile ? 20 : 36 }}>
+          {["Razorpay", "Flipkart", "Swiggy", "PhonePe", "Zepto", "Meesho", "CRED", "Groww", "Ola"].map(co => (
+            <span key={co} style={{
+              fontSize: mobile ? 13 : 15, fontWeight: 700, color: "var(--text3)",
+              letterSpacing: "-.02em", opacity: .6,
+              padding: "6px 14px", borderRadius: 8,
+              border: "1px solid var(--border)",
+            }}>{co}</span>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Testimonials ─────────────────────────────────────── */}
+      <section style={{ padding: mobile ? "0 20px 56px" : "0 24px 80px", maxWidth: 960, margin: "0 auto" }}>
+        <SectionLabel>What candidates say</SectionLabel>
+        <h2 style={{ fontSize: mobile ? 24 : 34, fontWeight: 800, textAlign: "center", marginBottom: 36, letterSpacing: "-1px" }}>
+          Real results from real job seekers
+        </h2>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3,1fr)", gap: 16 }}>
+          {[
+            {
+              name: "Priya Sharma",
+              role: "Got hired at Razorpay",
+              avatar: "PS",
+              text: "The JD trust score saved me from applying to 3 ghost jobs. The resume builder helped me tailor my resume in 10 minutes. Got the Razorpay call within a week.",
+              score: 84,
+              tag: "SDE-2 · Bangalore",
+            },
+            {
+              name: "Arjun Mehta",
+              role: "Switched from TCS to Flipkart",
+              avatar: "AM",
+              text: "Career GPS showed me exactly which skills I was missing for a product role. The interview prep for Flipkart-style questions was spot on. Best tool I've used.",
+              score: 79,
+              tag: "PM · Mumbai",
+            },
+            {
+              name: "Divya Reddy",
+              role: "First job at Swiggy",
+              avatar: "DR",
+              text: "As a fresher, I had no idea how to write a resume. jobSayer walked me through everything. My score went from 42 to 81 after following the suggestions.",
+              score: 81,
+              tag: "Frontend Dev · Hyderabad",
+            },
+          ].map(t => (
+            <div key={t.name} style={{
+              background: "var(--surface)", border: "1px solid var(--border)",
+              borderRadius: 16, padding: "22px", display: "flex", flexDirection: "column", gap: 16,
+            }}>
+              {/* Stars */}
+              <div style={{ display: "flex", gap: 2 }}>
+                {[1,2,3,4,5].map(i => (
+                  <span key={i} style={{ color: "#eab308", fontSize: 14 }}>★</span>
+                ))}
+              </div>
+              {/* Quote */}
+              <p style={{ fontSize: 13, color: "var(--text2)", lineHeight: 1.7, flex: 1 }}>
+                "{t.text}"
+              </p>
+              {/* Footer */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: "50%", flexShrink: 0,
+                    background: "var(--accdim)", border: "1px solid var(--accborder)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 12, fontWeight: 700, color: "var(--accent)",
+                  }}>{t.avatar}</div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)" }}>{t.name}</div>
+                    <div style={{ fontSize: 11, color: "var(--success)", fontWeight: 600 }}>{t.role}</div>
+                  </div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: "var(--accent)" }}>{t.score}</div>
+                  <div style={{ fontSize: 10, color: "var(--text3)" }}>jobSayer Score</div>
+                </div>
+              </div>
+              <div style={{ fontSize: 11, color: "var(--text3)", padding: "4px 10px", background: "rgba(255,255,255,.03)", borderRadius: 6, border: "1px solid var(--border)", textAlign: "center" }}>
+                {t.tag}
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* ── How it works ─────────────────────────────────────── */}
@@ -1048,12 +1143,13 @@ function Dashboard({ user }: { user: any }) {
             <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "-.01em", marginBottom: 12 }}>Quick actions</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {[
-                { label: "Edit Resume",   sub: "Builder",            href: "/builder",    accent: true  },
-                { label: "View Score",    sub: "Full breakdown",      href: "/score",      accent: false },
-                { label: "Browse Jobs",   sub: `${matchCount || "—"} matched`, href: "/jobs", accent: false },
-                { label: "Interview Prep",sub: "AI mock sessions",   href: "/interview",  accent: false },
-                { label: "Career GPS",    sub: "Skill roadmap",      href: "/career-gps", accent: false },
-                { label: "Get Verified",  sub: "BGV badge",          href: "/bgv",        accent: false },
+                { label: "Edit Resume",      sub: "Builder",            href: "/builder",      accent: true  },
+                { label: "View Score",       sub: "Full breakdown",      href: "/score",        accent: false },
+                { label: "Browse Jobs",      sub: `${matchCount || "—"} matched`, href: "/jobs", accent: false },
+                { label: "Track Applications",sub: "Application tracker", href: "/applications", accent: false },
+                { label: "Interview Prep",   sub: "AI mock sessions",    href: "/interview",    accent: false },
+                { label: "Career GPS",       sub: "Skill roadmap",       href: "/career-gps",   accent: false },
+                { label: "Get Verified",     sub: "BGV badge",           href: "/bgv",          accent: false },
               ].map(a => (
                 <Link key={a.label} href={a.href} style={{ textDecoration: "none" }}>
                   <div style={{

@@ -10,6 +10,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth";
+import { useTheme } from "@/lib/useTheme";
 
 function useWidth() {
   const [w, setW] = useState(1200);
@@ -23,16 +24,18 @@ function useWidth() {
 }
 
 const NAV_LINKS = [
-  { href: "/builder",    label: "Builder",    icon: "✏️" },
-  { href: "/score",      label: "Score",      icon: "🎯" },
-  { href: "/jobs",       label: "Jobs",       icon: "💼" },
-  { href: "/interview",  label: "Interview",  icon: "🎤" },
-  { href: "/career-gps", label: "Career GPS", icon: "🧭" },
-  { href: "/bgv",        label: "BGV",        icon: "🛡" },
+  { href: "/builder",      label: "Builder",    icon: "✏️" },
+  { href: "/score",        label: "Score",      icon: "🎯" },
+  { href: "/jobs",         label: "Jobs",       icon: "💼" },
+  { href: "/applications", label: "Tracker",    icon: "📋" },
+  { href: "/interview",    label: "Interview",  icon: "🎤" },
+  { href: "/career-gps",   label: "Career GPS", icon: "🧭" },
+  { href: "/bgv",          label: "BGV",        icon: "🛡" },
 ];
 
 export default function AppNav({ actions }: { actions?: React.ReactNode }) {
   const { user } = useAuth();
+  const { dark, toggle: toggleTheme } = useTheme();
   const pathname = usePathname();
   const w = useWidth();
   const mobile = w < 768;
@@ -93,6 +96,14 @@ export default function AppNav({ actions }: { actions?: React.ReactNode }) {
         {/* Right side: page actions + profile */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: mobile ? 0 : 12, flexShrink: 0 }}>
           {!mobile && actions}
+
+          {/* Theme toggle */}
+          {!mobile && (
+            <button onClick={toggleTheme} title={dark ? "Switch to light mode" : "Switch to dark mode"}
+              style={{ width: 30, height: 30, borderRadius: 7, border: "1px solid var(--border)", background: "var(--surface2)", color: "var(--text2)", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              {dark ? "☀" : "🌙"}
+            </button>
+          )}
 
           {/* Profile avatar */}
           {!mobile && user && (

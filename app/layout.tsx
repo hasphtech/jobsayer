@@ -47,7 +47,12 @@ export const metadata: Metadata = {
 };
 
 const FOUC_SCRIPT = `(function(){
-  document.documentElement.style.setProperty('background','#0f1117');
+  var t=localStorage.getItem('jobsayer-theme');
+  if(t==='light'){document.body.classList.add('light');document.documentElement.style.setProperty('background','#f8fafc');}
+  else{document.documentElement.style.setProperty('background','#08080c');}
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+  }
 })();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
