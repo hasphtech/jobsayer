@@ -627,8 +627,10 @@ function LandingPage({ signIn }: { signIn: () => void }) {
             { icon: "🛡", title: "JD Trust Score",            tag: "Unique", tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Every listing rated for authenticity. Ghost jobs and fake JDs flagged before you waste time." },
             { icon: "🎯", title: "jobSayer Score",            tag: "Core",   tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "ATS, keywords, clarity, impact — one score with specific fixes for each gap." },
             { icon: "💼", title: "Resume-first matching",     tag: "Core",   tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "Jobs ranked by how your resume actually fits — not who paid for top placement." },
+            { icon: "📋", title: "Application Tracker",       tag: "New",    tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Kanban board to track every application — Saved, Applied, Screening, Interview, Offer." },
             { icon: "🧠", title: "India-tuned interview prep",tag: "New",    tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "AI mock interviews for Razorpay, Flipkart, Swiggy, Infosys — company-specific questions." },
             { icon: "🗺", title: "Career GPS",                tag: "New",    tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Set a target role. Get a personalised skill roadmap with salary bands and timelines." },
+            { icon: "💰", title: "Salary Insights",           tag: "New",    tagC: "var(--warn)",    iconBg: "rgba(234,179,8,.08)",  desc: "2025 salary ranges for 30+ Indian tech roles — P25, median, P75 with YoY growth." },
             { icon: "⚡", title: "Honest JD Scanner",         tag: "New",    tagC: "var(--warn)",    iconBg: "rgba(234,179,8,.08)",  desc: "AI flags ghost jobs, inflated requirements, salary red flags, and your JD match % instantly." },
           ].map(f => (
             <div key={f.title} style={{
@@ -878,12 +880,14 @@ function LandingPage({ signIn }: { signIn: () => void }) {
             <div>
               <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--text3)", marginBottom: 12 }}>For Candidates</div>
               {[
-                { label: "Resume Builder", href: "/builder" },
-                { label: "Resume Score",   href: "/score" },
-                { label: "Matched Jobs",   href: "/jobs" },
-                { label: "Interview Prep", href: "/interview" },
-                { label: "Career GPS",     href: "/career-gps" },
-                { label: "BGV Badge",      href: "/bgv" },
+                { label: "Resume Builder",       href: "/builder"      },
+                { label: "Resume Score",         href: "/score"        },
+                { label: "Matched Jobs",         href: "/jobs"         },
+                { label: "Application Tracker",  href: "/applications" },
+                { label: "Interview Prep",        href: "/interview"    },
+                { label: "Career GPS",            href: "/career-gps"   },
+                { label: "Salary Insights",       href: "/salary"       },
+                { label: "BGV Badge",             href: "/bgv"          },
               ].map(l => (
                 <Link key={l.label} href={l.href} style={{ display: "block", fontSize: 12, color: "var(--text3)", textDecoration: "none", marginBottom: 7, lineHeight: 1 }}
                   onMouseEnter={e => (e.currentTarget.style.color = "var(--text1)")}

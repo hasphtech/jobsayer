@@ -22,14 +22,22 @@
   --shadow:    0 4px 24px rgba(0,0,0,0.5);
 
   /* new tokens */
-  --surface-hover: rgba(255,255,255,0.04);
-  --border-strong: rgba(255,255,255,0.12);
+  --surface-hover:  rgba(255,255,255,0.04);
+  --border-strong:  rgba(255,255,255,0.12);
+  --nav-bg:         rgba(8,8,12,0.95);      /* sticky nav background */
+  --nav-active-bg:  rgba(255,255,255,0.07); /* active nav link */
+  --nav-hover-col:  #ffffff;
 }
 
 /* ─── Light theme override ──────────────────────────────────── */
 body.light {
   --bg:        #f8fafc;
   --surface:   #ffffff;
+  --nav-bg:        rgba(255,255,255,0.97);
+  --nav-active-bg: rgba(0,0,0,0.06);
+  --nav-hover-col: #0f172a;
+  --surface-hover: rgba(0,0,0,0.04);
+  --border-strong: rgba(0,0,0,0.15);
   --surface2:  #f1f5f9;
   --border:    rgba(0,0,0,0.10);
   --border2:   rgba(0,0,0,0.05);
