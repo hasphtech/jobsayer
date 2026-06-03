@@ -1796,10 +1796,11 @@ export default function BuilderPage() {
 
           <div style={{ marginLeft: "auto", display: "flex", gap: 6, alignItems: "center" }}>
             <span style={{ fontSize: 9, fontWeight: 600, color: "var(--text3)", opacity: autoSaved ? 1 : 0, transition: "opacity .3s", pointerEvents: "none" }}>✓ Saved</span>
-            <a href="/score"      style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>🎯 Score</a>
-            <a href="/jobs"       style={{ fontSize: 10, fontWeight: 700, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>💼 Jobs</a>
-            <a href="/interview"  style={{ fontSize: 10, fontWeight: 700, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>🎤 Prep</a>
-            <a href="/career-gps" style={{ fontSize: 10, fontWeight: 700, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>🧭 GPS</a>
+            <a href="/score"      style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)",   borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>Score</a>
+            <a href="/jobs"       style={{ fontSize: 10, fontWeight: 600, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)",    borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>Jobs</a>
+            <a href="/interview"  style={{ fontSize: 10, fontWeight: 600, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)",    borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>Interview</a>
+            <a href="/career-gps" style={{ fontSize: 10, fontWeight: 600, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)",    borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>GPS</a>
+            <a href="/bgv"        style={{ fontSize: 10, fontWeight: 600, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)",    borderRadius: 6, padding: "3px 8px", textDecoration: "none" }}>BGV</a>
             {user
               ? <span style={{ fontSize: 10, fontWeight: 700, color: "var(--text3)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 5, padding: "2px 7px" }}>{plan.loading ? "…" : plan.planName}</span>
               : <button onClick={() => signInWithGoogle()} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontFamily: "inherit" }}>
@@ -3543,19 +3544,26 @@ export default function BuilderPage() {
             <Check size={10} style={{ color: "var(--accent)" }} /> Autosaved
           </span>
 
-          {/* Score, Jobs, Interview, GPS — always visible, no sign-in needed */}
-          <a href="/score" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "5px 10px", textDecoration: "none", whiteSpace: "nowrap" }}>
-            🎯 My Score
-          </a>
-          <a href="/jobs" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 6, padding: "5px 10px", textDecoration: "none", whiteSpace: "nowrap" }}>
-            💼 Jobs
-          </a>
-          <a href="/interview" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 6, padding: "5px 10px", textDecoration: "none", whiteSpace: "nowrap" }}>
-            🎤 Interview
-          </a>
-          <a href="/career-gps" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 6, padding: "5px 10px", textDecoration: "none", whiteSpace: "nowrap" }}>
-            🧭 Career GPS
-          </a>
+          {/* Nav links — consistent with AppNav style */}
+          <div style={{ display: "flex", gap: 1, alignItems: "center" }}>
+            {[
+              { href: "/score",      label: "Score",      active: true  },
+              { href: "/jobs",       label: "Jobs",       active: false },
+              { href: "/interview",  label: "Interview",  active: false },
+              { href: "/career-gps", label: "Career GPS", active: false },
+              { href: "/bgv",        label: "BGV",        active: false },
+            ].map(l => (
+              <a key={l.href} href={l.href} style={{
+                padding: "4px 10px", borderRadius: 7, fontSize: 12, fontWeight: l.active ? 700 : 400,
+                color: l.active ? "var(--accent)" : "var(--text2)",
+                background: l.active ? "var(--accdim)" : "transparent",
+                border: l.active ? "1px solid var(--accborder)" : "1px solid transparent",
+                textDecoration: "none", whiteSpace: "nowrap", transition: "color .15s",
+              }}>
+                {l.label}
+              </a>
+            ))}
+          </div>
 
           {/* User / sign in */}
           {user

@@ -434,22 +434,16 @@ export default function InterviewPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-      {/* Top bar */}
-      <div style={{
-        background: "var(--surface)", borderBottom: "1px solid var(--border)",
-        padding: "0 24px", height: 56, display: "flex", alignItems: "center",
-        justifyContent: "space-between", position: "sticky", top: 0, zIndex: 50,
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <AppNav actions={
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <button onClick={() => setStage("setup")}
-            style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--text3)", background: "none", border: "none", cursor: "pointer", fontSize: 13 }}>
-            <ArrowLeft size={14} /> Setup
+            style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 7, color: "var(--text3)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>
+            <ArrowLeft size={12} /> Exit session
           </button>
-          <span style={{ color: "var(--border)", fontSize: 18 }}>›</span>
-          <span style={{ fontSize: 14, fontWeight: 600 }}>🎤 {effectiveCompany} · {effectiveRole}</span>
+          <span style={{ fontSize: 12, color: "var(--text3)", fontWeight: 500 }}>🎤 {effectiveCompany} · {effectiveRole}</span>
+          <ProgressDots total={questions.length} current={currentQ} answers={answers} />
         </div>
-        <ProgressDots total={questions.length} current={currentQ} answers={answers} />
-      </div>
+      } />
 
       <div style={{ maxWidth: 720, margin: "0 auto", padding: "32px 20px" }}>
         {/* Question card */}
