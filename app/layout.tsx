@@ -17,22 +17,27 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: { default: "JobSayer", template: "%s | JobSayer" },
-  description: "Build job-winning resumes with AI. Templates, PDF/DOCX export, ATS scoring, JD matching.",
-  keywords: ["resume builder", "CV maker", "India", "job application", "professional resume", "AI resume"],
-  authors: [{ name: "JobSayer", url: "https://jobsayer.com" }],
+  title: { default: "jobSayer — AI Resume Builder & Job Portal India", template: "%s | jobSayer" },
+  description: "India's smartest job search platform. AI resume builder, ATS scoring, cover letter generator, verified job listings, interview prep, and salary insights — all free to start.",
+  keywords: [
+    "resume builder India", "AI resume builder", "ATS resume checker", "cover letter builder India",
+    "jobs in India", "interview prep India", "salary insights India", "job portal India",
+    "CV maker India", "free resume builder", "career GPS India",
+  ],
+  authors: [{ name: "jobSayer", url: "https://jobsayer.com" }],
   robots: { index: true, follow: true },
+  alternates: { canonical: "https://jobsayer.com" },
   openGraph: {
     type: "website",
     url: "https://jobsayer.com",
-    siteName: "JobSayer",
-    title: "JobSayer — Professional Resume Builder",
-    description: "Build job-winning resumes with AI. Templates, PDF/DOCX export, ATS scoring.",
+    siteName: "jobSayer",
+    title: "jobSayer — AI Resume Builder & Job Portal India",
+    description: "AI resume builder, ATS scoring, cover letter generator, job listings, and interview prep — built for the Indian job market.",
     images: [{ url: "https://jobsayer.com/og.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "JobSayer — Professional Resume Builder",
+    title: "jobSayer — AI Resume Builder & Job Portal India",
     description: "Build professional resumes with AI assistance.",
   },
   icons: {

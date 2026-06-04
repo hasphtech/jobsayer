@@ -24,14 +24,15 @@ function useWidth() {
 }
 
 const NAV_LINKS = [
-  { href: "/builder",      label: "Builder",    icon: "✏️" },
-  { href: "/score",        label: "Score",      icon: "🎯" },
-  { href: "/jobs",         label: "Jobs",       icon: "💼" },
-  { href: "/applications", label: "Tracker",    icon: "📋" },
-  { href: "/interview",    label: "Interview",  icon: "🎤" },
-  { href: "/career-gps",   label: "Career GPS", icon: "🧭" },
-  { href: "/bgv",          label: "BGV",        icon: "🛡" },
-  { href: "/salary",       label: "Salaries",   icon: "💰" },
+  { href: "/builder",       label: "Builder",       icon: "✏️" },
+  { href: "/cover-letter",  label: "Cover Letter",  icon: "✉️" },
+  { href: "/score",         label: "Score",         icon: "🎯" },
+  { href: "/jobs",          label: "Jobs",          icon: "💼" },
+  { href: "/applications",  label: "Tracker",       icon: "📋" },
+  { href: "/interview",     label: "Interview",     icon: "🎤" },
+  { href: "/career-gps",    label: "Career GPS",    icon: "🧭" },
+  { href: "/bgv",           label: "BGV",           icon: "🛡" },
+  { href: "/salary",        label: "Salaries",      icon: "💰" },
 ];
 
 export default function AppNav({ actions }: { actions?: React.ReactNode }) {
@@ -50,7 +51,7 @@ export default function AppNav({ actions }: { actions?: React.ReactNode }) {
     <>
       <nav style={{
         position: "sticky", top: 0, zIndex: 100,
-        background: "rgba(8,8,12,.95)", backdropFilter: "blur(16px)",
+        background: "var(--nav-bg)", backdropFilter: "blur(16px)",
         borderBottom: "1px solid var(--border)",
         height: 56, display: "flex", alignItems: "center",
         padding: "0 20px", gap: 0,
@@ -73,11 +74,11 @@ export default function AppNav({ actions }: { actions?: React.ReactNode }) {
                   fontWeight: active ? 600 : 400,
                   color: active ? "var(--text1)" : "var(--text2)",
                   textDecoration: "none",
-                  background: active ? "rgba(255,255,255,.07)" : "transparent",
+                  background: active ? "var(--nav-active-bg)" : "transparent",
                   transition: "color .15s, background .15s",
                   borderBottom: active ? "2px solid var(--accent)" : "2px solid transparent",
                 }}
-                  onMouseEnter={e => { if (!active) e.currentTarget.style.color = "var(--text1)"; }}
+                  onMouseEnter={e => { if (!active) e.currentTarget.style.color = "var(--nav-hover-col)"; }}
                   onMouseLeave={e => { if (!active) e.currentTarget.style.color = "var(--text2)"; }}
                 >
                   {l.label}

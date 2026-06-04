@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Private / app pages — no crawl value
+Disallow: /admin
+Disallow: /api/
+Disallow: /auth/
+Disallow: /verify
+
+Sitemap: https://jobsayer.com/sitemap.xml
