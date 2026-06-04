@@ -73,6 +73,34 @@ function fmtLPA(n: number) {
   return n >= 100 ? `₹${(n / 100).toFixed(1)}Cr` : `₹${n}L`;
 }
 
+/* ── Company-type gap data ───────────────────────────────────── */
+const COMPANY_GAP: {
+  role: string;
+  services: [number, number];   // [min, max] LPA
+  funded: [number, number];
+  mnc: [number, number];
+}[] = [
+  { role: "SDE-1 Fresher",         services: [3.5, 8],   funded: [10, 18],  mnc: [18, 32]  },
+  { role: "SDE-2 (3 yrs exp)",     services: [8,  14],   funded: [20, 32],  mnc: [28, 45]  },
+  { role: "Senior SDE (6 yrs)",    services: [14, 22],   funded: [32, 55],  mnc: [45, 70]  },
+  { role: "Product Manager",       services: [10, 18],   funded: [22, 42],  mnc: [35, 65]  },
+  { role: "Data Engineer",         services: [8,  14],   funded: [18, 32],  mnc: [25, 45]  },
+  { role: "DevOps / SRE",          services: [10, 18],   funded: [20, 38],  mnc: [30, 52]  },
+];
+
+/* ── Hike calculator data ────────────────────────────────────── */
+type CompanyType = "services" | "funded" | "mnc";
+const HIKE_RANGES: Record<CompanyType, Record<CompanyType, [number, number]>> = {
+  services: { services: [15, 25], funded: [40, 80],  mnc: [60, 100] },
+  funded:   { services: [10, 20], funded: [20, 35],  mnc: [30, 60]  },
+  mnc:      { services: [5,  15], funded: [15, 30],  mnc: [20, 35]  },
+};
+const COMPANY_LABELS: Record<CompanyType, string> = {
+  services: "IT Services (TCS / Infosys / Wipro)",
+  funded:   "Funded Startup (Razorpay / Swiggy / CRED)",
+  mnc:      "MNC Product (Google / Microsoft / Amazon India)",
+};
+
 /* ── Main Page ───────────────────────────────────────────────── */
 export default function SalaryPage() {
   const [city,     setCity]     = useState("All cities");
@@ -80,6 +108,12 @@ export default function SalaryPage() {
   const [exp,      setExp]      = useState<"all" | "0-2" | "2-5" | "5-10" | "10+">("all");
   const [search,   setSearch]   = useState("");
   const [sortBy,   setSortBy]   = useState<"median" | "growth" | "openings">("median");
+
+  // Hike calculator state
+  const [currentCTC,  setCurrentCTC]  = useState("");
+  const [fromType,    setFromType]    = useState<CompanyType>("services");
+  const [toType,      setToType]      = useState<CompanyType>("funded");
+  const [activeTab,   setActiveTab]   = useState<"browse" | "compare" | "hike">("browse");
 
   const filtered = useMemo(() => DATA
     .filter(d => city     === "All cities" || d.city     === city)
@@ -123,6 +157,138 @@ export default function SalaryPage() {
             Real salary ranges for tech roles in India. Based on 2025 offer data. Use this to negotiate your next offer confidently.
           </p>
         </div>
+
+        {/* Tabs */}
+        <div style={{ display: "flex", gap: 6, marginBottom: 24, background: "var(--surface2)", borderRadius: 12, padding: 4, width: "fit-content" }}>
+          {([["browse","📊 Browse Salaries"],["compare","🏢 Services vs Product"],["hike","🧮 Hike Calculator"]] as const).map(([key, label]) => (
+            <button key={key} onClick={() => setActiveTab(key)} style={{
+              padding: "7px 16px", borderRadius: 9, border: "none", fontSize: 12, fontWeight: 600,
+              background: activeTab === key ? "var(--surface)" : "transparent",
+              color: activeTab === key ? "var(--text1)" : "var(--text3)",
+              cursor: "pointer", boxShadow: activeTab === key ? "0 1px 4px rgba(0,0,0,.15)" : "none",
+            }}>{label}</button>
+          ))}
+        </div>
+
+        {/* ══ TAB: Company type comparison ══ */}
+        {activeTab === "compare" && (
+          <div style={{ marginBottom: 32 }}>
+            <div style={{ marginBottom: 16 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>The salary gap no one talks about</h2>
+              <p style={{ fontSize: 13, color: "var(--text3)", lineHeight: 1.7, maxWidth: 600 }}>
+                Same degree. Same city. Often same college. The difference is the company type.
+                IT services to product switch typically yields a <strong style={{ color: "var(--success)" }}>40–100% hike</strong> at the same experience level.
+              </p>
+            </div>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                <thead>
+                  <tr>
+                    {["Role", "IT Services", "Funded Startup", "MNC / Product"].map((h, i) => (
+                      <th key={h} style={{ padding: "10px 14px", textAlign: i === 0 ? "left" : "center", fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".05em", borderBottom: "1px solid var(--border)", whiteSpace: "nowrap" }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {COMPANY_GAP.map((row, i) => {
+                    const gap = Math.round(((row.mnc[0] / row.services[1]) - 1) * 100);
+                    return (
+                      <tr key={row.role} style={{ background: i % 2 === 0 ? "var(--surface)" : "transparent" }}>
+                        <td style={{ padding: "12px 14px", fontWeight: 600, color: "var(--text1)" }}>{row.role}</td>
+                        <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--danger)" }}>₹{row.services[0]}–{row.services[1]}L</div>
+                        </td>
+                        <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--warn)" }}>₹{row.funded[0]}–{row.funded[1]}L</div>
+                        </td>
+                        <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--success)" }}>₹{row.mnc[0]}–{row.mnc[1]}L</div>
+                          <div style={{ fontSize: 10, color: "var(--success)", marginTop: 2 }}>+{gap}% vs services</div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <div style={{ marginTop: 16, padding: "12px 16px", borderRadius: 10, background: "var(--accdim)", border: "1px solid var(--accborder)", fontSize: 12, color: "var(--text2)", lineHeight: 1.7 }}>
+              💡 <strong style={{ color: "var(--accent)" }}>What to do about it:</strong> Build your resume to target product companies — use the{" "}
+              <a href="/builder" style={{ color: "var(--accent)" }}>Resume Builder</a> with product company keywords, then{" "}
+              <a href="/interview" style={{ color: "var(--accent)" }}>practice the skill gaps</a> on Career GPS before applying.
+            </div>
+          </div>
+        )}
+
+        {/* ══ TAB: Hike calculator ══ */}
+        {activeTab === "hike" && (
+          <div style={{ maxWidth: 560, marginBottom: 32 }}>
+            <h2 style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>Job-switch hike calculator</h2>
+            <p style={{ fontSize: 13, color: "var(--text3)", marginBottom: 24, lineHeight: 1.7 }}>
+              67% of Indian professionals accept the first offer without negotiating — leaving ₹1–5 LPA on the table.
+              Know your number before the call.
+            </p>
+            <div style={{ ...card, padding: 24, display: "flex", flexDirection: "column", gap: 18 }}>
+              <div>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 6 }}>
+                  Current CTC (LPA)
+                </label>
+                <input type="number" min={1} max={500} placeholder="e.g. 12"
+                  value={currentCTC} onChange={e => setCurrentCTC(e.target.value)}
+                  style={{ width: "100%", padding: "10px 13px", borderRadius: 9, background: "var(--surface2)", border: "1px solid var(--border)", color: "var(--text1)", fontSize: 16, fontWeight: 600 }} />
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 8 }}>Current company type</label>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {(Object.entries(COMPANY_LABELS) as [CompanyType, string][]).map(([k, l]) => (
+                    <button key={k} onClick={() => setFromType(k)} style={{ padding: "9px 14px", borderRadius: 9, border: `1px solid ${fromType === k ? "var(--accent)" : "var(--border)"}`, background: fromType === k ? "var(--accdim)" : "none", color: fromType === k ? "var(--accent)" : "var(--text2)", fontSize: 13, fontWeight: fromType === k ? 700 : 400, cursor: "pointer", textAlign: "left" }}>{l}</button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 8 }}>Target company type</label>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {(Object.entries(COMPANY_LABELS) as [CompanyType, string][]).map(([k, l]) => (
+                    <button key={k} onClick={() => setToType(k)} style={{ padding: "9px 14px", borderRadius: 9, border: `1px solid ${toType === k ? "var(--accent)" : "var(--border)"}`, background: toType === k ? "var(--accdim)" : "none", color: toType === k ? "var(--accent)" : "var(--text2)", fontSize: 13, fontWeight: toType === k ? 700 : 400, cursor: "pointer", textAlign: "left" }}>{l}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Result */}
+              {currentCTC && Number(currentCTC) > 0 && (() => {
+                const ctc = Number(currentCTC);
+                const [lo, hi] = HIKE_RANGES[fromType][toType];
+                const newLo = Math.round(ctc * (1 + lo / 100) * 10) / 10;
+                const newHi = Math.round(ctc * (1 + hi / 100) * 10) / 10;
+                const sameType = fromType === toType;
+                return (
+                  <div style={{ background: sameType ? "var(--surface2)" : "rgba(34,197,94,.08)", border: `1px solid ${sameType ? "var(--border)" : "rgba(34,197,94,.2)"}`, borderRadius: 12, padding: 20, textAlign: "center" }}>
+                    <div style={{ fontSize: 12, color: "var(--text3)", marginBottom: 6 }}>Expected hike range</div>
+                    <div style={{ fontSize: 28, fontWeight: 900, color: sameType ? "var(--text2)" : "var(--success)", letterSpacing: "-.03em" }}>{lo}% – {hi}%</div>
+                    <div style={{ fontSize: 13, color: "var(--text2)", marginTop: 8 }}>
+                      ₹{ctc}L → <strong style={{ color: sameType ? "var(--text1)" : "var(--success)" }}>₹{newLo}L – ₹{newHi}L</strong>
+                    </div>
+                    {!sameType && (
+                      <div style={{ marginTop: 10, fontSize: 12, color: "var(--text3)" }}>
+                        You could be leaving <strong style={{ color: "var(--warn)" }}>₹{(newLo - ctc).toFixed(1)}L – ₹{(newHi - ctc).toFixed(1)}L</strong> on the table by not switching.
+                      </div>
+                    )}
+                    {fromType === "services" && toType !== "services" && (
+                      <a href="/interview" style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 14, padding: "8px 18px", borderRadius: 8, background: "var(--accent)", color: "#fff", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+                        Practice for the switch →
+                      </a>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+            <div style={{ marginTop: 12, fontSize: 11, color: "var(--text3)", lineHeight: 1.6 }}>
+              Based on 2026 India market data. Actual offers depend on skills, negotiation, and company band policies.
+            </div>
+          </div>
+        )}
+
+        {/* ══ TAB: Browse (original content) ══ */}
+        {activeTab === "browse" && <>
 
         {/* Hot roles */}
         <div style={{ ...card, padding: "18px 20px", marginBottom: 24, background: "linear-gradient(135deg,rgba(99,102,241,.06),rgba(99,102,241,.02))", borderColor: "var(--accborder)" }}>
@@ -228,11 +394,12 @@ export default function SalaryPage() {
         {/* Disclaimer */}
         <div style={{ marginTop: 32, padding: "14px 18px", background: "rgba(255,255,255,.02)", borderRadius: 10, border: "1px solid var(--border)" }}>
           <p style={{ fontSize: 12, color: "var(--text3)", lineHeight: 1.7 }}>
-            <strong style={{ color: "var(--text2)" }}>Data sources:</strong> 2025 offer letters, job postings, and community-reported compensation for India-based roles.
+            <strong style={{ color: "var(--text2)" }}>Data sources:</strong> 2025–2026 offer letters, job postings, and community-reported compensation for India-based roles.
             Figures are pre-tax CTC in LPA. Actual offers may vary based on company, team, and individual negotiation.{" "}
             <Link href="/builder" style={{ color: "var(--accent)" }}>Build your resume →</Link> to improve your chances of hitting the upper range.
           </p>
         </div>
+        </> /* end browse tab */}
       </div>
     </div>
   );

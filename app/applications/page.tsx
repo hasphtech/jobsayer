@@ -153,6 +153,38 @@ function AppModal({
   );
 }
 
+/* ── Ghosting probability ────────────────────────────────────── */
+function ghostSignal(stage: Stage, daysSince: number): { pct: number; label: string; color: string } | null {
+  if (stage === "offer" || stage === "rejected" || stage === "saved") return null;
+  const thresholds: Record<Exclude<Stage, "offer" | "rejected" | "saved">, number> = {
+    applied: 14, screening: 10, interview: 7,
+  };
+  const threshold = thresholds[stage as "applied" | "screening" | "interview"];
+  if (!threshold || daysSince < threshold) return null;
+  const overdue = Math.min(daysSince - threshold, threshold * 2);
+  const pct = Math.min(40 + Math.round((overdue / (threshold * 2)) * 55), 92);
+  const label = pct >= 80 ? "Likely ghosted" : pct >= 60 ? "Probably ghosted" : "Possibly ghosted";
+  const color = pct >= 80 ? "var(--danger)" : pct >= 60 ? "var(--warn)" : "var(--text3)";
+  return { pct, label, color };
+}
+
+/* ── Follow-up email template ────────────────────────────────── */
+function buildFollowUp(app: Application, daysSince: number): string {
+  return `Subject: Follow-up — ${app.role} Application
+
+Hi [Hiring Manager / Recruiter name],
+
+I hope you're doing well. I applied for the ${app.role} position at ${app.company} ${daysSince === 1 ? "yesterday" : `${daysSince} days ago`} and wanted to follow up to reiterate my strong interest in the role.
+
+I'm genuinely excited about the opportunity to contribute to ${app.company} and believe my background aligns well with what your team is looking for. I'd love to learn about the next steps in the process when you have a moment.
+
+Thank you for your time and consideration. I look forward to hearing from you.
+
+Warm regards,
+[Your Name]
+[Phone] | [Email] | [LinkedIn]`;
+}
+
 /* ── Application Card ────────────────────────────────────────── */
 function AppCard({ app, onEdit, onDelete, onStageChange }: {
   app: Application;
@@ -160,9 +192,19 @@ function AppCard({ app, onEdit, onDelete, onStageChange }: {
   onDelete: () => void;
   onStageChange: (s: Stage) => void;
 }) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded,    setExpanded]    = useState(false);
+  const [showEmail,   setShowEmail]   = useState(false);
+  const [emailCopied, setEmailCopied] = useState(false);
   const stage = STAGES.find(s => s.key === app.stage)!;
   const daysSince = Math.floor((Date.now() - new Date(app.appliedDate).getTime()) / 86400000);
+  const ghost = ghostSignal(app.stage, daysSince);
+  const followUpEmail = buildFollowUp(app, daysSince);
+
+  async function copyEmail() {
+    await navigator.clipboard.writeText(followUpEmail);
+    setEmailCopied(true);
+    setTimeout(() => setEmailCopied(false), 2000);
+  }
 
   return (
     <div style={{
@@ -195,7 +237,7 @@ function AppCard({ app, onEdit, onDelete, onStageChange }: {
         </div>
       </div>
 
-      {/* Stage + date */}
+      {/* Stage + date + ghost signal */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
         <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 99, background: stage.bg, color: stage.color }}>
           {stage.icon} {stage.label}
@@ -203,6 +245,11 @@ function AppCard({ app, onEdit, onDelete, onStageChange }: {
         <span style={{ fontSize: 11, color: "var(--text3)" }}>
           {daysSince === 0 ? "Today" : daysSince === 1 ? "1 day ago" : `${daysSince} days ago`}
         </span>
+        {ghost && (
+          <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 99, background: `${ghost.color}15`, border: `1px solid ${ghost.color}40`, color: ghost.color }}>
+            👻 {ghost.pct}% — {ghost.label}
+          </span>
+        )}
       </div>
 
       {/* Quick stage mover */}
@@ -220,6 +267,36 @@ function AppCard({ app, onEdit, onDelete, onStageChange }: {
           </button>
         ))}
       </div>
+
+      {/* Follow-up email generator */}
+      {ghost && (
+        <div style={{ marginTop: 10 }}>
+          <button onClick={() => setShowEmail(v => !v)} style={{
+            display: "flex", alignItems: "center", gap: 6, padding: "5px 12px",
+            borderRadius: 7, border: `1px solid ${ghost.color}40`,
+            background: `${ghost.color}08`, color: ghost.color,
+            fontSize: 11, fontWeight: 600, cursor: "pointer",
+          }}>
+            ✉️ {showEmail ? "Hide" : "Generate follow-up email"}
+          </button>
+          {showEmail && (
+            <div style={{ marginTop: 8, background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 10, padding: 12 }}>
+              <pre style={{ fontSize: 11, color: "var(--text2)", lineHeight: 1.7, whiteSpace: "pre-wrap", fontFamily: "inherit", margin: 0 }}>
+                {followUpEmail}
+              </pre>
+              <button onClick={copyEmail} style={{
+                marginTop: 8, padding: "6px 14px", borderRadius: 7,
+                border: `1px solid ${emailCopied ? "var(--success)" : "var(--border)"}`,
+                background: emailCopied ? "rgba(34,197,94,.1)" : "none",
+                color: emailCopied ? "var(--success)" : "var(--text2)",
+                fontSize: 11, fontWeight: 600, cursor: "pointer",
+              }}>
+                {emailCopied ? "✓ Copied!" : "📋 Copy email"}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Notes toggle */}
       {app.notes && (

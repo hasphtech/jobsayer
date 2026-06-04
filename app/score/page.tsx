@@ -184,13 +184,57 @@ function DimBar({ pct, status }: { pct: number; status: string }) {
   );
 }
 
+/* ── Per-ATS score derivation ──────────────────────────────────── */
+interface AtsSystem {
+  name:      string;
+  icon:      string;
+  safeScore: number;  // score needed to pass
+  weights:   Record<string, number>; // dimension label → weight (must sum 1)
+  usedBy:    string;
+}
+const ATS_SYSTEMS: AtsSystem[] = [
+  { name: "Naukri RMS",       icon: "🔵", safeScore: 75, weights: { "ATS Compatibility": .35, "Keyword Strength": .35, "Experience Clarity": .20, "Impact Statements": .10 }, usedBy: "Naukri job applications" },
+  { name: "Workday",          icon: "🟣", safeScore: 80, weights: { "ATS Compatibility": .30, "Keyword Strength": .30, "Experience Clarity": .30, "Impact Statements": .10 }, usedBy: "TCS, Infosys, Wipro, MNCs" },
+  { name: "Taleo (Oracle)",   icon: "🔴", safeScore: 78, weights: { "ATS Compatibility": .25, "Keyword Strength": .45, "Experience Clarity": .20, "Impact Statements": .10 }, usedBy: "Large enterprises, banks" },
+  { name: "Greenhouse/Lever", icon: "🟢", safeScore: 70, weights: { "ATS Compatibility": .20, "Keyword Strength": .40, "Experience Clarity": .30, "Impact Statements": .10 }, usedBy: "Razorpay, CRED, funded startups" },
+];
+
+function deriveAtsScore(result: ScoreResult, ats: AtsSystem): number {
+  let total = 0;
+  for (const dim of result.dimensions) {
+    const w = ats.weights[dim.label] ?? 0;
+    total += (dim.score / 25) * w * 100; // each dim is /25, scale to 100
+  }
+  return Math.round(total);
+}
+
+/* ── Format parser check ────────────────────────────────────────── */
+interface FormatIssue { severity: "high" | "medium" | "low"; message: string; fix: string }
+
+function checkFormat(data: ResumeData): FormatIssue[] {
+  const issues: FormatIssue[] = [];
+  if (!data.skills?.trim()) issues.push({ severity: "high", message: "No skills section detected", fix: "Add a dedicated Skills section — ATS parsers look for this specifically." });
+  if (!data.email?.trim()) issues.push({ severity: "high", message: "Missing email address", fix: "Add email — ATS can't process applications without contact info." });
+  if (!data.phone?.trim()) issues.push({ severity: "high", message: "Missing phone number", fix: "Add phone number to your contact section." });
+  if (!data.summary?.trim()) issues.push({ severity: "medium", message: "No summary / objective section", fix: "Add a 2–3 line professional summary with keywords from your target JD." });
+  if (data.photo && data.photo.length > 100) issues.push({ severity: "medium", message: "Photo detected in resume", fix: "Remove photo for ATS submissions — most Indian ATS systems (Workday, Taleo) cannot parse images and may skip your entire resume." });
+  const allDesc = (data.work ?? []).map(w => w.desc ?? "").join(" ");
+  if (allDesc && !allDesc.includes("•") && !allDesc.includes("-") && !allDesc.includes("\n")) {
+    issues.push({ severity: "medium", message: "Work experience written as paragraphs", fix: "Use bullet points (•) for each work achievement. ATS parsers extract bullets better than dense paragraphs." });
+  }
+  const hasMetrics = /\d+%|\d+x|\d+ (users|customers|engineers|people|crore|lakh|million|thousand)/i.test(allDesc);
+  if (!hasMetrics && allDesc.length > 50) issues.push({ severity: "low", message: "No quantified results in experience", fix: "Add numbers: 'Improved load time by 40%', 'Served 2M users', 'Led team of 6'. Naukri and Workday rank quantified resumes higher." });
+  return issues;
+}
+
 /* ── Page ──────────────────────────────────────────────────────── */
 export default function ScorePage() {
   const router = useRouter();
-  const [result, setResult] = useState<ScoreResult | null>(null);
-  const [resumeName, setResumeName] = useState("Your resume");
-  const [resumeText, setResumeText] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [result,      setResult]      = useState<ScoreResult | null>(null);
+  const [resumeData,  setResumeData]  = useState<ResumeData | null>(null);
+  const [resumeName,  setResumeName]  = useState("Your resume");
+  const [resumeText,  setResumeText]  = useState("");
+  const [loading,     setLoading]     = useState(true);
 
   useEffect(() => {
     try {
@@ -200,6 +244,7 @@ export default function ScorePage() {
         const data: ResumeData = parsed.data ?? parsed;
         const computed = computeScore(data);
         setResult(computed);
+        setResumeData(data);
         setResumeText(resumeToText(data));
         if (data.name) setResumeName(`${data.name}'s resume`);
       }
@@ -354,6 +399,84 @@ export default function ScorePage() {
         <div style={{ marginBottom: 20 }}>
           <JdMatchPanel resumeText={resumeText} />
         </div>
+
+        {/* ── Per-ATS Breakdown ── */}
+        <div style={{ ...card, marginBottom: 20 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>🖥️ Per-ATS Score Breakdown</div>
+          <p style={{ fontSize: 12, color: "var(--text3)", marginBottom: 18, lineHeight: 1.6 }}>
+            Different ATS systems weight resume sections differently. A score ≥ safe threshold means your resume reaches a human recruiter.
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            {ATS_SYSTEMS.map(ats => {
+              const score = deriveAtsScore(result, ats);
+              const passes = score >= ats.safeScore;
+              const color = passes ? "var(--success)" : score >= ats.safeScore - 10 ? "var(--warn)" : "var(--danger)";
+              return (
+                <div key={ats.name}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                    <div>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)" }}>{ats.icon} {ats.name}</span>
+                      <span style={{ fontSize: 11, color: "var(--text3)", marginLeft: 8 }}>Used by: {ats.usedBy}</span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 13, fontWeight: 800, color }}>{score}</span>
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 99, background: `${color}15`, color, border: `1px solid ${color}40` }}>
+                        {passes ? "✓ Passes" : `✗ Need ${ats.safeScore}+`}
+                      </span>
+                    </div>
+                  </div>
+                  <div style={{ height: 6, background: "rgba(255,255,255,.06)", borderRadius: 3, overflow: "hidden", position: "relative" }}>
+                    <div style={{ height: "100%", width: `${score}%`, background: `linear-gradient(90deg,${color}88,${color})`, borderRadius: 3, transition: "width .6s ease" }} />
+                    {/* safe threshold marker */}
+                    <div style={{ position: "absolute", top: 0, left: `${ats.safeScore}%`, width: 2, height: "100%", background: "rgba(255,255,255,.3)" }} />
+                  </div>
+                  <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 4 }}>Safe threshold: {ats.safeScore} · Your score: {score}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── Format & Parser Check ── */}
+        {resumeData && (() => {
+          const issues = checkFormat(resumeData);
+          const highs = issues.filter(i => i.severity === "high");
+          const meds  = issues.filter(i => i.severity === "medium");
+          const lows  = issues.filter(i => i.severity === "low");
+          const sevColor = { high: "var(--danger)", medium: "var(--warn)", low: "var(--accent)" };
+          return (
+            <div style={{ ...card, marginBottom: 20 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>⚙️ ATS Parser Compatibility Check</div>
+              <p style={{ fontSize: 12, color: "var(--text3)", marginBottom: 16, lineHeight: 1.6 }}>
+                Many Indian ATS systems silently reject resumes due to formatting issues — before a human ever reads them.
+              </p>
+              {issues.length === 0 ? (
+                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", borderRadius: 10, background: "rgba(34,197,94,.08)", border: "1px solid rgba(34,197,94,.2)" }}>
+                  <CheckCircle2 size={18} color="var(--success)" />
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--success)" }}>No parser issues detected — your resume format is ATS-safe.</div>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {[...highs, ...meds, ...lows].map((issue, i) => (
+                    <div key={i} style={{ display: "flex", gap: 12, padding: "12px 14px", borderRadius: 10, background: "var(--surface2)", borderLeft: `3px solid ${sevColor[issue.severity]}` }}>
+                      <div style={{ flexShrink: 0, marginTop: 1 }}>
+                        {issue.severity === "high" ? <AlertTriangle size={15} color={sevColor.high} /> : issue.severity === "medium" ? <AlertTriangle size={15} color={sevColor.medium} /> : <Lightbulb size={15} color={sevColor.low} />}
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)", marginBottom: 3 }}>{issue.message}</div>
+                        <div style={{ fontSize: 12, color: "var(--text3)", lineHeight: 1.5 }}>{issue.fix}</div>
+                        <a href="/builder" style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 6, fontSize: 11, color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>✏️ Fix in Builder →</a>
+                      </div>
+                      <div style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 99, background: `${sevColor[issue.severity]}15`, color: sevColor[issue.severity], height: "fit-content" }}>
+                        {issue.severity.toUpperCase()}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* ── Skills Map ── */}
         <div style={card}>
