@@ -302,6 +302,103 @@ export async function getShare(
   return { data: row.data, template: row.template, viewCount: row.view_count ?? 0 };
 }
 
+/* ── Cover letters ───────────────────────────────────────── */
+
+/**
+ * Stores generated cover letters, optionally linked to a saved resume.
+ *
+ * SQL (run once in Supabase SQL editor):
+ *   create table if not exists cover_letters (
+ *     id              uuid primary key default gen_random_uuid(),
+ *     user_id         uuid not null references auth.users(id) on delete cascade,
+ *     resume_save_id  uuid references resume_saves(id) on delete set null,
+ *     job_title       text not null,
+ *     company         text not null,
+ *     letter          text not null,
+ *     tone            text not null default 'professional',
+ *     created_at      timestamptz default now()
+ *   );
+ *   alter table cover_letters enable row level security;
+ *   create policy "Users manage own cover letters" on cover_letters
+ *     for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+ *   create index on cover_letters(user_id, created_at desc);
+ *   create index on cover_letters(resume_save_id);
+ */
+export interface CoverLetterRecord {
+  id:            string;
+  resumeSaveId:  string | null;
+  jobTitle:      string;
+  company:       string;
+  letter:        string;
+  tone:          string;
+  createdAt:     string;
+}
+
+/** Save a generated cover letter, optionally linked to a resume save. */
+export async function saveCoverLetter(
+  userId:        string,
+  jobTitle:      string,
+  company:       string,
+  letter:        string,
+  tone:          string,
+  resumeSaveId?: string,
+): Promise<string> {
+  const supabase = await getSupabaseAsync();
+  const { data, error } = await supabase
+    .from("cover_letters")
+    .insert({
+      user_id:        userId,
+      resume_save_id: resumeSaveId ?? null,
+      job_title:      jobTitle,
+      company,
+      letter,
+      tone,
+    })
+    .select("id")
+    .single();
+  if (error) throw new Error(error.message);
+  return (data as { id: string }).id;
+}
+
+/** List all cover letters for a user. Pass resumeSaveId to filter by resume. */
+export async function listCoverLetters(
+  userId:        string,
+  resumeSaveId?: string,
+): Promise<CoverLetterRecord[]> {
+  const supabase = await getSupabaseAsync();
+  let query = supabase
+    .from("cover_letters")
+    .select("id, resume_save_id, job_title, company, letter, tone, created_at")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (resumeSaveId) {
+    query = query.eq("resume_save_id", resumeSaveId);
+  }
+
+  const { data, error } = await query;
+  if (error || !data) return [];
+  return (data as Array<{
+    id: string; resume_save_id: string | null;
+    job_title: string; company: string;
+    letter: string; tone: string; created_at: string;
+  }>).map(r => ({
+    id:           r.id,
+    resumeSaveId: r.resume_save_id,
+    jobTitle:     r.job_title,
+    company:      r.company,
+    letter:       r.letter,
+    tone:         r.tone,
+    createdAt:    r.created_at,
+  }));
+}
+
+/** Delete a cover letter by id. */
+export async function deleteCoverLetter(id: string, userId: string): Promise<void> {
+  const supabase = await getSupabaseAsync();
+  await supabase.from("cover_letters").delete().eq("id", id).eq("user_id", userId);
+}
+
 /**
  * Atomically increments view_count for a share.
  *
