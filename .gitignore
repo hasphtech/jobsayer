@@ -46,3 +46,4 @@ supabase/
 *.swp
 *.swo
 .claude/
+*.md
