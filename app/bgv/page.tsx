@@ -222,11 +222,8 @@ export default function BgvPage() {
   function setEdu(i: number, k: keyof EduEntry, v: string) { setEducation(p => p.map((x, j) => j === i ? { ...x, [k]: v } : x)); }
   function setEmp(i: number, k: keyof EmpEntry, v: string) { setEmployment(p => p.map((x, j) => j === i ? { ...x, [k]: v } : x)); }
 
-  if (authLoading || loadingExisting) return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ color: "var(--text3)", fontSize: 14 }}>Loading…</div>
-    </div>
-  );
+  // Render shell + nav immediately — skeletons fill while data loads
+  const dataLoading = authLoading || loadingExisting;
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
@@ -234,7 +231,7 @@ export default function BgvPage() {
 
       <div style={{ maxWidth: 700, margin: "0 auto", padding: "40px 20px 80px" }}>
 
-        {/* Header */}
+        {/* Header — always visible */}
         <div style={{ marginBottom: 32 }}>
           <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Background Verification (BGV)</h1>
           <p style={{ fontSize: 14, color: "var(--text3)", lineHeight: 1.7 }}>
@@ -243,13 +240,23 @@ export default function BgvPage() {
           </p>
         </div>
 
+        {/* Skeleton while loading */}
+        {dataLoading && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32 }}>
+            <div className="skeleton" style={{ height: 100, borderRadius: 14 }} />
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+              {[0,1,2].map(i => <div key={i} className="skeleton" style={{ height: 90, borderRadius: 14 }} />)}
+            </div>
+          </div>
+        )}
+
         {/* Existing status card */}
-        {existing && existing.status !== "pending" && step !== "submitted" && (
+        {!dataLoading && existing && existing.status !== "pending" && step !== "submitted" && (
           <StatusBadge bgv={existing} />
         )}
 
         {/* Trust info bar */}
-        {!existing && (
+        {!dataLoading && !existing && (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 32 }}>
             {[
               { icon: "🪪", title: "Identity Check",   desc: "PAN + Aadhaar last 4 digits" },
@@ -266,7 +273,7 @@ export default function BgvPage() {
         )}
 
         {/* Submitted confirmation */}
-        {step === "submitted" && (
+        {!dataLoading && step === "submitted" && (
           <div style={{ ...cardStyle, textAlign: "center", padding: "48px" }}>
             <div style={{ fontSize: 56, marginBottom: 16 }}>🛡</div>
             <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 10 }}>BGV Submitted Successfully!</h2>
@@ -291,7 +298,7 @@ export default function BgvPage() {
         )}
 
         {/* Multi-step form */}
-        {step !== "submitted" && (
+        {!dataLoading && step !== "submitted" && (
           <>
             <StepBar current={step} />
 
