@@ -13,16 +13,26 @@ import { Plus, Trash2, ExternalLink, ChevronDown, ChevronUp } from "lucide-react
 type Stage = "saved" | "applied" | "screening" | "interview" | "offer" | "rejected";
 
 interface Application {
-  id:          string;
-  company:     string;
-  role:        string;
-  location:    string;
-  salary:      string;
-  url:         string;
-  stage:       Stage;
-  notes:       string;
-  appliedDate: string;       // ISO date string
-  updatedAt:   string;
+  id:           string;
+  company:      string;
+  role:         string;
+  location:     string;
+  salary:       string;
+  url:          string;
+  stage:        Stage;
+  notes:        string;
+  appliedDate:  string;       // ISO date string
+  updatedAt:    string;
+  noticePeriod: string;       // "Immediate" | "15 days" | "30 days" | "45 days" | "60 days" | "90 days" | "3 months+"
+  offerDate:    string;       // ISO date — when offer was received (for countdown)
+}
+
+const NOTICE_OPTS = ["Immediate", "15 days", "30 days", "45 days", "60 days", "90 days", "3 months+"] as const;
+
+function noticeDays(period: string): number {
+  if (!period || period === "Immediate") return 0;
+  if (period === "3 months+") return 90;
+  return parseInt(period) || 0;
 }
 
 /* ── Config ─────────────────────────────────────────────────── */
@@ -39,7 +49,9 @@ const STORAGE_KEY = "jobsayer-applications";
 
 const emptyApp = (): Omit<Application, "id" | "updatedAt"> => ({
   company: "", role: "", location: "", salary: "",
-  url: "", stage: "saved", notes: "", appliedDate: new Date().toISOString().split("T")[0],
+  url: "", stage: "saved", notes: "",
+  appliedDate: new Date().toISOString().split("T")[0],
+  noticePeriod: "30 days", offerDate: "",
 });
 
 /* ── Helpers ─────────────────────────────────────────────────── */
@@ -129,6 +141,21 @@ function AppModal({
             </div>
           </div>
 
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div>
+              <label style={lbl}>Notice period required</label>
+              <select value={form.noticePeriod} onChange={e => set("noticePeriod", e.target.value)}
+                style={{ ...inp, appearance: "none" as React.CSSProperties["appearance"] }}>
+                {NOTICE_OPTS.map(o => <option key={o} value={o}>{o}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={lbl}>Offer received date</label>
+              <input type="date" style={inp} value={form.offerDate} onChange={e => set("offerDate", e.target.value)}
+                placeholder="Only if offer received" />
+            </div>
+          </div>
+
           <div>
             <label style={lbl}>Notes</label>
             <textarea value={form.notes} onChange={e => set("notes", e.target.value)}
@@ -200,6 +227,24 @@ function AppCard({ app, onEdit, onDelete, onStageChange }: {
   const ghost = ghostSignal(app.stage, daysSince);
   const followUpEmail = buildFollowUp(app, daysSince);
 
+  // Joining countdown: if offer received, when should candidate give notice?
+  const joiningInfo = (() => {
+    if (app.stage !== "offer" || !app.offerDate) return null;
+    const nd = noticeDays(app.noticePeriod);
+    if (nd === 0) return { label: "Can join immediately", color: "var(--success)", urgent: false };
+    const offerMs   = new Date(app.offerDate).getTime();
+    const noticeEnd = new Date(offerMs + nd * 86400000);
+    const daysLeft  = Math.ceil((noticeEnd.getTime() - Date.now()) / 86400000);
+    const dateStr   = noticeEnd.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+    if (daysLeft < 0) return { label: `Notice period ended ${Math.abs(daysLeft)}d ago`, color: "var(--danger)", urgent: true };
+    if (daysLeft === 0) return { label: "Last day of notice today!", color: "var(--danger)", urgent: true };
+    return {
+      label: `Notice ends ${dateStr} (${daysLeft}d left)`,
+      color: daysLeft <= 7 ? "var(--warn)" : "var(--success)",
+      urgent: daysLeft <= 7,
+    };
+  })();
+
   async function copyEmail() {
     await navigator.clipboard.writeText(followUpEmail);
     setEmailCopied(true);
@@ -250,7 +295,25 @@ function AppCard({ app, onEdit, onDelete, onStageChange }: {
             👻 {ghost.pct}% — {ghost.label}
           </span>
         )}
+        {app.noticePeriod && app.stage !== "offer" && (
+          <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 99, background: "var(--surface2)", border: "1px solid var(--border)", color: "var(--text3)" }}>
+            🕐 {app.noticePeriod}
+          </span>
+        )}
       </div>
+
+      {/* Joining countdown — shown only on offer stage */}
+      {joiningInfo && (
+        <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 8, background: `${joiningInfo.color}10`, border: `1px solid ${joiningInfo.color}35` }}>
+          <span style={{ fontSize: 14 }}>{joiningInfo.urgent ? "⚠️" : "📅"}</span>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: joiningInfo.color }}>{joiningInfo.label}</div>
+            {app.noticePeriod && app.noticePeriod !== "Immediate" && (
+              <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 1 }}>Notice required: {app.noticePeriod}</div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Quick stage mover */}
       <div style={{ display: "flex", gap: 4, marginTop: 10, flexWrap: "wrap" }}>

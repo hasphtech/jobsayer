@@ -11,6 +11,40 @@ import { useResumePlan } from "@/lib/resumePlan";
 import { getSupabaseAsync } from "@/lib/auth";
 import AppNav from "@/components/AppNav";
 
+/* ── Availability types ─────────────────────────────────────── */
+type OpenToWork   = "active" | "passive" | "not_looking";
+type NoticePeriod = "immediate" | "15" | "30" | "45" | "60" | "90" | "90+";
+type WorkPref     = "full_time" | "part_time" | "contract" | "any";
+
+interface Availability {
+  openToWork:   OpenToWork;
+  noticePeriod: NoticePeriod;
+  workPref:     WorkPref;
+}
+
+const AVAIL_KEY = "jobsayer-availability";
+
+const OTW_CONFIG: Record<OpenToWork, { label: string; color: string; bg: string; dot: string }> = {
+  active:      { label: "Actively looking",  color: "var(--success)", bg: "rgba(34,197,94,.1)",  dot: "#22c55e" },
+  passive:     { label: "Open to offers",    color: "var(--warn)",    bg: "rgba(234,179,8,.1)",  dot: "#eab308" },
+  not_looking: { label: "Not looking",       color: "var(--text3)",   bg: "var(--surface2)",     dot: "#71717a" },
+};
+const NOTICE_OPTIONS: { value: NoticePeriod; label: string }[] = [
+  { value: "immediate", label: "Immediate" },
+  { value: "15",        label: "15 days"   },
+  { value: "30",        label: "30 days"   },
+  { value: "45",        label: "45 days"   },
+  { value: "60",        label: "60 days"   },
+  { value: "90",        label: "90 days"   },
+  { value: "90+",       label: "3 months+" },
+];
+const WORK_PREF_OPTIONS: { value: WorkPref; label: string }[] = [
+  { value: "full_time", label: "Full-time"       },
+  { value: "part_time", label: "Part-time"       },
+  { value: "contract",  label: "Contract / Gig"  },
+  { value: "any",       label: "Any / Open"      },
+];
+
 interface SaveMeta {
   id: string;
   name: string;
@@ -33,6 +67,23 @@ export default function ProfilePage() {
   const [bgv, setBgv] = useState<BgvStatus | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [avail, setAvail] = useState<Availability>({ openToWork: "active", noticePeriod: "30", workPref: "full_time" });
+
+  // Load availability from localStorage
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(AVAIL_KEY);
+      if (raw) setAvail(JSON.parse(raw));
+    } catch { /* ignore */ }
+  }, []);
+
+  function updateAvail(patch: Partial<Availability>) {
+    setAvail(prev => {
+      const next = { ...prev, ...patch };
+      try { localStorage.setItem(AVAIL_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+      return next;
+    });
+  }
 
   // Redirect guests to home
   useEffect(() => {
@@ -121,8 +172,23 @@ export default function ProfilePage() {
               {user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split("@")[0] || "User"}
             </div>
             <div style={{ fontSize: 13, color: "var(--text3)", marginTop: 3 }}>{user.email}</div>
-            <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 4 }}>
-              Member since {new Date(user.created_at).toLocaleDateString("en-IN", { month: "long", year: "numeric" })}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
+              {/* Open to Work badge */}
+              <span style={{
+                display: "inline-flex", alignItems: "center", gap: 5,
+                fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 99,
+                background: OTW_CONFIG[avail.openToWork].bg,
+                color: OTW_CONFIG[avail.openToWork].color,
+                border: `1px solid ${OTW_CONFIG[avail.openToWork].color}40`,
+              }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: OTW_CONFIG[avail.openToWork].dot, display: "inline-block" }} />
+                {OTW_CONFIG[avail.openToWork].label}
+              </span>
+              {avail.openToWork !== "not_looking" && (
+                <span style={{ fontSize: 11, color: "var(--text3)", padding: "3px 10px", borderRadius: 99, background: "var(--surface2)", border: "1px solid var(--border)" }}>
+                  🕐 {avail.noticePeriod === "immediate" ? "Immediate joiner" : `${avail.noticePeriod}-day notice`}
+                </span>
+              )}
             </div>
           </div>
           <button
@@ -135,6 +201,81 @@ export default function ProfilePage() {
           >
             Sign out
           </button>
+        </div>
+
+        {/* ── Availability & Notice Period ── */}
+        <div style={{ ...card, marginBottom: 20 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", marginBottom: 18 }}>
+            🟢 Availability & Notice Period
+          </div>
+
+          {/* Open to Work */}
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 10 }}>
+              Job search status
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {(Object.entries(OTW_CONFIG) as [OpenToWork, typeof OTW_CONFIG[OpenToWork]][]).map(([key, cfg]) => (
+                <button key={key} onClick={() => updateAvail({ openToWork: key })} style={{
+                  padding: "8px 16px", borderRadius: 99, fontSize: 12, fontWeight: 600, cursor: "pointer",
+                  border: `1px solid ${avail.openToWork === key ? cfg.color + "60" : "var(--border)"}`,
+                  background: avail.openToWork === key ? cfg.bg : "var(--surface2)",
+                  color: avail.openToWork === key ? cfg.color : "var(--text2)",
+                  display: "flex", alignItems: "center", gap: 6,
+                }}>
+                  <span style={{ width: 7, height: 7, borderRadius: "50%", background: avail.openToWork === key ? cfg.dot : "var(--border)", display: "inline-block" }} />
+                  {cfg.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Notice Period */}
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 10 }}>
+              Current notice period
+            </div>
+            <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
+              {NOTICE_OPTIONS.map(opt => (
+                <button key={opt.value} onClick={() => updateAvail({ noticePeriod: opt.value })} style={{
+                  padding: "7px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer",
+                  border: `1px solid ${avail.noticePeriod === opt.value ? "var(--accent)" : "var(--border)"}`,
+                  background: avail.noticePeriod === opt.value ? "var(--accdim)" : "var(--surface2)",
+                  color: avail.noticePeriod === opt.value ? "var(--accent)" : "var(--text2)",
+                }}>
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Work type preference */}
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 10 }}>
+              Work type preference
+            </div>
+            <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
+              {WORK_PREF_OPTIONS.map(opt => (
+                <button key={opt.value} onClick={() => updateAvail({ workPref: opt.value })} style={{
+                  padding: "7px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer",
+                  border: `1px solid ${avail.workPref === opt.value ? "var(--accent)" : "var(--border)"}`,
+                  background: avail.workPref === opt.value ? "var(--accdim)" : "var(--surface2)",
+                  color: avail.workPref === opt.value ? "var(--accent)" : "var(--text2)",
+                }}>
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Summary line */}
+          {avail.openToWork !== "not_looking" && (
+            <div style={{ marginTop: 18, padding: "10px 14px", borderRadius: 9, background: OTW_CONFIG[avail.openToWork].bg, border: `1px solid ${OTW_CONFIG[avail.openToWork].color}30`, fontSize: 12, color: OTW_CONFIG[avail.openToWork].color, fontWeight: 600 }}>
+              {OTW_CONFIG[avail.openToWork].label} ·{" "}
+              {avail.noticePeriod === "immediate" ? "Can join immediately" : `Can join in ${avail.noticePeriod} days`} ·{" "}
+              {WORK_PREF_OPTIONS.find(o => o.value === avail.workPref)?.label}
+            </div>
+          )}
         </div>
 
         {/* Plan card */}

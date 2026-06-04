@@ -188,6 +188,51 @@ const ROLE_BLUEPRINTS: RoleBlueprint[] = [
     ],
   },
   {
+    title: "IT Services → Product Switch",
+    category: "Transition",
+    icon: "🔀",
+    salary: "₹20–55 LPA (2–3× your current CTC)",
+    demand: "very high",
+    topCompanies: ["Razorpay", "Flipkart", "Swiggy", "PhonePe", "CRED", "Zepto", "Meesho"],
+    skills: [
+      { name: "Data Structures & Algorithms", level: "core", resources: [
+        { label: "Striver's DSA Sheet (free)", url: "https://takeuforward.org/interviews/strivers-sde-sheet-top-coding-interview-problems/", type: "free" },
+        { label: "LeetCode Top 150", url: "https://leetcode.com/studyplan/top-interview-150/", type: "free" },
+        { label: "NeetCode 150", url: "https://neetcode.io/practice", type: "free" },
+      ]},
+      { name: "System Design (HLD + LLD)", level: "core", resources: [
+        { label: "System Design Primer (GitHub)", url: "https://github.com/donnemartin/system-design-primer", type: "free" },
+        { label: "Grokking System Design", url: "https://www.designgurus.io/course/grokking-the-system-design-interview", type: "paid" },
+        { label: "ByteByteGo Newsletter", url: "https://bytebytego.com/", type: "free" },
+      ]},
+      { name: "Core CS Fundamentals (OS, DBMS, Networks)", level: "core", resources: [
+        { label: "InterviewBit CS Fundamentals", url: "https://www.interviewbit.com/courses/programming/", type: "free" },
+        { label: "DBMS — Gate Smashers (YouTube)", url: "https://www.youtube.com/playlist?list=PLxCzCOWd7aiFAN6I8CuViBuCdJgiOkT2Y", type: "free" },
+      ]},
+      { name: "Product Thinking (for tech roles)", level: "core", resources: [
+        { label: "Shreyas Doshi on Product Thinking", url: "https://twitter.com/shreyas", type: "free" },
+        { label: "Exponent PM Interview Guide", url: "https://www.tryexponent.com/courses/pm-interview", type: "paid" },
+      ]},
+      { name: "Modern Tech Stack (React / Node / Go)", level: "advanced", resources: [
+        { label: "The Odin Project (full-stack, free)", url: "https://www.theodinproject.com/", type: "free" },
+        { label: "Go Tour", url: "https://go.dev/tour/", type: "free" },
+      ]},
+      { name: "Resume rewrite — product company format", level: "advanced", resources: [
+        { label: "jobSayer Resume Builder", url: "/builder", type: "free" },
+        { label: "Google XYZ Resume Formula", url: "https://www.inc.com/bill-murphy-jr/google-recruiters-say-these-5-resume-tips-including-x-y-z-formula-will-improve-your-odds-of-getting-hired-at-google.html", type: "free" },
+      ]},
+      { name: "Mock Interviews (company-specific)", level: "advanced", resources: [
+        { label: "jobSayer Interview Prep", url: "/interview", type: "free" },
+        { label: "Pramp (free peer interviews)", url: "https://www.pramp.com/", type: "free" },
+        { label: "interviewing.io", url: "https://interviewing.io/", type: "paid" },
+      ]},
+      { name: "Networking & Referrals", level: "bonus", resources: [
+        { label: "LinkedIn — connect with PMs/SDEs at target companies", url: "https://linkedin.com", type: "free" },
+        { label: "Blind App (anonymous company discussions)", url: "https://www.teamblind.com/", type: "free" },
+      ]},
+    ],
+  },
+  {
     title: "Product Manager",
     category: "Product",
     icon: "🚀",
@@ -275,7 +320,8 @@ export default function CareerGpsPage() {
 
   /* ── Role selector view ── */
   if (!selectedRole) {
-    const categories = [...new Set(ROLE_BLUEPRINTS.map(r => r.category))];
+    // Pin Transition first, then the rest
+    const categories = ["Transition", ...new Set(ROLE_BLUEPRINTS.filter(r => r.category !== "Transition").map(r => r.category))];
 
     return (
       <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
@@ -301,8 +347,9 @@ export default function CareerGpsPage() {
 
           {categories.map(cat => (
             <div key={cat} style={{ marginBottom: 28 }}>
-              <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--text3)", marginBottom: 14 }}>
+              <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: cat === "Transition" ? "var(--accent)" : "var(--text3)", marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
                 {cat}
+                {cat === "Transition" && <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 99, background: "var(--accdim)", border: "1px solid var(--accborder)", color: "var(--accent)", textTransform: "none", letterSpacing: 0 }}>#1 goal of Indian engineers</span>}
               </h2>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 14 }}>
                 {ROLE_BLUEPRINTS.filter(r => r.category === cat).map(role => {
@@ -314,7 +361,9 @@ export default function CareerGpsPage() {
                   return (
                     <button key={role.title} onClick={() => setSelectedRole(role)} style={{
                       ...card, padding: "18px 20px",
-                      cursor: "pointer", textAlign: "left", background: "var(--surface)",
+                      cursor: "pointer", textAlign: "left",
+                      background: role.category === "Transition" ? "linear-gradient(135deg,rgba(99,102,241,.07),rgba(99,102,241,.02))" : "var(--surface)",
+                      borderColor: role.category === "Transition" ? "var(--accborder)" : "var(--border)",
                       transition: "border-color .15s, transform .15s",
                     }}
                       onMouseEnter={e => (e.currentTarget.style.borderColor = "var(--accent)")}
@@ -522,21 +571,35 @@ export default function CareerGpsPage() {
 
         {/* CTA */}
         <div style={{ marginTop: 28, display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-          <Link href="/jobs" style={{
-            display: "flex", alignItems: "center", gap: 8, padding: "13px 28px",
-            background: "var(--accent)", borderRadius: 12, color: "#fff",
-            fontSize: 14, fontWeight: 700, textDecoration: "none",
-          }}>
-            Find {selectedRole.title} Jobs <ChevronRight size={14} />
-          </Link>
+          {selectedRole.category !== "Transition" && (
+            <Link href="/jobs" style={{
+              display: "flex", alignItems: "center", gap: 8, padding: "13px 28px",
+              background: "var(--accent)", borderRadius: 12, color: "#fff",
+              fontSize: 14, fontWeight: 700, textDecoration: "none",
+            }}>
+              Find {selectedRole.title} Jobs <ChevronRight size={14} />
+            </Link>
+          )}
           <Link href="/interview" style={{
             display: "flex", alignItems: "center", gap: 8, padding: "13px 28px",
-            background: "var(--surface)", border: "1px solid var(--border)",
-            borderRadius: 12, color: "var(--text1)",
-            fontSize: 14, fontWeight: 600, textDecoration: "none",
+            background: selectedRole.category === "Transition" ? "var(--accent)" : "var(--surface)",
+            border: selectedRole.category === "Transition" ? "none" : "1px solid var(--border)",
+            borderRadius: 12,
+            color: selectedRole.category === "Transition" ? "#fff" : "var(--text1)",
+            fontSize: 14, fontWeight: 700, textDecoration: "none",
           }}>
-            🎤 Practice Interview
+            🎤 Practice for the Switch <ChevronRight size={14} />
           </Link>
+          {selectedRole.category === "Transition" && (
+            <Link href="/salary?tab=compare" style={{
+              display: "flex", alignItems: "center", gap: 8, padding: "13px 28px",
+              background: "var(--surface)", border: "1px solid var(--border)",
+              borderRadius: 12, color: "var(--text1)",
+              fontSize: 14, fontWeight: 600, textDecoration: "none",
+            }}>
+              💰 See the salary gap
+            </Link>
+          )}
         </div>
       </div>
     </div>
