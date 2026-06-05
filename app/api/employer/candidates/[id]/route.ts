@@ -17,11 +17,11 @@ function supabaseAdmin() {
   );
 }
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const ctx = await verifyApiKey(req);
   if (!ctx.ok) return ctx.response;
 
-  const candidateUserId = params.id;
+  const { id: candidateUserId } = await params;
   const unlockContact   = req.headers.get("X-Unlock-Contact") === "true" && CONTACT_UNLOCK_TIERS.has(ctx.tier);
   const sb              = supabaseAdmin();
 
