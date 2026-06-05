@@ -3796,305 +3796,333 @@ export default function BuilderPage() {
 
           {/* ── EDIT TAB ──────────────────────────────────────── */}
           {leftTab === "edit" && (
-            /* ── Concept A: section list (200px) + form panel (flex:1) ── */
-            <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
+            <div style={{ flex: 1, overflowY: "auto", paddingTop: 0, display: "flex", flexDirection: "column" as const }}>
 
-              {/* ══ LEFT: persistent section list (200px) ══ */}
-              <div style={{ width: 200, flexShrink: 0, borderRight: "1px solid var(--border)", display: "flex", flexDirection: "column" as const, overflow: "hidden", background: "var(--surface)" }}>
-
-                {/* Progress bar */}
-                <div style={{ flexShrink: 0, padding: "8px 10px 6px", borderBottom: "1px solid var(--border)" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
-                    <span style={{ fontSize: 9, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase" as const, letterSpacing: ".05em" }}>Progress</span>
-                    <span style={{ fontSize: 11, fontWeight: 800, color: progressPct >= 80 ? "var(--success)" : progressPct >= 50 ? "var(--warn)" : "var(--text3)" }}>
-                      {completedCount}/{TOTAL_MAIN}
-                    </span>
-                  </div>
-                  <div style={{ height: 3, background: "var(--surface2)", borderRadius: 99, overflow: "hidden" }}>
-                    <div style={{ height: "100%", borderRadius: 99, transition: "width .4s ease", width: `${progressPct}%`, background: progressPct >= 80 ? "var(--success)" : progressPct >= 50 ? "var(--warn)" : "var(--accent)" }} />
-                  </div>
+              {/* ── Completeness meter ─────────────────────────── */}
+              <div style={{ flexShrink: 0, padding: "8px 12px 6px", borderBottom: "1px solid var(--border)", background: "var(--surface)" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 5 }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase" as const, letterSpacing: ".05em" }}>
+                    Resume completeness
+                  </span>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: progressPct >= 80 ? "var(--success)" : progressPct >= 50 ? "var(--warn)" : "var(--text3)" }}>
+                    {completedCount}/{TOTAL_MAIN} · {progressPct}%
+                  </span>
                 </div>
-
-                {/* My Resumes compact bar */}
-                {user && (
-                  <div style={{ padding: "5px 7px 4px", borderBottom: "1px solid var(--border)", flexShrink: 0 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                      <button
-                        onClick={() => { setSavesOpen(o => !o); if (!savesOpen) handleLoadSavesList(); }}
-                        style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 5, background: savesOpen ? "var(--accdim)" : "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: savesOpen ? "var(--accborder)" : "var(--border)", borderRadius: 6, padding: "4px 7px", cursor: "pointer", fontFamily: "inherit", overflow: "hidden", textAlign: "left" as const }}>
-                        <FolderOpen size={10} style={{ color: "var(--accent)", flexShrink: 0 }} />
-                        <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text1)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const, flex: 1 }}>{resumeName}</span>
-                        <span style={{ fontSize: 9, color: "var(--text3)", transform: savesOpen ? "rotate(180deg)" : "none", transition: "transform .2s", flexShrink: 0 }}>▾</span>
-                      </button>
-                      <button onClick={e => { e.stopPropagation(); handleCloudSave(); }} disabled={savingCloud} title={currentSaveId ? "Update save" : "Save resume"}
-                        style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, borderRadius: 6, borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", background: "var(--accdim)", color: "var(--accent)", cursor: savingCloud ? "not-allowed" : "pointer", flexShrink: 0 }}>
-                        {savingCloud ? <Loader2 size={10} style={{ animation: "spin .7s linear infinite" }} /> : <Save size={10} />}
-                      </button>
-                    </div>
-                    {savesOpen && (
-                      <div style={{ marginTop: 4, borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 7, overflow: "hidden", background: "var(--surface2)" }}>
-                        {loadingSaves ? (
-                          <div style={{ padding: "8px", fontSize: 10, color: "var(--text3)", textAlign: "center" as const }}>Loading…</div>
-                        ) : savesList.length === 0 ? (
-                          <div style={{ padding: "8px", fontSize: 10, color: "var(--text3)", textAlign: "center" as const }}>No saves yet</div>
-                        ) : (
-                          savesList.slice(0, 6).map(r => (
-                            <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 7px", borderBottom: "1px solid var(--border)", background: r.id === currentSaveId ? "var(--accdim)" : "transparent" }}>
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text1)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>{r.name}</div>
-                                <div style={{ fontSize: 9, color: "var(--text3)" }}>{r.template}</div>
-                              </div>
-                              <button onClick={() => { handleLoadResume(r.id); setSavesOpen(false); }}
-                                style={{ fontSize: 9, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 4, padding: "1px 5px", cursor: "pointer", fontFamily: "inherit", flexShrink: 0 }}>Load</button>
-                              <button onClick={() => handleDeleteResume(r.id)} title="Delete"
-                                style={{ background: "none", border: "none", cursor: "pointer", color: "#fca5a5", padding: "1px", display: "flex", alignItems: "center", flexShrink: 0 }}><X size={9} /></button>
-                            </div>
-                          ))
-                        )}
-                        <div style={{ display: "flex", borderTop: "1px solid var(--border)" }}>
-                          {savesList.length < plan.maxSaves && (
-                            <button onClick={() => { setCurrentSaveId(null); handleCloudSave(); setSavesOpen(false); }}
-                              style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 3, fontSize: 9, fontWeight: 700, color: "var(--accent)", background: "none", border: "none", borderRight: "1px solid var(--border)", padding: "5px 0", cursor: "pointer", fontFamily: "inherit" }}>
-                              <Plus size={9} /> New
-                            </button>
-                          )}
-                          {currentSaveId && (
-                            <button onClick={() => { handleLoadVersions(); setSavesOpen(false); }}
-                              style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 3, fontSize: 9, fontWeight: 600, color: "var(--text3)", background: "none", border: "none", padding: "5px 0", cursor: "pointer", fontFamily: "inherit" }}>
-                              🕒 History
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    )}
+                <div style={{ height: 4, background: "var(--surface2)", borderRadius: 99, overflow: "hidden" }}>
+                  <div style={{
+                    height: "100%", borderRadius: 99, transition: "width .4s ease",
+                    width: `${progressPct}%`,
+                    background: progressPct >= 80 ? "var(--success)" : progressPct >= 50 ? "var(--warn)" : "var(--accent)",
+                  }} />
+                </div>
+                {progressPct < 100 && (
+                  <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 4 }}>
+                    {progressPct >= 80
+                      ? "Almost there — fill the remaining sections"
+                      : progressPct >= 50
+                      ? "Good start — keep adding sections for a stronger resume"
+                      : "Fill key sections to boost your ATS score"}
                   </div>
                 )}
-
-                {/* Section rows */}
-                <div style={{ flex: 1, overflowY: "auto", padding: "4px 5px 4px" }}>
-                  <div style={{ padding: "4px 6px 2px", fontSize: 9, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase" as const, letterSpacing: ".06em" }}>Sections</div>
-
-                  {orderedIndices.map(idx => {
-                    const s2     = MAIN_STEPS[idx];
-                    const done2  = isDone(s2.key, data);
-                    const active2 = activeSection === s2.key && step !== STEP_ATS;
-                    const sub2   = stepSubtitle(s2.key, data) || modeSubtitle(idx);
-                    const ICONS2: Record<string, string> = { profile: "📇", summary: "📝", work: "💼", edu: "🎓", skills: "⚡", projects: "🚀", certifications: "🏆", languages: "🌐", awards: "🥇", interests: "🎯", references: "👤" };
-                    const status2   = sectionStatus(s2.key, data);
-                    const required2 = REQUIRED_SECTIONS.has(s2.key);
-                    const dot2 = status2 === "complete" ? "#22c55e" : status2 === "partial" ? "#f59e0b" : required2 ? "rgba(255,255,255,.18)" : null;
-                    return (
-                      <button key={s2.key}
-                        onClick={() => { setActiveSection(s2.key); if (step === STEP_ATS) setStep(idx); else setStep(idx); }}
-                        style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, padding: "6px 7px", borderRadius: 7, background: active2 ? "var(--accdim)" : "transparent", border: `1px solid ${active2 ? "var(--accborder)" : "transparent"}`, cursor: "pointer", fontFamily: "inherit", marginBottom: 1, transition: "all .12s", textAlign: "left" as const }}>
-                        <div style={{ width: 22, height: 22, borderRadius: 6, background: done2 ? "var(--text1)" : "var(--surface2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: done2 ? 10 : 12, fontWeight: 700, flexShrink: 0, color: done2 ? "var(--bg)" : undefined }}>
-                          {done2 ? "✓" : (ICONS2[s2.key] ?? "📄")}
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 12, fontWeight: active2 ? 700 : 500, color: active2 ? "var(--accent)" : "var(--text1)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>{modeLabel(idx)}</div>
-                          <div style={{ fontSize: 9, color: "var(--text3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>{sub2}</div>
-                        </div>
-                        {dot2 && <div style={{ width: 6, height: 6, borderRadius: "50%", background: dot2, flexShrink: 0, transition: "background .3s" }} />}
-                      </button>
-                    );
-                  })}
-
-                  {/* Custom sections row */}
-                  <button onClick={() => setActiveSection("__custom")}
-                    style={{ width: "100%", display: "flex", alignItems: "center", gap: 6, padding: "6px 7px", borderRadius: 7, background: activeSection === "__custom" ? "var(--accdim)" : "transparent", border: `1px solid ${activeSection === "__custom" ? "var(--accborder)" : "transparent"}`, cursor: "pointer", fontFamily: "inherit", marginBottom: 1, transition: "all .12s", textAlign: "left" as const }}>
-                    <div style={{ width: 22, height: 22, borderRadius: 6, background: (data.customSections ?? []).length > 0 ? "var(--text1)" : "var(--surface2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0, color: (data.customSections ?? []).length > 0 ? "var(--bg)" : undefined }}>
-                      {(data.customSections ?? []).length > 0 ? "✓" : "＋"}
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12, fontWeight: activeSection === "__custom" ? 700 : 500, color: activeSection === "__custom" ? "var(--accent)" : "var(--text1)" }}>Custom</div>
-                      <div style={{ fontSize: 9, color: "var(--text3)" }}>
-                        {(data.customSections ?? []).length > 0 ? `${data.customSections!.length} added` : "Publications, Patents…"}
-                      </div>
-                    </div>
-                  </button>
-                </div>
-
-                {/* Reset / Clear footer */}
-                <div style={{ padding: "5px 7px 7px", borderTop: "1px solid var(--border)", display: "flex", gap: 4, flexShrink: 0 }}>
-                  <button onClick={() => { if (confirm("Reset to sample data?")) { setData(SAMPLE); setActiveSection("profile"); setStep(0); } }}
-                    style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 3, fontSize: 10, fontWeight: 600, color: "var(--text3)", background: "none", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 5, padding: "4px 0", cursor: "pointer", fontFamily: "inherit" }}>
-                    <RotateCcw size={9} /> Reset
-                  </button>
-                  <button onClick={() => { if (confirm("Clear all content?")) { setData(BLANK); setActiveSection("profile"); setStep(0); } }}
-                    style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 600, color: "#dc2626", background: "none", borderWidth: 1, borderStyle: "solid", borderColor: "#fecaca", borderRadius: 5, padding: "4px 0", cursor: "pointer", fontFamily: "inherit" }}>
-                    Clear
-                  </button>
-                </div>
               </div>
 
-              {/* ══ RIGHT: form panel (flex:1) ══ */}
-              <div style={{ flex: 1, display: "flex", flexDirection: "column" as const, overflow: "hidden" }}>
+              <div style={{ flex: 1, overflowY: "auto" as const, paddingTop: 10 }}>
 
-                {/* Version history modal */}
-                {showVersions && (
-                  <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
-                    onClick={e => { if (e.target === e.currentTarget) setShowVersions(false); }}>
-                    <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "24px", width: "100%", maxWidth: 420, maxHeight: "70vh", overflowY: "auto" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                        <div style={{ fontSize: 15, fontWeight: 700 }}>🕒 Version History</div>
-                        <button onClick={() => setShowVersions(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18 }}>✕</button>
-                      </div>
-                      <p style={{ fontSize: 12, color: "var(--text3)", marginBottom: 14, lineHeight: 1.6 }}>
-                        Each time you save, a snapshot is created. Restore any version — your current work will be replaced.
-                      </p>
-                      {loadingVersions ? (
-                        <div style={{ padding: "20px", textAlign: "center" as const, color: "var(--text3)", fontSize: 13 }}>Loading versions…</div>
-                      ) : versions.length === 0 ? (
-                        <div style={{ padding: "20px", textAlign: "center" as const, color: "var(--text3)", fontSize: 13 }}>No versions yet. Save your resume to create a snapshot.</div>
-                      ) : versions.map((v, vi) => (
-                        <div key={v.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 0", borderBottom: vi < versions.length - 1 ? "1px solid var(--border)" : "none" }}>
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text1)" }}>v{versions.length - vi}</div>
-                            <div style={{ fontSize: 10, color: "var(--text3)" }}>{new Date(v.createdAt).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</div>
+              {/* ── ATS full-panel view (replaces accordion when ATS score clicked) ── */}
+              {step === STEP_ATS ? (
+                <div style={{ flex: 1, padding: "0 12px 20px" }}>
+                  <button
+                    onClick={() => { setStep(activeSection ? (MAIN_STEPS.findIndex(s => s.key === activeSection) >= 0 ? MAIN_STEPS.findIndex(s => s.key === activeSection) : 0) : 0); }}
+                    style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 600, color: "var(--text3)", background: "none", border: "none", cursor: "pointer", padding: "4px 0 10px", fontFamily: "inherit" }}>
+                    ← Back to editing
+                  </button>
+                  {renderStepContent()}
+                </div>
+              ) : (<>
+
+              {/* ── My Resumes panel (signed-in users only) ───────── */}
+              {user && (
+                <div style={{ margin: "0 10px 10px", borderWidth: 1.5, borderStyle: "solid", borderColor: savesOpen ? "var(--accent)" : "var(--border)", borderRadius: 10, overflow: "hidden", boxShadow: savesOpen ? "0 0 0 3px var(--accdim)" : "none", transition: "border-color .15s, box-shadow .15s" }}>
+                  {/* Header row */}
+                  <div onClick={() => { setSavesOpen(o => !o); if (!savesOpen) handleLoadSavesList(); }}
+                    style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 12px", cursor: "pointer", background: savesOpen ? "var(--accdim)" : "var(--surface)", userSelect: "none" as const, transition: "background .1s" }}>
+                    <div style={{ width: 26, height: 26, borderRadius: 7, background: "var(--surface2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <FolderOpen size={13} style={{ color: "var(--accent)" }} />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>{resumeName}</div>
+                      <div style={{ fontSize: 10, color: "var(--text3)" }}>{savesList.length}/{plan.maxSaves} saved · {plan.planName}</div>
+                    </div>
+                    <button onClick={e => { e.stopPropagation(); handleCloudSave(); }} disabled={savingCloud}
+                      style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "3px 8px", cursor: savingCloud ? "default" : "pointer", fontFamily: "inherit", flexShrink: 0 }}>
+                      {savingCloud ? <Loader2 size={10} style={{ animation: "spin .7s linear infinite" }} /> : <Save size={10} />}
+                      {currentSaveId ? "Update" : "Save"}
+                    </button>
+                    <span style={{ fontSize: 11, color: "var(--text3)", display: "inline-block", transform: savesOpen ? "rotate(180deg)" : "none", transition: "transform .2s", flexShrink: 0 }}>▾</span>
+                  </div>
+                  {/* Expanded list */}
+                  {savesOpen && (
+                    <div style={{ borderTop: "1px solid var(--border)", background: "var(--surface2)" }}>
+                      {loadingSaves ? (
+                        <div style={{ padding: "12px 14px", fontSize: 11, color: "var(--text3)" }}>Loading…</div>
+                      ) : savesList.length === 0 ? (
+                        <div style={{ padding: "12px 14px", fontSize: 11, color: "var(--text3)" }}>No saved resumes yet — hit Save to store this one.</div>
+                      ) : savesList.map(r => (
+                        <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderBottom: "1px solid var(--border)", background: r.id === currentSaveId ? "var(--accdim)" : "transparent" }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text1)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>{r.name}</div>
+                            <div style={{ fontSize: 9, color: "var(--text3)" }}>{r.template} · {new Date(r.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</div>
                           </div>
-                          <button onClick={() => user && loadResumeVersion(v.id, user.id).then(d => { if (d) { setData(d.data); setShowVersions(false); } })}
-                            style={{ fontSize: 11, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}>
+                          <button onClick={() => { handleLoadResume(r.id); setSavesOpen(false); }}
+                            style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 5, padding: "2px 8px", cursor: "pointer", fontFamily: "inherit", flexShrink: 0 }}>
+                            Load
+                          </button>
+                          <button onClick={() => handleDeleteResume(r.id)} title="Delete"
+                            style={{ background: "none", border: "none", cursor: "pointer", color: "#fca5a5", padding: "2px 3px", display: "flex", alignItems: "center", flexShrink: 0 }}>
+                            <X size={12} />
+                          </button>
+                        </div>
+                      ))}
+                      {savesList.length < plan.maxSaves && (
+                        <div style={{ padding: "8px 12px" }}>
+                          <button onClick={() => { setCurrentSaveId(null); handleCloudSave(); setSavesOpen(false); }}
+                            style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 5, fontSize: 11, fontWeight: 700, color: "var(--accent)", background: "var(--bg)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 7, padding: "6px 0", cursor: "pointer", fontFamily: "inherit" }}>
+                            <Plus size={11} /> Save as new resume
+                          </button>
+                        </div>
+                      )}
+                      {/* Version history button */}
+                      {currentSaveId && (
+                        <div style={{ padding: "6px 12px 10px", borderTop: "1px solid var(--border)" }}>
+                          <button onClick={() => { handleLoadVersions(); setSavesOpen(false); }}
+                            style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 5, fontSize: 11, fontWeight: 600, color: "var(--text2)", background: "none", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 7, padding: "6px 0", cursor: "pointer", fontFamily: "inherit" }}>
+                            🕒 Version history {versionCount > 0 ? `(${Math.min(versionCount, 10)})` : ""}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ── Version history panel ── */}
+              {showVersions && (
+                <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+                  onClick={e => { if (e.target === e.currentTarget) setShowVersions(false); }}>
+                  <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "24px", width: "100%", maxWidth: 420, maxHeight: "70vh", overflowY: "auto" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                      <div style={{ fontSize: 15, fontWeight: 700 }}>🕒 Version History</div>
+                      <button onClick={() => setShowVersions(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18 }}>✕</button>
+                    </div>
+                    <p style={{ fontSize: 12, color: "var(--text3)", marginBottom: 14, lineHeight: 1.6 }}>
+                      Each time you save, a snapshot is created. Restore any version — your current work will be replaced.
+                    </p>
+                    {loadingVersions ? (
+                      <div style={{ textAlign: "center", padding: "20px", color: "var(--text3)", fontSize: 13 }}>Loading…</div>
+                    ) : versions.length === 0 ? (
+                      <div style={{ textAlign: "center", padding: "20px", color: "var(--text3)", fontSize: 13 }}>
+                        No versions yet. Save your resume to create the first snapshot.
+                      </div>
+                    ) : versions.map((v, i) => (
+                      <div key={v.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 9, border: "1px solid var(--border)", marginBottom: 8, background: i === 0 ? "var(--accdim)" : "var(--surface2)" }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)" }}>{v.label}</div>
+                          <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>Template: {v.template}{i === 0 ? " · Latest" : ""}</div>
+                        </div>
+                        {i > 0 && (
+                          <button onClick={() => { if (confirm(`Restore "${v.label}"? Your current work will be replaced.`)) handleRestoreVersion(v.id); }}
+                            style={{ fontSize: 11, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit", flexShrink: 0 }}>
                             Restore
                           </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* ATS panel */}
-                {step === STEP_ATS ? (
-                  <div style={{ flex: 1, overflowY: "auto", padding: "12px 16px 20px" }}>
-                    <button onClick={() => { setStep(activeSection ? (MAIN_STEPS.findIndex(s => s.key === activeSection) >= 0 ? MAIN_STEPS.findIndex(s => s.key === activeSection) : 0) : 0); }}
-                      style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 600, color: "var(--text3)", background: "none", border: "none", cursor: "pointer", padding: "0 0 10px", fontFamily: "inherit" }}>
-                      ← Back to editing
-                    </button>
-                    {renderStepContent()}
-                  </div>
-
-                ) : activeSection === "__custom" ? (
-                  /* Custom sections form */
-                  <div style={{ flex: 1, overflowY: "auto", padding: "12px 14px 20px" }}>
-                    <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text1)", marginBottom: 4 }}>Custom Sections</div>
-                    <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 14, lineHeight: 1.5 }}>
-                      Add any extra section — Volunteer Work, Publications, Patents, Speaking, etc.
-                    </div>
-                    <div style={{ display: "flex", flexDirection: "column" as const, gap: 10 }}>
-                      {(data.customSections ?? []).map((cs, i) => (
-                        <div key={cs.id} style={{ background: "var(--surface2)", borderWidth: 1.5, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 10, padding: 12, display: "flex", flexDirection: "column" as const, gap: 9 }}>
-                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                            <input value={cs.title} onChange={e => set("customSections", (data.customSections ?? []).map((x, j) => j === i ? { ...x, title: e.target.value } : x))}
-                              placeholder="Section title (e.g. Volunteer Work)"
-                              style={{ flex: 1, fontSize: 12, fontWeight: 700, color: "var(--text1)", background: "transparent", border: "none", outline: "none", fontFamily: "inherit" }} />
-                            <button onClick={() => set("customSections", (data.customSections ?? []).filter((_, j) => j !== i))}
-                              style={{ background: "none", border: "none", color: "#fca5a5", fontSize: 18, cursor: "pointer", padding: "2px 4px" }}>×</button>
-                          </div>
-                          <textarea spellCheck value={cs.content} onChange={e => set("customSections", (data.customSections ?? []).map((x, j) => j === i ? { ...x, content: e.target.value } : x))}
-                            placeholder={"• Led weekly food drives serving 200+ families\n• Organised annual charity run"}
-                            rows={4}
-                            style={{ padding: "8px 10px", borderRadius: 7, borderWidth: 1.5, borderStyle: "solid", borderColor: "var(--border)", background: "var(--surface)", color: "var(--text1)", fontSize: 12, fontFamily: "inherit", outline: "none", resize: "vertical" as const, lineHeight: 1.55 }}
-                            onFocus={e => { e.target.style.borderColor = "var(--accent)"; }}
-                            onBlur={e => { e.target.style.borderColor = "var(--border)"; }} />
-                        </div>
-                      ))}
-                      <button onClick={() => set("customSections", [...(data.customSections ?? []), { id: uid(), title: "", content: "" }])}
-                        style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px", borderRadius: 8, borderWidth: 1.5, borderStyle: "dashed", borderColor: "var(--border)", background: "var(--surface2)", color: "var(--text2)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
-                        <Plus size={12} /> Add section
-                      </button>
-                      <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 5 }}>
-                        <span style={{ fontSize: 10, color: "var(--text3)", fontWeight: 600, alignSelf: "center" }}>Quick add:</span>
-                        {["Volunteer Work", "Publications", "Patents", "Speaking", "Open Source"].map(label => (
-                          <button key={label} onClick={() => set("customSections", [...(data.customSections ?? []), { id: uid(), title: label, content: "" }])}
-                            style={{ fontSize: 10, fontWeight: 600, padding: "3px 9px", borderRadius: 5, cursor: "pointer", fontFamily: "inherit", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", background: "var(--surface)", color: "var(--text2)" }}>
-                            {label}
-                          </button>
-                        ))}
+                        )}
+                        {i === 0 && <span style={{ fontSize: 10, color: "var(--accent)", fontWeight: 700, flexShrink: 0 }}>Current</span>}
                       </div>
-                    </div>
+                    ))}
                   </div>
+                </div>
+              )}
 
-                ) : activeSection ? (
-                  /* Section edit form */
-                  <div style={{ flex: 1, overflowY: "auto", padding: "12px 14px 20px" }}>
-                    {(() => {
-                      const sIdx = MAIN_STEPS.findIndex(s => s.key === activeSection);
-                      const sInfo = sIdx >= 0 ? MAIN_STEPS[sIdx] : null;
-                      const ICONS3: Record<string, string> = { profile: "📇", summary: "📝", work: "💼", edu: "🎓", skills: "⚡", projects: "🚀", certifications: "🏆", languages: "🌐", awards: "🥇", interests: "🎯", references: "👤" };
-                      return (
-                        <>
-                          {/* Section header */}
-                          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14, paddingBottom: 10, borderBottom: "1px solid var(--border)" }}>
-                            <div style={{ width: 28, height: 28, borderRadius: 7, background: "var(--accdim)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>
-                              {ICONS3[activeSection] ?? "📄"}
+              {/* Profile strength bar */}
+              <div style={{ padding: "0 12px 10px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                  <span style={{ fontSize: 11, color: "var(--text3)" }}>Profile strength</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: ats.scoreColor }}>{ats.score}%</span>
+                </div>
+                <div style={{ height: 4, borderRadius: 99, background: "var(--surface2)", overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${ats.score}%`, borderRadius: 99, background: ats.scoreColor, transition: "width .4s" }} />
+                </div>
+                {ats.tips.length > 0 && (
+                  <div style={{ marginTop: 6, fontSize: 10, color: "var(--text3)" }}>→ {ats.tips[0]}</div>
+                )}
+              </div>
+
+              {/* Accordion sections */}
+              {orderedIndices.map(idx => {
+                const s     = MAIN_STEPS[idx];
+                const done  = isDone(s.key, data);
+                const open  = activeSection === s.key;
+                const sub   = stepSubtitle(s.key, data) || modeSubtitle(idx);
+                const ICONS: Record<string, string> = { profile: "📇", summary: "📝", work: "💼", edu: "🎓", skills: "⚡", projects: "🚀", certifications: "🏆", languages: "🌐", awards: "🥇", interests: "🎯", references: "👤" };
+                const status   = sectionStatus(s.key, data);
+                const required = REQUIRED_SECTIONS.has(s.key);
+                const dotColor = status === "complete" ? "#22c55e"
+                               : status === "partial"  ? "#f59e0b"
+                               : required              ? "#e2e8f0"   // gray dot for empty required
+                               : null;                                // no dot for empty optional
+                return (
+                  <div key={s.key} style={{ margin: "0 10px 5px", border: `1.5px solid ${open ? "var(--accent)" : "var(--border)"}`, borderRadius: 10, overflow: "hidden", boxShadow: open ? "0 0 0 3px var(--accdim)" : "none", transition: "border-color .15s, box-shadow .15s" }}>
+                    <div
+                      onClick={() => { if (open) { setActiveSection(null); } else { setActiveSection(s.key); setStep(idx); } }}
+                      style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 12px", cursor: "pointer", background: open ? "var(--accdim)" : "var(--surface)", userSelect: "none" as const, transition: "background .1s" }}>
+                      <div style={{ width: 26, height: 26, borderRadius: 7, background: done ? "var(--text1)" : "var(--surface2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: done ? 11 : 14, fontWeight: 700, flexShrink: 0, color: done ? "var(--bg)" : undefined }}>
+                        {done ? "✓" : (ICONS[s.key] ?? "📄")}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)" }}>{modeLabel(idx)}</div>
+                        <div style={{ fontSize: 10, color: "var(--text3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>{sub}</div>
+                      </div>
+                      {/* Completion dot */}
+                      {dotColor && (
+                        <div title={status === "complete" ? "Complete" : status === "partial" ? "Incomplete" : "Not started"}
+                          style={{ width: 8, height: 8, borderRadius: "50%", background: dotColor, flexShrink: 0, transition: "background .3s" }} />
+                      )}
+                      {/* Guest sign-in chip — shown inline in header when section is open */}
+                      {open && !user && (
+                        <button onClick={e => { e.stopPropagation(); signInWithGoogle(); }}
+                          style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "3px 8px", cursor: "pointer", fontFamily: "inherit", flexShrink: 0, whiteSpace: "nowrap" as const }}>
+                          <LogIn size={10} /> Sign in
+                        </button>
+                      )}
+                      <span style={{ fontSize: 11, color: "var(--text3)", display: "inline-block", transform: open ? "rotate(180deg)" : "none", transition: "transform .2s", flexShrink: 0 }}>▾</span>
+                    </div>
+                    {open && (
+                      <div style={{ borderTop: "1px solid var(--border)", background: "var(--surface2)", padding: "12px 12px 14px", maxHeight: 560, overflowY: "auto" }}>
+                        {renderStepContent()}
+                        {/* AI enhancement chips — shown for summary and work sections */}
+                        {(s.key === "summary" || s.key === "work") && plan.tier === "pro" && (
+                          <div style={{ marginTop: 12, padding: "10px 12px", background: "var(--bg)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 9 }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", marginBottom: 7, display: "flex", alignItems: "center", gap: 5 }}>
+                              <Sparkles size={10} /> AI Enhance
                             </div>
-                            <div style={{ flex: 1 }}>
-                              <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text1)" }}>{sInfo ? modeLabel(sIdx) : activeSection}</div>
-                              <div style={{ fontSize: 10, color: "var(--text3)" }}>{sInfo ? (stepSubtitle(activeSection, data) || modeSubtitle(sIdx)) : ""}</div>
-                            </div>
-                            {!user && (
-                              <button onClick={() => signInWithGoogle()}
-                                style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "4px 9px", cursor: "pointer", fontFamily: "inherit" }}>
-                                <LogIn size={10} /> Sign in
-                              </button>
-                            )}
-                          </div>
-                          {renderStepContent()}
-                          {/* AI enhancement chips */}
-                          {(activeSection === "summary" || activeSection === "work") && plan.tier === "pro" && (
-                            <div style={{ marginTop: 14, padding: "10px 12px", background: "var(--bg)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 9 }}>
-                              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", marginBottom: 7, display: "flex", alignItems: "center", gap: 5 }}>
-                                <Sparkles size={10} /> AI Enhance
-                              </div>
-                              <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 5 }}>
-                                {activeSection === "summary" && ([
-                                  { action: "summary_concise", label: "More concise" },
-                                  { action: "summary_metrics", label: "Add metrics" },
-                                  { action: "summary_jd",      label: "Stronger tone" },
-                                ] as { action: string; label: string }[]).map(chip => (
+                            <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 5 }}>
+                              {s.key === "summary" && ([
+                                { action: "summary_concise", label: "More concise" },
+                                { action: "summary_metrics", label: "Add metrics" },
+                                { action: "summary_jd",      label: "Stronger tone" },
+                              ] as { action: string; label: string }[]).map(chip => (
+                                <button key={chip.action}
+                                  onClick={() => handleAiEnhance(chip.action, data.summary ?? "", v => set("summary", v))}
+                                  disabled={!!aiLoading}
+                                  style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 600, cursor: aiLoading ? "wait" : "pointer", background: aiLoading === chip.action ? "var(--accent)" : "var(--accdim)", color: aiLoading === chip.action ? "#fff" : "var(--accent)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", fontFamily: "inherit", transition: "all .15s" }}>
+                                  {aiLoading === chip.action ? <Loader2 size={10} style={{ animation: "spin .7s linear infinite" }} /> : null}
+                                  {chip.label}
+                                </button>
+                              ))}
+                              {s.key === "work" && ([
+                                { action: "bullet_impact", label: "Add impact numbers" },
+                                { action: "bullet_verbs",  label: "Stronger verbs" },
+                              ] as { action: string; label: string }[]).map(chip => {
+                                const activeWork = data.work.find(w => w.company || w.role);
+                                return (
                                   <button key={chip.action}
-                                    onClick={() => handleAiEnhance(chip.action, data.summary ?? "", v => set("summary", v))}
+                                    onClick={() => activeWork && handleAiEnhance(chip.action, activeWork.desc ?? "", v => {
+                                      const idx2 = data.work.indexOf(activeWork);
+                                      const updated = data.work.map((w, i) => i === idx2 ? { ...w, desc: v } : w);
+                                      set("work", updated);
+                                    })}
                                     disabled={!!aiLoading}
                                     style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 600, cursor: aiLoading ? "wait" : "pointer", background: aiLoading === chip.action ? "var(--accent)" : "var(--accdim)", color: aiLoading === chip.action ? "#fff" : "var(--accent)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", fontFamily: "inherit", transition: "all .15s" }}>
                                     {aiLoading === chip.action ? <Loader2 size={10} style={{ animation: "spin .7s linear infinite" }} /> : null}
                                     {chip.label}
                                   </button>
-                                ))}
-                                {activeSection === "work" && ([
-                                  { action: "bullet_impact", label: "Add impact numbers" },
-                                  { action: "bullet_verbs",  label: "Stronger verbs" },
-                                ] as { action: string; label: string }[]).map(chip => {
-                                  const activeWork = data.work.find(w => w.company || w.role);
-                                  return (
-                                    <button key={chip.action}
-                                      onClick={() => activeWork && handleAiEnhance(chip.action, activeWork.desc ?? "", v => {
-                                        const idx2 = data.work.indexOf(activeWork);
-                                        const updated = data.work.map((w, i) => i === idx2 ? { ...w, desc: v } : w);
-                                        set("work", updated);
-                                      })}
-                                      disabled={!!aiLoading}
-                                      style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 600, cursor: aiLoading ? "wait" : "pointer", background: aiLoading === chip.action ? "var(--accent)" : "var(--accdim)", color: aiLoading === chip.action ? "#fff" : "var(--accent)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", fontFamily: "inherit", transition: "all .15s" }}>
-                                      {aiLoading === chip.action ? <Loader2 size={10} style={{ animation: "spin .7s linear infinite" }} /> : null}
-                                      {chip.label}
-                                    </button>
-                                  );
-                                })}
-                              </div>
+                                );
+                              })}
                             </div>
-                          )}
-                        </>
-                      );
-                    })()}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
+                );
+              })}
 
-                ) : (
-                  /* No section selected — empty state */
-                  <div style={{ flex: 1, display: "flex", flexDirection: "column" as const, alignItems: "center", justifyContent: "center", padding: "40px 20px", color: "var(--text3)", textAlign: "center" as const }}>
-                    <div style={{ fontSize: 32, marginBottom: 12 }}>←</div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text2)", marginBottom: 6 }}>Select a section to edit</div>
-                    <div style={{ fontSize: 12, color: "var(--text3)", lineHeight: 1.6 }}>Pick any section from the list on the left to start editing.</div>
+              {/* ── Custom Sections accordion ─────────────────── */}
+              <div style={{ margin: "0 10px 5px", borderWidth: 1.5, borderStyle: "solid", borderColor: activeSection === "__custom" ? "var(--accent)" : "var(--border)", borderRadius: 10, overflow: "hidden", boxShadow: activeSection === "__custom" ? "0 0 0 3px var(--accdim)" : "none", transition: "border-color .15s, box-shadow .15s" }}>
+                <div onClick={() => setActiveSection(activeSection === "__custom" ? null : "__custom")}
+                  style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 12px", cursor: "pointer", background: activeSection === "__custom" ? "var(--accdim)" : "var(--surface)", userSelect: "none" as const }}>
+                  <div style={{ width: 26, height: 26, borderRadius: 7, background: "var(--surface2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>
+                    ＋
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)" }}>Custom Sections</div>
+                    <div style={{ fontSize: 10, color: "var(--text3)" }}>
+                      {(data.customSections ?? []).length > 0 ? `${data.customSections!.length} section${data.customSections!.length > 1 ? "s" : ""}` : "Volunteer, Publications, Patents…"}
+                    </div>
+                  </div>
+                  <span style={{ fontSize: 11, color: "var(--text3)", display: "inline-block", transform: activeSection === "__custom" ? "rotate(180deg)" : "none", transition: "transform .2s", flexShrink: 0 }}>▾</span>
+                </div>
+                {activeSection === "__custom" && (
+                  <div style={{ borderTop: "1px solid var(--border)", background: "var(--surface2)", padding: "12px 12px 14px", display: "flex", flexDirection: "column", gap: 10 }}>
+                    <div style={{ fontSize: 11, color: "var(--text3)", lineHeight: 1.5 }}>
+                      Add any extra section — Volunteer Work, Publications, Patents, Speaking, etc.
+                    </div>
+                    {(data.customSections ?? []).map((cs, i) => (
+                      <div key={cs.id} style={{ background: "var(--bg)", borderWidth: 1.5, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 10, padding: 12, display: "flex", flexDirection: "column", gap: 9 }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                          <input
+                            value={cs.title}
+                            onChange={e => set("customSections", (data.customSections ?? []).map((x, j) => j === i ? { ...x, title: e.target.value } : x))}
+                            placeholder="Section title (e.g. Volunteer Work)"
+                            style={{ flex: 1, fontSize: 12, fontWeight: 700, color: "var(--text1)", background: "transparent", border: "none", outline: "none", fontFamily: "inherit" }}
+                          />
+                          <button onClick={() => set("customSections", (data.customSections ?? []).filter((_, j) => j !== i))}
+                            style={{ background: "none", border: "none", color: "#fca5a5", fontSize: 18, cursor: "pointer", padding: "2px 4px" }}>×</button>
+                        </div>
+                        <textarea
+                          spellCheck
+                          value={cs.content}
+                          onChange={e => set("customSections", (data.customSections ?? []).map((x, j) => j === i ? { ...x, content: e.target.value } : x))}
+                          placeholder={"• Led weekly food drives serving 200+ families\n• Organised annual charity run raising ₹2L"}
+                          rows={4}
+                          style={{ padding: "8px 10px", borderRadius: 7, borderWidth: 1.5, borderStyle: "solid", borderColor: "var(--border)", background: "var(--surface)", color: "var(--text1)", fontSize: 12, fontFamily: "inherit", outline: "none", resize: "vertical" as const, lineHeight: 1.55 }}
+                          onFocus={e => { e.target.style.borderColor = "var(--accent)"; }}
+                          onBlur={e => { e.target.style.borderColor = "var(--border)"; }}
+                        />
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => set("customSections", [...(data.customSections ?? []), { id: uid(), title: "", content: "" }])}
+                      style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px", borderRadius: 8, borderWidth: 1.5, borderStyle: "dashed", borderColor: "var(--border)", background: "var(--bg)", color: "var(--text2)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+                      <Plus size={12} /> Add section
+                    </button>
+                    {/* Quick starters */}
+                    <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 5 }}>
+                      <span style={{ fontSize: 10, color: "var(--text3)", fontWeight: 600, alignSelf: "center" }}>Quick add:</span>
+                      {["Volunteer Work", "Publications", "Patents", "Speaking", "Open Source"].map(label => (
+                        <button key={label}
+                          onClick={() => set("customSections", [...(data.customSections ?? []), { id: uid(), title: label, content: "" }])}
+                          style={{ fontSize: 10, fontWeight: 600, padding: "3px 9px", borderRadius: 5, cursor: "pointer", fontFamily: "inherit", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", background: "var(--surface)", color: "var(--text2)", transition: "all .12s" }}>
+                          {label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
+
+              {/* Reset / Clear footer */}
+              <div style={{ padding: "10px 10px 16px", display: "flex", gap: 6 }}>
+                <button onClick={() => { if (confirm("Reset to sample data?")) { setData(SAMPLE); setActiveSection("profile"); setStep(0); } }}
+                  style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, fontSize: 11, fontWeight: 600, color: "var(--text3)", background: "none", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 6, padding: "6px 0", cursor: "pointer", fontFamily: "inherit" }}>
+                  <RotateCcw size={10} /> Reset
+                </button>
+                <button onClick={() => { if (confirm("Clear all content?")) { setData(BLANK); setActiveSection("profile"); setStep(0); } }}
+                  style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 600, color: "#dc2626", background: "none", borderWidth: 1, borderStyle: "solid", borderColor: "#fecaca", borderRadius: 6, padding: "6px 0", cursor: "pointer", fontFamily: "inherit" }}>
+                  Clear all
+                </button>
+              </div>
+            </>)}
+              </div>{/* end inner scroll */}
             </div>
           )}
 
