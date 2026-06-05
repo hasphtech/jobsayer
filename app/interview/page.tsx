@@ -11,6 +11,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { ChevronRight, ChevronLeft, Mic, MicOff, Zap, CheckCircle2, AlertTriangle, Lightbulb, RotateCcw, ArrowLeft, BookOpen } from "lucide-react";
 import AppNav from "@/components/AppNav";
+import CourseCard from "@/components/CourseCard";
+import { getCoursesForSkill } from "@/lib/courseRecommendations";
 import type { ResumeData } from "@/lib/types";
 
 /* ── Types ───────────────────────────────────────────────── */
@@ -716,6 +718,25 @@ export default function InterviewPage() {
               );
             })}
           </div>
+
+          {/* Course recommendations for focusSkill */}
+          {(() => {
+            const courses = getCoursesForSkill(focusSkill, 2);
+            if (!courses.length) return null;
+            return (
+              <div style={{ ...card, marginBottom: 4 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
+                  📚 Deepen your {focusSkill} skills
+                </div>
+                <p style={{ fontSize: 12, color: "var(--text3)", marginBottom: 12, lineHeight: 1.5 }}>
+                  Practice helps — structured learning accelerates it.
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {courses.map(c => <CourseCard key={c.affiliateUrl} course={c} />)}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Actions */}
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>

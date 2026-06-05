@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Job Search India — Tech, Product & Finance Jobs",
-  description: "Search verified tech and non-tech jobs in India. Ghost-job detection, JD trust scores, and one-click apply with your AI-built resume. Updated daily.",
-  keywords: ["jobs in India", "tech jobs India", "software jobs Bangalore", "product manager jobs India", "verified job listings India"],
+  title: "Find Roles You're Built For — India",
+  description: "Discover verified tech and product roles matched to your career profile. Ghost-job detection, JD trust scores, and one-click apply with your career resume.",
+  keywords: ["career matched jobs India", "tech jobs India", "software jobs Bangalore", "product manager jobs India", "verified job listings India"],
   openGraph: {
-    title: "Job Search India — jobSayer",
-    description: "Verified job listings with ghost-job detection. Search, match, and apply with your AI resume.",
+    title: "Find Roles You're Built For — jobSayer",
+    description: "Career-matched job listings with ghost-job detection. Apply with your AI-built resume.",
     url: "https://jobsayer.com/jobs",
   },
   alternates: { canonical: "https://jobsayer.com/jobs" },

@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "ATS Score Checker",
-  description: "Check your resume's ATS score instantly. See how Naukri, Workday, and Taleo rank your resume. Get keyword gap analysis and improvement tips.",
-  keywords: ["ATS score checker", "resume ATS score India", "resume score", "ATS resume checker", "JD matching resume"],
+  title: "Career Score — Know Your Market Value",
+  description: "Understand your real market value. See how Naukri, Workday, and Taleo rank your resume, fix skill gaps, and maximise what you're worth to employers.",
+  keywords: ["career score India", "resume market value", "ATS score checker India", "resume keyword gap analysis", "career value India"],
   openGraph: {
-    title: "ATS Score Checker — jobSayer",
-    description: "Instantly score your resume against any job description. See keyword gaps and get tips.",
+    title: "Career Score — jobSayer Career Growth",
+    description: "Know your market value. Per-ATS score, keyword gaps, parser compatibility — with specific fixes.",
     url: "https://jobsayer.com/score",
   },
   alternates: { canonical: "https://jobsayer.com/score" },

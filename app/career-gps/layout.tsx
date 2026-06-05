@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Career GPS — AI Career Path Advisor",
-  description: "Get a personalised career roadmap powered by AI. See skill gaps vs your target role, recommended learning paths, and estimated timelines. Built for the Indian job market.",
-  keywords: ["career path India", "career guidance AI", "skill gap analysis India", "career roadmap software engineer", "career GPS India"],
+  title: "Career GPS — Navigate Your Path to Growth",
+  description: "Know exactly where your career is going. AI maps your skill gaps vs your target role, builds a prioritised learning plan, and shows the fastest route to your next level.",
+  keywords: ["career path India", "career growth roadmap India", "skill gap analysis India", "career navigation India", "IT services to product career India"],
   openGraph: {
-    title: "Career GPS — jobSayer",
-    description: "Personalised AI career roadmap. See your skill gaps and the fastest path to your target role.",
+    title: "Career GPS — jobSayer Career Growth",
+    description: "Navigate your career path with AI. Skill gaps, learning plan, and salary projection for your target role.",
     url: "https://jobsayer.com/career-gps",
   },
   alternates: { canonical: "https://jobsayer.com/career-gps" },

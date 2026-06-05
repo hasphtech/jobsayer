@@ -7,6 +7,8 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, ChevronRight, ExternalLink, CheckCircle2, AlertCircle } from "lucide-react";
 import AppNav from "@/components/AppNav";
+import CourseCard from "@/components/CourseCard";
+import { getCoursesForSkill } from "@/lib/courseRecommendations";
 import type { ResumeData } from "@/lib/types";
 
 /* ── Role definitions with required skills & resources ── */
@@ -540,10 +542,11 @@ export default function CareerGpsPage() {
 
                 {!have && (
                   <div style={{ marginLeft: 26 }}>
+                    {/* Free resources */}
                     <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".04em", marginBottom: 8 }}>
                       Learning resources
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 10 }}>
                       {skill.resources.map(r => (
                         <a key={r.url} href={r.url} target="_blank" rel="noopener noreferrer" style={{
                           display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -562,6 +565,22 @@ export default function CareerGpsPage() {
                         </a>
                       ))}
                     </div>
+
+                    {/* Affiliate course recommendations */}
+                    {(() => {
+                      const courses = getCoursesForSkill(skill.name, 2);
+                      if (!courses.length) return null;
+                      return (
+                        <div>
+                          <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".04em", marginBottom: 6 }}>
+                            Recommended courses
+                          </div>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                            {courses.map(c => <CourseCard key={c.affiliateUrl} course={c} compact />)}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 )}
               </div>

@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Background Verification (BGV) — Get Verified Before You Apply",
-  description: "Get your identity, education, and employment verified before job hunting. Share your jobSayer BGV badge with recruiters and skip the offer-stage delays.",
-  keywords: ["BGV India", "background verification India", "employment verification India", "education verification India", "pre-employment verification"],
+  title: "BGV — Show Up Credentialed",
+  description: "Build employer trust before they even meet you. Get identity, education, and employment verified. Share your BGV badge and skip the offer-stage delays that stall career growth.",
+  keywords: ["BGV India", "professional credentials India", "background verification career India", "verified professional India", "employer trust India"],
   openGraph: {
-    title: "Background Verification — jobSayer",
-    description: "Get verified upfront. Share your BGV badge and speed up every offer process.",
+    title: "Show Up Credentialed — jobSayer Career Growth",
+    description: "Verified identity, education, and employment. Share your BGV badge. Skip offer delays.",
     url: "https://jobsayer.com/bgv",
   },
   alternates: { canonical: "https://jobsayer.com/bgv" },

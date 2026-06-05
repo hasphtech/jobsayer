@@ -406,25 +406,25 @@ function LandingPage({ signIn }: { signIn: () => void }) {
           background: "linear-gradient(160deg, #fff 40%, rgba(255,255,255,.55) 100%)",
           WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
         }}>
-          The smartest way to land your next job
+          Build the career you deserve
         </h1>
 
         <p style={{
           fontSize: mobile ? 15 : 17, color: "var(--text3)",
-          maxWidth: 500, lineHeight: 1.75, marginBottom: 40,
+          maxWidth: 520, lineHeight: 1.75, marginBottom: 40,
         }}>
-          AI resume builder, ATS scoring, JD matching, and ghost-job detection —
-          built for the Indian job market.
+          Close skill gaps, craft a standout resume, ace every interview, and grow your
+          salary — one platform for your entire career journey in India.
         </p>
 
         {/* CTAs */}
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center", marginBottom: 18 }}>
-          <Link href="/builder" style={{
+          <Link href="/career-gps" style={{
             padding: mobile ? "13px 26px" : "14px 30px",
             background: "var(--accent)", borderRadius: 12, color: "#fff",
             fontSize: mobile ? 14 : 15, fontWeight: 700, textDecoration: "none",
             display: "inline-flex", alignItems: "center", gap: 7, letterSpacing: "-.01em",
-          }}>⚡ Build my resume — free</Link>
+          }}>🚀 Start growing — free</Link>
           <button onClick={signIn} style={{
             padding: mobile ? "13px 22px" : "14px 26px",
             background: "rgba(255,255,255,.04)", border: "1px solid var(--border)",
@@ -478,10 +478,10 @@ function LandingPage({ signIn }: { signIn: () => void }) {
         gap: mobile ? 28 : 72, flexWrap: "wrap",
       }}>
         {[
-          { val: "12,400+", label: "Resumes built",      col: "var(--accent)"  },
-          { val: "91%",     label: "ATS pass rate",      col: "var(--success)" },
-          { val: "3.2 days",label: "Avg time to match",  col: "var(--warn)"    },
-          { val: "Free",    label: "To get started",     col: "var(--text1)"   },
+          { val: "12,400+", label: "Careers growing",      col: "var(--accent)"  },
+          { val: "91%",     label: "ATS pass rate",       col: "var(--success)" },
+          { val: "40–100%", label: "Avg salary hike on switch", col: "var(--warn)" },
+          { val: "Free",    label: "Forever tier",        col: "var(--text1)"   },
         ].map(s => (
           <div key={s.label} style={{ textAlign: "center" }}>
             <div style={{ fontSize: mobile ? 22 : 28, fontWeight: 800, color: s.col, letterSpacing: "-.03em" }}>{s.val}</div>
@@ -509,9 +509,9 @@ function LandingPage({ signIn }: { signIn: () => void }) {
 
       {/* ── Testimonials ─────────────────────────────────────── */}
       <section style={{ padding: mobile ? "0 20px 56px" : "0 24px 80px", maxWidth: 960, margin: "0 auto" }}>
-        <SectionLabel>What candidates say</SectionLabel>
+        <SectionLabel>Career stories</SectionLabel>
         <h2 style={{ fontSize: mobile ? 24 : 34, fontWeight: 800, textAlign: "center", marginBottom: 36, letterSpacing: "-1px" }}>
-          Real results from real job seekers
+          Real careers, real growth
         </h2>
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3,1fr)", gap: 16 }}>
           {[
@@ -585,7 +585,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
       <section id="how" style={{ padding: mobile ? "64px 20px" : "96px 24px", maxWidth: 900, margin: "0 auto" }}>
         <SectionLabel>How it works</SectionLabel>
         <h2 style={{ fontSize: mobile ? 26 : 38, fontWeight: 800, textAlign: "center", marginBottom: 48, letterSpacing: "-1px" }}>
-          From resume to offer in 4 steps
+          Your career growth, step by step
         </h2>
         <div style={{
           display: "grid",
@@ -593,10 +593,10 @@ function LandingPage({ signIn }: { signIn: () => void }) {
           gap: mobile ? 12 : 2,
         }}>
           {[
-            { step: "01", icon: "📄", title: "Build your resume",    desc: "AI-assisted builder with ATS-ready templates. Fill once, export anywhere." },
-            { step: "02", icon: "🎯", title: "Get your Score",       desc: "4-dimension analysis: ATS, keywords, clarity, and impact — with fixes." },
-            { step: "03", icon: "💼", title: "Match to jobs",        desc: "Jobs ranked by how well your resume actually fits. No pay-to-rank." },
-            { step: "04", icon: "🧠", title: "Prep the interview",   desc: "AI mock interviews tuned to Razorpay, Flipkart, Swiggy formats." },
+            { step: "01", icon: "🧭", title: "Map your gaps",         desc: "Career GPS analyses your profile against your target role and shows the exact skills to close." },
+            { step: "02", icon: "📄", title: "Craft your story",     desc: "AI resume + cover letter with ATS-ready templates. Your career narrative, perfectly packaged." },
+            { step: "03", icon: "🎤", title: "Master every room",    desc: "Targeted interview practice on your specific gaps — not random questions. STAR feedback per answer." },
+            { step: "04", icon: "💰", title: "Grow your salary",     desc: "Know your market worth before the offer. Hike calculator and salary benchmarks by company type." },
           ].map((item, i) => (
             <div key={item.step} style={{
               padding: mobile ? "20px 18px" : "28px 20px",
@@ -618,20 +618,20 @@ function LandingPage({ signIn }: { signIn: () => void }) {
 
       {/* ── Features ─────────────────────────────────────────── */}
       <section id="features" style={{ padding: mobile ? "0 20px 64px" : "0 24px 96px", maxWidth: 960, margin: "0 auto" }}>
-        <SectionLabel>Features</SectionLabel>
+        <SectionLabel>Career growth tools</SectionLabel>
         <h2 style={{ fontSize: mobile ? 26 : 38, fontWeight: 800, textAlign: "center", marginBottom: 40, letterSpacing: "-1px" }}>
-          Built different, not just built
+          Every tool your career needs
         </h2>
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : tablet ? "1fr 1fr" : "repeat(3,1fr)", gap: 14 }}>
           {[
-            { icon: "🛡", title: "JD Trust Score",            tag: "Unique", tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Every listing rated for authenticity. Ghost jobs and fake JDs flagged before you waste time." },
-            { icon: "🎯", title: "jobSayer Score",            tag: "Core",   tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "ATS, keywords, clarity, impact — one score with specific fixes for each gap." },
-            { icon: "💼", title: "Resume-first matching",     tag: "Core",   tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "Jobs ranked by how your resume actually fits — not who paid for top placement." },
-            { icon: "📋", title: "Application Tracker",       tag: "New",    tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Kanban board to track every application — Saved, Applied, Screening, Interview, Offer." },
-            { icon: "🧠", title: "India-tuned interview prep",tag: "New",    tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "AI mock interviews for Razorpay, Flipkart, Swiggy, Infosys — company-specific questions." },
-            { icon: "🗺", title: "Career GPS",                tag: "New",    tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Set a target role. Get a personalised skill roadmap with salary bands and timelines." },
-            { icon: "💰", title: "Salary Insights",           tag: "New",    tagC: "var(--warn)",    iconBg: "rgba(234,179,8,.08)",  desc: "2025 salary ranges for 30+ Indian tech roles — P25, median, P75 with YoY growth." },
-            { icon: "⚡", title: "Honest JD Scanner",         tag: "New",    tagC: "var(--warn)",    iconBg: "rgba(234,179,8,.08)",  desc: "AI flags ghost jobs, inflated requirements, salary red flags, and your JD match % instantly." },
+            { icon: "🧭", title: "Career GPS",                tag: "Core",   tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "Map your skill gaps vs your target role. Get a prioritised learning plan with study time estimates." },
+            { icon: "🎯", title: "Career Score",              tag: "Core",   tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "ATS, keywords, clarity, impact — one score with specific fixes to maximise your market value." },
+            { icon: "🎤", title: "Skill-gap interview prep",  tag: "Core",   tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "Practice questions targeted at YOUR gaps — not random topics. STAR feedback per answer." },
+            { icon: "💰", title: "Salary intelligence",       tag: "Growth", tagC: "var(--warn)",    iconBg: "rgba(234,179,8,.08)",  desc: "Services vs product salary gap, hike calculator, and negotiation benchmarks for Indian tech." },
+            { icon: "📄", title: "Resume + cover letter AI",  tag: "Growth", tagC: "var(--warn)",    iconBg: "rgba(234,179,8,.08)",  desc: "Build a career story that passes ATS and impresses humans. 20+ templates, linked cover letters." },
+            { icon: "🛡", title: "BGV credential badge",      tag: "Trust",  tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Get identity, education, and employment verified upfront. Share your badge. Skip offer delays." },
+            { icon: "📋", title: "Pipeline tracker",          tag: "Track",  tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Track applications with ghosting detection, notice period countdowns, and follow-up generators." },
+            { icon: "⚡", title: "JD trust scanner",          tag: "Protect",tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Ghost jobs and inflated requirements flagged before you waste your time or data." },
           ].map(f => (
             <div key={f.title} style={{
               background: "var(--surface)", border: "1px solid var(--border)",
@@ -684,7 +684,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
               name: "Starter",
               price: "₹199",
               period: "/ month",
-              tagline: "For active job seekers",
+              tagline: "For ambitious professionals",
               color: "var(--accent)",
               highlight: true,
               features: [
@@ -704,7 +704,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
               name: "Pro",
               price: "₹499",
               period: "/ month",
-              tagline: "For serious career movers",
+              tagline: "For career accelerators",
               color: "#a78bfa",
               highlight: false,
               features: [
@@ -873,7 +873,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
                 <span style={{ fontSize: 14, fontWeight: 800, color: "var(--text1)" }}>jobSayer</span>
               </div>
               <p style={{ fontSize: 12, color: "var(--text3)", lineHeight: 1.6, maxWidth: 240, margin: 0 }}>
-                AI-powered resume builder and job platform built for the Indian job market.
+                India's career growth platform — from your first skill gap to your next pay rise.
               </p>
             </div>
             {/* Candidates */}

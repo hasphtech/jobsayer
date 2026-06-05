@@ -3647,23 +3647,61 @@ export default function BuilderPage() {
       <div className="no-print" style={{ display: "flex", flex: 1, overflow: "hidden" }}>
 
         {/* ══ LEFT PANEL (460px) ══════════════════════════════ */}
-        <div style={{ width: 460, flexShrink: 0, background: "var(--surface)", borderRight: "1px solid var(--border)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <div style={{ width: 460, flexShrink: 0, background: "var(--surface)", borderRight: "1px solid var(--border)", display: "flex", flexDirection: "row", overflow: "hidden" }}>
 
-          {/* Tab strip */}
-          <div style={{ display: "flex", borderBottom: "1px solid var(--border)", flexShrink: 0, padding: "0 4px" }}>
+          {/* ── Icon rail (44px) ──────────────────────────────── */}
+          <div style={{ width: 44, flexShrink: 0, borderRight: "1px solid var(--border)", display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 8, paddingBottom: 10, gap: 2, background: "var(--surface2)", overflowY: "auto", scrollbarWidth: "none" as const }}>
+            {/* Content tools */}
             {([
-              { id: "edit"      as const, icon: <Pencil size={12} />,      label: "Edit"     },
-              { id: "cover"     as const, icon: <Mail size={12} />,         label: "Cover Letter"},
-              { id: "templates" as const, icon: <Palette size={12} />,      label: "Templates"},
-              { id: "order"     as const, icon: <LayoutList size={12} />,   label: "Order"    },
-              { id: "jd"        as const, icon: <Target size={12} />,       label: "JD Match" },
-            ]).map(t => (
-              <button key={t.id} onClick={() => setLeftTab(t.id)}
-                style={{ display: "flex", alignItems: "center", gap: 5, padding: "10px 8px 9px", fontSize: 11, fontWeight: 600, color: leftTab === t.id ? "var(--accent)" : "var(--text3)", background: "none", border: "none", borderBottom: `2px solid ${leftTab === t.id ? "var(--accent)" : "transparent"}`, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" as const, marginBottom: -1, transition: "color .15s", flexShrink: 0 }}>
-                {t.icon}{t.label}
+              { id: "edit"  as const, icon: <Pencil size={15} />,    tip: "Edit sections"  },
+              { id: "cover" as const, icon: <Mail size={15} />,       tip: "Cover letter"   },
+            ] as { id: "edit"|"cover"|"templates"|"order"|"jd"; icon: React.ReactNode; tip: string }[]).map(t => (
+              <button key={t.id} onClick={() => setLeftTab(t.id)} title={t.tip}
+                style={{ width: 34, height: 34, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", flexShrink: 0, transition: "background .15s",
+                  background: leftTab === t.id ? "var(--accdim)"  : "transparent",
+                  color:      leftTab === t.id ? "var(--accent)"  : "var(--text3)" }}>
+                {t.icon}
               </button>
             ))}
+
+            {/* Divider */}
+            <div style={{ width: 22, height: 1, background: "var(--border)", margin: "4px 0", flexShrink: 0 }} />
+
+            {/* Design / match / order tools */}
+            {([
+              { id: "templates" as const, icon: <Palette size={15} />,    tip: "Templates & design", badge: undefined as string|undefined, badgeColor: undefined as string|undefined },
+              { id: "jd"        as const, icon: <Target size={15} />,      tip: "JD Match",
+                badge: jdResult ? `${jdResult.score}%` : undefined,
+                badgeColor: jdResult ? (jdResult.score >= 75 ? "var(--success)" : jdResult.score >= 50 ? "var(--warn)" : "var(--danger)") : undefined },
+              { id: "order"     as const, icon: <LayoutList size={15} />,  tip: "Section order", badge: undefined, badgeColor: undefined },
+            ]).map(t => (
+              <div key={t.id} style={{ position: "relative" as const, flexShrink: 0 }}>
+                <button onClick={() => setLeftTab(t.id)} title={t.tip}
+                  style={{ width: 34, height: 34, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", transition: "background .15s",
+                    background: leftTab === t.id ? "var(--accdim)"  : "transparent",
+                    color:      leftTab === t.id ? "var(--accent)"  : "var(--text3)" }}>
+                  {t.icon}
+                </button>
+                {t.badge && (
+                  <span style={{ position: "absolute" as const, top: 1, right: 1, fontSize: 7, fontWeight: 800, background: "var(--accent)", color: "#fff", borderRadius: 3, padding: "1px 3px", pointerEvents: "none" as const, lineHeight: 1.3 }}>
+                    {t.badge}
+                  </span>
+                )}
+              </div>
+            ))}
+
+            {/* ATS score — always visible at bottom of rail */}
+            <div style={{ marginTop: "auto" }}>
+              <button onClick={() => setStep(STEP_ATS)} title={`ATS Score: ${ats.score}`}
+                style={{ width: 34, display: "flex", flexDirection: "column" as const, alignItems: "center", gap: 2, padding: "6px 0", borderRadius: 9, border: "none", cursor: "pointer", background: step === STEP_ATS ? "var(--accdim)" : "transparent", color: ats.scoreColor }}>
+                <Activity size={15} />
+                <span style={{ fontSize: 9, fontWeight: 800, color: ats.scoreColor }}>{ats.score}</span>
+              </button>
+            </div>
           </div>
+
+          {/* ── Content panel (flex: 1 = 416px) ──────────────── */}
+          <div style={{ flex: 1, display: "flex", flexDirection: "column" as const, overflow: "hidden" }}>
 
           {/* ── EDIT TAB ──────────────────────────────────────── */}
           {leftTab === "edit" && (
@@ -4592,6 +4630,7 @@ export default function BuilderPage() {
               )}
             </div>
           )}
+          </div>{/* end content panel */}
         </div>{/* end left panel */}
 
         {/* ══ RIGHT PANEL: preview ════════════════════════════ */}

@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Salary Insights India — Tech & Product Salaries",
-  description: "Real salary data for software engineers, product managers, and designers in India. Compare by role, company, city, and experience level. Know your market worth.",
-  keywords: ["software engineer salary India", "product manager salary Bangalore", "tech salary India 2025", "salary comparison India", "IT salary India"],
+  title: "Know Your Worth — Salary Growth Intelligence India",
+  description: "Negotiate from data, not hope. IT services vs product company salary gaps, job-switch hike calculator, and 2026 salary benchmarks for 30+ Indian tech roles.",
+  keywords: ["salary negotiation India", "career salary growth India", "IT services vs product salary India", "tech salary India 2026", "salary hike calculator India", "know your worth India"],
   openGraph: {
-    title: "Salary Insights India — jobSayer",
-    description: "Real salary data by role, city, and experience. Know your market worth before your next offer.",
+    title: "Know Your Worth — jobSayer Career Growth",
+    description: "Services vs product salary gaps, hike calculator, and negotiation benchmarks for Indian tech.",
     url: "https://jobsayer.com/salary",
   },
   alternates: { canonical: "https://jobsayer.com/salary" },

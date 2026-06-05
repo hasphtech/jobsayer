@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "AI Interview Prep — Mock Interviews & Question Banks",
-  description: "Prepare for tech and product interviews with AI-powered mock interviews. Company-specific questions for Flipkart, Swiggy, Razorpay, and more. STAR method feedback.",
-  keywords: ["interview prep India", "mock interview AI", "Flipkart interview questions", "Swiggy interview prep", "product manager interview India", "software engineer interview"],
+  title: "Career Interview Prep — Master Every Room",
+  description: "Close your skill gaps through targeted interview practice. AI analyses your profile, identifies what you're missing, and drills you on exactly those gaps. Not random questions.",
+  keywords: ["career interview prep India", "skill gap interview practice", "AI mock interview India", "Flipkart interview prep", "Razorpay interview questions", "career growth interview"],
   openGraph: {
-    title: "AI Interview Prep — jobSayer",
-    description: "Company-specific mock interviews with AI feedback. Prep for India's top tech companies.",
+    title: "Master Every Room — jobSayer Career Growth",
+    description: "Skill-gap targeted interview practice. Drill what you're missing, not random questions.",
     url: "https://jobsayer.com/interview",
   },
   alternates: { canonical: "https://jobsayer.com/interview" },

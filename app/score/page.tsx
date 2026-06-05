@@ -12,6 +12,8 @@ import {
   TrendingUp, AlertTriangle, Lightbulb, CheckCircle2,
 } from "lucide-react";
 import AppNav from "@/components/AppNav";
+import CourseCard from "@/components/CourseCard";
+import { getCoursesForSkills } from "@/lib/courseRecommendations";
 import { computeScore, type ScoreResult } from "@/lib/scoreEngine";
 import { matchJd, resumeToText } from "@/lib/jdMatcher";
 import type { ResumeData } from "@/lib/types";
@@ -517,6 +519,29 @@ export default function ScorePage() {
             </div>
           </div>
         </div>
+
+        {/* ── Course recommendations for missing skills ── */}
+        {result.missingSkills.length > 0 && (() => {
+          const courses = getCoursesForSkills(result.missingSkills, 1, 4);
+          if (!courses.length) return null;
+          return (
+            <div style={{ ...card, marginBottom: 20 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>
+                📚 Courses to close your skill gaps
+              </div>
+              <p style={{ fontSize: 12, color: "var(--text3)", marginBottom: 16, lineHeight: 1.6 }}>
+                Adding these skills to your resume can increase your score significantly.
+                These courses are matched to your specific gaps.
+              </p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 10 }}>
+                {courses.map(c => <CourseCard key={c.affiliateUrl} course={c} />)}
+              </div>
+              <p style={{ fontSize: 10, color: "var(--text3)", marginTop: 10 }}>
+                Affiliate disclosure: jobSayer may earn a commission if you enroll. Price shown is approximate — check the platform for current offers.
+              </p>
+            </div>
+          );
+        })()}
 
         {/* ── CTA ── */}
         <div style={{ marginTop: 20, display: "flex", gap: 12, justifyContent: "center" }}>

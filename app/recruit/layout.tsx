@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Post Jobs & Hire Smarter — Recruiter Portal",
-  description: "Post jobs on jobSayer and get AI-matched, BGV-verified candidates. No ghost-job allowances. Founding employer pricing available for Bangalore tech companies.",
-  keywords: ["post jobs India", "hire software engineers India", "recruiter portal India", "employer job posting India", "hire developers Bangalore"],
+  title: "Hire Growth-Minded Professionals — Recruiter Portal",
+  description: "Connect with career-focused professionals on jobSayer. AI-matched, BGV-verified candidates who are actively growing their skills. No ghost jobs allowed.",
+  keywords: ["hire growth professionals India", "recruit software engineers India", "career-focused candidates India", "employer portal India", "hire developers Bangalore"],
   openGraph: {
-    title: "Hire Smarter — jobSayer Recruiter Portal",
-    description: "Post jobs, get AI-matched candidates, skip the ghosting. Verified employers only.",
+    title: "Hire Growth-Minded Talent — jobSayer",
+    description: "Reach career-focused professionals. AI-matched, BGV-verified, ghost-job free.",
     url: "https://jobsayer.com/recruit",
   },
   alternates: { canonical: "https://jobsayer.com/recruit" },

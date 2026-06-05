@@ -17,12 +17,13 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: { default: "jobSayer — AI Resume Builder & Job Portal India", template: "%s | jobSayer" },
-  description: "India's smartest job search platform. AI resume builder, ATS scoring, cover letter generator, verified job listings, interview prep, and salary insights — all free to start.",
+  title: { default: "jobSayer — Career Growth Platform for India", template: "%s | jobSayer" },
+  description: "India's career growth platform. Close skill gaps, build a standout resume, ace the interview, and grow your salary — everything your career needs, in one place.",
   keywords: [
-    "resume builder India", "AI resume builder", "ATS resume checker", "cover letter builder India",
-    "jobs in India", "interview prep India", "salary insights India", "job portal India",
-    "CV maker India", "free resume builder", "career GPS India",
+    "career growth platform India", "AI resume builder India", "career development India",
+    "interview prep India", "salary insights India", "skill gap analysis India",
+    "ATS resume checker", "cover letter builder India", "career GPS India",
+    "career advancement India", "professional growth India",
   ],
   authors: [{ name: "jobSayer", url: "https://jobsayer.com" }],
   robots: { index: true, follow: true },
@@ -31,8 +32,8 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://jobsayer.com",
     siteName: "jobSayer",
-    title: "jobSayer — AI Resume Builder & Job Portal India",
-    description: "AI resume builder, ATS scoring, cover letter generator, job listings, and interview prep — built for the Indian job market.",
+    title: "jobSayer — Career Growth Platform for India",
+    description: "Close skill gaps, build a standout resume, ace every interview, and grow your salary. India's career growth platform.",
     images: [{ url: "https://jobsayer.com/og.png", width: 1200, height: 630 }],
   },
   twitter: {
