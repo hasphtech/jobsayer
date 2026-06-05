@@ -1809,10 +1809,11 @@ export default function BuilderPage() {
         <input ref={certLogoInputRef} type="file" accept="image/*"                  style={{ display: "none" }} onChange={handleCertLogoChange} />
 
         {/* ── Mobile top bar ─────────────────────────────────── */}
-        <header style={{ height: 50, background: "var(--surface)", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", padding: "0 14px", gap: 10, flexShrink: 0, zIndex: 10 }}>
-          <a href="/" style={{ display: "flex", alignItems: "center", gap: 6, textDecoration: "none", flexShrink: 0 }}>
-            <div style={{ width: 28, height: 28, borderRadius: 8, background: "var(--text1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900, color: "var(--bg)" }}>J</div>
-            <span style={{ fontSize: 13, fontWeight: 800, color: "var(--text1)" }}>jobSayer</span>
+        <header style={{ height: 56, background: "var(--nav-bg)", backdropFilter: "blur(16px)", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", padding: "0 14px", gap: 10, flexShrink: 0, zIndex: 10 }}>
+          <a href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", flexShrink: 0 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="jobSayer" style={{ width: 24, height: 24, borderRadius: 6, objectFit: "cover" }} />
+            <span style={{ fontSize: 14, fontWeight: 800, color: "var(--text1)", letterSpacing: "-.3px" }}>jobSayer</span>
           </a>
 
           {/* ATS mini bar — clickable → ATS step */}
@@ -3569,11 +3570,12 @@ export default function BuilderPage() {
       <input ref={certLogoInputRef} type="file" accept="image/*"                  style={{ display: "none" }} onChange={handleCertLogoChange} />
 
       {/* ── Top bar ───────────────────────────────────────────── */}
-      <header className="no-print" style={{ height: 54, background: "var(--surface)", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", padding: "0 20px", gap: 14, flexShrink: 0, zIndex: 10 }}>
+      <header className="no-print" style={{ height: 56, background: "var(--nav-bg)", backdropFilter: "blur(16px)", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", padding: "0 20px", gap: 14, flexShrink: 0, zIndex: 10 }}>
 
         {/* Logo — links back to landing page */}
-        <a href="/" style={{ display: "flex", alignItems: "center", gap: 7, textDecoration: "none", flexShrink: 0 }}>
-          <div style={{ width: 30, height: 30, borderRadius: 9, background: "var(--text1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "var(--bg)" }}>J</div>
+        <a href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", flexShrink: 0 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="jobSayer" style={{ width: 24, height: 24, borderRadius: 6, objectFit: "cover" }} />
           <span style={{ fontSize: 14, fontWeight: 800, color: "var(--text1)" }}>jobSayer</span>
         </a>
 
@@ -3670,24 +3672,26 @@ export default function BuilderPage() {
             <Check size={10} style={{ color: "var(--accent)" }} /> Autosaved
           </span>
 
-          {/* Nav links — consistent with AppNav style */}
+          {/* Nav links — matches AppNav exactly */}
           <div style={{ display: "flex", gap: 1, alignItems: "center" }}>
             {[
-              { href: "/score",        label: "Score",      active: true  },
-              { href: "/jobs",         label: "Jobs",       active: false },
-              { href: "/applications", label: "Tracker",    active: false },
-              { href: "/interview",    label: "Interview",  active: false },
-              { href: "/career-gps",   label: "Career GPS", active: false },
-              { href: "/bgv",          label: "BGV",        active: false },
-              { href: "/salary",       label: "Salaries",   active: false },
+              { href: "/dashboard",    label: "Dashboard"  },
+              { href: "/score",        label: "Score"      },
+              { href: "/jobs",         label: "Jobs"       },
+              { href: "/applications", label: "Tracker"    },
+              { href: "/interview",    label: "Interview"  },
+              { href: "/career-gps",   label: "Career GPS" },
+              { href: "/salary",       label: "Salaries"   },
             ].map(l => (
               <a key={l.href} href={l.href} style={{
-                padding: "4px 10px", borderRadius: 7, fontSize: 12, fontWeight: l.active ? 700 : 400,
-                color: l.active ? "var(--accent)" : "var(--text2)",
-                background: l.active ? "var(--accdim)" : "transparent",
-                border: l.active ? "1px solid var(--accborder)" : "1px solid transparent",
+                padding: "5px 12px", borderRadius: 8, fontSize: 13, fontWeight: 400,
+                color: "var(--text2)", background: "transparent",
+                border: "2px solid transparent",
                 textDecoration: "none", whiteSpace: "nowrap", transition: "color .15s",
-              }}>
+              }}
+                onMouseEnter={e => (e.currentTarget.style.color = "var(--nav-hover-col)")}
+                onMouseLeave={e => (e.currentTarget.style.color = "var(--text2)")}
+              >
                 {l.label}
               </a>
             ))}
