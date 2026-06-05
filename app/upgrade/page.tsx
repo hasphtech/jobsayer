@@ -24,8 +24,8 @@ function loadRazorpay(): Promise<boolean> {
 }
 
 const PRICES = {
-  starter: { monthly: 199, annual: 1990 },
-  pro:     { monthly: 499, annual: 4990 },
+  starter: { monthly: 9,  annual: 84  },
+  pro:     { monthly: 19, annual: 168 },
 } as const;
 
 const FEATURES = {
@@ -36,6 +36,8 @@ const FEATURES = {
     "Shareable public link",
     "ATS score checker",
     "JD match scoring",
+    "Career Health Score",
+    "Global salary benchmarks",
   ],
   starter: [
     "5 saved resumes",
@@ -46,6 +48,10 @@ const FEATURES = {
     "JD match scoring",
     "Draft auto-save",
     "Resume upload & parse",
+    "Career GPS roadmaps",
+    "Interview prep (AI)",
+    "Career Health Score",
+    "Global salary + negotiation coach",
   ],
   pro: [
     "10 saved resumes",
@@ -53,13 +59,15 @@ const FEATURES = {
     "PDF + DOCX + JSON export",
     "Shareable public link",
     "ATS score checker",
-    "JD match scoring",
-    "AI summary writer",
-    "AI bullet rewriter",
+    "AI JD Resume Tailor",
+    "AI LinkedIn Optimizer",
+    "AI summary & bullet rewriter",
     "AI cover letter writer",
-    "AI JD tailor",
     "Draft auto-save",
     "Resume upload & parse",
+    "Career GPS + interview prep",
+    "Employer API access (50 pulls/mo)",
+    "Priority support",
   ],
 } as const;
 
@@ -286,7 +294,7 @@ export default function UpgradePage() {
             ["What happens to my resumes if I downgrade?",
               "Your saved resumes stay intact. You'll just be limited to editing 2 at a time on Free."],
             ["Is payment secure?",
-              "Payments are processed via Razorpay — a PCI DSS Level 1 certified gateway trusted by 10M+ businesses. We never store your card details."],
+              "Payments are processed via Stripe — a PCI DSS Level 1 certified gateway trusted by millions of businesses globally. We never store your card details."],
             ["Can I cancel anytime?",
               "Yes. Cancel before the next billing cycle and you won't be charged again. Access continues until the period ends."],
             ["Can I share my resume without signing up?",
@@ -300,7 +308,7 @@ export default function UpgradePage() {
         </div>
 
         <p style={{ fontSize: 11, color: "var(--text3)", marginTop: 32 }}>
-          Prices in INR. GST may apply. Questions?{" "}
+          Prices in USD. Billed in your local currency where applicable. Cancel anytime. Questions?{" "}
           <a href="mailto:hello@jobsayer.com" style={{ color: "var(--accent)" }}>hello@jobsayer.com</a>
         </p>
       </div>
@@ -363,7 +371,7 @@ function PlanCard({ name, price, interval, badge, features, cta, ctaStyle, highl
           fontSize: 38, fontWeight: 900,
           color: highlight ? "#fff" : "var(--text1)",
         }}>
-          {price === 0 ? "₹0" : `₹${price}`}
+          {price === 0 ? "$0" : `$${price}`}
         </span>
         {price > 0 && (
           <span style={{

@@ -31,6 +31,8 @@ const NAV_LINKS = [
   { href: "/jobs",           label: "Jobs",           icon: "💼" },
   { href: "/applications",   label: "Tracker",        icon: "📋" },
   { href: "/interview",      label: "Interview",      icon: "🎤" },
+  { href: "/tailor",         label: "JD Tailor",      icon: "✂️" },
+  { href: "/linkedin",       label: "LinkedIn",       icon: "💼" },
   { href: "/career-gps",     label: "Career GPS",     icon: "🧭" },
   { href: "/career-health",  label: "Health",         icon: "🏥" },
   { href: "/bgv",            label: "BGV",            icon: "🛡" },

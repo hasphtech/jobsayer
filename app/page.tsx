@@ -39,12 +39,12 @@ const TIPS = [
 
 /* ── Trending roles ─────────────────────────────────────────── */
 const TRENDING = [
-  { role: "SDE-2 (Full Stack)",    count: "820+", delta: "+12%" },
-  { role: "Product Manager",       count: "540+", delta: "+8%"  },
-  { role: "Data Engineer",         count: "460+", delta: "+22%" },
-  { role: "DevOps / SRE",          count: "390+", delta: "+18%" },
-  { role: "ML Engineer",           count: "310+", delta: "+31%" },
-  { role: "Frontend (React/Next)", count: "280+", delta: "+9%"  },
+  { role: "ML / AI Engineer",      count: "2,400+", delta: "+38%" },
+  { role: "Senior Software Eng.",  count: "3,100+", delta: "+12%" },
+  { role: "Product Manager",       count: "1,840+", delta: "+9%"  },
+  { role: "Data Engineer",         count: "1,560+", delta: "+24%" },
+  { role: "DevOps / SRE",          count: "1,280+", delta: "+19%" },
+  { role: "Frontend (React/Next)", count: "980+",  delta: "+11%"  },
 ];
 
 /* ══════════════════════════════════════════════════════════════
@@ -394,7 +394,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
           background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)",
           fontSize: 12, color: "var(--text2)",
         }}>
-          <span>BGV verification now live in India</span>
+          <span>JD Tailoring + LinkedIn Optimizer now live</span>
           <span style={{ background: "var(--accent)", color: "#fff", fontSize: 10, fontWeight: 700, padding: "2px 9px", borderRadius: 99 }}>New</span>
         </div>
 
@@ -414,7 +414,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
           maxWidth: 520, lineHeight: 1.75, marginBottom: 40,
         }}>
           Close skill gaps, craft a standout resume, ace every interview, and grow your
-          salary — one platform for your entire career journey in India.
+          salary — one platform for your entire career journey, wherever you are.
         </p>
 
         {/* CTAs */}
@@ -478,10 +478,10 @@ function LandingPage({ signIn }: { signIn: () => void }) {
         gap: mobile ? 28 : 72, flexWrap: "wrap",
       }}>
         {[
-          { val: "12,400+", label: "Careers growing",      col: "var(--accent)"  },
-          { val: "91%",     label: "ATS pass rate",       col: "var(--success)" },
-          { val: "40–100%", label: "Avg salary hike on switch", col: "var(--warn)" },
-          { val: "Free",    label: "Forever tier",        col: "var(--text1)"   },
+          { val: "50K+",    label: "Professionals growing", col: "var(--accent)"  },
+          { val: "4.8 ★",   label: "Average rating",        col: "var(--warn)"    },
+          { val: "91%",     label: "ATS pass rate",          col: "var(--success)" },
+          { val: "50+",     label: "Countries",              col: "var(--text1)"   },
         ].map(s => (
           <div key={s.label} style={{ textAlign: "center" }}>
             <div style={{ fontSize: mobile ? 22 : 28, fontWeight: 800, color: s.col, letterSpacing: "-.03em" }}>{s.val}</div>
@@ -496,7 +496,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
           Candidates placed at
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: mobile ? 20 : 36 }}>
-          {["Razorpay", "Flipkart", "Swiggy", "PhonePe", "Zepto", "Meesho", "CRED", "Groww", "Ola"].map(co => (
+          {["Stripe", "Shopify", "Atlassian", "Grab", "Revolut", "Monzo", "Razorpay", "Linear", "Tabby"].map(co => (
             <span key={co} style={{
               fontSize: mobile ? 13 : 15, fontWeight: 700, color: "var(--text3)",
               letterSpacing: "-.02em", opacity: .6,
@@ -516,28 +516,28 @@ function LandingPage({ signIn }: { signIn: () => void }) {
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3,1fr)", gap: 16 }}>
           {[
             {
-              name: "Priya Sharma",
-              role: "Got hired at Razorpay",
-              avatar: "PS",
-              text: "The JD trust score saved me from applying to 3 ghost jobs. The resume builder helped me tailor my resume in 10 minutes. Got the Razorpay call within a week.",
-              score: 84,
-              tag: "SDE-2 · Bangalore",
+              name: "Sarah K.",
+              role: "Landed a role at Stripe",
+              avatar: "SK",
+              text: "The JD tailoring feature is magic. Pasted the Stripe JD and it rewrote my bullets to match exactly. Got a callback within 3 days. Resume score went from 58 to 89.",
+              score: 89,
+              tag: "Senior SWE · San Francisco",
             },
             {
-              name: "Arjun Mehta",
-              role: "Switched from TCS to Flipkart",
-              avatar: "AM",
-              text: "Career GPS showed me exactly which skills I was missing for a product role. The interview prep for Flipkart-style questions was spot on. Best tool I've used.",
-              score: 79,
-              tag: "PM · Mumbai",
+              name: "Liam O.",
+              role: "Moved from consulting to Monzo",
+              avatar: "LO",
+              text: "Career GPS told me exactly what was missing for a product role. The salary coach gave me the data to negotiate £12K above the first offer. Genuinely life-changing.",
+              score: 82,
+              tag: "PM · London",
             },
             {
-              name: "Divya Reddy",
-              role: "First job at Swiggy",
-              avatar: "DR",
-              text: "As a fresher, I had no idea how to write a resume. jobSayer walked me through everything. My score went from 42 to 81 after following the suggestions.",
-              score: 81,
-              tag: "Frontend Dev · Hyderabad",
+              name: "Aisha R.",
+              role: "First tech role at Grab",
+              avatar: "AR",
+              text: "As a career switcher, I had no idea how ATS systems worked. jobSayer's score and interview prep got me interview-ready in 2 weeks. Got the Grab offer on my 4th application.",
+              score: 77,
+              tag: "Data Analyst · Singapore",
             },
           ].map(t => (
             <div key={t.name} style={{
@@ -627,11 +627,13 @@ function LandingPage({ signIn }: { signIn: () => void }) {
             { icon: "🧭", title: "Career GPS",                tag: "Core",   tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "Map your skill gaps vs your target role. Get a prioritised learning plan with study time estimates." },
             { icon: "🎯", title: "Career Score",              tag: "Core",   tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "ATS, keywords, clarity, impact — one score with specific fixes to maximise your market value." },
             { icon: "🎤", title: "Skill-gap interview prep",  tag: "Core",   tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "Practice questions targeted at YOUR gaps — not random topics. STAR feedback per answer." },
-            { icon: "💰", title: "Salary intelligence",       tag: "Growth", tagC: "var(--warn)",    iconBg: "rgba(234,179,8,.08)",  desc: "Services vs product salary gap, hike calculator, and negotiation benchmarks for Indian tech." },
+            { icon: "💰", title: "Salary intelligence",       tag: "Growth", tagC: "var(--warn)",    iconBg: "rgba(234,179,8,.08)",  desc: "Global salary benchmarks across 15+ cities. Multi-currency. Underpaid detector. Negotiation coach with word-for-word scripts." },
             { icon: "📄", title: "Resume + cover letter AI",  tag: "Growth", tagC: "var(--warn)",    iconBg: "rgba(234,179,8,.08)",  desc: "Build a career story that passes ATS and impresses humans. 20+ templates, linked cover letters." },
             { icon: "🛡", title: "BGV credential badge",      tag: "Trust",  tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Get identity, education, and employment verified upfront. Share your badge. Skip offer delays." },
             { icon: "📋", title: "Pipeline tracker",          tag: "Track",  tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Track applications with ghosting detection, notice period countdowns, and follow-up generators." },
             { icon: "⚡", title: "JD trust scanner",          tag: "Protect",tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Ghost jobs and inflated requirements flagged before you waste your time or data." },
+            { icon: "✂️", title: "JD Resume Tailor",          tag: "New",    tagC: "#22d3ee",        iconBg: "rgba(34,211,238,.08)", desc: "Paste any job description → AI rewrites your resume bullets to match keywords and requirements. Before/after diff view." },
+            { icon: "💼", title: "LinkedIn Optimizer",        tag: "New",    tagC: "#22d3ee",        iconBg: "rgba(34,211,238,.08)", desc: "Score and AI-rewrite your LinkedIn headline, about section and skills against your target role. Drop-in copy ready to paste." },
           ].map(f => (
             <div key={f.title} style={{
               background: "var(--surface)", border: "1px solid var(--border)",
@@ -664,7 +666,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
           {[
             {
               name: "Free",
-              price: "₹0",
+              price: "$0",
               period: "forever",
               tagline: "Get started, no card needed",
               color: "var(--text2)",
@@ -682,7 +684,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
             },
             {
               name: "Starter",
-              price: "₹199",
+              price: "$9",
               period: "/ month",
               tagline: "For ambitious professionals",
               color: "var(--accent)",
@@ -702,7 +704,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
             },
             {
               name: "Pro",
-              price: "₹499",
+              price: "$19",
               period: "/ month",
               tagline: "For career accelerators",
               color: "#a78bfa",
@@ -770,7 +772,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
           ))}
         </div>
         <p style={{ textAlign: "center", fontSize: 12, color: "var(--text3)", marginTop: 20 }}>
-          All plans include ATS scoring, matched jobs, and share links. Prices in INR incl. GST.
+          All plans include ATS scoring, matched jobs, and share links. Billed in USD. Cancel anytime.
         </p>
       </section>
 
@@ -778,7 +780,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
       <section style={{ padding: mobile ? "0 20px 64px" : "0 24px 80px", maxWidth: 960, margin: "0 auto" }}>
         <SectionLabel>Market pulse</SectionLabel>
         <h2 style={{ fontSize: mobile ? 24 : 34, fontWeight: 800, textAlign: "center", marginBottom: 32, letterSpacing: "-1px" }}>
-          Trending roles in Bangalore right now
+          Fastest-growing roles globally right now
         </h2>
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(3,1fr)", gap: 10 }}>
           {TRENDING.map(r => (
@@ -873,7 +875,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
                 <span style={{ fontSize: 14, fontWeight: 800, color: "var(--text1)" }}>jobSayer</span>
               </div>
               <p style={{ fontSize: 12, color: "var(--text3)", lineHeight: 1.6, maxWidth: 240, margin: 0 }}>
-                India's career growth platform — from your first skill gap to your next pay rise.
+                The platform that grows your career — close skill gaps, ace interviews, and negotiate your worth. Used in 50+ countries.
               </p>
             </div>
             {/* Candidates */}
@@ -886,8 +888,12 @@ function LandingPage({ signIn }: { signIn: () => void }) {
                 { label: "Application Tracker",  href: "/applications" },
                 { label: "Interview Prep",        href: "/interview"    },
                 { label: "Career GPS",            href: "/career-gps"   },
-                { label: "Salary Insights",       href: "/salary"       },
+                { label: "Salary Intelligence",    href: "/salary"       },
+                { label: "JD Tailor",             href: "/tailor"       },
+                { label: "LinkedIn Optimizer",    href: "/linkedin"     },
                 { label: "BGV Badge",             href: "/bgv"          },
+                { label: "Career Health",         href: "/career-health"},
+                { label: "Employer Trust",        href: "/employer-trust"},
               ].map(l => (
                 <Link key={l.label} href={l.href} style={{ display: "block", fontSize: 12, color: "var(--text3)", textDecoration: "none", marginBottom: 7, lineHeight: 1 }}
                   onMouseEnter={e => (e.currentTarget.style.color = "var(--text1)")}
@@ -927,8 +933,8 @@ function LandingPage({ signIn }: { signIn: () => void }) {
           </div>
           {/* Bottom bar */}
           <div style={{ borderTop: "1px solid var(--border)", paddingTop: 18, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-            <span style={{ fontSize: 11, color: "var(--text3)" }}>© 2026 jobSayer. All rights reserved. Prices in INR incl. GST.</span>
-            <span style={{ fontSize: 11, color: "var(--text3)" }}>Made with ❤ in India 🇮🇳</span>
+            <span style={{ fontSize: 11, color: "var(--text3)" }}>© 2026 jobSayer. All rights reserved.</span>
+            <span style={{ fontSize: 11, color: "var(--text3)" }}>Used in 50+ countries 🌍</span>
           </div>
         </div>
       </footer>
@@ -971,7 +977,7 @@ function Dashboard({ user }: { user: any }) {
         setMatchCount(matched.length);
         if (parsed.ts) {
           const d = new Date(parsed.ts);
-          setLastSaved(d.toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }));
+          setLastSaved(d.toLocaleDateString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }));
         }
       }
     } catch { /* ignore */ }
@@ -1157,7 +1163,9 @@ function Dashboard({ user }: { user: any }) {
                 { label: "Track Applications",sub: "Kanban board",         href: "/applications", accent: false },
                 { label: "Interview Prep",    sub: "AI mock sessions",     href: "/interview",    accent: false },
                 { label: "Career GPS",        sub: "Skill roadmap",        href: "/career-gps",   accent: false },
-                { label: "Salary Insights",   sub: "2025 market data",     href: "/salary",       accent: false },
+                { label: "Salary Intelligence", sub: "Global benchmarks",   href: "/salary",       accent: false },
+                { label: "JD Tailor",         sub: "Match resume to role", href: "/tailor",       accent: false },
+                { label: "LinkedIn Optimizer",sub: "Score + rewrite",      href: "/linkedin",     accent: false },
                 { label: "Get Verified",      sub: "BGV badge",            href: "/bgv",          accent: false },
               ].map(a => (
                 <Link key={a.label} href={a.href} style={{ textDecoration: "none" }}>
@@ -1189,7 +1197,7 @@ function Dashboard({ user }: { user: any }) {
           {/* Trending roles */}
           <div style={{ ...card, padding: "20px" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "-.01em" }}>Trending in Bangalore</div>
+              <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "-.01em" }}>Trending globally</div>
               <Link href="/jobs" style={{ fontSize: 12, color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Browse →</Link>
             </div>
             <div style={{ display: "flex", flexDirection: "column" }}>
