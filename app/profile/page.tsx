@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/auth";
 import { useResumePlan } from "@/lib/resumePlan";
 import { getSupabaseAsync } from "@/lib/auth";
 import AppNav from "@/components/AppNav";
+import type { SkillProof } from "@/lib/types";
 
 /* ── Availability types ─────────────────────────────────────── */
 type OpenToWork   = "active" | "passive" | "not_looking";
@@ -22,7 +23,17 @@ interface Availability {
   workPref:     WorkPref;
 }
 
-const AVAIL_KEY = "jobsayer-availability";
+const AVAIL_KEY  = "jobsayer-availability";
+const PROOFS_KEY = "jobsayer-skill-proofs";
+
+const PROOF_TYPE_CONFIG: Record<SkillProof["proofType"], { label: string; icon: string; placeholder: string }> = {
+  github:  { label: "GitHub",    icon: "🐙", placeholder: "https://github.com/you/project" },
+  demo:    { label: "Live Demo", icon: "🌐", placeholder: "https://your-project.vercel.app" },
+  article: { label: "Article",   icon: "✍️", placeholder: "https://medium.com/your-article" },
+  project: { label: "Project",   icon: "🚀", placeholder: "https://your-portfolio.com/project" },
+  cert:    { label: "Cert",      icon: "🎓", placeholder: "https://credly.com/badges/..." },
+  other:   { label: "Other",     icon: "🔗", placeholder: "https://..." },
+};
 
 const OTW_CONFIG: Record<OpenToWork, { label: string; color: string; bg: string; dot: string }> = {
   active:      { label: "Actively looking",  color: "var(--success)", bg: "rgba(34,197,94,.1)",  dot: "#22c55e" },
@@ -69,13 +80,39 @@ export default function ProfilePage() {
   const [deleting, setDeleting] = useState(false);
   const [avail, setAvail] = useState<Availability>({ openToWork: "active", noticePeriod: "30", workPref: "full_time" });
 
-  // Load availability from localStorage
+  // Proof of Skills state
+  const [proofs, setProofs]           = useState<SkillProof[]>([]);
+  const [proofForm, setProofForm]     = useState(false);
+  const [newSkill, setNewSkill]       = useState("");
+  const [newType, setNewType]         = useState<SkillProof["proofType"]>("github");
+  const [newUrl, setNewUrl]           = useState("");
+  const [newDesc, setNewDesc]         = useState("");
+
+  // Load availability + proofs from localStorage
   useEffect(() => {
     try {
       const raw = localStorage.getItem(AVAIL_KEY);
       if (raw) setAvail(JSON.parse(raw));
     } catch { /* ignore */ }
+    try {
+      const raw = localStorage.getItem(PROOFS_KEY);
+      if (raw) setProofs(JSON.parse(raw));
+    } catch { /* ignore */ }
   }, []);
+
+  function saveProofs(next: SkillProof[]) {
+    setProofs(next);
+    try { localStorage.setItem(PROOFS_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+  }
+  function addProof() {
+    if (!newSkill.trim() || !newUrl.trim()) return;
+    const entry: SkillProof = { id: crypto.randomUUID(), skill: newSkill.trim(), proofType: newType, url: newUrl.trim(), desc: newDesc.trim(), addedAt: new Date().toISOString() };
+    saveProofs([entry, ...proofs]);
+    setNewSkill(""); setNewUrl(""); setNewDesc(""); setProofForm(false);
+  }
+  function removeProof(id: string) {
+    saveProofs(proofs.filter(p => p.id !== id));
+  }
 
   function updateAvail(patch: Partial<Availability>) {
     setAvail(prev => {
@@ -368,6 +405,77 @@ export default function ProfilePage() {
                   }}>
                     Open
                   </Link>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ── Proof of Skills ── */}
+        <div style={{ ...card, marginBottom: 20 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)" }}>⚡ Proof of Skills</div>
+              <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 3 }}>Attach verifiable proof to each skill — GitHub repos, live demos, articles, certs.</div>
+            </div>
+            <button onClick={() => setProofForm(f => !f)} style={{ padding: "7px 16px", borderRadius: 8, background: "var(--accdim)", border: "1px solid var(--accborder)", color: "var(--accent)", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+              {proofForm ? "Cancel" : "+ Add proof"}
+            </button>
+          </div>
+
+          {/* Add form */}
+          {proofForm && (
+            <div style={{ background: "var(--surface2)", borderRadius: 12, padding: 18, border: "1px solid var(--border)", marginBottom: 16, display: "flex", flexDirection: "column", gap: 12 }}>
+              <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                <div style={{ flex: 1, minWidth: 160 }}>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 5 }}>Skill name</label>
+                  <input value={newSkill} onChange={e => setNewSkill(e.target.value)} placeholder="e.g. React, System Design"
+                    style={{ width: "100%", padding: "9px 12px", borderRadius: 8, background: "var(--surface)", border: "1px solid var(--border)", color: "var(--text1)", fontSize: 13, fontFamily: "inherit" }} />
+                </div>
+                <div style={{ flex: 1, minWidth: 140 }}>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 5 }}>Proof type</label>
+                  <select value={newType} onChange={e => setNewType(e.target.value as SkillProof["proofType"])}
+                    style={{ width: "100%", padding: "9px 12px", borderRadius: 8, background: "var(--surface)", border: "1px solid var(--border)", color: "var(--text1)", fontSize: 13, fontFamily: "inherit" }}>
+                    {(Object.entries(PROOF_TYPE_CONFIG) as [SkillProof["proofType"], typeof PROOF_TYPE_CONFIG[SkillProof["proofType"]]][]).map(([k, v]) => (
+                      <option key={k} value={k}>{v.icon} {v.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 5 }}>URL</label>
+                <input value={newUrl} onChange={e => setNewUrl(e.target.value)} placeholder={PROOF_TYPE_CONFIG[newType].placeholder}
+                  style={{ width: "100%", padding: "9px 12px", borderRadius: 8, background: "var(--surface)", border: "1px solid var(--border)", color: "var(--text1)", fontSize: 13, fontFamily: "inherit" }} />
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 5 }}>What does this prove? (optional)</label>
+                <input value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="e.g. Built a production app with 10K users using React + TypeScript"
+                  style={{ width: "100%", padding: "9px 12px", borderRadius: 8, background: "var(--surface)", border: "1px solid var(--border)", color: "var(--text1)", fontSize: 13, fontFamily: "inherit" }} />
+              </div>
+              <button onClick={addProof} disabled={!newSkill.trim() || !newUrl.trim()} style={{ padding: "9px 20px", borderRadius: 8, background: "var(--accent)", color: "#fff", border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", alignSelf: "flex-start" }}>
+                Save proof
+              </button>
+            </div>
+          )}
+
+          {proofs.length === 0 && !proofForm ? (
+            <div style={{ fontSize: 13, color: "var(--text3)", padding: "14px 0" }}>
+              No skill proofs yet. Add your first proof — it makes your profile 3× more credible to recruiters.
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {proofs.map(p => (
+                <div key={p.id} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "12px 14px", background: "var(--surface2)", borderRadius: 10, border: "1px solid var(--border)" }}>
+                  <span style={{ fontSize: 20, flexShrink: 0, marginTop: 1 }}>{PROOF_TYPE_CONFIG[p.proofType].icon}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3, flexWrap: "wrap" }}>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)" }}>{p.skill}</span>
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 99, background: "var(--accdim)", color: "var(--accent)", border: "1px solid var(--accborder)" }}>{PROOF_TYPE_CONFIG[p.proofType].label}</span>
+                    </div>
+                    {p.desc && <div style={{ fontSize: 12, color: "var(--text2)", marginBottom: 4, lineHeight: 1.5 }}>{p.desc}</div>}
+                    <a href={p.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: "var(--accent)", wordBreak: "break-all" }}>{p.url}</a>
+                  </div>
+                  <button onClick={() => removeProof(p.id)} style={{ background: "none", border: "none", color: "var(--text3)", cursor: "pointer", fontSize: 16, padding: "2px 4px", lineHeight: 1, flexShrink: 0 }} title="Remove">✕</button>
                 </div>
               ))}
             </div>

@@ -24,15 +24,17 @@ function useWidth() {
 }
 
 const NAV_LINKS = [
-  { href: "/builder",       label: "Builder",       icon: "✏️" },
-  { href: "/cover-letter",  label: "Cover Letter",  icon: "✉️" },
-  { href: "/score",         label: "Score",         icon: "🎯" },
-  { href: "/jobs",          label: "Jobs",          icon: "💼" },
-  { href: "/applications",  label: "Tracker",       icon: "📋" },
-  { href: "/interview",     label: "Interview",     icon: "🎤" },
-  { href: "/career-gps",    label: "Career GPS",    icon: "🧭" },
-  { href: "/bgv",           label: "BGV",           icon: "🛡" },
-  { href: "/salary",        label: "Salaries",      icon: "💰" },
+  { href: "/builder",        label: "Builder",        icon: "✏️" },
+  { href: "/cover-letter",   label: "Cover Letter",   icon: "✉️" },
+  { href: "/score",          label: "Score",          icon: "🎯" },
+  { href: "/jobs",           label: "Jobs",           icon: "💼" },
+  { href: "/applications",   label: "Tracker",        icon: "📋" },
+  { href: "/interview",      label: "Interview",      icon: "🎤" },
+  { href: "/career-gps",     label: "Career GPS",     icon: "🧭" },
+  { href: "/career-health",  label: "Health",         icon: "🏥" },
+  { href: "/bgv",            label: "BGV",            icon: "🛡" },
+  { href: "/salary",         label: "Salaries",       icon: "💰" },
+  { href: "/employer-trust", label: "Employer Trust", icon: "⭐" },
 ];
 
 export default function AppNav({ actions }: { actions?: React.ReactNode }) {

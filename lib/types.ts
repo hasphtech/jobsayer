@@ -57,6 +57,15 @@ export interface AwardEntry {
   desc: string;
 }
 
+export interface SkillProof {
+  id:        string;
+  skill:     string;            // e.g. "React", "System Design"
+  proofType: "github" | "demo" | "article" | "project" | "cert" | "other";
+  url:       string;
+  desc:      string;            // 1-2 line description of what it proves
+  addedAt:   string;            // ISO date
+}
+
 export interface CustomSection {
   id: string;
   title: string;    // e.g. "Volunteer Work", "Publications"
