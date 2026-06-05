@@ -272,13 +272,14 @@ const MAIN_STEPS = [
   { key: "awards",           label: "Awards",        icon: <Award size={13} />,         subtitle: "Honours & achievements" },
   { key: "interests",        label: "Interests",     icon: <Heart size={13} />,         subtitle: "Hobbies & interests" },
   { key: "references",       label: "References",    icon: <User size={13} />,          subtitle: "Optional" },
+  { key: "__declaration",    label: "Declaration",   icon: <AlignJustify size={13} />,  subtitle: "India-specific · Optional" },
 ];
-const STEP_STYLE    = 11;
-const STEP_ATS      = 12;
-const STEP_JD       = 13;
-const STEP_TEMPLATE = 14;
-const STEP_MODE     = 15;
-const STEP_REORDER  = 16;
+const STEP_STYLE    = 12;
+const STEP_ATS      = 13;
+const STEP_JD       = 14;
+const STEP_TEMPLATE = 15;
+const STEP_MODE     = 16;
+const STEP_REORDER  = 17;
 const TOTAL_MAIN = MAIN_STEPS.length;
 
 /* ── Mode config ─────────────────────────────────────────────── */
@@ -286,8 +287,8 @@ type BuilderMode = "fresher" | "experienced";
 
 // Step indices: 0=Profile 1=Summary 2=Work 3=Education 4=Skills 5=Projects 6=Certs 7=Languages 8=Awards 9=Interests 10=References
 const MODE_STEP_ORDER: Record<BuilderMode, number[]> = {
-  experienced: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-  fresher:     [0, 1, 3, 5, 4, 2, 6, 7, 8, 9, 10],
+  experienced: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+  fresher:     [0, 1, 3, 5, 4, 2, 6, 7, 8, 9, 10, 11],
 };
 
 const MODE_LABEL_OVERRIDES: Record<BuilderMode, Partial<Record<number, string>>> = {
@@ -307,6 +308,8 @@ const MODE_KEY_STEPS: Record<BuilderMode, number[]> = {
 };
 
 /* ── Blank / Sample ──────────────────────────────────────── */
+const DEFAULT_DECLARATION = "I hereby declare that the information provided above is true and correct to the best of my knowledge and belief. I take responsibility for the accuracy of the details furnished.";
+
 const BLANK: ResumeData = {
   name: "", title: "", email: "", phone: "", location: "", website: "",
   linkedin: "", github: "",
@@ -320,6 +323,7 @@ const BLANK: ResumeData = {
   awards: [],
   interests: "",
   references: [],
+  declaration: "",
 };
 
 const SAMPLE: ResumeData = {
@@ -719,6 +723,8 @@ function stepSubtitle(key: string, data: ResumeData): string {
       const n = (data.references ?? []).filter(r => r.name).length;
       return n > 0 ? `${n} ${n === 1 ? "reference" : "references"}` : "Optional";
     }
+    case "__declaration":
+      return data.declaration?.trim() ? "Added" : "Optional";
     default: return "";
   }
 }
@@ -735,8 +741,9 @@ function isDone(key: string, data: ResumeData): boolean {
     case "languages":      return (data.languages ?? []).some(l => l.name);
     case "awards":         return (data.awards ?? []).some(a => a.title);
     case "interests":      return !!(data.interests?.trim());
-    case "references":     return (data.references ?? []).some(r => r.name);
-    default:               return false;
+    case "references":       return (data.references ?? []).some(r => r.name);
+    case "__declaration":    return !!(data.declaration?.trim());
+    default:                 return false;
   }
 }
 
@@ -2769,6 +2776,45 @@ export default function BuilderPage() {
           );
         })()}
         <InlineAtsHint value={atsSkills(data).count} max={8} unit="skills" label="aim for 8+" />
+
+        {/* Keyword density breakdown */}
+        {data.skills?.trim() && (() => {
+          const list = data.skills.split(",").map(s => s.trim()).filter(Boolean);
+          const TECH_LANGS = /\b(java|python|go|rust|c\+\+|c#|ruby|kotlin|swift|scala|r\b|php|perl)\b/i;
+          const FRAMEWORKS = /\b(react|angular|vue|next|node|express|spring|django|flask|fastapi|rails|laravel|flutter|svelte)\b/i;
+          const INFRA      = /\b(aws|gcp|azure|docker|kubernetes|k8s|terraform|ci.?cd|jenkins|github.actions|linux|nginx|redis|kafka|rabbitmq)\b/i;
+          const DATABASES  = /\b(sql|postgres|mysql|mongodb|dynamodb|elasticsearch|sqlite|oracle|snowflake|bigquery)\b/i;
+          const SOFT       = /\b(leadership|communication|teamwork|problem.solving|agile|scrum|kanban|product|management|strategy|cross.functional)\b/i;
+
+          const cats = [
+            { label: "Languages",   color: "#6366f1", items: list.filter(s => TECH_LANGS.test(s)) },
+            { label: "Frameworks",  color: "#0891b2", items: list.filter(s => FRAMEWORKS.test(s)) },
+            { label: "Infra/Cloud", color: "#16a34a", items: list.filter(s => INFRA.test(s))      },
+            { label: "Databases",   color: "#d97706", items: list.filter(s => DATABASES.test(s))  },
+            { label: "Soft Skills", color: "#9333ea", items: list.filter(s => SOFT.test(s))       },
+          ].filter(c => c.items.length > 0);
+
+          if (!cats.length) return null;
+          return (
+            <div style={{ background: "var(--surface2)", borderRadius: 9, padding: "10px 12px", border: "1px solid var(--border)" }}>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase" as const, letterSpacing: ".05em", marginBottom: 8 }}>
+                Keyword coverage
+              </div>
+              <div style={{ display: "flex", flexDirection: "column" as const, gap: 5 }}>
+                {cats.map(c => (
+                  <div key={c.label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: 10, fontWeight: 600, color: c.color, minWidth: 68 }}>{c.label}</span>
+                    <div style={{ flex: 1, height: 5, background: "rgba(255,255,255,.08)", borderRadius: 99, overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: `${Math.min((c.items.length / 5) * 100, 100)}%`, background: c.color, borderRadius: 99, opacity: .8 }} />
+                    </div>
+                    <span style={{ fontSize: 10, color: "var(--text3)", minWidth: 16, textAlign: "right" as const }}>{c.items.length}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
         <SectionAtsBar label="Skills" score={atsSkills(data).score} max={15}
           hints={atsSkills(data).count === 0 ? ["Add comma-separated skills"] :
                  atsSkills(data).count < 5   ? [`Add ${5 - atsSkills(data).count} more for partial credit`] :
@@ -2972,6 +3018,51 @@ export default function BuilderPage() {
           </EntryCard>
         ))}
         <AddBtn onClick={() => set("references", [...(data.references ?? []), { id: uid(), name: "", title: "", company: "", email: "", phone: "" }])} label="Add Reference" />
+      </div>
+    );
+
+    /* ── Declaration (India-specific) ──────── */
+    if (key === "references" && false) { /* handled above */ }
+
+    if (key === "__declaration") return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 14, maxWidth: "100%" }}>
+        <div>
+          <div style={styles.stepLabel}>Optional · India-specific</div>
+          <div style={styles.stepTitle}>Declaration</div>
+          <div style={styles.stepSub}>Standard in Indian resumes. Confirms all information is true. Leave blank to omit from the resume.</div>
+        </div>
+        <div style={{ padding: "10px 14px", background: "var(--accdim)", border: "1px solid var(--accborder)", borderRadius: 9, fontSize: 12, color: "var(--text2)", lineHeight: 1.6 }}>
+          💡 Most Indian companies expect a declaration. It adds credibility and is required by some recruiters.
+        </div>
+        <div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+            <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase" as const, letterSpacing: ".04em" }}>Declaration text</label>
+            {!data.declaration?.trim() && (
+              <button onClick={() => set("declaration", DEFAULT_DECLARATION)}
+                style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", border: "1px solid var(--accborder)", borderRadius: 6, padding: "3px 9px", cursor: "pointer", fontFamily: "inherit" }}>
+                Use standard text
+              </button>
+            )}
+            {data.declaration?.trim() && (
+              <button onClick={() => set("declaration", "")}
+                style={{ fontSize: 10, fontWeight: 600, color: "var(--danger)", background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.2)", borderRadius: 6, padding: "3px 9px", cursor: "pointer", fontFamily: "inherit" }}>
+                Remove
+              </button>
+            )}
+          </div>
+          <textarea
+            value={data.declaration ?? ""}
+            onChange={e => set("declaration", e.target.value)}
+            placeholder="I hereby declare that the information provided above is true and correct to the best of my knowledge…"
+            rows={4}
+            style={{ width: "100%", padding: "10px 13px", borderRadius: 9, border: "1px solid var(--border)", background: "var(--surface2)", color: "var(--text1)", fontSize: 13, fontFamily: "inherit", resize: "vertical" as const, lineHeight: 1.6, boxSizing: "border-box" as const }}
+          />
+        </div>
+        <div style={{ fontSize: 12, color: "var(--text3)", display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ color: data.declaration?.trim() ? "var(--success)" : "var(--text3)" }}>
+            {data.declaration?.trim() ? "✓ Will appear at end of resume" : "○ Leave blank to omit"}
+          </span>
+        </div>
       </div>
     );
 
@@ -3705,7 +3796,37 @@ export default function BuilderPage() {
 
           {/* ── EDIT TAB ──────────────────────────────────────── */}
           {leftTab === "edit" && (
-            <div style={{ flex: 1, overflowY: "auto", paddingTop: 10 }}>
+            <div style={{ flex: 1, overflowY: "auto", paddingTop: 0, display: "flex", flexDirection: "column" as const }}>
+
+              {/* ── Completeness meter ─────────────────────────── */}
+              <div style={{ flexShrink: 0, padding: "8px 12px 6px", borderBottom: "1px solid var(--border)", background: "var(--surface)" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 5 }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase" as const, letterSpacing: ".05em" }}>
+                    Resume completeness
+                  </span>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: progressPct >= 80 ? "var(--success)" : progressPct >= 50 ? "var(--warn)" : "var(--text3)" }}>
+                    {completedCount}/{TOTAL_MAIN} · {progressPct}%
+                  </span>
+                </div>
+                <div style={{ height: 4, background: "var(--surface2)", borderRadius: 99, overflow: "hidden" }}>
+                  <div style={{
+                    height: "100%", borderRadius: 99, transition: "width .4s ease",
+                    width: `${progressPct}%`,
+                    background: progressPct >= 80 ? "var(--success)" : progressPct >= 50 ? "var(--warn)" : "var(--accent)",
+                  }} />
+                </div>
+                {progressPct < 100 && (
+                  <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 4 }}>
+                    {progressPct >= 80
+                      ? "Almost there — fill the remaining sections"
+                      : progressPct >= 50
+                      ? "Good start — keep adding sections for a stronger resume"
+                      : "Fill key sections to boost your ATS score"}
+                  </div>
+                )}
+              </div>
+
+              <div style={{ flex: 1, overflowY: "auto" as const, paddingTop: 10 }}>
 
               {/* ── ATS full-panel view (replaces accordion when ATS score clicked) ── */}
               {step === STEP_ATS ? (
@@ -4001,6 +4122,7 @@ export default function BuilderPage() {
                 </button>
               </div>
             </>)}
+              </div>{/* end inner scroll */}
             </div>
           )}
 

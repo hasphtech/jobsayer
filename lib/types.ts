@@ -84,4 +84,5 @@ export interface ResumeData {
   interests: string;          // comma-separated hobbies / interests
   references: ReferenceEntry[];
   customSections?: CustomSection[];  // user-defined extra sections
+  declaration?: string;              // India-specific declaration at end of resume
 }

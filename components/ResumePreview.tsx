@@ -322,6 +322,24 @@ function ExtraSections({ data, accent, dark = false }: { data: ResumeData; accen
           ))}
         </section>
       ))}
+      {data.declaration?.trim() && (
+        <section style={{ marginBottom: 20 }}>
+          <SecTitle label="Declaration" accent={accent} />
+          <p style={{ fontSize: 11, color: text2, lineHeight: 1.6, marginBottom: 8 }}>
+            {data.declaration}
+          </p>
+          <div style={{ marginTop: 14, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+            <div>
+              <p style={{ fontSize: 10, color: text3, marginBottom: 2 }}>Place: _____________</p>
+              <p style={{ fontSize: 10, color: text3 }}>Date: _____________</p>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <div style={{ borderTop: `1px solid ${text3}`, width: 100, marginBottom: 3 }} />
+              <p style={{ fontSize: 10, color: text3 }}>Signature</p>
+            </div>
+          </div>
+        </section>
+      )}
     </>
   );
 }
