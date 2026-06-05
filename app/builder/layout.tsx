@@ -2,20 +2,20 @@ import type { Metadata } from "next";
 import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "Free AI Resume Builder India — ATS-Friendly Templates | jobSayer",
+  title: "Free AI Resume Builder — ATS-Friendly Templates | jobSayer",
   description:
-    "Build a job-winning resume in minutes with AI. 20+ ATS-friendly templates optimised for Naukri, Workday & Taleo. PDF & DOCX export, real-time ATS score, JD matching. Free for Indian professionals.",
+    "Build a job-winning resume in minutes with AI. 20+ ATS-friendly templates for Workday, Taleo, Greenhouse & Lever. PDF & DOCX export, real-time ATS score, JD tailoring. Free to start — used by professionals in 50+ countries.",
   keywords: [
-    "free resume builder India",
-    "AI resume builder India",
+    "free AI resume builder",
     "ATS friendly resume builder",
-    "resume builder for freshers India",
-    "CV maker India free",
-    "online resume builder India",
-    "professional resume templates India",
-    "Naukri resume builder",
+    "resume builder online free",
+    "CV maker free",
+    "professional resume templates",
+    "ATS resume checker",
     "resume with ATS score",
-    "resume builder PDF download India",
+    "resume builder PDF download",
+    "job description resume tailoring",
+    "AI cover letter generator",
   ],
   authors: [{ name: "jobSayer", url: "https://jobsayer.com" }],
   robots: { index: true, follow: true },
@@ -23,24 +23,24 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "jobSayer",
-    title: "Free AI Resume Builder — ATS-Friendly | jobSayer India",
+    title: "Free AI Resume Builder — ATS-Friendly | jobSayer",
     description:
-      "Create a professional, ATS-ready resume in minutes. 20+ templates, real-time ATS score, JD matching, and PDF/DOCX export. Free to start.",
+      "Create a professional, ATS-ready resume in minutes. 20+ templates, real-time ATS score, JD tailoring, and PDF/DOCX export. Free to start.",
     url: "https://jobsayer.com/builder",
     images: [
       {
         url: "https://jobsayer.com/og.png",
         width: 1200,
         height: 630,
-        alt: "jobSayer Resume Builder — Free AI Resume Builder India",
+        alt: "jobSayer Resume Builder — Free AI Resume Builder",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Free AI Resume Builder India — jobSayer",
+    title: "Free AI Resume Builder — jobSayer",
     description:
-      "Build an ATS-ready resume in minutes. 20+ templates, real-time score, PDF export. Free.",
+      "Build an ATS-ready resume in minutes. 20+ templates, real-time score, JD tailoring, PDF export. Free.",
     images: ["https://jobsayer.com/og.png"],
     site: "@jobsayer",
   },
@@ -56,25 +56,25 @@ const softwareAppSchema = {
   "operatingSystem": "Web",
   "url": "https://jobsayer.com/builder",
   "description":
-    "Free AI-powered resume builder for Indian professionals. Create ATS-friendly resumes with 20+ templates, get a real-time ATS score, match against job descriptions, and export as PDF or DOCX.",
+    "Free AI-powered resume builder for professionals worldwide. Create ATS-friendly resumes with 20+ templates, get a real-time ATS score, match against job descriptions, and export as PDF or DOCX.",
   "screenshot": "https://jobsayer.com/og.png",
   "featureList": [
     "AI-powered content suggestions",
     "20+ ATS-ready templates",
-    "Real-time ATS score across Naukri, Workday, and Taleo",
+    "Real-time ATS score across Workday, Taleo, Greenhouse, and Lever",
     "JD keyword matching",
     "PDF and DOCX export",
     "Fresher and experienced mode",
     "Cover letter builder",
     "Cloud save with version history",
     "Skill gap analysis",
-    "India-specific resume formats including Declaration section",
+    "Standard and regional resume formats",
   ],
   "offers": {
     "@type": "Offer",
     "price": "0",
-    "priceCurrency": "INR",
-    "description": "Free tier available. Starter plan from ₹199/month.",
+    "priceCurrency": "USD",
+    "description": "Free tier available. Starter plan from $9/month.",
   },
   "aggregateRating": {
     "@type": "AggregateRating",
@@ -99,15 +99,15 @@ const faqSchema = {
       "name": "Is jobSayer's resume builder free?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. The free tier lets you build, preview, and export your resume as PDF with 4 basic templates and 1 cloud save. Paid plans (from ₹199/month) unlock all 20+ templates, DOCX export, AI writing, and multiple saves.",
+        "text": "Yes. The free tier lets you build, preview, and export your resume as PDF with 4 basic templates and 1 cloud save. Paid plans (from $9/month) unlock all 20+ templates, DOCX export, AI writing, and multiple saves.",
       },
     },
     {
       "@type": "Question",
-      "name": "Is the resume ATS-friendly for Naukri and Workday?",
+      "name": "Is the resume ATS-friendly for Workday and Greenhouse?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. jobSayer shows a live ATS score broken down by platform — Naukri RMS (needs 75+), Workday (needs 80+), Taleo, and Greenhouse/Lever. Each section has specific improvement hints to maximise your score on the platforms used by your target company.",
+        "text": "Yes. jobSayer shows a live ATS score broken down by platform — Workday (needs 80+), Taleo, Greenhouse, and Lever. Each section has specific improvement hints to maximise your score on the platforms used by your target company.",
       },
     },
     {
@@ -120,18 +120,18 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      "name": "Does the resume builder support DOCX format for Naukri upload?",
+      "name": "Does the resume builder support DOCX format?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. DOCX export is available on the Starter and Pro plans. Indian ATS platforms like Naukri RMS parse DOCX better than PDF, so the builder flags this and recommends DOCX for portal submissions.",
+        "text": "Yes. DOCX export is available on the Starter and Pro plans. Many ATS platforms parse DOCX better than PDF, so the builder flags this and recommends the best format based on your target platform.",
       },
     },
     {
       "@type": "Question",
-      "name": "Does the resume builder include a Declaration section for Indian resumes?",
+      "name": "Does the resume builder support regional resume formats?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. The builder includes an optional Declaration section — standard in Indian resumes — with a pre-filled template ('I hereby declare that the information provided is true and correct to the best of my knowledge'). You can customise or leave it blank.",
+        "text": "Yes. The builder supports region-specific formats including optional Declaration sections, varied date formats, and layout conventions common in different markets. You can enable or disable each section as needed.",
       },
     },
     {

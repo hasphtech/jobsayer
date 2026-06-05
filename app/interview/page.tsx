@@ -14,6 +14,7 @@ import AppNav from "@/components/AppNav";
 import CourseCard from "@/components/CourseCard";
 import { getCoursesForSkill } from "@/lib/courseRecommendations";
 import type { ResumeData } from "@/lib/types";
+import { trackAction } from "@/lib/activityTracker";
 
 /* ── Types ───────────────────────────────────────────────── */
 type Stage = "profile" | "analyzing" | "gaps" | "loading_q" | "practice" | "results";
@@ -197,6 +198,7 @@ export default function InterviewPage() {
   /* ── Finish practice ── */
   function finishPractice() {
     setPracticedGaps(p => new Set([...p, focusSkill]));
+    trackAction("interview_practiced");
     setStage("results");
   }
 

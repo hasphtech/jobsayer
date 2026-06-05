@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Know Your Worth — Salary Growth Intelligence India",
-  description: "Negotiate from data, not hope. IT services vs product company salary gaps, job-switch hike calculator, and 2026 salary benchmarks for 30+ Indian tech roles.",
-  keywords: ["salary negotiation India", "career salary growth India", "IT services vs product salary India", "tech salary India 2026", "salary hike calculator India", "know your worth India"],
+  title: "Global Salary Intelligence — Know Your Worth | jobSayer",
+  description: "Real salary data across North America, Europe, Asia Pacific and the Middle East. Multi-currency benchmarks, underpaid detector, and AI negotiation coach with word-for-word scripts.",
+  keywords: ["global salary data", "salary negotiation coach", "tech salary benchmark", "am I underpaid", "salary by country", "software engineer salary", "negotiation scripts", "salary intelligence"],
   openGraph: {
-    title: "Know Your Worth — jobSayer Career Growth",
-    description: "Services vs product salary gaps, hike calculator, and negotiation benchmarks for Indian tech.",
+    title: "Global Salary Intelligence — jobSayer",
+    description: "Benchmark your salary globally, find out if you're underpaid, and negotiate with data-backed scripts.",
     url: "https://jobsayer.com/salary",
   },
   alternates: { canonical: "https://jobsayer.com/salary" },

@@ -78,6 +78,8 @@ export default function ProfilePage() {
   const [bgv, setBgv] = useState<BgvStatus | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [discoverable, setDiscoverable] = useState(false);
+  const [discoverableSaving, setDiscoverableSaving] = useState(false);
   const [avail, setAvail] = useState<Availability>({ openToWork: "active", noticePeriod: "30", workPref: "full_time" });
 
   // Proof of Skills state
@@ -114,6 +116,20 @@ export default function ProfilePage() {
     saveProofs(proofs.filter(p => p.id !== id));
   }
 
+  async function toggleDiscoverable() {
+    if (!user) return;
+    const next = !discoverable;
+    setDiscoverableSaving(true);
+    try {
+      const sb = await getSupabaseAsync();
+      await sb.from("resume_saves")
+        .update({ discoverable: next, discoverable_updated: new Date().toISOString() })
+        .eq("user_id", user.id);
+      setDiscoverable(next);
+    } catch { /* ignore */ }
+    setDiscoverableSaving(false);
+  }
+
   function updateAvail(patch: Partial<Availability>) {
     setAvail(prev => {
       const next = { ...prev, ...patch };
@@ -144,6 +160,19 @@ export default function ProfilePage() {
     })();
     // Load BGV status
     fetch("/api/bgv/status").then(r => r.json()).then(d => { if (d.bgv) setBgv(d.bgv); }).catch(() => {});
+    // Load discoverable setting from Supabase
+    (async () => {
+      try {
+        const sb = await getSupabaseAsync();
+        const { data } = await sb.from("resume_saves")
+          .select("discoverable")
+          .eq("user_id", user.id)
+          .order("updated_at", { ascending: false })
+          .limit(1)
+          .single();
+        if (data) setDiscoverable(data.discoverable ?? false);
+      } catch { /* column may not exist yet pre-migration */ }
+    })();
   }, [user]);
 
   async function handleDeleteAccount() {
@@ -409,6 +438,43 @@ export default function ProfilePage() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* ── Employer Discoverability (opt-in) ── */}
+        <div style={{ ...card, marginBottom: 20, borderColor: discoverable ? "rgba(34,197,94,.3)" : "var(--border)" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)" }}>🔍 Employer Discoverability</div>
+                <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 99,
+                  background: discoverable ? "rgba(34,197,94,.1)" : "var(--surface2)",
+                  color: discoverable ? "var(--success)" : "var(--text3)",
+                  border: `1px solid ${discoverable ? "rgba(34,197,94,.25)" : "var(--border)"}`,
+                }}>
+                  {discoverable ? "Visible to employers" : "Private"}
+                </span>
+              </div>
+              <p style={{ fontSize: 12, color: "var(--text3)", lineHeight: 1.6, maxWidth: 480 }}>
+                When enabled, verified employers using the jobSayer API can discover your profile (skills, title, experience, location).
+                Your <strong style={{ color: "var(--text2)" }}>email and phone are never shared</strong> without your explicit approval.
+                You can turn this off at any time.
+              </p>
+            </div>
+            <button
+              onClick={toggleDiscoverable}
+              disabled={discoverableSaving}
+              style={{
+                flexShrink: 0, padding: "10px 20px", borderRadius: 10,
+                background: discoverable ? "rgba(34,197,94,.1)" : "var(--accdim)",
+                border: `1px solid ${discoverable ? "rgba(34,197,94,.3)" : "var(--accborder)"}`,
+                color: discoverable ? "var(--success)" : "var(--accent)",
+                fontSize: 13, fontWeight: 700, cursor: discoverableSaving ? "not-allowed" : "pointer",
+                opacity: discoverableSaving ? 0.6 : 1, fontFamily: "inherit",
+              }}
+            >
+              {discoverableSaving ? "Saving…" : discoverable ? "✓ Visible — Turn off" : "Enable visibility"}
+            </button>
+          </div>
         </div>
 
         {/* ── Proof of Skills ── */}

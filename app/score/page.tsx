@@ -17,6 +17,7 @@ import { getCoursesForSkills } from "@/lib/courseRecommendations";
 import { computeScore, type ScoreResult } from "@/lib/scoreEngine";
 import { matchJd, resumeToText } from "@/lib/jdMatcher";
 import type { ResumeData } from "@/lib/types";
+import { trackAction, recordScore } from "@/lib/activityTracker";
 
 /* ── JD Match Panel ────────────────────────────────────────────── */
 function JdMatchPanel({ resumeText }: { resumeText: string }) {
@@ -249,6 +250,9 @@ export default function ScorePage() {
         setResumeData(data);
         setResumeText(resumeToText(data));
         if (data.name) setResumeName(`${data.name}'s resume`);
+        // Track XP + record score snapshot for dashboard
+        trackAction("resume_scored", 60);
+        recordScore(computed.total);
       }
     } catch { /* ignore */ }
     setLoading(false);

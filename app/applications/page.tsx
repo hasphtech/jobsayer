@@ -8,6 +8,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import AppNav from "@/components/AppNav";
 import { useAuth } from "@/lib/auth";
 import { Plus, Trash2, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
+import { trackAction } from "@/lib/activityTracker";
 
 /* ── Types ──────────────────────────────────────────────────── */
 type Stage = "saved" | "applied" | "screening" | "interview" | "offer" | "rejected";
@@ -396,7 +397,11 @@ export default function ApplicationsPage() {
   function addApp(app: Application)    { persist([app, ...apps]); setModal(null); }
   function editApp(app: Application)   { persist(apps.map(a => a.id === app.id ? app : a)); setModal(null); }
   function deleteApp(id: string)       { persist(apps.filter(a => a.id !== id)); }
-  function moveStage(id: string, s: Stage) { persist(apps.map(a => a.id === id ? { ...a, stage: s, updatedAt: new Date().toISOString() } : a)); }
+  function moveStage(id: string, s: Stage) {
+    const prev = apps.find(a => a.id === id);
+    if (prev && prev.stage !== "applied" && s === "applied") trackAction("job_applied");
+    persist(apps.map(a => a.id === id ? { ...a, stage: s, updatedAt: new Date().toISOString() } : a));
+  }
 
   const filtered = apps
     .filter(a => filterStage === "all" || a.stage === filterStage)

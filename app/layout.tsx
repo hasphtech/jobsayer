@@ -17,13 +17,14 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: { default: "jobSayer — Career Growth Platform for India", template: "%s | jobSayer" },
-  description: "India's career growth platform. Close skill gaps, build a standout resume, ace the interview, and grow your salary — everything your career needs, in one place.",
+  title: { default: "jobSayer — Global Career Growth Platform", template: "%s | jobSayer" },
+  description: "The platform that grows your career — globally. Close skill gaps, build a standout resume, ace interviews, negotiate salary, and track your progress. Used by professionals in 50+ countries.",
   keywords: [
-    "career growth platform India", "AI resume builder India", "career development India",
-    "interview prep India", "salary insights India", "skill gap analysis India",
-    "ATS resume checker", "cover letter builder India", "career GPS India",
-    "career advancement India", "professional growth India",
+    "career growth platform", "AI resume builder", "global career development",
+    "interview prep", "salary negotiation", "skill gap analysis",
+    "ATS resume checker", "cover letter builder", "career GPS",
+    "career advancement", "professional growth", "job search tools",
+    "resume tailoring", "LinkedIn optimizer", "career health score",
   ],
   authors: [{ name: "jobSayer", url: "https://jobsayer.com" }],
   robots: { index: true, follow: true },
@@ -32,14 +33,14 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://jobsayer.com",
     siteName: "jobSayer",
-    title: "jobSayer — Career Growth Platform for India",
-    description: "Close skill gaps, build a standout resume, ace every interview, and grow your salary. India's career growth platform.",
+    title: "jobSayer — The Platform That Grows Your Career",
+    description: "Close skill gaps, build a standout resume, ace every interview, and negotiate your worth — all in one place. Trusted by professionals worldwide.",
     images: [{ url: "https://jobsayer.com/og.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "jobSayer — AI Resume Builder & Job Portal India",
-    description: "Build professional resumes with AI assistance.",
+    title: "jobSayer — AI Career Growth Platform",
+    description: "Resume builder, salary intelligence, interview prep, career health score and more. Used by 50K+ professionals globally.",
   },
   icons: {
     icon: [

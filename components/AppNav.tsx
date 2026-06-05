@@ -24,6 +24,7 @@ function useWidth() {
 }
 
 const NAV_LINKS = [
+  { href: "/dashboard",      label: "Dashboard",      icon: "📊" },
   { href: "/builder",        label: "Builder",        icon: "✏️" },
   { href: "/cover-letter",   label: "Cover Letter",   icon: "✉️" },
   { href: "/score",          label: "Score",          icon: "🎯" },
@@ -34,7 +35,7 @@ const NAV_LINKS = [
   { href: "/career-health",  label: "Health",         icon: "🏥" },
   { href: "/bgv",            label: "BGV",            icon: "🛡" },
   { href: "/salary",         label: "Salaries",       icon: "💰" },
-  { href: "/employer-trust", label: "Employer Trust", icon: "⭐" },
+  { href: "/employer-trust", label: "Trust",          icon: "⭐" },
 ];
 
 export default function AppNav({ actions }: { actions?: React.ReactNode }) {

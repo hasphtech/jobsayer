@@ -8,6 +8,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import AppNav from "@/components/AppNav";
 import type { ResumeData } from "@/lib/types";
+import { trackAction } from "@/lib/activityTracker";
 
 /* ── Scoring engine ──────────────────────────────────────────── */
 interface HealthDimension {
@@ -257,6 +258,7 @@ export default function CareerHealthPage() {
 
   function handleCheckin() {
     recordCheckin();
+    trackAction("career_health_checked", 480); // once per 8h
     const { current } = getStreak();
     setStreak(current);
     setCheckedIn(true);

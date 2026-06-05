@@ -16,6 +16,7 @@ import {
   type ResumeRecord, type CoverLetterRecord,
 } from "@/lib/resumeDb";
 import type { ResumeData } from "@/lib/types";
+import { trackAction } from "@/lib/activityTracker";
 
 /* ── Types ────────────────────────────────────────────────── */
 type Tone   = "professional" | "enthusiastic" | "concise";
@@ -144,6 +145,7 @@ export default function CoverLetterPage() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Generation failed");
       setLetter(json.letter);
+      trackAction("cover_letter_generated", 30);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
     } finally {

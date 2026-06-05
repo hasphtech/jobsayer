@@ -3,9 +3,10 @@
  * /salary — Global Salary Intelligence + Negotiation Coach
  * Multi-currency (USD/EUR/GBP/SGD/AED/INR), global cities, AI negotiation coach.
  */
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import AppNav from "@/components/AppNav";
 import Link from "next/link";
+import { trackAction } from "@/lib/activityTracker";
 
 /* ── Currency config ─────────────────────────────────────────── */
 type Currency = "USD" | "EUR" | "GBP" | "SGD" | "AED" | "INR";
@@ -146,6 +147,9 @@ export default function SalaryPage() {
   const [currency,  setCurrency]  = useState<Currency>("USD");
   const [activeTab, setActiveTab] = useState<"browse"|"underpaid"|"negotiate">("browse");
   const [showScript, setShowScript] = useState<number|null>(null);
+
+  // Track XP on first visit
+  useEffect(() => { trackAction("salary_checked", 120); }, []);
 
   // Underpaid checker
   const [upRole, setUpRole]     = useState("");

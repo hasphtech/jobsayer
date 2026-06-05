@@ -11,6 +11,7 @@ import AppNav from "@/components/AppNav";
 import CourseCard from "@/components/CourseCard";
 import { getCoursesForSkill } from "@/lib/courseRecommendations";
 import type { ResumeData } from "@/lib/types";
+import { trackAction } from "@/lib/activityTracker";
 
 /* ── Role blueprints ─────────────────────────────────────────── */
 interface RoleBlueprint {
@@ -547,7 +548,7 @@ export default function CareerGpsPage() {
                   return (
                     <button
                       key={role.title}
-                      onClick={() => setSelectedRole(role)}
+                      onClick={() => { setSelectedRole(role); trackAction("career_gps_used", 60); }}
                       style={{
                         ...card,
                         cursor: "pointer", textAlign: "left",
