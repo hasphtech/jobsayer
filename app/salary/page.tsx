@@ -4,7 +4,7 @@
  * Multi-currency (USD/EUR/GBP/SGD/AED/INR), global cities, AI negotiation coach.
  */
 import React, { useState, useMemo, useEffect } from "react";
-import AppNav from "@/components/AppNav";
+import AppShell from "@/components/AppShell";
 import Link from "next/link";
 import { trackAction } from "@/lib/activityTracker";
 
@@ -206,8 +206,7 @@ export default function SalaryPage() {
   const powerCol = { high: "var(--success)", medium: "var(--warn)" };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-      <AppNav />
+    <AppShell>
       <div style={{ maxWidth: 1000, margin: "0 auto", padding: "32px 20px 80px" }}>
 
         {/* Header */}
@@ -522,6 +521,6 @@ export default function SalaryPage() {
           </>
         )}
       </div>
-    </div>
+    </AppShell>
   );
 }

@@ -6,7 +6,7 @@
  */
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import AppNav from "@/components/AppNav";
+import AppShell from "@/components/AppShell";
 
 /* ── Types ───────────────────────────────────────────────────── */
 interface ApiKey {
@@ -130,8 +130,7 @@ export default function EmployerPortalPage() {
   const methodColor: Record<string, string> = { GET: "var(--success)", POST: "var(--accent)", DELETE: "var(--danger)" };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-      <AppNav />
+    <AppShell>
       <div style={{ maxWidth: 960, margin: "0 auto", padding: "36px 20px 80px" }}>
 
         {/* Header */}
@@ -364,6 +363,6 @@ export default function EmployerPortalPage() {
           </div>
         )}
       </div>
-    </div>
+    </AppShell>
   );
 }

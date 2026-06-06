@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { Check, Zap, Star, Sparkles } from "lucide-react";
 import { PLAN_DEFAULTS } from "@/lib/resumePlan";
 import { useAuth } from "@/lib/auth";
-import AppNav from "@/components/AppNav";
+import AppShell from "@/components/AppShell";
 
 /* ── Razorpay script loader ─────────────────────────────────── */
 function loadRazorpay(): Promise<boolean> {
@@ -153,14 +153,7 @@ export default function UpgradePage() {
   }, [user, interval, router]);
 
   return (
-    <div style={{
-      minHeight: "100dvh",
-      background: "var(--bg)",
-      color: "var(--text1)",
-      fontFamily: "inherit",
-      padding: "0 16px 60px",
-    }}>
-      <AppNav />
+    <AppShell>
       {/* ── Header ── */}
       <div style={{ maxWidth: 900, margin: "0 auto", paddingTop: 32, textAlign: "center" }}>
         <button
@@ -312,7 +305,7 @@ export default function UpgradePage() {
           <a href="mailto:hello@jobsayer.com" style={{ color: "var(--accent)" }}>hello@jobsayer.com</a>
         </p>
       </div>
-    </div>
+    </AppShell>
   );
 }
 

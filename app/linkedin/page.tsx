@@ -4,7 +4,7 @@
  * Score + AI-rewrite headline, about, skills for a target role.
  */
 import React, { useState } from "react";
-import AppNav from "@/components/AppNav";
+import AppShell from "@/components/AppShell";
 import Link from "next/link";
 import { trackAction } from "@/lib/activityTracker";
 
@@ -101,8 +101,7 @@ export default function LinkedInPage() {
   const tabKey = activeTab as "headline"|"about"|"skills";
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-      <AppNav />
+    <AppShell>
       <div style={{ maxWidth: 960, margin: "0 auto", padding: "32px 20px 80px" }}>
 
         {/* Header */}
@@ -277,6 +276,6 @@ export default function LinkedInPage() {
           </div>
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 }

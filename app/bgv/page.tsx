@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { validatePAN } from "@/lib/bgvUtils";
-import AppNav from "@/components/AppNav";
+import AppShell from "@/components/AppShell";
 
 /* ── Types ─────────────────────────────────────────────────── */
 interface EduEntry  { degree: string; institution: string; year: string; result: string }
@@ -226,8 +226,7 @@ export default function BgvPage() {
   const dataLoading = authLoading || loadingExisting;
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-      <AppNav />
+    <AppShell>
 
       <div style={{ maxWidth: 700, margin: "0 auto", padding: "40px 20px 80px" }}>
 
@@ -530,7 +529,7 @@ export default function BgvPage() {
           </>
         )}
       </div>
-    </div>
+    </AppShell>
   );
 }
 

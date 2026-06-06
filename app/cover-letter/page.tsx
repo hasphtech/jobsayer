@@ -8,7 +8,7 @@
  *   - "Saved letters" panel shows all past letters for the chosen resume
  */
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import AppNav from "@/components/AppNav";
+import AppShell from "@/components/AppShell";
 import { useAuth } from "@/lib/auth";
 import {
   listResumes, loadResumeSave,
@@ -217,8 +217,7 @@ export default function CoverLetterPage() {
     : null;
 
   return (
-    <>
-      <AppNav />
+    <AppShell>
       <div className="pg" style={{ maxWidth: 960, margin: "0 auto" }}>
 
         {/* Header */}
@@ -536,6 +535,6 @@ export default function CoverLetterPage() {
           .pg > div > div + div { grid-template-columns: 1fr !important; }
         }
       `}</style>
-    </>
+    </AppShell>
   );
 }

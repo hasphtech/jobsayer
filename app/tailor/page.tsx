@@ -6,7 +6,7 @@
  */
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import AppNav from "@/components/AppNav";
+import AppShell from "@/components/AppShell";
 import { trackAction } from "@/lib/activityTracker";
 import type { ResumeData } from "@/lib/types";
 
@@ -123,8 +123,7 @@ export default function TailorPage() {
   )) : null;
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-      <AppNav />
+    <AppShell>
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 20px 80px" }}>
 
         {/* Header */}
@@ -329,6 +328,6 @@ export default function TailorPage() {
           </div>
         )}
       </div>
-    </div>
+    </AppShell>
   );
 }

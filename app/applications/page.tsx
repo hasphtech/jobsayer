@@ -5,7 +5,7 @@
  * Stored in localStorage (guests) and synced to Supabase (signed-in users).
  */
 import React, { useState, useEffect, useCallback } from "react";
-import AppNav from "@/components/AppNav";
+import AppShell from "@/components/AppShell";
 import { useAuth } from "@/lib/auth";
 import { Plus, Trash2, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
 import { trackAction } from "@/lib/activityTracker";
@@ -412,12 +412,10 @@ export default function ApplicationsPage() {
   const card: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12 };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-      <AppNav actions={
-        <button onClick={() => setModal("add")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", background: "var(--accent)", border: "none", borderRadius: 8, color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
-          <Plus size={12} /> Add Application
+    <AppShell actions={
+        <button onClick={() => setModal("add")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", background: "var(--accent)", border: "none", borderRadius: 8, color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>+ Add Application
         </button>
-      } />
+      }>
 
       <div style={{ maxWidth: 960, margin: "0 auto", padding: "32px 20px 80px" }}>
         {/* Header */}
@@ -524,6 +522,6 @@ export default function ApplicationsPage() {
           onClose={() => setModal(null)}
         />
       )}
-    </div>
+    </AppShell>
   );
 }

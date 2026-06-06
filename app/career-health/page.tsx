@@ -6,7 +6,7 @@
  */
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import AppNav from "@/components/AppNav";
+import AppShell from "@/components/AppShell";
 import type { ResumeData } from "@/lib/types";
 import { trackAction } from "@/lib/activityTracker";
 
@@ -288,20 +288,18 @@ export default function CareerHealthPage() {
 
   if (!loaded) {
     return (
-      <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
-        <AppNav />
+      <AppShell>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "60vh", color: "var(--text3)", fontSize: 14 }}>
           Loading your career health…
         </div>
-      </div>
+      </AppShell>
     );
   }
 
   const card: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14 };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-      <AppNav />
+    <AppShell>
       <div style={{ maxWidth: 860, margin: "0 auto", padding: "36px 20px 80px" }}>
 
         {/* Header */}
@@ -462,6 +460,6 @@ export default function CareerHealthPage() {
           </Link>
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 }

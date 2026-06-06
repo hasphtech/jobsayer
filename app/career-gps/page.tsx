@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, ChevronRight, ExternalLink, CheckCircle2, AlertCircle } from "lucide-react";
-import AppNav from "@/components/AppNav";
+import AppShell from "@/components/AppShell";
 import CourseCard from "@/components/CourseCard";
 import { getCoursesForSkill } from "@/lib/courseRecommendations";
 import type { ResumeData } from "@/lib/types";
@@ -499,8 +499,7 @@ export default function CareerGpsPage() {
     ];
 
     return (
-      <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-        <AppNav />
+      <AppShell>
         <div style={{ maxWidth: 960, margin: "0 auto", padding: "36px 20px 80px" }}>
 
           <div style={{ marginBottom: 32 }}>
@@ -598,7 +597,7 @@ export default function CareerGpsPage() {
             </div>
           ))}
         </div>
-      </div>
+      </AppShell>
     );
   }
 
@@ -613,7 +612,7 @@ export default function CareerGpsPage() {
     filter === "done" ? matchedSkills : selectedRole.skills;
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
+    <AppShell>
       {/* Sticky top bar */}
       <div style={{
         background: "var(--surface)", borderBottom: "1px solid var(--border)",
@@ -808,6 +807,6 @@ export default function CareerGpsPage() {
           </Link>
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 }

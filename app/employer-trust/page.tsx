@@ -5,7 +5,7 @@
  * interview fairness. Globally framed — any company, any country.
  */
 import React, { useState, useMemo } from "react";
-import AppNav from "@/components/AppNav";
+import AppShell from "@/components/AppShell";
 import Link from "next/link";
 
 /* ── Types ───────────────────────────────────────────────────── */
@@ -128,8 +128,7 @@ export default function EmployerTrustPage() {
   });
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-      <AppNav />
+    <AppShell>
       <div style={{ maxWidth: 980, margin: "0 auto", padding: "32px 20px 80px" }}>
 
         {/* Header */}
@@ -298,6 +297,6 @@ export default function EmployerTrustPage() {
           Data based on candidate-reported experiences and public hiring data. Updated continuously. Trust scores weigh ghost rate (40%), response speed (25%), interview fairness (25%), and offer transparency (10%).
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 }

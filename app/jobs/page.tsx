@@ -10,7 +10,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Target, Shield, AlertTriangle, Clock, Users, MapPin, Briefcase, RefreshCw, Search, ChevronRight } from "lucide-react";
-import AppNav from "@/components/AppNav";
+import AppShell from "@/components/AppShell";
 
 /* ── JD Scanner ─────────────────────────────────────────────────── */
 
@@ -478,7 +478,7 @@ function DetailPanel({ job, resumeText }: { job: ScoredJob; resumeText: string }
   const matched = job.skills.filter(s => rt.includes(s)).length;
 
   return (
-    <div style={{ padding: "20px", position: "sticky", top: 56 }}>
+    <div style={{ padding: "20px", position: "sticky", top: 0 }}>
       {/* Company header */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
         <div style={{ width: 44, height: 44, borderRadius: 10, background: "var(--surface2)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>{job.logo}</div>
@@ -654,29 +654,27 @@ export default function JobsPage() {
     fontFamily: "inherit", transition: "all .18s",
   });
 
+  const tabBtn = (t: Tab): React.CSSProperties => ({
+    padding: "5px 14px", borderRadius: 7, border: "none", cursor: "pointer",
+    fontSize: 12, fontWeight: 600, fontFamily: "inherit", transition: "all .15s",
+    background: tab === t ? "rgba(255,255,255,.12)" : "none",
+    color: tab === t ? "var(--text1)" : "var(--text3)",
+  });
+
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-      <AppNav actions={
+    <AppShell actions={
         <div style={{ display: "flex", gap: 1, background: "rgba(255,255,255,.05)", borderRadius: 9, padding: 3 }}>
-          {(["jobs", "scanner"] as Tab[]).map(t => (
-            <button key={t} onClick={() => setTab(t)} style={{
-              padding: "4px 14px", borderRadius: 7, border: "none", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "inherit",
-              background: tab === t ? "var(--surface)" : "transparent",
-              color: tab === t ? "var(--text1)" : "var(--text3)",
-              transition: "all .15s",
-            }}>
-              {t === "jobs" ? "Matched Jobs" : "JD Scanner"}
-            </button>
-          ))}
+          <button onClick={() => setTab("jobs")} style={tabBtn("jobs")}>💼 Jobs</button>
+          <button onClick={() => setTab("scanner")} style={tabBtn("scanner")}>🔍 Scanner</button>
         </div>
-      } />
+      }>
 
       {tab === "scanner" ? (
         <div style={{ maxWidth: 960, margin: "0 auto", padding: "24px 20px" }}>
           <div style={{ marginBottom: 20 }}>
             <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}>🔍 Honest JD Scanner</h1>
             <p style={{ fontSize: 13, color: "var(--text3)" }}>
-              Paste any job description — we'll score it for ghost-job signals, red flags, requirement inflation, and match it against your resume.
+              Paste any job description — we&apos;ll score it for ghost-job signals, red flags, requirement inflation, and match it against your resume.
             </p>
           </div>
           <JdScannerTab resumeText={resumeText} />
@@ -695,7 +693,7 @@ export default function JobsPage() {
           </div>
 
           {/* Split layout */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", minHeight: "calc(100vh - 112px)" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", minHeight: "100%" }}>
             {/* Job list */}
             <div style={{ borderRight: "1px solid var(--border)", overflowY: "auto" }}>
               {filtered.map(job => (
@@ -720,6 +718,6 @@ export default function JobsPage() {
           </div>
         </div>
       )}
-    </div>
+    </AppShell>
   );
 }

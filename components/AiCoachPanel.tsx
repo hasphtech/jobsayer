@@ -56,7 +56,7 @@ function buildSuggestions(xp: XPState): Suggestion[] {
     });
   }
 
-  if (xp.activity.filter(a => a.type === "interview_practiced").length < 3) {
+  if (xp.log.filter(a => a.type === "interview_practiced").length < 3) {
     suggestions.push({
       icon: "ti-microphone",
       title: "Practice interviews",
@@ -74,7 +74,7 @@ function buildSuggestions(xp: XPState): Suggestion[] {
     });
   }
 
-  if (!xp.activity.find(a => a.type === "career_gps_used")) {
+  if (!xp.log.find(a => a.type === "career_gps_used")) {
     suggestions.push({
       icon: "ti-compass",
       title: "Map your career path",
@@ -105,9 +105,7 @@ export default function AiCoachPanel() {
   if (!xp) return null;
 
   const levelInfo = getLevelInfo(xp.totalXP);
-  const earnedBadges = BADGES.filter(b =>
-    b.condition({ ...xp, ...{ totalXP: xp.totalXP, activity: xp.activity } })
-  );
+  const earnedBadges = BADGES.filter(b => xp.badges.includes(b.id));
   const suggestions = buildSuggestions(xp);
 
   return (
@@ -224,7 +222,7 @@ export default function AiCoachPanel() {
       )}
 
       {/* ── Streak ── */}
-      {xp.streak > 0 && (
+      {xp.streakDays > 0 && (
         <div style={{
           marginTop: 14, background: "var(--surface)", border: "1px solid var(--border)",
           borderRadius: 10, padding: "10px 12px",
@@ -233,7 +231,7 @@ export default function AiCoachPanel() {
           <span style={{ fontSize: 20 }}>🔥</span>
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text1)" }}>
-              {xp.streak} day streak
+              {xp.streakDays} day streak
             </div>
             <div style={{ fontSize: 10, color: "var(--text3)" }}>Keep it going!</div>
           </div>

@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { useResumePlan } from "@/lib/resumePlan";
 import { getSupabaseAsync } from "@/lib/auth";
-import AppNav from "@/components/AppNav";
+import AppShell from "@/components/AppShell";
 import type { SkillProof } from "@/lib/types";
 
 /* ── Availability types ─────────────────────────────────────── */
@@ -214,8 +214,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-      <AppNav />
+    <AppShell>
 
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "40px 20px 80px" }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 28 }}>My Account</h1>
@@ -625,7 +624,7 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 }
 

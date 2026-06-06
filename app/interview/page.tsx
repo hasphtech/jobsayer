@@ -10,7 +10,7 @@
  */
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { ChevronRight, ChevronLeft, Mic, MicOff, Zap, CheckCircle2, AlertTriangle, Lightbulb, RotateCcw, ArrowLeft, BookOpen } from "lucide-react";
-import AppNav from "@/components/AppNav";
+import AppShell from "@/components/AppShell";
 import CourseCard from "@/components/CourseCard";
 import { getCoursesForSkill } from "@/lib/courseRecommendations";
 import type { ResumeData } from "@/lib/types";
@@ -225,8 +225,7 @@ export default function InterviewPage() {
      STAGE: profile
   ══════════════════════════════════════════════════════════ */
   if (stage === "profile") return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-      <AppNav />
+    <AppShell>
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "36px 20px 80px" }}>
 
         <div style={{ textAlign: "center", marginBottom: 36 }}>
@@ -322,15 +321,14 @@ export default function InterviewPage() {
           </button>
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 
   /* ══════════════════════════════════════════════════════════
      STAGE: analyzing (loading)
   ══════════════════════════════════════════════════════════ */
   if (stage === "analyzing" || stage === "loading_q") return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-      <AppNav />
+    <AppShell>
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "100px 20px", textAlign: "center" }}>
         <div style={{ width: 64, height: 64, borderRadius: "50%", border: "3px solid var(--border)", borderTopColor: "var(--accent)", margin: "0 auto 24px", animation: "spin 1s linear infinite" }} />
         <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 10 }}>
@@ -343,7 +341,7 @@ export default function InterviewPage() {
         </p>
       </div>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-    </div>
+    </AppShell>
   );
 
   /* ══════════════════════════════════════════════════════════
@@ -355,12 +353,10 @@ export default function InterviewPage() {
     const nextGap = gaps.criticalGaps.find(g => !practicedGaps.has(g.skill));
 
     return (
-      <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-        <AppNav actions={
-          <button onClick={() => setStage("profile")} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 7, color: "var(--text3)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>
-            <ArrowLeft size={12} /> Re-analyse
+      <AppShell actions={
+          <button onClick={() => setStage("profile")} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 7, color: "var(--text3)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>← Re-analyse
           </button>
-        } />
+        }>
         <div style={{ maxWidth: 760, margin: "0 auto", padding: "32px 20px 80px" }}>
 
           {/* Readiness score */}
@@ -487,7 +483,7 @@ export default function InterviewPage() {
             </div>
           )}
         </div>
-      </div>
+      </AppShell>
     );
   }
 
@@ -502,17 +498,15 @@ export default function InterviewPage() {
     const wordCount = (cur?.text ?? "").trim().split(/\s+/).filter(Boolean).length;
 
     return (
-      <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-        <AppNav actions={
+      <AppShell actions={
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <button onClick={() => { if (confirm("Exit practice?")) setStage("gaps"); }} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 7, color: "var(--text3)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>
-              <ArrowLeft size={12} /> Gap Plan
+            <button onClick={() => setStage("gaps")} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 7, color: "var(--text3)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>← Gap Plan
             </button>
             <span style={{ padding: "4px 12px", borderRadius: 99, background: "var(--accdim)", border: "1px solid var(--accborder)", fontSize: 12, fontWeight: 600, color: "var(--accent)" }}>
               Practicing: {focusSkill}
             </span>
           </div>
-        } />
+        }>
 
         <div style={{ maxWidth: 720, margin: "0 auto", padding: "28px 20px 80px" }}>
 
@@ -668,7 +662,7 @@ export default function InterviewPage() {
           </div>
         </div>
         <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }`}</style>
-      </div>
+      </AppShell>
     );
   }
 
@@ -682,12 +676,10 @@ export default function InterviewPage() {
     const nextGap = gaps?.criticalGaps.find(g => !practicedGaps.has(g.skill));
 
     return (
-      <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-        <AppNav actions={
-          <button onClick={() => setStage("gaps")} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 7, color: "var(--text3)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>
-            <ArrowLeft size={12} /> Gap Plan
+      <AppShell actions={
+          <button onClick={() => setStage("gaps")} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 7, color: "var(--text3)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>← Gap Plan
           </button>
-        } />
+        }>
         <div style={{ maxWidth: 680, margin: "0 auto", padding: "36px 20px 80px" }}>
 
           {/* Score hero */}
@@ -762,7 +754,7 @@ export default function InterviewPage() {
             </div>
           </div>
         </div>
-      </div>
+      </AppShell>
     );
   }
 

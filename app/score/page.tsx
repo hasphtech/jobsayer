@@ -11,7 +11,7 @@ import {
   RefreshCw, Briefcase, ChevronRight,
   TrendingUp, AlertTriangle, Lightbulb, CheckCircle2,
 } from "lucide-react";
-import AppNav from "@/components/AppNav";
+import AppShell from "@/components/AppShell";
 import CourseCard from "@/components/CourseCard";
 import { getCoursesForSkills } from "@/lib/courseRecommendations";
 import { computeScore, type ScoreResult } from "@/lib/scoreEngine";
@@ -283,17 +283,16 @@ export default function ScorePage() {
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-      <AppNav actions={
+    <AppShell actions={
         <div style={{ display: "flex", gap: 8 }}>
-          <Link href="/jobs" style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", background: "var(--accdim)", border: "1px solid var(--accborder)", borderRadius: 8, color: "var(--accent)", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>
-            <Briefcase size={12} /> Matched Jobs
+          <Link href="/jobs" style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text1)", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>
+            Matched Jobs
           </Link>
           <Link href="/builder" style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", background: "var(--accent)", borderRadius: 8, color: "#fff", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>
             Fix in Builder
           </Link>
         </div>
-      } />
+      }>
 
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "28px 20px" }}>
 
@@ -567,6 +566,6 @@ export default function ScorePage() {
           </Link>
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 }
