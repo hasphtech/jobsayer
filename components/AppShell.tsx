@@ -19,7 +19,7 @@ import AiCoachPanel from "./AiCoachPanel";
 /* ── Nav structure ───────────────────────────────────────────── */
 const TOOL_LINKS = [
   { href: "/dashboard",    label: "Dashboard",    icon: "ti-layout-dashboard" },
-  { href: "/builder",      label: "Builder",      icon: "ti-file-text" },
+  { href: "/builder",      label: "Resume Builder", icon: "ti-file-text" },
   { href: "/score",        label: "ATS Score",    icon: "ti-target" },
   { href: "/tailor",       label: "JD Tailor",    icon: "ti-scissors" },
   { href: "/cover-letter", label: "Cover Letter", icon: "ti-mail" },
@@ -115,7 +115,7 @@ interface AppShellProps {
 
 /* ── AppShell ────────────────────────────────────────────────── */
 export default function AppShell({ children, actions, aiPanel = true, contentFill = false }: AppShellProps) {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { dark, toggle: toggleTheme } = useTheme();
   const pathname = usePathname();
   const w = useWidth();
@@ -261,28 +261,14 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
             {dark ? "☀" : "🌙"}
           </button>
 
-          {/* User avatar */}
+          {/* Upgrade link */}
           {user && (
-            <Link href="/profile" style={{
-              display: "flex", alignItems: "center", gap: 6,
-              padding: "4px 8px 4px 4px", borderRadius: 20,
-              border: "1px solid var(--border)", background: "var(--surface2)",
-              textDecoration: "none", color: "var(--text2)", fontSize: 12,
+            <Link href="/upgrade" style={{
+              fontSize: 11, fontWeight: 700, color: "var(--accent)",
+              background: "var(--accdim)", border: "1px solid var(--accborder)",
+              borderRadius: 7, padding: "4px 10px", textDecoration: "none",
             }}>
-              {hasAvatar
-                // eslint-disable-next-line @next/next/no-img-element
-                ? <img src={user.user_metadata.avatar_url} alt="" style={{ width: 22, height: 22, borderRadius: "50%", objectFit: "cover" }} />
-                : (
-                  <span style={{
-                    width: 22, height: 22, borderRadius: "50%",
-                    background: "var(--accdim)", border: "1px solid var(--accborder)",
-                    display: "inline-flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 10, fontWeight: 700, color: "var(--accent)",
-                  }}>
-                    {avatarLetter}
-                  </span>
-                )}
-              {firstName}
+              Upgrade
             </Link>
           )}
         </div>
@@ -315,12 +301,12 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
             <div style={{ flex: 1 }} />
           </div>
 
-          {/* User pill */}
-          <div style={{ padding: "10px", borderTop: "1px solid var(--border)" }}>
+          {/* User pill + sign out */}
+          <div style={{ padding: "10px", borderTop: "1px solid var(--border)", display: "flex", flexDirection: "column", gap: 4 }}>
             <Link href="/profile" style={{
               display: "flex", alignItems: "center", gap: 8,
               padding: "8px 10px", borderRadius: 8,
-              background: "var(--surface-hover)", border: "1px solid var(--border)",
+              background: "var(--surface2)", border: "1px solid var(--border)",
               textDecoration: "none",
             }}>
               {hasAvatar
@@ -340,10 +326,23 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
                 <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text1)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {firstName}
                 </div>
-                <div style={{ fontSize: 10, color: "var(--text3)" }}>Account settings</div>
+                <div style={{ fontSize: 10, color: "var(--text3)" }}>View profile</div>
               </div>
               <i className="ti ti-settings" style={{ fontSize: 13, color: "var(--text3)", flexShrink: 0 }} />
             </Link>
+            <button
+              onClick={() => signOut()}
+              style={{
+                display: "flex", alignItems: "center", gap: 8,
+                width: "100%", padding: "7px 10px", borderRadius: 8,
+                background: "none", border: "1px solid var(--border)",
+                cursor: "pointer", fontFamily: "inherit",
+                color: "var(--text3)", fontSize: 12, fontWeight: 500,
+              }}
+            >
+              <i className="ti ti-logout" style={{ fontSize: 13 }} />
+              Sign out
+            </button>
           </div>
         </aside>
 

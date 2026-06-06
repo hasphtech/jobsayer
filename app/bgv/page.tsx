@@ -133,7 +133,7 @@ export default function BgvPage() {
 
   // Existing BGV record
   const [existing, setExisting] = useState<BgvRecord | null>(null);
-  const [loadingExisting, setLoadingExisting] = useState(true);
+  const [loadingExisting, setLoadingExisting] = useState(false);
 
   // Form state
   const [step, setStep]           = useState<Step>("identity");
@@ -148,6 +148,7 @@ export default function BgvPage() {
 
   useEffect(() => {
     if (!user) return;
+    setLoadingExisting(true);
     fetch("/api/bgv/status").then(r => r.json()).then(d => {
       if (d.bgv) {
         setExisting(d.bgv);

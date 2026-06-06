@@ -90,7 +90,7 @@ function Nav({ user, signIn }: { user: any; signIn: () => void; }) {
             {user ? (
               <>
                 <NavLink href="/dashboard">Dashboard</NavLink>
-                <NavLink href="/builder">Builder</NavLink>
+                <NavLink href="/builder">Resume Builder</NavLink>
                 <NavLink href="/jobs">Jobs</NavLink>
                 <NavLink href="/career-gps">Career GPS</NavLink>
                 <button onClick={toggleTheme} title={dark ? "Light mode" : "Dark mode"} style={{ ...ghostBtn, padding: "6px 10px" }}>{dark ? "☀" : "🌙"}</button>
