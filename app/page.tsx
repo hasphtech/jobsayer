@@ -89,15 +89,12 @@ function Nav({ user, signIn }: { user: any; signIn: () => void; }) {
           <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
             {user ? (
               <>
+                <NavLink href="/dashboard">Dashboard</NavLink>
                 <NavLink href="/builder">Builder</NavLink>
-                <NavLink href="/score">Score</NavLink>
                 <NavLink href="/jobs">Jobs</NavLink>
-                <NavLink href="/applications">Tracker</NavLink>
-                <NavLink href="/interview">Interview</NavLink>
                 <NavLink href="/career-gps">Career GPS</NavLink>
-                <NavLink href="/bgv">BGV</NavLink>
-                <NavLink href="/salary">Salaries</NavLink>
-                <Link href="/profile" style={{ ...ghostBtn, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px" }}>
+                <button onClick={toggleTheme} title={dark ? "Light mode" : "Dark mode"} style={{ ...ghostBtn, padding: "6px 10px" }}>{dark ? "☀" : "🌙"}</button>
+                <Link href="/profile" style={{ ...ghostBtn, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 10px" }}>
                   {user.user_metadata?.avatar_url
                     /* eslint-disable-next-line @next/next/no-img-element */
                     ? <img src={user.user_metadata.avatar_url} alt="" style={{ width: 22, height: 22, borderRadius: "50%", objectFit: "cover" }} />
@@ -105,8 +102,7 @@ function Nav({ user, signIn }: { user: any; signIn: () => void; }) {
                   }
                   {user.user_metadata?.full_name?.split(" ")[0] || user.email?.split("@")[0]}
                 </Link>
-                <Link href="/builder" style={primaryBtn}>Open Builder →</Link>
-                <button onClick={toggleTheme} title={dark ? "Light mode" : "Dark mode"} style={{ ...ghostBtn, padding: "6px 10px" }}>{dark ? "☀" : "🌙"}</button>
+                <Link href="/dashboard" style={primaryBtn}>Go to Dashboard →</Link>
               </>
             ) : (
               <>
