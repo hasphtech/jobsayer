@@ -109,10 +109,12 @@ interface AppShellProps {
   actions?: React.ReactNode;
   /** Show right AI coach panel. Default true on ≥1200px screens. */
   aiPanel?: boolean;
+  /** When true, content area is overflow:hidden + flex so children can fill it (e.g. builder). */
+  contentFill?: boolean;
 }
 
 /* ── AppShell ────────────────────────────────────────────────── */
-export default function AppShell({ children, actions, aiPanel = true }: AppShellProps) {
+export default function AppShell({ children, actions, aiPanel = true, contentFill = false }: AppShellProps) {
   const { user } = useAuth();
   const { dark, toggle: toggleTheme } = useTheme();
   const pathname = usePathname();
@@ -346,7 +348,13 @@ export default function AppShell({ children, actions, aiPanel = true }: AppShell
         </aside>
 
         {/* ── Content area ── */}
-        <main style={{ flex: 1, overflowY: "auto", overflowX: "hidden" }}>
+        <main style={{
+          flex: 1,
+          overflowY: contentFill ? "hidden" : "auto",
+          overflowX: "hidden",
+          display: contentFill ? "flex" : undefined,
+          flexDirection: contentFill ? "column" : undefined,
+        }}>
           {children}
         </main>
 

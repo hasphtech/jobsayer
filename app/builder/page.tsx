@@ -31,6 +31,7 @@ import { parseResumeFile } from "@/lib/resumeParser";
 import { matchJd, resumeToText, type JdMatchResult } from "@/lib/jdMatcher";
 import ResumePreview, { BASIC_TEMPLATES, PREMIUM_TEMPLATES, TEMPLATE_ACCENT, PHOTO_TEMPLATES } from "@/components/ResumePreview";
 import type { ResumeData, LanguageEntry } from "@/lib/types";
+import AppShell from "@/components/AppShell";
 
 const ALL_TEMPLATES = [...BASIC_TEMPLATES, ...PREMIUM_TEMPLATES];
 
@@ -3531,10 +3532,131 @@ export default function BuilderPage() {
     return null;
   }
 
-  return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh", background: "var(--bg)", overflow: "hidden" }}>
+  const builderActions = (
+    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      {/* Editable resume name */}
+      {nameEditing ? (
+        <input
+          autoFocus
+          value={resumeName}
+          onChange={e => setResumeName(e.target.value)}
+          onBlur={() => setNameEditing(false)}
+          onKeyDown={e => { if (e.key === "Enter" || e.key === "Escape") setNameEditing(false); }}
+          style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "3px 8px", outline: "none", fontFamily: "inherit", width: 160 }}
+        />
+      ) : (
+        <div style={{ display: "flex", alignItems: "center", gap: 2, position: "relative" }}>
+          <button onClick={() => setNameEditing(true)}
+            style={{ display: "flex", alignItems: "center", gap: 5, background: "none", border: "none", cursor: "pointer", padding: "3px 6px", borderRadius: 6, fontFamily: "inherit" }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{resumeName}</span>
+            <Pencil size={10} style={{ color: "var(--text3)", flexShrink: 0 }} />
+          </button>
+          <button onClick={() => { setShowResumeMenu(!showResumeMenu); if (!showResumeMenu) handleLoadSavesList(); }}
+            style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, background: "none", border: "none", cursor: "pointer", borderRadius: 4, color: "var(--text3)", padding: 0 }}>
+            <ChevronDown size={12} />
+          </button>
+          {showResumeMenu && (
+            <div style={{
+              position: "absolute", top: 28, left: 0, zIndex: 100,
+              background: "var(--surface)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)",
+              borderRadius: 8, boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+              width: 200, maxHeight: 300, overflowY: "auto",
+              padding: "6px", display: "flex", flexDirection: "column", gap: 4,
+              fontFamily: "inherit"
+            }}>
+              <button onClick={handleCreateNew}
+                style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 6, background: "none", border: "none", cursor: "pointer", color: "var(--text1)", fontSize: 12, fontWeight: 700, textAlign: "left" as const }}>
+                <Plus size={12} /> Create New
+              </button>
+              <div style={{ height: 1, background: "var(--border)", margin: "4px 0" }} />
+              {user ? (
+                loadingSaves ? (
+                  <div style={{ padding: "10px", fontSize: 11, color: "var(--text3)", textAlign: "center" }}>Loading…</div>
+                ) : savesList.length === 0 ? (
+                  <div style={{ padding: "10px", fontSize: 11, color: "var(--text3)", textAlign: "center" }}>No saved resumes</div>
+                ) : (
+                  savesList.map(r => (
+                    <button key={r.id} onClick={() => { handleLoadResume(r.id); setShowResumeMenu(false); }}
+                      style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 6, background: r.id === currentSaveId ? "var(--accdim)" : "none", border: "none", cursor: "pointer", color: r.id === currentSaveId ? "var(--accent)" : "var(--text2)", fontSize: 12, fontWeight: r.id === currentSaveId ? 700 : 600, textAlign: "left" as const }}>
+                      <FileText size={12} style={{ opacity: 0.6 }} /> {r.name}
+                    </button>
+                  ))
+                )
+              ) : (
+                <div style={{ padding: "10px", fontSize: 11, color: "var(--text3)", textAlign: "center" }}>Sign in to see your saves</div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
-      {/* ── Score CTA Toast — appears after save ─────────────── */}
+      <div style={{ width: 1, height: 20, background: "var(--border)" }} />
+
+      {/* Progress + ATS */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)" }}>Progress</span>
+        <div style={{ width: 100, height: 5, background: "var(--surface2)", borderRadius: 99, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${progressPct}%`, background: "var(--text1)", borderRadius: 99, transition: "width .4s" }} />
+        </div>
+        <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text1)" }}>{completedCount}/{TOTAL_MAIN}</span>
+        <div style={{ width: 1, height: 14, background: "var(--border)" }} />
+        <button onClick={() => { setLeftTab("edit"); setStep(STEP_ATS); }} title="View ATS breakdown"
+          style={{ display: "flex", alignItems: "center", gap: 5, background: "none", border: "none", cursor: "pointer", padding: "2px 6px", borderRadius: 6 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)" }}>ATS</span>
+          <div style={{ position: "relative", width: 70, height: 5, background: "var(--surface2)", borderRadius: 99, overflow: "hidden" }}>
+            <div style={{
+              height: "100%", width: `${ats.score}%`, borderRadius: 99,
+              background: `linear-gradient(90deg, ${ats.score < 50 ? "#ef4444, #f97316" : ats.score < 75 ? "#f97316, #eab308" : "#22c55e, #16a34a"})`,
+              transition: "width .5s ease",
+            }} />
+          </div>
+          <span style={{ fontSize: 11, fontWeight: 800, color: ats.scoreColor, minWidth: 20 }}>{ats.score}</span>
+        </button>
+      </div>
+
+      <div style={{ width: 1, height: 20, background: "var(--border)" }} />
+
+      {/* Autosave indicator */}
+      <span style={{
+        fontSize: 10, fontWeight: 600, color: "var(--text3)",
+        display: "flex", alignItems: "center", gap: 3,
+        opacity: autoSaved ? 1 : 0, transition: "opacity .3s ease",
+        pointerEvents: "none", minWidth: 62,
+      }}>
+        <Check size={10} style={{ color: "var(--accent)" }} /> Autosaved
+      </span>
+
+      {/* Share */}
+      <button onClick={handleShare} disabled={shareStatus === "loading"}
+        style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: shareStatus === "copied" ? "var(--accent)" : "var(--text2)", background: shareStatus === "copied" ? "var(--accdim)" : "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: shareStatus === "copied" ? "var(--accborder)" : "var(--border)", borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontFamily: "inherit" }}>
+        {shareStatus === "loading" ? <Loader2 size={11} style={{ animation: "spin .7s linear infinite" }} /> :
+         shareStatus === "copied"  ? <><Check size={11} /> Copied!</> :
+         <><Link2 size={11} /> Share</>}
+      </button>
+
+      {/* Export PDF */}
+      <button onClick={handlePdfExport}
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 8, background: "var(--text1)", border: "none", color: "var(--bg)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+        <Download size={13} /> Export PDF
+      </button>
+
+      {/* DOCX */}
+      <button onClick={handleDocxExport}
+        style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", borderRadius: 7, background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", color: plan.hasDocxExport ? "var(--text2)" : "var(--text3)", fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+        {!plan.hasDocxExport && <Lock size={10} />} DOCX
+      </button>
+
+      {/* Dark/light toggle */}
+      <button onClick={() => setDark(d => !d)} title={dark ? "Switch to light mode" : "Switch to dark mode"}
+        style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, borderRadius: 8, borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", background: "var(--surface2)", color: "var(--text2)", cursor: "pointer", flexShrink: 0 }}>
+        {dark ? <Sun size={13} /> : <Moon size={13} />}
+      </button>
+    </div>
+  );
+
+  return (
+    <AppShell actions={builderActions} contentFill aiPanel={false}>
+      {/* ── Score CTA Toast ── */}
       {showScoreCta && (
         <div style={{
           position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)",
@@ -3548,18 +3670,9 @@ export default function BuilderPage() {
             <div style={{ fontSize: 12, color: "var(--text3)" }}>See your jobSayer Score and matched jobs.</div>
           </div>
           <div style={{ display: "flex", gap: 6 }}>
-            <a href="/score" style={{
-              padding: "8px 14px", background: "var(--accent)", borderRadius: 8,
-              color: "#fff", fontSize: 12, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap",
-            }}>View Score →</a>
-            <a href="/jobs" style={{
-              padding: "8px 14px", background: "var(--accdim)", border: "1px solid var(--accborder)",
-              borderRadius: 8, color: "var(--accent)", fontSize: 12, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap",
-            }}>Jobs →</a>
-            <button onClick={() => setShowScoreCta(false)} style={{
-              padding: "8px 10px", background: "none", border: "1px solid var(--border)",
-              borderRadius: 8, color: "var(--text3)", fontSize: 12, cursor: "pointer", fontFamily: "inherit",
-            }}>✕</button>
+            <a href="/score" style={{ padding: "8px 14px", background: "var(--accent)", borderRadius: 8, color: "#fff", fontSize: 12, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>View Score →</a>
+            <a href="/jobs" style={{ padding: "8px 14px", background: "var(--accdim)", border: "1px solid var(--accborder)", borderRadius: 8, color: "var(--accent)", fontSize: 12, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>Jobs →</a>
+            <button onClick={() => setShowScoreCta(false)} style={{ padding: "8px 10px", background: "none", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text3)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>✕</button>
           </div>
         </div>
       )}
@@ -3569,177 +3682,8 @@ export default function BuilderPage() {
       <input ref={resumeInputRef}   type="file" accept=".pdf,.doc,.docx,.txt,.md" style={{ display: "none" }} onChange={handleResumeImport}   />
       <input ref={certLogoInputRef} type="file" accept="image/*"                  style={{ display: "none" }} onChange={handleCertLogoChange} />
 
-      {/* ── Top bar ───────────────────────────────────────────── */}
-      <header className="no-print" style={{ height: 56, background: "var(--nav-bg)", backdropFilter: "blur(16px)", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", padding: "0 20px", gap: 14, flexShrink: 0, zIndex: 10 }}>
-
-        {/* Logo — links back to landing page */}
-        <a href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", flexShrink: 0 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="jobSayer" style={{ width: 24, height: 24, borderRadius: 6, objectFit: "cover" }} />
-          <span style={{ fontSize: 14, fontWeight: 800, color: "var(--text1)" }}>jobSayer</span>
-        </a>
-
-        {/* Editable resume name */}
-        {nameEditing ? (
-          <input
-            autoFocus
-            value={resumeName}
-            onChange={e => setResumeName(e.target.value)}
-            onBlur={() => setNameEditing(false)}
-            onKeyDown={e => { if (e.key === "Enter" || e.key === "Escape") setNameEditing(false); }}
-            style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "3px 8px", outline: "none", fontFamily: "inherit", width: 180 }}
-          />
-        ) : (
-          <div style={{ display: "flex", alignItems: "center", gap: 2, position: "relative" }}>
-            <button onClick={() => setNameEditing(true)}
-              style={{ display: "flex", alignItems: "center", gap: 5, background: "none", border: "none", cursor: "pointer", padding: "3px 6px", borderRadius: 6, fontFamily: "inherit" }}>
-              <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)", maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{resumeName}</span>
-              <Pencil size={10} style={{ color: "var(--text3)", flexShrink: 0 }} />
-            </button>
-            <button onClick={() => { setShowResumeMenu(!showResumeMenu); if (!showResumeMenu) handleLoadSavesList(); }}
-              style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, background: "none", border: "none", cursor: "pointer", borderRadius: 4, color: "var(--text3)", padding: 0 }}>
-              <ChevronDown size={12} />
-            </button>
-
-            {showResumeMenu && (
-              <div style={{
-                position: "absolute", top: 28, left: 0, zIndex: 100,
-                background: "var(--surface)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)",
-                borderRadius: 8, boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                width: 200, maxHeight: 300, overflowY: "auto",
-                padding: "6px", display: "flex", flexDirection: "column", gap: 4,
-                fontFamily: "inherit"
-              }}>
-                <button onClick={handleCreateNew}
-                  style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 6, background: "none", border: "none", cursor: "pointer", color: "var(--text1)", fontSize: 12, fontWeight: 700, textAlign: "left" as const }}>
-                  <Plus size={12} /> Create New
-                </button>
-                <div style={{ height: 1, background: "var(--border)", margin: "4px 0" }} />
-                {user ? (
-                  loadingSaves ? (
-                    <div style={{ padding: "10px", fontSize: 11, color: "var(--text3)", textAlign: "center" }}>Loading…</div>
-                  ) : savesList.length === 0 ? (
-                    <div style={{ padding: "10px", fontSize: 11, color: "var(--text3)", textAlign: "center" }}>No saved resumes</div>
-                  ) : (
-                    savesList.map(r => (
-                      <button key={r.id} onClick={() => { handleLoadResume(r.id); setShowResumeMenu(false); }}
-                        style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 6, background: r.id === currentSaveId ? "var(--accdim)" : "none", border: "none", cursor: "pointer", color: r.id === currentSaveId ? "var(--accent)" : "var(--text2)", fontSize: 12, fontWeight: r.id === currentSaveId ? 700 : 600, textAlign: "left" as const }}>
-                        <FileText size={12} style={{ opacity: 0.6 }} /> {r.name}
-                      </button>
-                    ))
-                  )
-                ) : (
-                  <div style={{ padding: "10px", fontSize: 11, color: "var(--text3)", textAlign: "center" }}>Sign in to see your saves</div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-
-        <div style={{ width: 1, height: 20, background: "var(--border)", margin: "0 4px" }} />
-
-        {/* Progress + ATS */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)" }}>Progress</span>
-          <div style={{ width: 120, height: 5, background: "var(--surface2)", borderRadius: 99, overflow: "hidden" }}>
-            <div style={{ height: "100%", width: `${progressPct}%`, background: "var(--text1)", borderRadius: 99, transition: "width .4s" }} />
-          </div>
-          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text1)" }}>{completedCount}/{TOTAL_MAIN}</span>
-          <div style={{ width: 1, height: 14, background: "var(--border)" }} />
-          <button onClick={() => { setLeftTab("edit"); setStep(STEP_ATS); }} title="View ATS breakdown"
-            style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", cursor: "pointer", padding: "2px 6px", borderRadius: 6 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)" }}>ATS</span>
-            <div style={{ position: "relative", width: 80, height: 5, background: "var(--surface2)", borderRadius: 99, overflow: "hidden" }}>
-              <div style={{
-                height: "100%", width: `${ats.score}%`, borderRadius: 99,
-                background: `linear-gradient(90deg, ${ats.score < 50 ? "#ef4444, #f97316" : ats.score < 75 ? "#f97316, #eab308" : "#22c55e, #16a34a"})`,
-                transition: "width .5s ease",
-              }} />
-            </div>
-            <span style={{ fontSize: 11, fontWeight: 800, color: ats.scoreColor, minWidth: 20 }}>{ats.score}</span>
-          </button>
-        </div>
-
-        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
-          {/* Autosave indicator */}
-          <span style={{
-            fontSize: 10, fontWeight: 600, color: "var(--text3)",
-            display: "flex", alignItems: "center", gap: 3,
-            opacity: autoSaved ? 1 : 0, transition: "opacity .3s ease",
-            pointerEvents: "none", minWidth: 72,
-          }}>
-            <Check size={10} style={{ color: "var(--accent)" }} /> Autosaved
-          </span>
-
-          {/* Nav links — matches AppNav exactly */}
-          <div style={{ display: "flex", gap: 1, alignItems: "center" }}>
-            {[
-              { href: "/dashboard",    label: "Dashboard"  },
-              { href: "/score",        label: "Score"      },
-              { href: "/jobs",         label: "Jobs"       },
-              { href: "/applications", label: "Tracker"    },
-              { href: "/interview",    label: "Interview"  },
-              { href: "/career-gps",   label: "Career GPS" },
-              { href: "/salary",       label: "Salaries"   },
-            ].map(l => (
-              <a key={l.href} href={l.href} style={{
-                padding: "5px 12px", borderRadius: 8, fontSize: 13, fontWeight: 400,
-                color: "var(--text2)", background: "transparent",
-                border: "2px solid transparent",
-                textDecoration: "none", whiteSpace: "nowrap", transition: "color .15s",
-              }}
-                onMouseEnter={e => (e.currentTarget.style.color = "var(--nav-hover-col)")}
-                onMouseLeave={e => (e.currentTarget.style.color = "var(--text2)")}
-              >
-                {l.label}
-              </a>
-            ))}
-          </div>
-
-          {/* User / sign in */}
-          {user
-            ? <span style={{ fontSize: 10, fontWeight: 700, color: "var(--text3)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 5, padding: "3px 8px" }}>{plan.loading ? "…" : plan.planName}</span>
-            : <button onClick={() => signInWithGoogle()} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--accborder)", borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit" }}>
-                <LogIn size={11} /> Sign in
-              </button>
-          }
-
-          {/* auto-saved indicator */}
-          {user && autoSaved && (
-            <span style={{ fontSize: 10, fontWeight: 600, color: "var(--text3)" }}>✓ Saved</span>
-          )}
-
-          {/* Share */}
-          <button onClick={handleShare} disabled={shareStatus === "loading"}
-            style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: shareStatus === "copied" ? "var(--accent)" : "var(--text2)", background: shareStatus === "copied" ? "var(--accdim)" : "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: shareStatus === "copied" ? "var(--accborder)" : "var(--border)", borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontFamily: "inherit" }}>
-            {shareStatus === "loading" ? <Loader2 size={11} style={{ animation: "spin .7s linear infinite" }} /> :
-             shareStatus === "copied"  ? <><Check size={11} /> Copied!</> :
-             <><Link2 size={11} /> Share</>}
-          </button>
-
-          {/* Export PDF */}
-          <button onClick={handlePdfExport}
-            style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 8, background: "var(--text1)", border: "none", color: "var(--bg)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
-            <Download size={13} /> Export PDF
-          </button>
-
-          {/* DOCX/JSON small buttons */}
-          <button onClick={handleDocxExport}
-            style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", borderRadius: 7, background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", color: plan.hasDocxExport ? "var(--text2)" : "var(--text3)", fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
-            {!plan.hasDocxExport && <Lock size={10} />} DOCX
-          </button>
-
-          {/* Dark/light toggle */}
-          <button onClick={() => setDark(d => !d)} title={dark ? "Switch to light mode" : "Switch to dark mode"}
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: 8, borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", background: "var(--surface2)", color: "var(--text2)", cursor: "pointer", flexShrink: 0 }}>
-            {dark ? <Sun size={14} /> : <Moon size={14} />}
-          </button>
-        </div>
-      </header>
-
-      {/* ── Two-panel main layout (desktop) ─────────────────── */}
-      <div className="no-print" style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+      {/* ── Two-panel main layout ─────────────────── */}
+      <div className="no-print" style={{ display: "flex", flex: 1, overflow: "hidden", height: "100%" }}>
 
         {/* ══ LEFT PANEL (460px) ══════════════════════════════ */}
         <div style={{ width: 460, flexShrink: 0, background: "var(--surface)", borderRight: "1px solid var(--border)", display: "flex", flexDirection: "row", overflow: "hidden" }}>
@@ -4916,7 +4860,7 @@ export default function BuilderPage() {
           body > div { height: auto !important; overflow: visible !important; }
         }
       `}</style>
-    </div>
+    </AppShell>
   );
 }
 
