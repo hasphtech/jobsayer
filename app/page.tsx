@@ -8,6 +8,7 @@
  */
 import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { useTheme } from "@/lib/useTheme";
 import { computeScore } from "@/lib/scoreEngine";
@@ -1265,13 +1266,16 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 ══════════════════════════════════════════════════════════════ */
 export default function HomePage() {
   const { user } = useAuth();
+  const router = useRouter();
   const [showSignIn, setShowSignIn]   = useState(false);
   const [authError,  setAuthError]    = useState<string | null>(null);
   const openSignIn  = useCallback(() => setShowSignIn(true),  []);
   const closeSignIn = useCallback(() => setShowSignIn(false), []);
 
-  // Auto-close modal once the user successfully signs in
-  useEffect(() => { if (user) setShowSignIn(false); }, [user]);
+  // Redirect signed-in users straight to the dashboard
+  useEffect(() => {
+    if (user) router.replace("/dashboard");
+  }, [user, router]);
 
   // Surface auth errors from three sources:
   //   ?auth_error=        — our own callback route
@@ -1320,10 +1324,7 @@ export default function HomePage() {
           <button onClick={() => setAuthError(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--danger)", fontSize: 16, padding: 0 }}>✕</button>
         </div>
       )}
-      {user
-        ? <Dashboard user={user} />
-        : <LandingPage signIn={openSignIn} />
-      }
+      {!user && <LandingPage signIn={openSignIn} />}
       {showSignIn && <SignInModal onClose={closeSignIn} />}
     </>
   );
