@@ -1,10 +1,30 @@
 User-agent: *
 Allow: /
 
-# Private / app pages — no crawl value
+# Auth-gated app pages — no crawl value (require login, return 200 with redirect)
 Disallow: /admin
 Disallow: /api/
 Disallow: /auth/
 Disallow: /verify
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /applications
+Disallow: /r/
+
+# AI crawlers — opt out of training data collection
+User-agent: GPTBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
 
 Sitemap: https://jobsayer.com/sitemap.xml

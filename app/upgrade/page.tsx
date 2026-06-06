@@ -4,7 +4,7 @@
  * Three tiers: Free · Starter · Pro
  * Payments via Razorpay checkout popup.
  */
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Zap, Star, Sparkles } from "lucide-react";
 import { PLAN_DEFAULTS } from "@/lib/resumePlan";
@@ -23,6 +23,69 @@ function loadRazorpay(): Promise<boolean> {
   });
 }
 
+/* ── Currency detection ─────────────────────────────────────── */
+interface CurrencyInfo {
+  code: string;
+  symbol: string;
+  rate: number; // multiplier from USD base
+}
+
+const CURRENCIES: Record<string, CurrencyInfo> = {
+  IN:  { code: "INR", symbol: "₹",  rate: 83.5  },
+  GB:  { code: "GBP", symbol: "£",  rate: 0.79  },
+  AU:  { code: "AUD", symbol: "A$", rate: 1.53  },
+  CA:  { code: "CAD", symbol: "C$", rate: 1.36  },
+  SG:  { code: "SGD", symbol: "S$", rate: 1.34  },
+  AE:  { code: "AED", symbol: "AED ", rate: 3.67 },
+  SA:  { code: "SAR", symbol: "SAR ", rate: 3.75 },
+  DE:  { code: "EUR", symbol: "€",  rate: 0.92  },
+  FR:  { code: "EUR", symbol: "€",  rate: 0.92  },
+  NL:  { code: "EUR", symbol: "€",  rate: 0.92  },
+  ES:  { code: "EUR", symbol: "€",  rate: 0.92  },
+  IT:  { code: "EUR", symbol: "€",  rate: 0.92  },
+  NZ:  { code: "NZD", symbol: "NZ$", rate: 1.63 },
+  JP:  { code: "JPY", symbol: "¥",  rate: 149.5 },
+  MY:  { code: "MYR", symbol: "RM ", rate: 4.47  },
+  PH:  { code: "PHP", symbol: "₱",  rate: 56.5  },
+  NG:  { code: "NGN", symbol: "₦",  rate: 1580  },
+  ZA:  { code: "ZAR", symbol: "R",  rate: 18.6  },
+  BR:  { code: "BRL", symbol: "R$", rate: 4.97  },
+  MX:  { code: "MXN", symbol: "MX$", rate: 17.2 },
+};
+
+// Timezone → country code mapping for common regions
+const TZ_TO_COUNTRY: Record<string, string> = {
+  "Asia/Calcutta": "IN", "Asia/Kolkata": "IN",
+  "Europe/London": "GB", "Europe/Berlin": "DE", "Europe/Paris": "FR",
+  "Europe/Amsterdam": "NL", "Europe/Madrid": "ES", "Europe/Rome": "IT",
+  "Australia/Sydney": "AU", "Australia/Melbourne": "AU", "Australia/Perth": "AU",
+  "America/Toronto": "CA", "America/Vancouver": "CA",
+  "Asia/Singapore": "SG", "Asia/Dubai": "AE", "Asia/Riyadh": "SA",
+  "Pacific/Auckland": "NZ", "Asia/Tokyo": "JP",
+  "Asia/Kuala_Lumpur": "MY", "Asia/Manila": "PH",
+  "Africa/Lagos": "NG", "Africa/Johannesburg": "ZA",
+  "America/Sao_Paulo": "BR", "America/Mexico_City": "MX",
+};
+
+function useCurrency(): CurrencyInfo {
+  const [currency, setCurrency] = useState<CurrencyInfo>({ code: "USD", symbol: "$", rate: 1 });
+  useEffect(() => {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const country = TZ_TO_COUNTRY[tz];
+      if (country && CURRENCIES[country]) setCurrency(CURRENCIES[country]);
+    } catch { /* fallback to USD */ }
+  }, []);
+  return currency;
+}
+
+function formatPrice(usd: number, currency: CurrencyInfo): string {
+  const amount = Math.round(usd * currency.rate);
+  // For JPY / NGN don't show decimals, others round to nearest whole
+  return `${currency.symbol}${amount.toLocaleString()}`;
+}
+
+/* ── Base USD prices ────────────────────────────────────────── */
 const PRICES = {
   starter: { monthly: 9,  annual: 84  },
   pro:     { monthly: 19, annual: 168 },
@@ -74,6 +137,7 @@ const FEATURES = {
 export default function UpgradePage() {
   const router   = useRouter();
   const { user } = useAuth();
+  const currency = useCurrency();
   const [interval, setInterval] = useState<"monthly" | "annual">("monthly");
   const [payLoading, setPayLoading] = useState<string | null>(null);
   const [payError,   setPayError]   = useState("");
@@ -85,8 +149,12 @@ export default function UpgradePage() {
     (PRICES.pro.monthly * 12 - PRICES.pro.annual) / (PRICES.pro.monthly * 12) * 100
   );
 
-  function getPrice(tier: "starter" | "pro") {
+  function getUsdPrice(tier: "starter" | "pro") {
     return interval === "monthly" ? PRICES[tier].monthly : Math.round(PRICES[tier].annual / 12);
+  }
+
+  function getDisplayPrice(tier: "starter" | "pro") {
+    return formatPrice(getUsdPrice(tier), currency);
   }
 
   const handleUpgrade = useCallback(async (plan: "starter" | "pro") => {
@@ -229,7 +297,7 @@ export default function UpgradePage() {
           {/* Free */}
           <PlanCard
             name="Free"
-            price={0}
+            price="Free"
             interval={interval}
             badge={null}
             features={FEATURES.free}
@@ -241,7 +309,7 @@ export default function UpgradePage() {
           {/* Starter */}
           <PlanCard
             name="Starter"
-            price={getPrice("starter")}
+            price={getDisplayPrice("starter")}
             interval={interval}
             badge={interval === "annual" ? `Save ${annualSavingStarter}%` : null}
             features={FEATURES.starter}
@@ -253,7 +321,7 @@ export default function UpgradePage() {
           {/* Pro — highlighted */}
           <PlanCard
             name="Pro"
-            price={getPrice("pro")}
+            price={getDisplayPrice("pro")}
             interval={interval}
             badge="Most popular"
             features={FEATURES.pro}
@@ -301,7 +369,7 @@ export default function UpgradePage() {
         </div>
 
         <p style={{ fontSize: 11, color: "var(--text3)", marginTop: 32 }}>
-          Prices in USD. Billed in your local currency where applicable. Cancel anytime. Questions?{" "}
+          Prices shown in {currency.code}.{currency.code !== "USD" ? " Converted from USD at indicative rates." : ""} Cancel anytime. Questions?{" "}
           <a href="mailto:hello@jobsayer.com" style={{ color: "var(--accent)" }}>hello@jobsayer.com</a>
         </p>
       </div>
@@ -313,7 +381,7 @@ export default function UpgradePage() {
 
 interface PlanCardProps {
   name:      string;
-  price:     number;
+  price:     string;
   interval:  "monthly" | "annual";
   badge:     string | null;
   features:  readonly string[];
@@ -364,9 +432,9 @@ function PlanCard({ name, price, interval, badge, features, cta, ctaStyle, highl
           fontSize: 38, fontWeight: 900,
           color: highlight ? "#fff" : "var(--text1)",
         }}>
-          {price === 0 ? "$0" : `$${price}`}
+          {price}
         </span>
-        {price > 0 && (
+        {price !== "Free" && (
           <span style={{
             fontSize: 12, fontWeight: 600,
             color: highlight ? "rgba(255,255,255,.7)" : "var(--text3)",

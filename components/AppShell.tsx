@@ -9,9 +9,9 @@
  * Mobile (<768px): topbar + hamburger drawer (sidebar hidden).
  * Pass aiPanel={false} to suppress the right panel (e.g. full-width tool pages).
  */
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { useTheme } from "@/lib/useTheme";
 import AiCoachPanel from "./AiCoachPanel";
@@ -38,6 +38,147 @@ const INSIGHT_LINKS = [
 ];
 
 const ALL_LINKS = [...TOOL_LINKS, ...INSIGHT_LINKS];
+
+/* ── Command Palette ─────────────────────────────────────────── */
+function CommandPalette({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [query, setQuery] = useState("");
+  const [cursor, setCursor] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
+
+  const results = query.trim()
+    ? ALL_LINKS.filter(l =>
+        l.label.toLowerCase().includes(query.toLowerCase()) ||
+        l.href.toLowerCase().includes(query.toLowerCase())
+      )
+    : ALL_LINKS;
+
+  // Reset cursor when results change
+  useEffect(() => { setCursor(0); }, [query]);
+
+  // Focus input when opened
+  useEffect(() => {
+    if (open) { setQuery(""); setCursor(0); setTimeout(() => inputRef.current?.focus(), 30); }
+  }, [open]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") { onClose(); return; }
+      if (e.key === "ArrowDown") { e.preventDefault(); setCursor(c => Math.min(c + 1, results.length - 1)); }
+      if (e.key === "ArrowUp")   { e.preventDefault(); setCursor(c => Math.max(c - 1, 0)); }
+      if (e.key === "Enter" && results[cursor]) {
+        router.push(results[cursor].href);
+        onClose();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, cursor, results, onClose, router]);
+
+  if (!open) return null;
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, zIndex: 1000,
+        background: "rgba(0,0,0,.55)", backdropFilter: "blur(4px)",
+        display: "flex", alignItems: "flex-start", justifyContent: "center",
+        paddingTop: 120,
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: "100%", maxWidth: 520,
+          background: "var(--surface)", border: "1px solid var(--border)",
+          borderRadius: 14, boxShadow: "0 24px 80px rgba(0,0,0,.5)",
+          overflow: "hidden",
+        }}
+      >
+        {/* Search input */}
+        <div style={{
+          display: "flex", alignItems: "center", gap: 10,
+          padding: "12px 16px", borderBottom: "1px solid var(--border)",
+        }}>
+          <i className="ti ti-search" style={{ fontSize: 16, color: "var(--text3)", flexShrink: 0 }} />
+          <input
+            ref={inputRef}
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Search tools, pages, features..."
+            style={{
+              flex: 1, background: "none", border: "none", outline: "none",
+              fontSize: 14, color: "var(--text1)", fontFamily: "inherit",
+            }}
+          />
+          {query && (
+            <button onClick={() => setQuery("")} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 16, padding: 0, lineHeight: 1 }}>✕</button>
+          )}
+          <kbd style={{ fontSize: 10, color: "var(--text3)", background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 4, padding: "2px 6px" }}>Esc</kbd>
+        </div>
+
+        {/* Results */}
+        <div style={{ maxHeight: 360, overflowY: "auto", padding: "6px" }}>
+          {results.length === 0 ? (
+            <div style={{ padding: "20px", textAlign: "center", color: "var(--text3)", fontSize: 13 }}>
+              No results for &quot;{query}&quot;
+            </div>
+          ) : (
+            results.map((item, i) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onClose}
+                style={{
+                  display: "flex", alignItems: "center", gap: 12,
+                  padding: "10px 12px", borderRadius: 8, textDecoration: "none",
+                  background: i === cursor ? "var(--accdim)" : "transparent",
+                  border: `1px solid ${i === cursor ? "var(--accborder)" : "transparent"}`,
+                  transition: "background .1s",
+                }}
+                onMouseEnter={() => setCursor(i)}
+              >
+                <span style={{
+                  width: 30, height: 30, borderRadius: 7, flexShrink: 0,
+                  background: i === cursor ? "var(--accent)" : "var(--surface2)",
+                  border: "1px solid var(--border)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <i className={`ti ${item.icon}`} style={{ fontSize: 14, color: i === cursor ? "#fff" : "var(--text2)" }} />
+                </span>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: i === cursor ? "var(--accent)" : "var(--text1)" }}>
+                    {item.label}
+                  </div>
+                  <div style={{ fontSize: 11, color: "var(--text3)" }}>jobsayer.com{item.href}</div>
+                </div>
+                {i === cursor && (
+                  <kbd style={{ marginLeft: "auto", fontSize: 10, color: "var(--text3)", background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 4, padding: "2px 6px", flexShrink: 0 }}>↵</kbd>
+                )}
+              </Link>
+            ))
+          )}
+        </div>
+
+        {/* Footer hint */}
+        <div style={{
+          borderTop: "1px solid var(--border)", padding: "8px 16px",
+          display: "flex", gap: 16, alignItems: "center",
+        }}>
+          {[["↑↓", "navigate"], ["↵", "go"], ["Esc", "close"]].map(([key, hint]) => (
+            <span key={key} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "var(--text3)" }}>
+              <kbd style={{ background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 4, padding: "1px 5px", fontSize: 10 }}>{key}</kbd>
+              {hint}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /* ── Helpers ─────────────────────────────────────────────────── */
 function useWidth() {
@@ -119,6 +260,19 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
   const { dark, toggle: toggleTheme } = useTheme();
   const pathname = usePathname();
   const w = useWidth();
+  const [cmdOpen, setCmdOpen] = useState(false);
+
+  // ⌘K / Ctrl+K global hotkey
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setCmdOpen(o => !o);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
   const mobile = w < 768;
   const wideEnough = w >= 1200;
   const showAiPanel = aiPanel && wideEnough;
@@ -142,6 +296,7 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
   /* ── Mobile layout ─────────────────────────────────────────── */
   if (mobile) {
     return (
+      <>
       <div style={{ display: "flex", flexDirection: "column", minHeight: "100dvh", background: "var(--bg)" }}>
         {/* Mobile topbar */}
         <div style={{
@@ -193,11 +348,14 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
         {/* Page content */}
         <main style={{ flex: 1 }}>{children}</main>
       </div>
+      <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} />
+      </>
     );
   }
 
   /* ── Desktop layout ────────────────────────────────────────── */
   return (
+    <>
     <div style={{
       display: "flex", flexDirection: "column",
       height: "100dvh", overflow: "hidden",
@@ -223,21 +381,24 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
 
         {/* Command bar */}
         <div style={{ flex: 1, maxWidth: 440 }}>
-          <div style={{
-            background: "var(--surface2)", border: "1px solid var(--border)",
-            borderRadius: 8, padding: "6px 14px",
-            display: "flex", alignItems: "center", gap: 8, cursor: "text",
-          }}>
+          <button
+            onClick={() => setCmdOpen(true)}
+            style={{
+              width: "100%", background: "var(--surface2)", border: "1px solid var(--border)",
+              borderRadius: 8, padding: "6px 14px", cursor: "text",
+              display: "flex", alignItems: "center", gap: 8, fontFamily: "inherit",
+            }}
+          >
             <i className="ti ti-search" style={{ fontSize: 13, color: "var(--text3)", flexShrink: 0 }} />
-            <span style={{ fontSize: 12.5, color: "var(--text3)", flex: 1 }}>
+            <span style={{ fontSize: 12.5, color: "var(--text3)", flex: 1, textAlign: "left" }}>
               Search tools, jobs, skills...
             </span>
-            <span style={{
+            <kbd style={{
               fontSize: 10, color: "var(--text3)",
               background: "var(--border)", padding: "2px 6px", borderRadius: 4,
-              border: "1px solid var(--border2)",
-            }}>⌘K</span>
-          </div>
+              border: "1px solid var(--border2)", fontFamily: "inherit",
+            }}>⌘K</kbd>
+          </button>
         </div>
 
         {/* Right: page actions + streak + theme + user */}
@@ -361,6 +522,8 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
         {showAiPanel && <AiCoachPanel />}
       </div>
     </div>
+    <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} />
+    </>
   );
 }
 

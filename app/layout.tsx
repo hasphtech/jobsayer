@@ -35,12 +35,14 @@ export const metadata: Metadata = {
     siteName: "jobSayer",
     title: "jobSayer — The Platform That Grows Your Career",
     description: "Close skill gaps, build a standout resume, ace every interview, and negotiate your worth — all in one place. Trusted by professionals worldwide.",
-    images: [{ url: "https://jobsayer.com/og.png", width: 1200, height: 630 }],
+    images: [{ url: "https://jobsayer.com/og.png", width: 1200, height: 630, alt: "jobSayer — AI Career Growth Platform" }],
   },
   twitter: {
     card: "summary_large_image",
+    site: "@jobsayer",
     title: "jobSayer — AI Career Growth Platform",
     description: "Resume builder, salary intelligence, interview prep, career health score and more. Used by 50K+ professionals globally.",
+    images: ["https://jobsayer.com/og.png"],
   },
   icons: {
     icon: [
@@ -51,6 +53,7 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
     shortcut: "/favicon.ico",
   },
+  metadataBase: new URL("https://jobsayer.com"),
 };
 
 const FOUC_SCRIPT = `(function(){
@@ -77,6 +80,42 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Raleway:wght@400;600;700&family=Source+Sans+3:wght@400;600;700&family=Nunito:wght@400;600;700&display=swap"
         />
         <script dangerouslySetInnerHTML={{ __html: FOUC_SCRIPT }} />
+        {/* JSON-LD: Organization */}
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "jobSayer",
+          url: "https://jobsayer.com",
+          logo: "https://jobsayer.com/logo.png",
+          sameAs: [
+            "https://twitter.com/jobsayer",
+            "https://linkedin.com/company/jobsayer",
+          ],
+          contactPoint: { "@type": "ContactPoint", email: "hello@jobsayer.com", contactType: "customer support" },
+        }) }} />
+        {/* JSON-LD: WebSite with Sitelinks SearchBox */}
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "jobSayer",
+          url: "https://jobsayer.com",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: { "@type": "EntryPoint", urlTemplate: "https://jobsayer.com/jobs?q={search_term_string}" },
+            "query-input": "required name=search_term_string",
+          },
+        }) }} />
+        {/* JSON-LD: SoftwareApplication */}
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: "jobSayer",
+          operatingSystem: "Web",
+          applicationCategory: "BusinessApplication",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+          description: "AI-powered career growth platform — resume builder, ATS scorer, interview prep, salary insights and more.",
+          url: "https://jobsayer.com",
+        }) }} />
       </head>
       <body className={inter.variable}>
         <ClientAuthProvider>
