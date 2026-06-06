@@ -3,45 +3,67 @@
  * AppShell — hybrid desktop shell (replaces AppNav)
  *
  * Structure:
- *   [full-width topbar: logo | ⌘K command bar | user info]
+ *   [full-width topbar: logo | ⌘K command bar | role switcher | user info]
  *   [sidebar: labeled nav + career assets + user pill] | [content] | [AI coach panel?]
  *
  * Mobile (<768px): topbar + hamburger drawer (sidebar hidden).
  * Pass aiPanel={false} to suppress the right panel (e.g. full-width tool pages).
+ *
+ * Dual-role: CANDIDATE mode shows career tools; RECRUITER mode shows employer portal nav.
+ * Role is persisted in localStorage via useRole().
  */
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { useTheme } from "@/lib/useTheme";
+import { useRole, AppRole } from "@/lib/useRole";
 import AiCoachPanel from "./AiCoachPanel";
 
-/* ── Nav structure ───────────────────────────────────────────── */
+/* ── Candidate nav ───────────────────────────────────────────── */
 const TOOL_LINKS = [
-  { href: "/dashboard",    label: "Dashboard",    icon: "ti-layout-dashboard" },
+  { href: "/dashboard",    label: "Dashboard",      icon: "ti-layout-dashboard" },
   { href: "/builder",      label: "Resume Builder", icon: "ti-file-text" },
-  { href: "/score",        label: "ATS Score",    icon: "ti-target" },
-  { href: "/tailor",       label: "JD Tailor",    icon: "ti-scissors" },
-  { href: "/cover-letter", label: "Cover Letter", icon: "ti-mail" },
-  { href: "/interview",    label: "Interview",    icon: "ti-microphone" },
+  { href: "/score",        label: "ATS Score",      icon: "ti-target" },
+  { href: "/tailor",       label: "JD Tailor",      icon: "ti-scissors" },
+  { href: "/cover-letter", label: "Cover Letter",   icon: "ti-mail" },
+  { href: "/interview",    label: "Interview",      icon: "ti-microphone" },
 ];
 
 const INSIGHT_LINKS = [
-  { href: "/jobs",                label: "Jobs",         icon: "ti-briefcase" },
-  { href: "/applications",        label: "Tracker",      icon: "ti-list-check" },
-  { href: "/career-gps",          label: "Career GPS",   icon: "ti-compass" },
-  { href: "/career-health",       label: "Health",       icon: "ti-heart-rate-monitor" },
-  { href: "/salary",              label: "Salaries",     icon: "ti-coin" },
-  { href: "/vault",               label: "Doc Vault",    icon: "ti-folder-lock" },
-  { href: "/company",              label: "Companies",    icon: "ti-building-bank" },
-  { href: "/employer-trust",      label: "Trust",        icon: "ti-shield-check" },
-  { href: "/bgv",                 label: "BGV",          icon: "ti-certificate" },
-  { href: "/linkedin",            label: "LinkedIn",     icon: "ti-brand-linkedin" },
-  { href: "/integrations",        label: "Bot Integ.",   icon: "ti-plug-connected" },
-  { href: "/employer-dashboard",  label: "Employer",     icon: "ti-building" },
+  { href: "/jobs",             label: "Jobs",        icon: "ti-briefcase" },
+  { href: "/applications",     label: "Tracker",     icon: "ti-list-check" },
+  { href: "/career-gps",       label: "Career GPS",  icon: "ti-compass" },
+  { href: "/career-health",    label: "Health",      icon: "ti-heart-rate-monitor" },
+  { href: "/salary",           label: "Salaries",    icon: "ti-coin" },
+  { href: "/vault",            label: "Doc Vault",   icon: "ti-folder-lock" },
+  { href: "/company",          label: "Companies",   icon: "ti-building-bank" },
+  { href: "/employer-trust",   label: "Trust",       icon: "ti-shield-check" },
+  { href: "/bgv",              label: "BGV",         icon: "ti-certificate" },
+  { href: "/linkedin",         label: "LinkedIn",    icon: "ti-brand-linkedin" },
+  { href: "/integrations",     label: "Bot Integ.",  icon: "ti-plug-connected" },
 ];
 
-const ALL_LINKS = [...TOOL_LINKS, ...INSIGHT_LINKS];
+/* ── Recruiter nav ───────────────────────────────────────────── */
+const RECRUITER_TOOL_LINKS = [
+  { href: "/employer-dashboard",               label: "Overview",    icon: "ti-layout-dashboard" },
+  { href: "/employer-dashboard?tab=pipeline",  label: "Pipeline",    icon: "ti-funnel" },
+  { href: "/employer-dashboard?tab=candidates",label: "Candidates",  icon: "ti-users" },
+  { href: "/employer-dashboard?tab=bgv",       label: "BGV",         icon: "ti-shield-check" },
+  { href: "/jobs/post",                         label: "Post a Job",  icon: "ti-circle-plus" },
+];
+
+const RECRUITER_INSIGHT_LINKS = [
+  { href: "/employer-dashboard?tab=team-tools", label: "Team Tools",  icon: "ti-tools" },
+  { href: "/employer-dashboard?tab=billing",    label: "Billing",     icon: "ti-credit-card" },
+  { href: "/integrations",                       label: "Bot Integ.", icon: "ti-plug-connected" },
+  { href: "/company",                            label: "Companies",  icon: "ti-building-bank" },
+];
+
+const ALL_LINKS = [
+  ...TOOL_LINKS, ...INSIGHT_LINKS,
+  ...RECRUITER_TOOL_LINKS, ...RECRUITER_INSIGHT_LINKS,
+].filter((l, i, arr) => arr.findIndex(x => x.href === l.href) === i);
 
 /* ── Command Palette ─────────────────────────────────────────── */
 function CommandPalette({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -184,6 +206,52 @@ function CommandPalette({ open, onClose }: { open: boolean; onClose: () => void 
   );
 }
 
+/* ── Role switcher pill ──────────────────────────────────────── */
+function RoleSwitcher({ role, setRole }: { role: AppRole; setRole: (r: AppRole) => void }) {
+  const router = useRouter();
+  const [hov, setHov] = useState<AppRole | null>(null);
+
+  function handleSwitch(r: AppRole) {
+    setRole(r);
+    if (r === "recruiter") router.push("/employer-dashboard");
+    else router.push("/dashboard");
+  }
+
+  const pill = (r: AppRole, label: string) => {
+    const active = role === r;
+    const hovered = hov === r;
+    return (
+      <button
+        key={r}
+        onClick={() => handleSwitch(r)}
+        onMouseEnter={() => setHov(r)}
+        onMouseLeave={() => setHov(null)}
+        style={{
+          padding: "4px 11px", border: "none", cursor: "pointer",
+          background: active ? "var(--accent)" : hovered ? "var(--surface)" : "transparent",
+          color: active ? "#fff" : hovered ? "var(--text1)" : "var(--text3)",
+          fontFamily: "inherit", fontSize: 11, fontWeight: 700,
+          transition: "background .12s, color .12s",
+          borderRadius: 6,
+        }}
+      >
+        {label}
+      </button>
+    );
+  };
+
+  return (
+    <div style={{
+      display: "flex", alignItems: "center",
+      background: "var(--surface2)", border: "1px solid var(--border)",
+      borderRadius: 8, padding: 2, gap: 1,
+    }}>
+      {pill("candidate", "👤 Candidate")}
+      {pill("recruiter", "🏢 Recruiter")}
+    </div>
+  );
+}
+
 /* ── Helpers ─────────────────────────────────────────────────── */
 function useWidth() {
   const [w, setW] = useState(1200);
@@ -262,9 +330,16 @@ interface AppShellProps {
 export default function AppShell({ children, actions, aiPanel = true, contentFill = false }: AppShellProps) {
   const { user, signOut } = useAuth();
   const { dark, toggle: toggleTheme } = useTheme();
+  const { role, setRole } = useRole();
   const pathname = usePathname();
   const w = useWidth();
   const [cmdOpen, setCmdOpen] = useState(false);
+  // Client-side search params (avoids Suspense requirement)
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    setSearch(window.location.search);
+  }, [pathname]);
 
   // ⌘K / Ctrl+K global hotkey
   useEffect(() => {
@@ -294,8 +369,29 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
   const avatarLetter = (user?.email?.[0] ?? "?").toUpperCase();
   const hasAvatar = !!user?.user_metadata?.avatar_url;
 
-  const isActive = (href: string) =>
-    pathname === href || pathname.startsWith(href + "/");
+  // Active check — handles both clean paths and ?tab= query params
+  const isActive = (href: string) => {
+    if (href.includes("?")) {
+      const [hPath, hSearch] = href.split("?");
+      if (pathname !== hPath) return false;
+      const hTab = new URLSearchParams(hSearch).get("tab");
+      const curTab = new URLSearchParams(search).get("tab");
+      return curTab === hTab;
+    }
+    // /employer-dashboard (no tab) = overview — not active when a tab is selected
+    if (href === "/employer-dashboard") {
+      if (pathname !== "/employer-dashboard") return false;
+      const curTab = new URLSearchParams(search).get("tab");
+      return !curTab || curTab === "overview";
+    }
+    return pathname === href || pathname.startsWith(href + "/");
+  };
+
+  // Current mode's nav links
+  const toolLinks    = role === "recruiter" ? RECRUITER_TOOL_LINKS    : TOOL_LINKS;
+  const insightLinks = role === "recruiter" ? RECRUITER_INSIGHT_LINKS : INSIGHT_LINKS;
+  const toolLabel    = role === "recruiter" ? "Hiring" : "Tools";
+  const insightLabel = role === "recruiter" ? "Settings" : "Insights";
 
   /* ── Mobile layout ─────────────────────────────────────────── */
   if (mobile) {
@@ -333,7 +429,11 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
             background: "var(--surface)", borderBottom: "1px solid var(--border)",
             padding: "12px 14px", display: "flex", flexDirection: "column", gap: 4,
           }}>
-            {ALL_LINKS.map(l => (
+            {/* Role switcher in mobile drawer */}
+            <div style={{ marginBottom: 6 }}>
+              <RoleSwitcher role={role} setRole={setRole} />
+            </div>
+            {[...toolLinks, ...insightLinks].map(l => (
               <Link key={l.href} href={l.href} onClick={closeDrawer} style={{
                 padding: "10px 14px", borderRadius: 9, fontSize: 14, fontWeight: 500,
                 color: isActive(l.href) ? "var(--accent)" : "var(--text1)",
@@ -405,9 +505,12 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
           </button>
         </div>
 
-        {/* Right: page actions + streak + theme + user */}
+        {/* Right: page actions + role switcher + streak + theme + upgrade */}
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
           {actions}
+
+          {/* Role switcher */}
+          <RoleSwitcher role={role} setRole={setRole} />
 
           {/* Streak badge — if present */}
           <StreakBadge />
@@ -426,8 +529,8 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
             {dark ? "☀" : "🌙"}
           </button>
 
-          {/* Upgrade link */}
-          {user && (
+          {/* Upgrade link — only in candidate mode */}
+          {user && role === "candidate" && (
             <Link href="/upgrade" style={{
               fontSize: 11, fontWeight: 700, color: "var(--accent)",
               background: "var(--accdim)", border: "1px solid var(--accborder)",
@@ -451,15 +554,15 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
           overflowY: "auto", overflowX: "hidden",
         }}>
           <div style={{ padding: "12px 10px", flex: 1, display: "flex", flexDirection: "column" }}>
-            <SectionLabel>Tools</SectionLabel>
-            {TOOL_LINKS.map(l => (
+            <SectionLabel>{toolLabel}</SectionLabel>
+            {toolLinks.map(l => (
               <NavLink key={l.href} {...l} active={isActive(l.href)} />
             ))}
 
             <div style={{ height: 1, background: "var(--border)", margin: "8px 10px" }} />
 
-            <SectionLabel>Insights</SectionLabel>
-            {INSIGHT_LINKS.map(l => (
+            <SectionLabel>{insightLabel}</SectionLabel>
+            {insightLinks.map(l => (
               <NavLink key={l.href} {...l} active={isActive(l.href)} />
             ))}
 
