@@ -18,6 +18,63 @@ type AuthStep = "method" | "checking" | "otp_sent" | "company" | "done";
 
 const EMPLOYER_SIGNUP_KEY = "jobsayer_employer_signup";
 
+/* ── Spinner ── */
+function Spinner() {
+  return (
+    <span style={{
+      display: "inline-block", width: 14, height: 14,
+      border: "2px solid rgba(255,255,255,.3)",
+      borderTopColor: "#fff", borderRadius: "50%",
+      animation: "spin .7s linear infinite",
+      verticalAlign: "middle",
+    }} />
+  );
+}
+
+/* ── Step progress bar ── */
+function StepBar({ step }: { step: AuthStep }) {
+  const steps = [
+    { key: "method",   label: "Sign in"  },
+    { key: "otp_sent", label: "Verify"   },
+    { key: "company",  label: "Company"  },
+  ];
+  const idx = step === "checking" || step === "done" ? 2
+    : steps.findIndex(s => s.key === step);
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 0, marginBottom: 24 }}>
+      {steps.map((s, i) => {
+        const done    = i < idx;
+        const active  = i === idx;
+        const color   = done || active ? "var(--accent)" : "var(--border)";
+        return (
+          <React.Fragment key={s.key}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+              <div style={{
+                width: 26, height: 26, borderRadius: "50%",
+                border: `2px solid ${color}`,
+                background: done ? "var(--accent)" : active ? "var(--accdim)" : "transparent",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 10, fontWeight: 800,
+                color: done ? "#fff" : active ? "var(--accent)" : "var(--text3)",
+                flexShrink: 0,
+              }}>
+                {done ? "✓" : i + 1}
+              </div>
+              <span style={{ fontSize: 9, fontWeight: 700, color: active ? "var(--accent)" : "var(--text3)", textTransform: "uppercase", letterSpacing: ".04em", whiteSpace: "nowrap" }}>
+                {s.label}
+              </span>
+            </div>
+            {i < steps.length - 1 && (
+              <div style={{ flex: 1, height: 2, background: i < idx ? "var(--accent)" : "var(--border)", margin: "0 6px", marginBottom: 16 }} />
+            )}
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
+}
+
 function EmployerAuthModal({
   onClose,
   onProfile,
@@ -25,23 +82,22 @@ function EmployerAuthModal({
   onClose: () => void;
   onProfile: (p: EmployerProfile) => void;
 }) {
-  const { user, loading: authLoading, signInWithGoogle, signInWithOtp, verifyOtp } = useAuth();
-  // If already signed in, skip straight to "checking" — avoids flashing auth form
-  const [step, setStep]         = useState<AuthStep>(user ? "checking" : "method");
-  const [email, setEmail]       = useState("");
-  const [otp, setOtp]           = useState("");
-  const [company, setCompany]   = useState("");
-  const [website, setWebsite]   = useState("");
-  const [busy, setBusy]         = useState(false);
-  const [err, setErr]           = useState("");
-  // Prevent the profile-check effect from running more than once per auth
-  const profileChecked = React.useRef(false);
+  const { user, signInWithGoogle, signInWithOtp, verifyOtp } = useAuth();
+  const [step, setStep]       = useState<AuthStep>(user ? "checking" : "method");
+  const [email, setEmail]     = useState("");
+  const [otp, setOtp]         = useState("");
+  const [company, setCompany] = useState("");
+  const [website, setWebsite] = useState("");
+  const [busy, setBusy]       = useState(false);
+  const [err, setErr]         = useState("");
+  const profileChecked        = React.useRef(false);
 
   // Once signed in → check / create employer profile (runs once per auth)
   useEffect(() => {
     if (!user || profileChecked.current) return;
     profileChecked.current = true;
     (async () => {
+      setStep("checking");
       const res = await fetch("/api/employer/profile");
       if (res.ok) {
         const { profile } = await res.json() as { profile: EmployerProfile | null };
@@ -64,7 +120,7 @@ function EmployerAuthModal({
     setBusy(true); setErr("");
     const { error } = await verifyOtp(email.trim().toLowerCase(), otp.trim());
     if (error) { setErr(error); setBusy(false); }
-    else setBusy(false); // auth state change → useEffect above fires
+    else setBusy(false);
   }
 
   async function handleCompany() {
@@ -81,143 +137,230 @@ function EmployerAuthModal({
     setBusy(false);
   }
 
-  // Close on Escape
   useEffect(() => {
     const h = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
   }, [onClose]);
 
-  const overlay: React.CSSProperties = {
-    position: "fixed", inset: 0, zIndex: 200,
-    background: "rgba(0,0,0,.65)", backdropFilter: "blur(4px)",
-    display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
-  };
-  const card: React.CSSProperties = {
-    background: "var(--surface)", border: "1px solid var(--border)",
-    borderRadius: 18, padding: "32px 28px", width: "100%", maxWidth: 400, position: "relative",
-  };
+  /* ── Shared input / button styles ── */
   const inp: React.CSSProperties = {
-    width: "100%", padding: "11px 14px", borderRadius: 9,
+    width: "100%", padding: "10px 13px", borderRadius: 8,
     background: "var(--surface2)", border: "1px solid var(--border)",
-    color: "var(--text1)", fontSize: 14, fontFamily: "inherit", boxSizing: "border-box",
+    color: "var(--text1)", fontSize: 13, fontFamily: "inherit",
+    boxSizing: "border-box", outline: "none",
+    transition: "border-color .15s",
   };
-  const btn: React.CSSProperties = {
-    width: "100%", padding: "12px", borderRadius: 9, border: "none",
-    background: "var(--accent)", color: "#fff", fontSize: 14, fontWeight: 700,
+  const primaryBtn: React.CSSProperties = {
+    width: "100%", padding: "11px", borderRadius: 8, border: "none",
+    background: busy ? "rgba(99,102,241,.6)" : "var(--accent)",
+    color: "#fff", fontSize: 13, fontWeight: 700,
+    cursor: busy ? "default" : "pointer", fontFamily: "inherit",
+    display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+    transition: "background .15s",
+  };
+  const ghostBtn: React.CSSProperties = {
+    width: "100%", padding: "9px", borderRadius: 8,
+    border: "1px solid var(--border)", background: "transparent",
+    color: "var(--text3)", fontSize: 12, fontWeight: 500,
     cursor: "pointer", fontFamily: "inherit",
+    transition: "color .15s, border-color .15s",
   };
+
+  /* ── Error box ── */
+  const ErrBox = ({ msg }: { msg: string }) => (
+    <div style={{ fontSize: 12, color: "#ef4444", padding: "8px 12px", borderRadius: 7, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.2)", marginBottom: 10 }}>
+      {msg}
+    </div>
+  );
 
   return (
-    <div style={overlay} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div style={card}>
-        <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18 }}>✕</button>
+    <>
+      {/* inject keyframe once */}
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      <div
+        onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+        style={{
+          position: "fixed", inset: 0, zIndex: 200,
+          background: "rgba(0,0,0,.6)", backdropFilter: "blur(6px)",
+          display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
+        }}
+      >
+        <div style={{
+          background: "var(--surface)", border: "1px solid var(--border)",
+          borderRadius: 16, padding: "28px 24px", width: "100%", maxWidth: 400,
+          position: "relative", boxShadow: "0 24px 80px rgba(0,0,0,.45)",
+        }}>
+          {/* Close button */}
+          <button onClick={onClose} style={{
+            position: "absolute", top: 12, right: 12,
+            width: 28, height: 28, borderRadius: 7,
+            background: "var(--surface2)", border: "1px solid var(--border)",
+            color: "var(--text3)", cursor: "pointer", fontSize: 12,
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>✕</button>
 
-        {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: step === "checking" ? 0 : 24 }}>
-          <div style={{ fontSize: 28, marginBottom: 8 }}>🏢</div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: "var(--text1)" }}>
-            {step === "checking" ? "Checking your account…"
-              : step === "company" ? "Set up your employer account"
-              : "Sign in as Recruiter"}
+          {/* Logo + title */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+            <div style={{
+              width: 36, height: 36, borderRadius: 9,
+              background: "var(--accdim)", border: "1px solid var(--accborder)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 16, flexShrink: 0,
+            }}>🏢</div>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: "var(--text1)", lineHeight: 1.2 }}>
+                {step === "checking"
+                  ? "Verifying account…"
+                  : step === "company"
+                    ? "One last step"
+                    : "Recruiter Sign-in"}
+              </div>
+              <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 1 }}>
+                {step === "checking"
+                  ? "Checking your employer profile"
+                  : step === "company"
+                    ? "Add your company to activate the portal"
+                    : "One account for candidates and recruiters"}
+              </div>
+            </div>
           </div>
-          {step !== "checking" && (
-            <div style={{ fontSize: 13, color: "var(--text3)", marginTop: 4 }}>
-              {step === "company"
-                ? <>Your candidate account works here too — just add your company name</>
-                : <>Same account for both candidate and recruiter — no separate login needed</>}
+
+          {/* Step progress bar — hidden during checking/done */}
+          {step !== "checking" && step !== "done" && <StepBar step={step} />}
+
+          {/* ── CHECKING ── */}
+          {step === "checking" && (
+            <div style={{ textAlign: "center", padding: "28px 0 12px", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+              <div style={{
+                width: 40, height: 40, borderRadius: "50%",
+                border: "3px solid var(--border)",
+                borderTopColor: "var(--accent)",
+                animation: "spin .7s linear infinite",
+              }} />
+              <div style={{ fontSize: 13, color: "var(--text3)" }}>Loading your employer profile…</div>
             </div>
           )}
+
+          {/* ── COMPANY ── */}
+          {step === "company" && (
+            <>
+              <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 16, padding: "9px 12px", borderRadius: 8, background: "rgba(99,102,241,.06)", border: "1px solid var(--accborder)" }}>
+                ✓ Signed in as <strong style={{ color: "var(--text1)" }}>{user?.email}</strong>
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", display: "block", marginBottom: 5, textTransform: "uppercase", letterSpacing: ".04em" }}>Company Name *</label>
+                <input
+                  style={inp} placeholder="e.g. Razorpay, Flipkart…" value={company}
+                  onChange={e => { setCompany(e.target.value); setErr(""); }}
+                  onFocus={e => (e.target.style.borderColor = "var(--accent)")}
+                  onBlur={e => (e.target.style.borderColor = "var(--border)")}
+                  onKeyDown={e => e.key === "Enter" && handleCompany()} autoFocus
+                />
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", display: "block", marginBottom: 5, textTransform: "uppercase", letterSpacing: ".04em" }}>Website <span style={{ fontWeight: 400, textTransform: "none" }}>(optional)</span></label>
+                <input
+                  style={inp} placeholder="https://yourcompany.com" value={website}
+                  onChange={e => setWebsite(e.target.value)}
+                  onFocus={e => (e.target.style.borderColor = "var(--accent)")}
+                  onBlur={e => (e.target.style.borderColor = "var(--border)")}
+                />
+              </div>
+              {err && <ErrBox msg={err} />}
+              <button onClick={handleCompany} disabled={busy} style={primaryBtn}>
+                {busy ? <><Spinner /> Saving…</> : "Activate Employer Portal →"}
+              </button>
+            </>
+          )}
+
+          {/* ── OTP VERIFY ── */}
+          {step === "otp_sent" && (
+            <>
+              <div style={{ fontSize: 13, color: "var(--text2)", textAlign: "center", marginBottom: 16, lineHeight: 1.6 }}>
+                We sent a 6-digit code to<br />
+                <strong style={{ color: "var(--text1)" }}>{email}</strong>
+              </div>
+              <input
+                type="text" inputMode="numeric" maxLength={6}
+                placeholder="— — — — — —"
+                value={otp}
+                onChange={e => { setOtp(e.target.value.replace(/\D/g, "")); setErr(""); }}
+                onFocus={e => (e.target.style.borderColor = "var(--accent)")}
+                onBlur={e => (e.target.style.borderColor = "var(--border)")}
+                onKeyDown={e => e.key === "Enter" && handleVerifyOtp()}
+                style={{ ...inp, letterSpacing: "0.4em", textAlign: "center", fontSize: 22, fontWeight: 800, marginBottom: 12 }}
+                autoFocus
+              />
+              {err && <ErrBox msg={err} />}
+              <button onClick={handleVerifyOtp} disabled={busy} style={{ ...primaryBtn, marginBottom: 8 }}>
+                {busy ? <><Spinner /> Verifying…</> : "Verify Code →"}
+              </button>
+              <button onClick={() => { setStep("method"); setOtp(""); setErr(""); }} style={ghostBtn}>
+                ← Use a different email
+              </button>
+            </>
+          )}
+
+          {/* ── METHOD ── */}
+          {step === "method" && (
+            <>
+              {/* Google */}
+              <button
+                onClick={() => {
+                  sessionStorage.setItem(EMPLOYER_SIGNUP_KEY, "1");
+                  signInWithGoogle("/recruit");
+                }}
+                style={{
+                  width: "100%", padding: "10px 14px", borderRadius: 8,
+                  border: "1px solid var(--border)", background: "var(--surface2)",
+                  color: "var(--text1)", fontSize: 13, fontWeight: 600,
+                  cursor: "pointer", fontFamily: "inherit",
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+                  marginBottom: 14, transition: "border-color .15s",
+                }}
+                onMouseEnter={e => (e.currentTarget.style.borderColor = "var(--accent)")}
+                onMouseLeave={e => (e.currentTarget.style.borderColor = "var(--border)")}
+              >
+                <svg width="16" height="16" viewBox="0 0 48 48" style={{ flexShrink: 0 }}>
+                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+                Continue with Google
+              </button>
+
+              {/* Divider */}
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+                <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+                <span style={{ fontSize: 11, color: "var(--text3)", whiteSpace: "nowrap" }}>or use work email</span>
+                <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+              </div>
+
+              {/* Email */}
+              <input
+                type="email" placeholder="you@company.com" value={email}
+                onChange={e => { setEmail(e.target.value); setErr(""); }}
+                onFocus={e => (e.target.style.borderColor = "var(--accent)")}
+                onBlur={e => (e.target.style.borderColor = "var(--border)")}
+                onKeyDown={e => e.key === "Enter" && handleSendOtp()}
+                style={{ ...inp, marginBottom: 10 }} autoFocus
+              />
+              {err && <ErrBox msg={err} />}
+              <button onClick={handleSendOtp} disabled={busy} style={primaryBtn}>
+                {busy ? <><Spinner /> Sending code…</> : "Send OTP →"}
+              </button>
+
+              {/* Trust note */}
+              <div style={{ marginTop: 14, fontSize: 11, color: "var(--text3)", textAlign: "center", lineHeight: 1.6 }}>
+                Free to start · No credit card · Esc to close
+              </div>
+            </>
+          )}
         </div>
-
-        {/* Checking state — spinner while profile loads */}
-        {step === "checking" && (
-          <div style={{ textAlign: "center", padding: "24px 0 8px" }}>
-            <div style={{ fontSize: 12, color: "var(--text3)" }}>Loading your profile…</div>
-          </div>
-        )}
-
-        {step === "company" ? (
-          /* Company name step */
-          <>
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text3)", display: "block", marginBottom: 6 }}>COMPANY NAME *</label>
-              <input style={inp} placeholder="e.g. Razorpay, Flipkart…" value={company}
-                onChange={e => { setCompany(e.target.value); setErr(""); }}
-                onKeyDown={e => e.key === "Enter" && handleCompany()} autoFocus />
-            </div>
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text3)", display: "block", marginBottom: 6 }}>COMPANY WEBSITE (optional)</label>
-              <input style={inp} placeholder="https://yourcompany.com" value={website}
-                onChange={e => setWebsite(e.target.value)} />
-            </div>
-            {err && <p style={{ fontSize: 12, color: "var(--danger)", margin: "0 0 10px" }}>{err}</p>}
-            <button onClick={handleCompany} disabled={busy} style={btn}>
-              {busy ? "Saving…" : "Continue →"}
-            </button>
-          </>
-        ) : step === "otp_sent" ? (
-          /* OTP verify step */
-          <>
-            <p style={{ fontSize: 13, color: "var(--text2)", textAlign: "center", marginBottom: 14 }}>
-              Code sent to <strong style={{ color: "var(--text1)" }}>{email}</strong>
-            </p>
-            <input type="text" inputMode="numeric" maxLength={6} placeholder="6-digit code"
-              value={otp} onChange={e => { setOtp(e.target.value.replace(/\D/g, "")); setErr(""); }}
-              onKeyDown={e => e.key === "Enter" && handleVerifyOtp()}
-              style={{ ...inp, letterSpacing: "0.3em", textAlign: "center", fontSize: 20, fontWeight: 700, marginBottom: 12 }}
-              autoFocus />
-            {err && <p style={{ fontSize: 12, color: "var(--danger)", margin: "0 0 10px" }}>{err}</p>}
-            <button onClick={handleVerifyOtp} disabled={busy} style={btn}>
-              {busy ? "Verifying…" : "Verify & Continue →"}
-            </button>
-            <button onClick={() => { setStep("method"); setOtp(""); setErr(""); }}
-              style={{ width: "100%", background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 12, marginTop: 10, fontFamily: "inherit" }}>
-              ← Use different email
-            </button>
-          </>
-        ) : (
-          /* Method selection */
-          <>
-            {/* Google */}
-            <button onClick={() => {
-              // Flag that we're in employer signup so the page auto-opens modal on return
-              sessionStorage.setItem(EMPLOYER_SIGNUP_KEY, "1");
-              signInWithGoogle("/recruit");
-            }} style={{
-              width: "100%", padding: "11px", borderRadius: 9,
-              border: "1px solid var(--border)", background: "var(--surface2)",
-              color: "var(--text1)", fontSize: 14, fontWeight: 600,
-              cursor: "pointer", fontFamily: "inherit",
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 16,
-            }}>
-              <svg width="18" height="18" viewBox="0 0 48 48">
-                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-              </svg>
-              Continue with Google
-            </button>
-
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-              <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
-              <span style={{ fontSize: 12, color: "var(--text3)" }}>or work email</span>
-              <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
-            </div>
-
-            <input type="email" placeholder="you@company.com" value={email}
-              onChange={e => { setEmail(e.target.value); setErr(""); }}
-              onKeyDown={e => e.key === "Enter" && handleSendOtp()}
-              style={{ ...inp, marginBottom: 10 }} autoFocus />
-            {err && <p style={{ fontSize: 12, color: "var(--danger)", margin: "0 0 10px" }}>{err}</p>}
-            <button onClick={handleSendOtp} disabled={busy} style={btn}>
-              {busy ? "Sending…" : "Send OTP →"}
-            </button>
-          </>
-        )}
       </div>
-    </div>
+    </>
   );
 }
 
