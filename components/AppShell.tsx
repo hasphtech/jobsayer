@@ -27,14 +27,18 @@ const TOOL_LINKS = [
 ];
 
 const INSIGHT_LINKS = [
-  { href: "/jobs",           label: "Jobs",        icon: "ti-briefcase" },
-  { href: "/applications",   label: "Tracker",     icon: "ti-list-check" },
-  { href: "/career-gps",    label: "Career GPS",   icon: "ti-compass" },
-  { href: "/career-health", label: "Health",       icon: "ti-heart-rate-monitor" },
-  { href: "/salary",        label: "Salaries",     icon: "ti-coin" },
-  { href: "/employer-trust",label: "Trust",        icon: "ti-shield-check" },
-  { href: "/bgv",           label: "BGV",          icon: "ti-certificate" },
-  { href: "/linkedin",      label: "LinkedIn",     icon: "ti-brand-linkedin" },
+  { href: "/jobs",                label: "Jobs",         icon: "ti-briefcase" },
+  { href: "/applications",        label: "Tracker",      icon: "ti-list-check" },
+  { href: "/career-gps",          label: "Career GPS",   icon: "ti-compass" },
+  { href: "/career-health",       label: "Health",       icon: "ti-heart-rate-monitor" },
+  { href: "/salary",              label: "Salaries",     icon: "ti-coin" },
+  { href: "/vault",               label: "Doc Vault",    icon: "ti-folder-lock" },
+  { href: "/company",              label: "Companies",    icon: "ti-building-bank" },
+  { href: "/employer-trust",      label: "Trust",        icon: "ti-shield-check" },
+  { href: "/bgv",                 label: "BGV",          icon: "ti-certificate" },
+  { href: "/linkedin",            label: "LinkedIn",     icon: "ti-brand-linkedin" },
+  { href: "/integrations",        label: "Bot Integ.",   icon: "ti-plug-connected" },
+  { href: "/employer-dashboard",  label: "Employer",     icon: "ti-building" },
 ];
 
 const ALL_LINKS = [...TOOL_LINKS, ...INSIGHT_LINKS];

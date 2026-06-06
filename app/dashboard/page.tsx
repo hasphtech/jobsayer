@@ -136,6 +136,257 @@ function QuickAction({ href, icon, label, xp }: { href: string; icon: string; la
   );
 }
 
+/* ── Post-hire continuity panel (GAP 3) ─────────────────────── */
+type PHPhase = "30" | "60" | "90";
+
+const PH_PHASES: { key: PHPhase; label: string; color: string; goals: string[] }[] = [
+  {
+    key: "30", label: "First 30 days", color: "#6366f1",
+    goals: [
+      "Meet every direct teammate 1-on-1",
+      "Understand team's top 3 OKRs",
+      "Ship one small contribution",
+      "Set up 1:1 cadence with manager",
+    ],
+  },
+  {
+    key: "60", label: "Days 31–60", color: "#f59e0b",
+    goals: [
+      "Identify one process gap to improve",
+      "Own a meaningful deliverable end-to-end",
+      "Build cross-team relationships",
+      "Request first informal feedback",
+    ],
+  },
+  {
+    key: "90", label: "Days 61–90", color: "#22c55e",
+    goals: [
+      "Document your wins + metrics impact",
+      "Propose a growth plan to manager",
+      "Contribute to a roadmap discussion",
+      "Schedule formal 90-day review",
+    ],
+  },
+];
+
+function PostHirePanel() {
+  const STORAGE_KEY = "jobsayer-posthire";
+
+  // Load/save state from localStorage after mount
+  const [mounted, setMounted] = useState(false);
+  const [activePhase, setActivePhase] = useState<PHPhase>("30");
+  const [checked, setChecked] = useState<Record<string, boolean>>({});
+  const [offerSalary, setOfferSalary] = useState("1200000");
+  const [currentSalary, setCurrentSalary] = useState("1000000");
+  const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const s = JSON.parse(raw);
+        if (s.checked) setChecked(s.checked);
+        if (s.activePhase) setActivePhase(s.activePhase);
+      }
+    } catch { /* ignore */ }
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ checked, activePhase })); } catch { /* ignore */ }
+  }, [checked, activePhase, mounted]);
+
+  function toggleCheck(key: string) {
+    setChecked(prev => ({ ...prev, [key]: !prev[key] }));
+  }
+
+  const phase = PH_PHASES.find(p => p.key === activePhase)!;
+  const doneCount = phase.goals.filter((_, i) => checked[`${activePhase}_${i}`]).length;
+  const pct = Math.round((doneCount / phase.goals.length) * 100);
+
+  // Counteroffer calculator
+  const offerNum = Number(offerSalary.replace(/,/g, "")) || 0;
+  const curNum   = Number(currentSalary.replace(/,/g, "")) || 0;
+  const delta    = offerNum - curNum;
+  const deltaPct = curNum > 0 ? ((delta / curNum) * 100).toFixed(1) : "0";
+  const isGood   = delta > 0;
+  const totalComp1yr = offerNum;
+  const counterTarget = Math.round(offerNum * 1.08); // aim 8% above offer
+
+  function fmt(n: number) {
+    if (n >= 100000) return `₹${(n / 100000).toFixed(1)}L`;
+    return `₹${n.toLocaleString("en-IN")}`;
+  }
+
+  return (
+    <div style={{ marginTop: 14 }}>
+      {/* Header row */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+          Post-Hire Continuity
+        </div>
+        <div style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: "rgba(99,102,241,.12)", color: "var(--accent)", fontWeight: 700 }}>
+          NEW
+        </div>
+        <div style={{ flex: 1 }} />
+        <button onClick={() => setExpanded(o => !o)}
+          style={{ fontSize: 11, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+          {expanded ? "Collapse ↑" : "Expand ↓"}
+        </button>
+      </div>
+
+      {/* 30-60-90 tracker */}
+      <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px", marginBottom: 10 }}>
+        {/* Phase tabs */}
+        <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
+          {PH_PHASES.map(p => (
+            <button key={p.key} onClick={() => setActivePhase(p.key)}
+              style={{
+                flex: 1, padding: "7px 0", borderRadius: 7, fontSize: 11, fontWeight: 700, fontFamily: "inherit",
+                cursor: "pointer", border: "1px solid transparent",
+                background: activePhase === p.key ? `${p.color}18` : "var(--surface2)",
+                color: activePhase === p.key ? p.color : "var(--text3)",
+                borderColor: activePhase === p.key ? `${p.color}40` : "var(--border)",
+              }}>
+              {p.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Progress bar */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+          <div style={{ flex: 1, height: 5, background: "var(--border)", borderRadius: 3, overflow: "hidden" }}>
+            <div style={{ height: "100%", width: `${pct}%`, background: phase.color, borderRadius: 3, transition: "width .3s" }} />
+          </div>
+          <span style={{ fontSize: 11, fontWeight: 700, color: phase.color, flexShrink: 0 }}>{doneCount}/{phase.goals.length}</span>
+        </div>
+
+        {/* Goals checklist */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {phase.goals.map((goal, i) => {
+            const key = `${activePhase}_${i}`;
+            const done = !!checked[key];
+            return (
+              <button key={i} onClick={() => toggleCheck(key)}
+                style={{
+                  display: "flex", alignItems: "center", gap: 10, width: "100%", textAlign: "left",
+                  padding: "9px 12px", borderRadius: 8, cursor: "pointer", fontFamily: "inherit",
+                  background: done ? `${phase.color}10` : "var(--surface2)",
+                  border: `1px solid ${done ? phase.color + "35" : "var(--border)"}`,
+                }}>
+                <div style={{
+                  width: 18, height: 18, borderRadius: "50%", flexShrink: 0,
+                  background: done ? phase.color : "transparent",
+                  border: `1.5px solid ${done ? phase.color : "var(--border)"}`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  {done && <span style={{ fontSize: 10, color: "#fff" }}>✓</span>}
+                </div>
+                <span style={{ fontSize: 12, color: done ? "var(--text3)" : "var(--text1)", textDecoration: done ? "line-through" : "none", flex: 1 }}>
+                  {goal}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Expanded section: promotion readiness + appraisal prep + counteroffer */}
+      {expanded && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+
+          {/* Promotion readiness */}
+          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px" }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)", marginBottom: 10 }}>🚀 Promotion Readiness</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {[
+                { label: "Performance above expectations", done: doneCount >= 2 },
+                { label: "Visibility with senior leadership", done: doneCount >= 3 },
+                { label: "Document impact with metrics", done: false },
+                { label: "Sponsor/mentor identified", done: false },
+                { label: "Next-level skills in progress", done: false },
+              ].map((item, i) => (
+                <div key={i} style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 12 }}>
+                  <span style={{ color: item.done ? "#22c55e" : "var(--text3)", flexShrink: 0 }}>{item.done ? "✓" : "○"}</span>
+                  <span style={{ color: item.done ? "var(--text1)" : "var(--text3)" }}>{item.label}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 12, padding: "8px 10px", borderRadius: 7, background: "rgba(99,102,241,.07)", border: "1px solid rgba(99,102,241,.15)", fontSize: 11, color: "var(--text3)" }}>
+              💡 <strong style={{ color: "var(--accent)" }}>Tip:</strong> Most promotions happen when you do the next level&apos;s job before the title change. Focus on scope, not time served.
+            </div>
+          </div>
+
+          {/* Counteroffer calculator */}
+          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px" }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)", marginBottom: 10 }}>💰 Counteroffer Calculator</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div>
+                <label style={{ fontSize: 10, color: "var(--text3)", fontWeight: 700, textTransform: "uppercase", display: "block", marginBottom: 4 }}>Your Current CTC (₹/year)</label>
+                <input value={currentSalary} onChange={e => setCurrentSalary(e.target.value)}
+                  style={{ width: "100%", padding: "8px 10px", borderRadius: 7, background: "var(--surface2)", border: "1px solid var(--border)", color: "var(--text1)", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 10, color: "var(--text3)", fontWeight: 700, textTransform: "uppercase", display: "block", marginBottom: 4 }}>Offer CTC (₹/year)</label>
+                <input value={offerSalary} onChange={e => setOfferSalary(e.target.value)}
+                  style={{ width: "100%", padding: "8px 10px", borderRadius: 7, background: "var(--surface2)", border: "1px solid var(--border)", color: "var(--text1)", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
+              </div>
+              <div style={{ padding: "12px", borderRadius: 8, background: isGood ? "rgba(34,197,94,.07)" : "rgba(239,68,68,.07)", border: `1px solid ${isGood ? "rgba(34,197,94,.25)" : "rgba(239,68,68,.25)"}` }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: isGood ? "#22c55e" : "#ef4444", marginBottom: 4 }}>
+                  {isGood ? `+${deltaPct}% raise` : `${deltaPct}% cut — reconsider`}
+                </div>
+                <div style={{ fontSize: 11, color: "var(--text3)" }}>Delta: {fmt(Math.abs(delta))}</div>
+                <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 4 }}>Counter at: <strong style={{ color: "var(--accent)" }}>{fmt(counterTarget)}</strong></div>
+                <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 4, lineHeight: 1.5 }}>
+                  {Number(deltaPct) < 20 && Number(deltaPct) > 0 ? "⚠️ Less than 20% — typically not worth the switch unless role or growth is materially better." : ""}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Appraisal prep */}
+          <div style={{ gridColumn: "1 / -1", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px" }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)", marginBottom: 10 }}>📊 Appraisal Prep — What to Document</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
+              {[
+                { icon: "📈", title: "Quantified Impact", desc: "Revenue influenced, cost saved, load reduced — anything with a number." },
+                { icon: "🤝", title: "Cross-team Work", desc: "Projects where you collaborated outside your team. Shows breadth." },
+                { icon: "🎓", title: "Skills Acquired", desc: "Certifications, new tools adopted, technologies picked up." },
+                { icon: "🚀", title: "Initiatives Launched", desc: "Processes you started, problems you found and solved without being asked." },
+                { icon: "👥", title: "People Grown", desc: "If you mentored, onboarded, or unblocked others — document it." },
+                { icon: "💡", title: "Feedback Received", desc: "Positive 360 feedback, awards, shoutouts — keep receipts." },
+              ].map(item => (
+                <div key={item.title} style={{ padding: "10px", borderRadius: 8, background: "var(--surface2)", border: "1px solid var(--border)" }}>
+                  <div style={{ fontSize: 16, marginBottom: 4 }}>{item.icon}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)", marginBottom: 3 }}>{item.title}</div>
+                  <div style={{ fontSize: 11, color: "var(--text3)", lineHeight: 1.5 }}>{item.desc}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
+              <Link href="/vault" style={{
+                fontSize: 12, fontWeight: 700, padding: "7px 14px", borderRadius: 7,
+                background: "var(--accent)", color: "#fff", textDecoration: "none",
+              }}>
+                📁 Store in Doc Vault
+              </Link>
+              <Link href="/builder" style={{
+                fontSize: 12, fontWeight: 700, padding: "7px 14px", borderRadius: 7,
+                background: "var(--surface2)", color: "var(--text1)", textDecoration: "none",
+                border: "1px solid var(--border)",
+              }}>
+                ✏️ Update Resume
+              </Link>
+            </div>
+          </div>
+
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── Page ────────────────────────────────────────────────────── */
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -412,6 +663,9 @@ export default function DashboardPage() {
             })}
           </div>
         </div>
+
+        {/* ── POST-HIRE CONTINUITY (GAP 3) ── */}
+        <PostHirePanel />
 
         {/* ── Weekly goals (if any) ── */}
         {state.weeklyGoals?.length > 0 && (
