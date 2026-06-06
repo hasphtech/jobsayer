@@ -27,6 +27,19 @@
   --nav-bg:         rgba(8,8,12,0.95);      /* sticky nav background */
   --nav-active-bg:  rgba(255,255,255,0.07); /* active nav link */
   --nav-hover-col:  #ffffff;
+
+  /* AppShell layout tokens */
+  --shell-sidebar-w:   200px;
+  --shell-topbar-h:    46px;
+  --shell-ai-panel-w:  240px;
+  --shell-sidebar-bg:  #0b0b16;
+  --shell-topbar-bg:   #0d0d18;
+  --shell-ai-bg:       #0b0b16;
+  --shell-link-active-bg:  rgba(99,102,241,0.15);
+  --shell-link-active-col: #fff;
+  --shell-link-col:        rgba(255,255,255,0.45);
+  --shell-link-hover-col:  rgba(255,255,255,0.8);
+  --shell-section-col:     rgba(255,255,255,0.18);
 }
 
 /* ─── Light theme override ──────────────────────────────────── */
@@ -38,6 +51,16 @@ body.light {
   --nav-hover-col: #0f172a;
   --surface-hover: rgba(0,0,0,0.04);
   --border-strong: rgba(0,0,0,0.15);
+
+  /* AppShell light overrides */
+  --shell-sidebar-bg:  #ffffff;
+  --shell-topbar-bg:   #ffffff;
+  --shell-ai-bg:       #f8f9fc;
+  --shell-link-active-bg:  rgba(99,102,241,0.08);
+  --shell-link-active-col: #4338ca;
+  --shell-link-col:        #64748b;
+  --shell-link-hover-col:  #0f172a;
+  --shell-section-col:     #94a3b8;
   --surface2:  #f1f5f9;
   --border:    rgba(0,0,0,0.10);
   --border2:   rgba(0,0,0,0.05);
