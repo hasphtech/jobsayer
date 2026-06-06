@@ -218,7 +218,7 @@ export default function CoverLetterPage() {
 
   return (
     <AppShell>
-      <div className="pg" style={{ maxWidth: 960, margin: "0 auto" }}>
+      <div className="pg" style={{ padding: "24px 24px 48px" }}>
 
         {/* Header */}
         <div style={{ marginBottom: 24 }}>

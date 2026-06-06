@@ -226,7 +226,7 @@ export default function InterviewPage() {
   ══════════════════════════════════════════════════════════ */
   if (stage === "profile") return (
     <AppShell>
-      <div style={{ maxWidth: 680, margin: "0 auto", padding: "36px 20px 80px" }}>
+      <div style={{ padding: "24px 24px 48px" }}>
 
         <div style={{ textAlign: "center", marginBottom: 36 }}>
           <div style={{ fontSize: 44, marginBottom: 12 }}>🧭</div>
@@ -329,7 +329,7 @@ export default function InterviewPage() {
   ══════════════════════════════════════════════════════════ */
   if (stage === "analyzing" || stage === "loading_q") return (
     <AppShell>
-      <div style={{ maxWidth: 480, margin: "0 auto", padding: "100px 20px", textAlign: "center" }}>
+      <div style={{ padding: "80px 24px", textAlign: "center" }}>
         <div style={{ width: 64, height: 64, borderRadius: "50%", border: "3px solid var(--border)", borderTopColor: "var(--accent)", margin: "0 auto 24px", animation: "spin 1s linear infinite" }} />
         <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 10 }}>
           {stage === "analyzing" ? "Analysing your skill gaps…" : `Generating ${focusSkill} questions…`}
@@ -357,7 +357,7 @@ export default function InterviewPage() {
           <button onClick={() => setStage("profile")} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 7, color: "var(--text3)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>← Re-analyse
           </button>
         }>
-        <div style={{ maxWidth: 760, margin: "0 auto", padding: "32px 20px 80px" }}>
+        <div style={{ padding: "24px 24px 48px" }}>
 
           {/* Readiness score */}
           <div style={{ ...card, marginBottom: 24, background: `${scColor}08`, borderColor: `${scColor}28`, textAlign: "center", padding: "32px 24px" }}>
@@ -508,7 +508,7 @@ export default function InterviewPage() {
           </div>
         }>
 
-        <div style={{ maxWidth: 720, margin: "0 auto", padding: "28px 20px 80px" }}>
+        <div style={{ padding: "24px 24px 48px" }}>
 
           {/* Progress */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
@@ -680,7 +680,7 @@ export default function InterviewPage() {
           <button onClick={() => setStage("gaps")} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 7, color: "var(--text3)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>← Gap Plan
           </button>
         }>
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "36px 20px 80px" }}>
+        <div style={{ padding: "24px 24px 48px" }}>
 
           {/* Score hero */}
           <div style={{ ...card, textAlign: "center", marginBottom: 24, background: `${c}08`, borderColor: `${c}28`, padding: "36px 24px" }}>

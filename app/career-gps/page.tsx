@@ -500,7 +500,7 @@ export default function CareerGpsPage() {
 
     return (
       <AppShell>
-        <div style={{ maxWidth: 960, margin: "0 auto", padding: "36px 20px 80px" }}>
+        <div style={{ padding: "24px 24px 48px" }}>
 
           <div style={{ marginBottom: 32 }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 99, background: "var(--accdim)", border: "1px solid var(--accborder)", fontSize: 11, fontWeight: 700, color: "var(--accent)", marginBottom: 12 }}>
@@ -634,7 +634,7 @@ export default function CareerGpsPage() {
         </Link>
       </div>
 
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "28px 20px 80px" }}>
+      <div style={{ padding: "24px 24px 48px" }}>
 
         {/* Overview card */}
         <div style={{ ...card, marginBottom: 20, display: "flex", gap: 24, flexWrap: "wrap", alignItems: "center" }}>
