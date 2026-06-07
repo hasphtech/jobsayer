@@ -380,6 +380,8 @@ function LandingPage({ signIn }: { signIn: () => void }) {
   const w = useWindowWidth();
   const mobile = w < 640;
   const tablet = w < 900;
+  const [featuresTab, setFeaturesTab] = useState<"resume" | "jobseeker" | "recruiter">("resume");
+  const [pricingTab, setPricingTab]   = useState<"resume" | "jobseeker" | "employer">("jobseeker");
 
   return (
     <div style={{ background: "var(--bg)", color: "var(--text1)", overflowX: "hidden" }}>
@@ -633,22 +635,62 @@ function LandingPage({ signIn }: { signIn: () => void }) {
       {/* ── Features ─────────────────────────────────────────── */}
       <section id="features" style={{ padding: mobile ? "0 16px 40px" : "0 24px 96px", maxWidth: 960, margin: "0 auto" }}>
         <SectionLabel>Career growth tools</SectionLabel>
-        <h2 style={{ fontSize: mobile ? 22 : 38, fontWeight: 800, textAlign: "center", marginBottom: mobile ? 18 : 40, letterSpacing: "-1px" }}>
+        <h2 style={{ fontSize: mobile ? 22 : 38, fontWeight: 800, textAlign: "center", marginBottom: mobile ? 16 : 28, letterSpacing: "-1px" }}>
           Every tool your career needs
         </h2>
+
+        {/* Role tab switcher */}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: mobile ? 18 : 32 }}>
+          <div style={{
+            display: "inline-flex", background: "var(--surface)",
+            border: "1px solid var(--border)", borderRadius: 12, padding: 4, gap: 2,
+          }}>
+            {([
+              { key: "resume",    label: mobile ? "📄 Resume" : "📄 Resume Builder" },
+              { key: "jobseeker", label: mobile ? "🎯 Job Seekers" : "🎯 For Job Seekers" },
+              { key: "recruiter", label: mobile ? "🏢 Recruiters" : "🏢 For Recruiters" },
+            ] as const).map(tab => (
+              <button
+                key={tab.key}
+                onClick={() => setFeaturesTab(tab.key)}
+                style={{
+                  padding: mobile ? "7px 10px" : "8px 20px",
+                  borderRadius: 9, border: "none", cursor: "pointer", fontFamily: "inherit",
+                  fontSize: mobile ? 11 : 13, fontWeight: 600,
+                  background: featuresTab === tab.key ? "var(--accent)" : "transparent",
+                  color: featuresTab === tab.key ? "#fff" : "var(--text2)",
+                  transition: "all .18s",
+                  whiteSpace: "nowrap",
+                }}
+              >{tab.label}</button>
+            ))}
+          </div>
+        </div>
+
+        {/* Features grid — filtered by tab */}
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : tablet ? "1fr 1fr" : "repeat(3,1fr)", gap: mobile ? 8 : 14 }}>
-          {[
+          {(featuresTab === "resume" ? [
+            { icon: "📄", title: "Resume + Cover Letter AI",  tag: "Core",    tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "Build a career story that passes ATS and impresses humans. 20+ templates, linked cover letters." },
+            { icon: "✂️", title: "JD Resume Tailor",          tag: "New",     tagC: "#22d3ee",        iconBg: "rgba(34,211,238,.08)", desc: "Paste any JD → AI rewrites your bullets to match keywords and requirements. Before/after diff view." },
+            { icon: "💼", title: "LinkedIn Optimizer",        tag: "New",     tagC: "#22d3ee",        iconBg: "rgba(34,211,238,.08)", desc: "Score and AI-rewrite your LinkedIn headline, about section and skills. Drop-in copy ready to paste." },
+            { icon: "🎯", title: "ATS Score & Fix",           tag: "Core",    tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "ATS, keywords, clarity, impact — one score with actionable fixes to maximise your market value." },
+            { icon: "🎨", title: "20+ Pro Templates",         tag: "Design",  tagC: "var(--warn)",    iconBg: "rgba(234,179,8,.08)",  desc: "ATS-safe designs for every industry — from tech to finance to creative roles. Always recruiter-ready." },
+            { icon: "📤", title: "PDF + DOCX Export",         tag: "Export",  tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "One-click export in recruiter-friendly formats. Share a live link or download anytime." },
+          ] : featuresTab === "jobseeker" ? [
             { icon: "🧭", title: "Career GPS",                tag: "Core",   tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "Map your skill gaps vs your target role. Get a prioritised learning plan with study time estimates." },
-            { icon: "🎯", title: "Career Score",              tag: "Core",   tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "ATS, keywords, clarity, impact — one score with specific fixes to maximise your market value." },
-            { icon: "🎤", title: "Skill-gap interview prep",  tag: "Core",   tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "Practice questions targeted at YOUR gaps — not random topics. STAR feedback per answer." },
-            { icon: "💰", title: "Salary intelligence",       tag: "Growth", tagC: "var(--warn)",    iconBg: "rgba(234,179,8,.08)",  desc: "Global salary benchmarks across 15+ cities. Multi-currency. Underpaid detector. Negotiation coach with word-for-word scripts." },
-            { icon: "📄", title: "Resume + cover letter AI",  tag: "Growth", tagC: "var(--warn)",    iconBg: "rgba(234,179,8,.08)",  desc: "Build a career story that passes ATS and impresses humans. 20+ templates, linked cover letters." },
-            { icon: "🛡", title: "BGV credential badge",      tag: "Trust",  tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Get identity, education, and employment verified upfront. Share your badge. Skip offer delays." },
-            { icon: "📋", title: "Pipeline tracker",          tag: "Track",  tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Track applications with ghosting detection, notice period countdowns, and follow-up generators." },
-            { icon: "⚡", title: "JD trust scanner",          tag: "Protect",tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Ghost jobs and inflated requirements flagged before you waste your time or data." },
-            { icon: "✂️", title: "JD Resume Tailor",          tag: "New",    tagC: "#22d3ee",        iconBg: "rgba(34,211,238,.08)", desc: "Paste any job description → AI rewrites your resume bullets to match keywords and requirements. Before/after diff view." },
-            { icon: "💼", title: "LinkedIn Optimizer",        tag: "New",    tagC: "#22d3ee",        iconBg: "rgba(34,211,238,.08)", desc: "Score and AI-rewrite your LinkedIn headline, about section and skills against your target role. Drop-in copy ready to paste." },
-          ].map(f => (
+            { icon: "🎤", title: "Skill-gap Interview Prep",  tag: "Core",   tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "Practice questions targeted at YOUR gaps — not random topics. STAR feedback per answer." },
+            { icon: "💰", title: "Salary Intelligence",       tag: "Growth", tagC: "var(--warn)",    iconBg: "rgba(234,179,8,.08)",  desc: "Global salary benchmarks across 15+ cities. Multi-currency. Underpaid detector. Negotiation scripts." },
+            { icon: "📋", title: "Pipeline Tracker",          tag: "Track",  tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Track applications with ghosting detection, notice period countdowns, and follow-up generators." },
+            { icon: "🛡", title: "BGV Credential Badge",      tag: "Trust",  tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Get identity, education, and employment verified upfront. Share your badge. Skip offer delays." },
+            { icon: "⚡", title: "JD Trust Scanner",          tag: "Protect",tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Ghost jobs and inflated requirements flagged before you waste your time or data." },
+          ] : [
+            { icon: "📢", title: "Post & Manage Jobs",        tag: "Core",   tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "Ghost-proof verified listings go live after admin review. Candidates trust verified employer posts." },
+            { icon: "🤖", title: "AI Candidate Matching",     tag: "Core",   tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "Candidates ranked by fit score against your JD. Spend time on the right people, not the stack." },
+            { icon: "🏅", title: "Verified Company Badge",    tag: "Trust",  tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Verify your company identity. Boosts apply rates and filters out spam applicants." },
+            { icon: "📊", title: "Candidate Pipeline",        tag: "Manage", tagC: "var(--warn)",    iconBg: "rgba(234,179,8,.08)",  desc: "Review, shortlist, and communicate with candidates in one place. No ATS integration needed." },
+            { icon: "🛡", title: "Pre-screened Candidates",   tag: "Quality",tagC: "var(--accent)",  iconBg: "rgba(99,102,241,.1)",  desc: "Access candidates with BGV-verified credentials — identity, education, and employment already checked." },
+            { icon: "📈", title: "Hiring Analytics",          tag: "Insight",tagC: "var(--warn)",    iconBg: "rgba(234,179,8,.08)",  desc: "Track post views, apply rates, shortlist conversions and time-to-hire across all your listings." },
+          ]).map(f => (
             <div key={f.title} style={{
               background: "var(--surface)", border: "1px solid var(--border)",
               borderRadius: 12, padding: mobile ? "14px 12px" : "22px",
@@ -674,71 +716,125 @@ function LandingPage({ signIn }: { signIn: () => void }) {
         <h2 style={{ fontSize: mobile ? 22 : 38, fontWeight: 800, textAlign: "center", marginBottom: 8, letterSpacing: "-1px" }}>
           Simple, transparent pricing
         </h2>
-        <p style={{ textAlign: "center", color: "var(--text3)", fontSize: 14, marginBottom: 40 }}>No hidden fees. Start free, upgrade when you need more.</p>
+        <p style={{ textAlign: "center", color: "var(--text3)", fontSize: 14, marginBottom: 28 }}>
+          No hidden fees. Start free, upgrade when you need more.
+        </p>
 
+        {/* Pricing category toggle */}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: mobile ? 20 : 36 }}>
+          <div style={{
+            display: "inline-flex", background: "var(--surface)",
+            border: "1px solid var(--border)", borderRadius: 12, padding: 4, gap: 2,
+          }}>
+            {([
+              { key: "jobseeker", label: mobile ? "🎯 Job Seekers" : "🎯 For Job Seekers" },
+              { key: "resume",    label: mobile ? "📄 Resume" : "📄 Resume Builder" },
+              { key: "employer",  label: mobile ? "🏢 Employers" : "🏢 For Employers" },
+            ] as const).map(tab => (
+              <button
+                key={tab.key}
+                onClick={() => setPricingTab(tab.key)}
+                style={{
+                  padding: mobile ? "7px 10px" : "8px 20px",
+                  borderRadius: 9, border: "none", cursor: "pointer", fontFamily: "inherit",
+                  fontSize: mobile ? 11 : 13, fontWeight: 600,
+                  background: pricingTab === tab.key ? "var(--accent)" : "transparent",
+                  color: pricingTab === tab.key ? "#fff" : "var(--text2)",
+                  transition: "all .18s",
+                  whiteSpace: "nowrap",
+                }}
+              >{tab.label}</button>
+            ))}
+          </div>
+        </div>
+
+        {/* Plans grid */}
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3,1fr)", gap: mobile ? 10 : 16, alignItems: "start" }}>
-          {[
+          {(pricingTab === "jobseeker" ? [
             {
               name: "Free",
-              price: "$0",
-              period: "forever",
-              tagline: "Get started, no card needed",
-              color: "var(--text2)",
-              highlight: false,
-              features: [
-                "2 saved resumes",
-                "4 basic templates",
-                "PDF export",
-                "Public share link",
-                "jobSayer Score",
-                "Matched jobs feed",
-              ],
-              missing: ["DOCX export", "All 20+ templates", "AI writing assistant", "Interview prep (AI)", "Career GPS roadmap", "Priority support"],
+              price: "$0", period: "forever",
+              tagline: "Start growing, no card needed",
+              color: "var(--text2)", highlight: false,
+              features: ["2 saved resumes", "4 basic templates", "PDF export", "jobSayer Score", "Matched jobs feed"],
+              missing: ["Interview prep (AI)", "Career GPS roadmap", "AI writing", "Salary intelligence", "Priority support"],
               cta: "Start free", ctaHref: "/builder",
             },
             {
               name: "Starter",
-              price: "$9",
-              period: "/ month",
+              price: "$9", period: "/ month",
               tagline: "For ambitious professionals",
-              color: "var(--accent)",
-              highlight: true,
-              features: [
-                "5 saved resumes",
-                "All 20+ templates",
-                "PDF + DOCX export",
-                "Public share link",
-                "jobSayer Score",
-                "Matched jobs feed",
-                "Interview prep (AI)",
-                "Career GPS roadmap",
-              ],
-              missing: ["AI writing assistant", "Priority support"],
+              color: "var(--accent)", highlight: true,
+              features: ["5 saved resumes", "All 20+ templates", "PDF + DOCX export", "jobSayer Score", "Matched jobs feed", "Interview prep (AI)", "Career GPS roadmap"],
+              missing: ["AI writing assistant", "Salary intelligence", "Priority support"],
               cta: "Get Starter", ctaHref: "/upgrade",
             },
             {
               name: "Pro",
-              price: "$19",
-              period: "/ month",
+              price: "$19", period: "/ month",
               tagline: "For career accelerators",
-              color: "#a78bfa",
-              highlight: false,
-              features: [
-                "10 saved resumes",
-                "All 20+ templates",
-                "PDF + DOCX export",
-                "Public share link",
-                "jobSayer Score",
-                "Matched jobs feed",
-                "Interview prep (AI)",
-                "Career GPS roadmap",
-                "AI writing assistant",
-                "Priority support",
-              ],
+              color: "#a78bfa", highlight: false,
+              features: ["10 saved resumes", "All 20+ templates", "PDF + DOCX export", "jobSayer Score", "Matched jobs feed", "Interview prep (AI)", "Career GPS roadmap", "AI writing assistant", "Salary intelligence", "Priority support"],
               missing: [],
               cta: "Get Pro", ctaHref: "/upgrade",
             },
-          ].map(plan => (
+          ] : pricingTab === "resume" ? [
+            {
+              name: "Free",
+              price: "$0", period: "forever",
+              tagline: "Build your first resume",
+              color: "var(--text2)", highlight: false,
+              features: ["2 saved resumes", "4 basic templates", "PDF export", "Public share link", "ATS score"],
+              missing: ["DOCX export", "All 20+ templates", "AI writing assistant", "JD tailor", "LinkedIn optimizer"],
+              cta: "Start free", ctaHref: "/builder",
+            },
+            {
+              name: "Resume Pro",
+              price: "$7", period: "/ month",
+              tagline: "For serious job applicants",
+              color: "var(--accent)", highlight: true,
+              features: ["Unlimited resumes", "All 20+ templates", "PDF + DOCX export", "Public share link", "ATS score", "AI writing assistant", "JD Resume Tailor", "LinkedIn Optimizer"],
+              missing: ["Team seats", "Dedicated support"],
+              cta: "Get Resume Pro", ctaHref: "/upgrade",
+            },
+            {
+              name: "Teams",
+              price: "$19", period: "/ month",
+              tagline: "For career coaches & agencies",
+              color: "#a78bfa", highlight: false,
+              features: ["5 member seats", "Unlimited resumes", "All 20+ templates", "PDF + DOCX export", "AI writing assistant", "JD Resume Tailor", "LinkedIn Optimizer", "Bulk export", "Dedicated support"],
+              missing: [],
+              cta: "Get Teams", ctaHref: "/upgrade",
+            },
+          ] : [
+            {
+              name: "Free",
+              price: "$0", period: "forever",
+              tagline: "Post your first jobs",
+              color: "var(--text2)", highlight: false,
+              features: ["3 job posts", "Basic candidate listing", "Company profile page", "AI job description helper"],
+              missing: ["AI candidate matching", "Verified badge", "Candidate pipeline", "Analytics", "Priority placement"],
+              cta: "Start hiring free", ctaHref: "/recruit",
+            },
+            {
+              name: "Growth",
+              price: "$49", period: "/ month",
+              tagline: "For growing teams",
+              color: "var(--accent)", highlight: true,
+              features: ["20 active job posts", "AI candidate matching", "Verified company badge", "Candidate pipeline", "Hiring analytics", "Priority job placement"],
+              missing: ["Unlimited posts", "API access", "Dedicated account manager"],
+              cta: "Start Growth", ctaHref: "/recruit",
+            },
+            {
+              name: "Scale",
+              price: "$149", period: "/ month",
+              tagline: "For high-volume hiring",
+              color: "#a78bfa", highlight: false,
+              features: ["Unlimited job posts", "AI candidate matching", "Verified company badge", "Candidate pipeline", "Hiring analytics", "Priority placement", "API access", "Dedicated account manager"],
+              missing: [],
+              cta: "Contact Sales", ctaHref: "/recruit",
+            },
+          ]).map(plan => (
             <div key={plan.name} style={{
               background: plan.highlight ? "linear-gradient(160deg, rgba(99,102,241,.1), rgba(99,102,241,.04))" : "var(--surface)",
               border: `1.5px solid ${plan.highlight ? "var(--accborder)" : "var(--border)"}`,

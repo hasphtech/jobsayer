@@ -1828,8 +1828,8 @@ export default function BuilderPage() {
 
           {/* Page count badge */}
           <span title={pageCount > 1 ? "Recruiters prefer 1-page resumes" : "Fits on 1 page"}
-            style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 5, borderWidth: 1, borderStyle: "solid", borderColor: pageCount > 1 ? "var(--warn)" : "var(--border)", background: pageCount > 1 ? "#fffbeb" : "var(--surface2)", color: pageCount > 1 ? "#b45309" : "var(--text3)" }}>
-            {pageCount}p
+            style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 5, borderWidth: 1, borderStyle: "solid", borderColor: pageCount > 1 ? "var(--warn)" : "var(--border)", background: pageCount > 1 ? "rgba(234,179,8,.1)" : "var(--surface2)", color: pageCount > 1 ? "var(--warn)" : "var(--text3)" }}>
+            {pageCount === 1 ? "1 page" : `${pageCount} pages`}
           </span>
 
           <div style={{ marginLeft: "auto", display: "flex", gap: 6, alignItems: "center" }}>
@@ -1892,8 +1892,8 @@ export default function BuilderPage() {
             ))}
             {/* Page length indicator */}
             <span title={pageCount > 1 ? `~${pageCount} pages — recruiters prefer 1 page` : "Fits on 1 page"}
-              style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 3, padding: "5px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap", borderWidth: 1.5, borderStyle: "solid", borderColor: pageCount > 1 ? "var(--warn)" : "var(--border)", background: pageCount > 1 ? "#fffbeb" : "var(--surface2)", color: pageCount > 1 ? "#b45309" : "var(--text3)" }}>
-              {pageCount > 1 ? "⚠" : "✓"} {pageCount}p
+              style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 3, padding: "5px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap", borderWidth: 1.5, borderStyle: "solid", borderColor: pageCount > 1 ? "var(--warn)" : "var(--border)", background: pageCount > 1 ? "rgba(234,179,8,.1)" : "var(--surface2)", color: pageCount > 1 ? "var(--warn)" : "var(--text3)" }}>
+              {pageCount > 1 ? "⚠" : "✓"} {pageCount === 1 ? "1 page" : `${pageCount} pages`}
             </span>
 
             <div style={{ width: 1, height: 14, background: "var(--border)", flexShrink: 0, margin: "0 2px" }} />
@@ -2254,13 +2254,13 @@ export default function BuilderPage() {
           </div>
 
           {/* Page length card */}
-          <div style={{ display: "flex", alignItems: "center", gap: 14, background: pageCount > 1 ? "#fffbeb" : "var(--bg)", borderWidth: 1.5, borderStyle: "solid", borderColor: pageCount > 1 ? "var(--warn)" : "var(--border)", borderRadius: 12, padding: "14px 16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, background: pageCount > 1 ? "rgba(234,179,8,.07)" : "var(--bg)", borderWidth: 1.5, borderStyle: "solid", borderColor: pageCount > 1 ? "var(--warn)" : "var(--border)", borderRadius: 12, padding: "14px 16px" }}>
             <span style={{ fontSize: 28, lineHeight: 1 }}>{pageCount > 2 ? "📄📄📄" : pageCount > 1 ? "📄📄" : "📄"}</span>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 800, color: pageCount > 1 ? "#b45309" : "var(--text1)" }}>
+              <div style={{ fontSize: 14, fontWeight: 800, color: pageCount > 1 ? "var(--warn)" : "var(--text1)" }}>
                 {pageCount === 1 ? "Fits on 1 page ✓" : `~${pageCount} pages`}
               </div>
-              <div style={{ fontSize: 11, color: pageCount > 1 ? "#b45309" : "var(--text3)", marginTop: 2 }}>
+              <div style={{ fontSize: 11, color: pageCount > 1 ? "var(--warn)" : "var(--text3)", marginTop: 2 }}>
                 {pageCount === 1
                   ? "Ideal length — recruiters can scan it in under 30 seconds."
                   : pageCount === 2
