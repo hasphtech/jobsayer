@@ -566,7 +566,7 @@ export default function CareerGpsPage() {
                           {role.demand} demand
                         </span>
                       </div>
-                      <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 3 }}>{role.title}</div>
+                      <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 3, color: "var(--text1)" }}>{role.title}</div>
                       <div style={{ fontSize: 12, color: "var(--text3)", marginBottom: 12 }}>{role.salaryRange} / yr</div>
 
                       {pct !== null && (
@@ -577,7 +577,7 @@ export default function CareerGpsPage() {
                               {pct}%
                             </span>
                           </div>
-                          <div style={{ height: 5, background: "rgba(255,255,255,.06)", borderRadius: 3, overflow: "hidden" }}>
+                          <div style={{ height: 5, background: "var(--surface2)", borderRadius: 3, overflow: "hidden" }}>
                             <div style={{
                               height: "100%", borderRadius: 3, width: `${pct}%`,
                               background: pct >= 60 ? "var(--success)" : pct >= 30 ? "var(--warn)" : "var(--danger)",
