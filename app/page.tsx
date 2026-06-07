@@ -61,7 +61,7 @@ function Nav({ user, signIn }: { user: any; signIn: () => void; }) {
     <>
       <nav style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-        background: "rgba(8,8,12,.92)", backdropFilter: "blur(16px)",
+        background: "var(--nav-bg)", backdropFilter: "blur(16px)",
         borderBottom: "1px solid var(--border)",
         height: 56, display: "flex", alignItems: "center",
         padding: "0 24px", gap: 12,
@@ -380,6 +380,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
   const w = useWindowWidth();
   const mobile = w < 640;
   const tablet = w < 900;
+  const { dark } = useTheme();
   const [featuresTab, setFeaturesTab] = useState<"resume" | "jobseeker" | "recruiter">("resume");
   const [pricingTab, setPricingTab]   = useState<"resume" | "jobseeker" | "employer">("jobseeker");
 
@@ -417,7 +418,9 @@ function LandingPage({ signIn }: { signIn: () => void }) {
           fontSize: mobile ? 38 : tablet ? 54 : 64,
           fontWeight: 800, lineHeight: 1.05, letterSpacing: "-.04em",
           marginBottom: 20, maxWidth: 700,
-          background: "linear-gradient(160deg, #fff 40%, rgba(255,255,255,.55) 100%)",
+          background: dark
+            ? "linear-gradient(160deg, #fff 40%, rgba(255,255,255,.55) 100%)"
+            : "linear-gradient(160deg, #0f172a 40%, rgba(15,23,42,.65) 100%)",
           WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
         }}>
           Build the career you deserve
@@ -441,7 +444,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
           }}>🚀 Start growing — free</Link>
           <button onClick={signIn} style={{
             padding: mobile ? "13px 22px" : "14px 26px",
-            background: "rgba(255,255,255,.04)", border: "1px solid var(--border)",
+            background: "var(--surface2)", border: "1px solid var(--border)",
             borderRadius: 12, color: "var(--text1)",
             fontSize: mobile ? 14 : 15, fontWeight: 500,
             cursor: "pointer", fontFamily: "inherit", letterSpacing: "-.01em",
@@ -464,7 +467,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
           }}>
             <div style={{ background: "var(--surface2)", padding: "10px 16px", display: "flex", alignItems: "center", gap: 6, borderBottom: "1px solid var(--border)" }}>
               {["#ef4444","#eab308","#22c55e"].map(c => <div key={c} style={{ width: 9, height: 9, borderRadius: "50%", background: c, opacity: .7 }} />)}
-              <div style={{ marginLeft: 10, fontSize: 10, color: "var(--text3)", background: "rgba(255,255,255,.04)", borderRadius: 6, padding: "2px 12px", border: "1px solid var(--border)" }}>jobsayer.com/score</div>
+              <div style={{ marginLeft: 10, fontSize: 10, color: "var(--text3)", background: "var(--surface)", borderRadius: 6, padding: "2px 12px", border: "1px solid var(--border)" }}>jobsayer.com/score</div>
             </div>
             <div style={{ padding: "22px 24px", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
               {[
@@ -589,7 +592,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
                   <div style={{ fontSize: 10, color: "var(--text3)" }}>jobSayer Score</div>
                 </div>
               </div>
-              <div style={{ fontSize: 11, color: "var(--text3)", padding: "4px 10px", background: "rgba(255,255,255,.03)", borderRadius: 6, border: "1px solid var(--border)", textAlign: "center" }}>
+              <div style={{ fontSize: 11, color: "var(--text3)", padding: "4px 10px", background: "var(--surface2)", borderRadius: 6, border: "1px solid var(--border)", textAlign: "center" }}>
                 {t.tag}
               </div>
             </div>
@@ -696,7 +699,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
               borderRadius: 12, padding: mobile ? "14px 12px" : "22px",
               transition: "border-color .2s",
             }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,.14)"; }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--text3)"; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; }}
             >
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: mobile ? 8 : 14 }}>
@@ -937,7 +940,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
               { icon: "🛡", text: "Verified company badge builds candidate trust" },
               { icon: "🆓", text: "Free to start — 3 job posts, no card needed" },
             ].map(p => (
-              <div key={p.text} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 14px", background: "rgba(255,255,255,.03)", borderRadius: 10, border: "1px solid var(--border)" }}>
+              <div key={p.text} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 14px", background: "var(--surface2)", borderRadius: 10, border: "1px solid var(--border)" }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>{p.icon}</span>
                 <span style={{ fontSize: 13, color: "var(--text2)", lineHeight: 1.5 }}>{p.text}</span>
               </div>
@@ -1164,14 +1167,14 @@ function Dashboard({ user }: { user: any }) {
           {/* Score ring card */}
           <Link href="/score" style={{ textDecoration: "none" }}>
             <div style={{ ...card, padding: "18px 16px", cursor: "pointer", transition: "border-color .18s" }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(255,255,255,.14)"}
+              onMouseEnter={e => e.currentTarget.style.borderColor = "var(--text3)"}
               onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}
             >
               <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 12, fontWeight: 500 }}>Resume score</div>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{ position: "relative", width: 56, height: 56, flexShrink: 0 }}>
                   <svg width="56" height="56" style={{ transform: "rotate(-90deg)" }}>
-                    <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,.05)" strokeWidth="5" />
+                    <circle cx="28" cy="28" r="22" fill="none" stroke="var(--surface2)" strokeWidth="5" />
                     <circle cx="28" cy="28" r="22" fill="none" stroke={scoreColor} strokeWidth="5" strokeLinecap="round"
                       strokeDasharray={circ} strokeDashoffset={circ * (1 - (score ?? 0) / 100)}
                       style={{ transition: "stroke-dashoffset 1.2s ease" }}
@@ -1189,7 +1192,7 @@ function Dashboard({ user }: { user: any }) {
 
           <Link href="/jobs" style={{ textDecoration: "none" }}>
             <div style={{ ...card, padding: "18px 16px", cursor: "pointer", transition: "border-color .18s" }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(255,255,255,.14)"}
+              onMouseEnter={e => e.currentTarget.style.borderColor = "var(--text3)"}
               onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}
             >
               <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 12, fontWeight: 500 }}>Job matches</div>
@@ -1200,7 +1203,7 @@ function Dashboard({ user }: { user: any }) {
 
           <Link href="/bgv" style={{ textDecoration: "none" }}>
             <div style={{ ...card, padding: "18px 16px", cursor: "pointer", transition: "border-color .18s" }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(255,255,255,.14)"}
+              onMouseEnter={e => e.currentTarget.style.borderColor = "var(--text3)"}
               onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}
             >
               <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 12, fontWeight: 500 }}>BGV status</div>
@@ -1249,7 +1252,7 @@ function Dashboard({ user }: { user: any }) {
                         <span style={{ fontSize: 12, color: "var(--text2)" }}>{dim.label}</span>
                         <span style={{ fontSize: 13, fontWeight: 700, color: c }}>{dim.score}<span style={{ fontSize: 10, color: "var(--text3)" }}>/25</span></span>
                       </div>
-                      <div style={{ background: "rgba(255,255,255,.05)", borderRadius: 99, height: 5 }}>
+                      <div style={{ background: "var(--surface2)", borderRadius: 99, height: 5 }}>
                         <div style={{ width: `${pct}%`, height: "100%", background: c, borderRadius: 99 }} />
                       </div>
                     </div>
@@ -1285,7 +1288,7 @@ function Dashboard({ user }: { user: any }) {
                   <div style={{
                     display: "flex", alignItems: "center", justifyContent: "space-between",
                     padding: mobile ? "9px 10px" : "10px 13px", borderRadius: 9,
-                    background: a.accent ? "var(--accdim)" : "rgba(255,255,255,.03)",
+                    background: a.accent ? "var(--accdim)" : "var(--surface2)",
                     border: `1px solid ${a.accent ? "var(--accborder)" : "var(--border)"}`,
                     transition: "border-color .15s",
                   }}
