@@ -430,9 +430,22 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
             background: "var(--surface)", borderBottom: "1px solid var(--border)",
             padding: "12px 14px", display: "flex", flexDirection: "column", gap: 4,
           }}>
-            {/* Role switcher in mobile drawer */}
-            <div style={{ marginBottom: 6 }}>
+            {/* Role switcher + theme toggle in mobile drawer */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
               <RoleSwitcher role={role} setRole={setRole} />
+              <button
+                onClick={toggleTheme}
+                title={dark ? "Switch to light mode" : "Switch to dark mode"}
+                style={{
+                  display: "flex", alignItems: "center", gap: 6,
+                  padding: "6px 12px", borderRadius: 8,
+                  border: "1px solid var(--border)", background: "var(--surface2)",
+                  color: "var(--text2)", fontSize: 12, fontWeight: 500,
+                  cursor: "pointer", fontFamily: "inherit",
+                }}
+              >
+                {dark ? "☀" : "🌙"} {dark ? "Light" : "Dark"}
+              </button>
             </div>
             {[...toolLinks, ...insightLinks].map(l => (
               <Link key={l.href} href={l.href} onClick={closeDrawer} style={{

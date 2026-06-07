@@ -126,6 +126,21 @@ function Nav({ user, signIn }: { user: any; signIn: () => void; }) {
           background: "var(--surface)", borderBottom: "1px solid var(--border)",
           padding: "16px 20px", display: "flex", flexDirection: "column", gap: 10,
         }}>
+          {/* Theme toggle row */}
+          <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 4 }}>
+            <button
+              onClick={() => { toggleTheme(); }}
+              style={{
+                display: "flex", alignItems: "center", gap: 6,
+                padding: "7px 14px", borderRadius: 9,
+                border: "1px solid var(--border)", background: "var(--surface2)",
+                color: "var(--text2)", fontSize: 13, fontWeight: 500,
+                cursor: "pointer", fontFamily: "inherit",
+              }}
+            >
+              {dark ? "☀" : "🌙"} {dark ? "Light mode" : "Dark mode"}
+            </button>
+          </div>
           {user ? (
             <>
               <MobileNavLink href="/builder"      onClick={() => setMenuOpen(false)}>✏️ Resume Builder</MobileNavLink>
@@ -371,9 +386,9 @@ function LandingPage({ signIn }: { signIn: () => void }) {
 
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section style={{
-        minHeight: "100vh", display: "flex", flexDirection: "column",
+        minHeight: mobile ? 0 : "100vh", display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center", textAlign: "center",
-        padding: mobile ? "100px 20px 60px" : "120px 24px 80px",
+        padding: mobile ? "88px 20px 40px" : "120px 24px 80px",
         position: "relative",
       }}>
         {/* Ambient glow */}
@@ -470,9 +485,11 @@ function LandingPage({ signIn }: { signIn: () => void }) {
       {/* ── Stats bar ────────────────────────────────────────── */}
       <section style={{
         borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)",
-        padding: "28px 20px", background: "var(--surface)",
-        display: "flex", justifyContent: "center",
-        gap: mobile ? 28 : 72, flexWrap: "wrap",
+        padding: mobile ? "20px 16px" : "28px 20px", background: "var(--surface)",
+        display: mobile ? "grid" : "flex",
+        gridTemplateColumns: mobile ? "1fr 1fr" : undefined,
+        justifyContent: "center",
+        gap: mobile ? 12 : 72, flexWrap: "wrap",
       }}>
         {[
           { val: "50K+",    label: "Professionals growing", col: "var(--accent)"  },
@@ -488,7 +505,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
       </section>
 
       {/* ── Social proof — company logos ─────────────────────── */}
-      <section style={{ padding: mobile ? "40px 20px" : "56px 24px", maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
+      <section style={{ padding: mobile ? "28px 16px" : "56px 24px", maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
         <p style={{ fontSize: 12, fontWeight: 600, color: "var(--text3)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 24 }}>
           Candidates placed at
         </p>
@@ -505,12 +522,12 @@ function LandingPage({ signIn }: { signIn: () => void }) {
       </section>
 
       {/* ── Testimonials ─────────────────────────────────────── */}
-      <section style={{ padding: mobile ? "0 20px 56px" : "0 24px 80px", maxWidth: 960, margin: "0 auto" }}>
+      <section style={{ padding: mobile ? "0 16px 40px" : "0 24px 80px", maxWidth: 960, margin: "0 auto" }}>
         <SectionLabel>Career stories</SectionLabel>
-        <h2 style={{ fontSize: mobile ? 24 : 34, fontWeight: 800, textAlign: "center", marginBottom: 36, letterSpacing: "-1px" }}>
+        <h2 style={{ fontSize: mobile ? 22 : 34, fontWeight: 800, textAlign: "center", marginBottom: 24, letterSpacing: "-1px" }}>
           Real careers, real growth
         </h2>
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3,1fr)", gap: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(3,1fr)", gap: mobile ? 10 : 16 }}>
           {[
             {
               name: "Sarah K.",
@@ -539,7 +556,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
           ].map(t => (
             <div key={t.name} style={{
               background: "var(--surface)", border: "1px solid var(--border)",
-              borderRadius: 16, padding: "22px", display: "flex", flexDirection: "column", gap: 16,
+              borderRadius: 14, padding: mobile ? "14px" : "22px", display: "flex", flexDirection: "column", gap: mobile ? 10 : 16,
             }}>
               {/* Stars */}
               <div style={{ display: "flex", gap: 2 }}>
@@ -579,9 +596,9 @@ function LandingPage({ signIn }: { signIn: () => void }) {
       </section>
 
       {/* ── How it works ─────────────────────────────────────── */}
-      <section id="how" style={{ padding: mobile ? "64px 20px" : "96px 24px", maxWidth: 900, margin: "0 auto" }}>
+      <section id="how" style={{ padding: mobile ? "36px 16px" : "96px 24px", maxWidth: 900, margin: "0 auto" }}>
         <SectionLabel>How it works</SectionLabel>
-        <h2 style={{ fontSize: mobile ? 26 : 38, fontWeight: 800, textAlign: "center", marginBottom: 48, letterSpacing: "-1px" }}>
+        <h2 style={{ fontSize: mobile ? 22 : 38, fontWeight: 800, textAlign: "center", marginBottom: mobile ? 20 : 48, letterSpacing: "-1px" }}>
           Your career growth, step by step
         </h2>
         <div style={{
@@ -614,12 +631,12 @@ function LandingPage({ signIn }: { signIn: () => void }) {
       </section>
 
       {/* ── Features ─────────────────────────────────────────── */}
-      <section id="features" style={{ padding: mobile ? "0 20px 64px" : "0 24px 96px", maxWidth: 960, margin: "0 auto" }}>
+      <section id="features" style={{ padding: mobile ? "0 16px 40px" : "0 24px 96px", maxWidth: 960, margin: "0 auto" }}>
         <SectionLabel>Career growth tools</SectionLabel>
-        <h2 style={{ fontSize: mobile ? 26 : 38, fontWeight: 800, textAlign: "center", marginBottom: 40, letterSpacing: "-1px" }}>
+        <h2 style={{ fontSize: mobile ? 22 : 38, fontWeight: 800, textAlign: "center", marginBottom: mobile ? 18 : 40, letterSpacing: "-1px" }}>
           Every tool your career needs
         </h2>
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : tablet ? "1fr 1fr" : "repeat(3,1fr)", gap: 14 }}>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : tablet ? "1fr 1fr" : "repeat(3,1fr)", gap: mobile ? 8 : 14 }}>
           {[
             { icon: "🧭", title: "Career GPS",                tag: "Core",   tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "Map your skill gaps vs your target role. Get a prioritised learning plan with study time estimates." },
             { icon: "🎯", title: "Career Score",              tag: "Core",   tagC: "var(--success)", iconBg: "rgba(34,197,94,.08)",  desc: "ATS, keywords, clarity, impact — one score with specific fixes to maximise your market value." },
@@ -634,32 +651,32 @@ function LandingPage({ signIn }: { signIn: () => void }) {
           ].map(f => (
             <div key={f.title} style={{
               background: "var(--surface)", border: "1px solid var(--border)",
-              borderRadius: 14, padding: "22px",
+              borderRadius: 12, padding: mobile ? "14px 12px" : "22px",
               transition: "border-color .2s",
             }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,.14)"; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; }}
             >
-              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 14 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 10, background: f.iconBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>{f.icon}</div>
-                <span style={{ fontSize: 10, fontWeight: 600, padding: "3px 9px", borderRadius: 99, background: `${f.tagC}18`, color: f.tagC, border: `1px solid ${f.tagC}30` }}>{f.tag}</span>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: mobile ? 8 : 14 }}>
+                <div style={{ width: mobile ? 30 : 40, height: mobile ? 30 : 40, borderRadius: 10, background: f.iconBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: mobile ? 15 : 20 }}>{f.icon}</div>
+                {!mobile && <span style={{ fontSize: 10, fontWeight: 600, padding: "3px 9px", borderRadius: 99, background: `${f.tagC}18`, color: f.tagC, border: `1px solid ${f.tagC}30` }}>{f.tag}</span>}
               </div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", marginBottom: 6, letterSpacing: "-.01em" }}>{f.title}</div>
-              <div style={{ fontSize: 13, color: "var(--text3)", lineHeight: 1.65 }}>{f.desc}</div>
+              <div style={{ fontSize: mobile ? 12 : 14, fontWeight: 700, color: "var(--text1)", marginBottom: 4, letterSpacing: "-.01em" }}>{f.title}</div>
+              {!mobile && <div style={{ fontSize: 13, color: "var(--text3)", lineHeight: 1.65 }}>{f.desc}</div>}
             </div>
           ))}
         </div>
       </section>
 
       {/* ── Pricing ──────────────────────────────────────────── */}
-      <section id="pricing" style={{ padding: mobile ? "0 20px 64px" : "0 24px 80px", maxWidth: 960, margin: "0 auto" }}>
+      <section id="pricing" style={{ padding: mobile ? "0 16px 40px" : "0 24px 80px", maxWidth: 960, margin: "0 auto" }}>
         <SectionLabel>Pricing</SectionLabel>
-        <h2 style={{ fontSize: mobile ? 26 : 38, fontWeight: 800, textAlign: "center", marginBottom: 8, letterSpacing: "-1px" }}>
+        <h2 style={{ fontSize: mobile ? 22 : 38, fontWeight: 800, textAlign: "center", marginBottom: 8, letterSpacing: "-1px" }}>
           Simple, transparent pricing
         </h2>
         <p style={{ textAlign: "center", color: "var(--text3)", fontSize: 14, marginBottom: 40 }}>No hidden fees. Start free, upgrade when you need more.</p>
 
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3,1fr)", gap: 16, alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3,1fr)", gap: mobile ? 10 : 16, alignItems: "start" }}>
           {[
             {
               name: "Free",
@@ -754,12 +771,15 @@ function LandingPage({ signIn }: { signIn: () => void }) {
 
               <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--text3)", marginBottom: 10 }}>Includes</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                {plan.features.map(f => (
+                {(mobile ? plan.features.slice(0, 5) : plan.features).map(f => (
                   <div key={f} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--text2)" }}>
                     <span style={{ color: "var(--success)", flexShrink: 0, marginTop: 1 }}>✓</span>{f}
                   </div>
                 ))}
-                {plan.missing.map(f => (
+                {mobile && plan.features.length > 5 && (
+                  <div style={{ fontSize: 12, color: "var(--text3)", paddingLeft: 4 }}>+{plan.features.length - 5} more included</div>
+                )}
+                {!mobile && plan.missing.map(f => (
                   <div key={f} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--text3)", opacity: .5 }}>
                     <span style={{ flexShrink: 0, marginTop: 1 }}>—</span>{f}
                   </div>
@@ -774,7 +794,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
       </section>
 
       {/* ── Trending roles ───────────────────────────────────── */}
-      <section style={{ padding: mobile ? "0 20px 64px" : "0 24px 80px", maxWidth: 960, margin: "0 auto" }}>
+      <section style={{ padding: mobile ? "0 16px 36px" : "0 24px 80px", maxWidth: 960, margin: "0 auto" }}>
         <SectionLabel>Market pulse</SectionLabel>
         <h2 style={{ fontSize: mobile ? 24 : 34, fontWeight: 800, textAlign: "center", marginBottom: 32, letterSpacing: "-1px" }}>
           Fastest-growing roles globally right now
@@ -797,7 +817,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
       </section>
 
       {/* ── Recruiter crosssell ──────────────────────────────── */}
-      <section style={{ padding: mobile ? "0 20px 64px" : "0 24px 80px", maxWidth: 960, margin: "0 auto" }}>
+      <section style={{ padding: mobile ? "0 16px 36px" : "0 24px 80px", maxWidth: 960, margin: "0 auto" }}>
         <div style={{
           display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 14,
           background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 18, overflow: "hidden",
@@ -832,11 +852,11 @@ function LandingPage({ signIn }: { signIn: () => void }) {
 
       {/* ── CTA banner ───────────────────────────────────────── */}
       <section style={{
-        margin: mobile ? "0 20px 64px" : "0 24px 96px",
+        margin: mobile ? "0 16px 40px" : "0 24px 96px",
         maxWidth: 860, marginLeft: "auto", marginRight: "auto",
         background: "linear-gradient(135deg, rgba(99,102,241,.12), rgba(99,102,241,.06))",
-        border: "1px solid var(--accborder)", borderRadius: 24,
-        padding: mobile ? "40px 24px" : "56px 48px", textAlign: "center",
+        border: "1px solid var(--accborder)", borderRadius: 20,
+        padding: mobile ? "28px 20px" : "56px 48px", textAlign: "center",
       }}>
         <div style={{ fontSize: 32, marginBottom: 14 }}>🚀</div>
         <h2 style={{ fontSize: mobile ? 22 : 32, fontWeight: 800, marginBottom: 12, letterSpacing: "-1px" }}>
@@ -858,12 +878,12 @@ function LandingPage({ signIn }: { signIn: () => void }) {
       {/* ── Footer ───────────────────────────────────────────── */}
       <footer style={{
         borderTop: "1px solid var(--border)",
-        padding: mobile ? "32px 20px 24px" : "40px 48px 28px",
+        padding: mobile ? "24px 16px 20px" : "40px 48px 28px",
         background: "var(--surface)",
       }}>
         <div style={{ maxWidth: 960, margin: "0 auto" }}>
           {/* Top row */}
-          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "2fr 1fr 1fr 1fr", gap: mobile ? 28 : 40, marginBottom: 32 }}>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "2fr 1fr 1fr 1fr", gap: mobile ? 20 : 40, marginBottom: mobile ? 20 : 32 }}>
             {/* Brand */}
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
@@ -891,7 +911,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
                 { label: "BGV Badge",             href: "/bgv"          },
                 { label: "Career Health",         href: "/career-health"},
                 { label: "Employer Trust",        href: "/employer-trust"},
-              ].map(l => (
+              ].slice(0, mobile ? 6 : 12).map(l => (
                 <Link key={l.label} href={l.href} style={{ display: "block", fontSize: 12, color: "var(--text3)", textDecoration: "none", marginBottom: 7, lineHeight: 1 }}
                   onMouseEnter={e => (e.currentTarget.style.color = "var(--text1)")}
                   onMouseLeave={e => (e.currentTarget.style.color = "var(--text3)")}
@@ -1152,7 +1172,7 @@ function Dashboard({ user }: { user: any }) {
           {/* Quick actions */}
           <div style={{ ...card, padding: "20px" }}>
             <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "-.01em", marginBottom: 12 }}>Quick actions</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <div style={{ display: mobile ? "grid" : "flex", gridTemplateColumns: mobile ? "1fr 1fr" : undefined, flexDirection: mobile ? undefined : "column", gap: 6 }}>
               {[
                 { label: "Edit Resume",       sub: "Builder",             href: "/builder",      accent: true  },
                 { label: "View Score",        sub: "Full breakdown",       href: "/score",        accent: false },
@@ -1168,7 +1188,7 @@ function Dashboard({ user }: { user: any }) {
                 <Link key={a.label} href={a.href} style={{ textDecoration: "none" }}>
                   <div style={{
                     display: "flex", alignItems: "center", justifyContent: "space-between",
-                    padding: "10px 13px", borderRadius: 9,
+                    padding: mobile ? "9px 10px" : "10px 13px", borderRadius: 9,
                     background: a.accent ? "var(--accdim)" : "rgba(255,255,255,.03)",
                     border: `1px solid ${a.accent ? "var(--accborder)" : "var(--border)"}`,
                     transition: "border-color .15s",
@@ -1177,8 +1197,8 @@ function Dashboard({ user }: { user: any }) {
                     onMouseLeave={e => e.currentTarget.style.borderColor = a.accent ? "var(--accborder)" : "var(--border)"}
                   >
                     <div>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: a.accent ? "var(--accent)" : "var(--text1)" }}>{a.label}</div>
-                      <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 1 }}>{a.sub}</div>
+                      <div style={{ fontSize: mobile ? 11 : 12, fontWeight: 600, color: a.accent ? "var(--accent)" : "var(--text1)" }}>{a.label}</div>
+                      {!mobile && <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 1 }}>{a.sub}</div>}
                     </div>
                     <span style={{ fontSize: 14, color: "var(--text3)" }}>›</span>
                   </div>
@@ -1189,7 +1209,7 @@ function Dashboard({ user }: { user: any }) {
         </div>
 
         {/* ── Bottom row ── */}
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 14 }}>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: mobile ? 10 : 14 }}>
 
           {/* Trending roles */}
           <div style={{ ...card, padding: "20px" }}>

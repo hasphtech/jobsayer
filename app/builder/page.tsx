@@ -2678,8 +2678,8 @@ export default function BuilderPage() {
               </div>
               {/* Bullet suggestion panel */}
               {openSuggestions === i && getSuggestions(w.role).length > 0 && (
-                <div style={{ background: "#fffbeb", borderWidth: 1, borderStyle: "solid", borderColor: "#fde68a", borderRadius: 9, padding: "10px 12px", display: "flex", flexDirection: "column", gap: 5 }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: "#92400e", textTransform: "uppercase" as const, letterSpacing: ".5px", marginBottom: 2 }}>
+                <div style={{ background: "rgba(234,179,8,.07)", borderWidth: 1, borderStyle: "solid", borderColor: "rgba(234,179,8,.2)", borderRadius: 9, padding: "10px 12px", display: "flex", flexDirection: "column", gap: 5 }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "var(--warn)", textTransform: "uppercase" as const, letterSpacing: ".5px", marginBottom: 2 }}>
                     💡 Suggestions for "{w.role}" — click to add
                   </div>
                   {getSuggestions(w.role).map((bullet, bi) => (
@@ -2688,9 +2688,9 @@ export default function BuilderPage() {
                         const newDesc = w.desc.trim() ? w.desc.trimEnd() + "\n" + bullet : bullet;
                         set("work", data.work.map((x, j) => j === i ? { ...x, desc: newDesc } : x));
                       }}
-                      style={{ textAlign: "left" as const, fontSize: 11, color: "#78350f", background: "#fff", borderWidth: 1, borderStyle: "solid", borderColor: "#fde68a", borderRadius: 6, padding: "6px 10px", cursor: "pointer", fontFamily: "inherit", lineHeight: 1.5, transition: "background .1s" }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#fef3c7"; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "#fff"; }}>
+                      style={{ textAlign: "left" as const, fontSize: 11, color: "var(--text2)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 6, padding: "6px 10px", cursor: "pointer", fontFamily: "inherit", lineHeight: 1.5, transition: "background .1s" }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--surface)"; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "var(--surface2)"; }}>
                       {bullet}
                     </button>
                   ))}
@@ -2757,8 +2757,8 @@ export default function BuilderPage() {
                 })}
               </div>
               {dupes.size > 0 && (
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "7px 10px", background: "#fef2f2", borderWidth: 1, borderStyle: "solid", borderColor: "#fecaca", borderRadius: 8, fontSize: 11 }}>
-                  <span style={{ color: "#dc2626", fontWeight: 600 }}>⚠ {dupes.size} duplicate skill{dupes.size > 1 ? "s" : ""} detected</span>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "7px 10px", background: "rgba(239,68,68,.07)", borderWidth: 1, borderStyle: "solid", borderColor: "rgba(239,68,68,.2)", borderRadius: 8, fontSize: 11 }}>
+                  <span style={{ color: "var(--danger)", fontWeight: 600 }}>⚠ {dupes.size} duplicate skill{dupes.size > 1 ? "s" : ""} detected</span>
                   <button
                     onClick={() => {
                       const unique: string[] = [];
@@ -2769,7 +2769,7 @@ export default function BuilderPage() {
                       });
                       set("skills", unique.join(", "));
                     }}
-                    style={{ fontSize: 11, fontWeight: 700, color: "#dc2626", background: "#fff", borderWidth: 1, borderStyle: "solid", borderColor: "#fecaca", borderRadius: 5, padding: "2px 8px", cursor: "pointer", fontFamily: "inherit" }}>
+                    style={{ fontSize: 11, fontWeight: 700, color: "var(--danger)", background: "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: "rgba(239,68,68,.2)", borderRadius: 5, padding: "2px 8px", cursor: "pointer", fontFamily: "inherit" }}>
                     Remove duplicates
                   </button>
                 </div>
@@ -3113,7 +3113,7 @@ export default function BuilderPage() {
                     position: "relative", padding: 0, borderRadius: 8, cursor: "pointer",
                     borderWidth: 2, borderStyle: "solid",
                     borderColor: active ? tAccent : "var(--border)",
-                    background: "#fff",
+                    background: "var(--surface)",
                     display: "flex", flexDirection: "column", alignItems: "stretch",
                     fontFamily: "inherit", overflow: "hidden", flexShrink: 0,
                     transition: "border-color .15s, box-shadow .15s",
@@ -3212,8 +3212,8 @@ export default function BuilderPage() {
                     <span style={{ fontSize: 14, color: "var(--text3)", fontWeight: 600 }}>% match</span>
                   </div>
                   <div style={{ fontSize: 12, color: "var(--text3)", textAlign: "right" as const }}>
-                    <div style={{ fontWeight: 700, color: "#16a34a" }}>{jdResult.found.length} found</div>
-                    <div style={{ fontWeight: 700, color: "#dc2626" }}>{jdResult.missing.length} missing</div>
+                    <div style={{ fontWeight: 700, color: "var(--success)" }}>{jdResult.found.length} found</div>
+                    <div style={{ fontWeight: 700, color: "var(--danger)" }}>{jdResult.missing.length} missing</div>
                   </div>
                 </div>
                 <div style={{ height: 7, borderRadius: 99, background: "var(--surface2)", overflow: "hidden" }}>
@@ -3234,7 +3234,7 @@ export default function BuilderPage() {
                   {g.found.length > 0 && (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: g.missing.length ? 10 : 0 }}>
                       {g.found.map(kw => (
-                        <span key={kw} style={{ fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 99, background: "#dcfce7", color: "#15803d" }}>✓ {kw}</span>
+                        <span key={kw} style={{ fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 99, background: "rgba(34,197,94,.12)", color: "var(--success)", border: "1px solid rgba(34,197,94,.2)" }}>✓ {kw}</span>
                       ))}
                     </div>
                   )}
@@ -3250,7 +3250,7 @@ export default function BuilderPage() {
                             }
                             setJdResult(r => r ? { ...r, found: [...r.found, kw], missing: r.missing.filter(m => m !== kw), score: Math.round(((r.found.length + 1) / (r.found.length + r.missing.length)) * 100) } : r);
                           }}
-                          style={{ fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 99, background: "#fee2e2", color: "#dc2626", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+                          style={{ fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 99, background: "rgba(239,68,68,.1)", color: "var(--danger)", border: "1px solid rgba(239,68,68,.2)", cursor: "pointer", fontFamily: "inherit" }}>
                           + {kw}
                         </button>
                       ))}
@@ -3408,7 +3408,7 @@ export default function BuilderPage() {
                               setImportStatus("idle");
                             }}
                             title="Remove imported data"
-                            style={{ display: "flex", alignItems: "center", gap: 5, padding: "8px 12px", borderRadius: 7, background: "#fef2f2", borderWidth: 1, borderStyle: "solid", borderColor: "#fecaca", color: "#dc2626", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", flexShrink: 0 }}>
+                            style={{ display: "flex", alignItems: "center", gap: 5, padding: "8px 12px", borderRadius: 7, background: "rgba(239,68,68,.08)", borderWidth: 1, borderStyle: "solid", borderColor: "rgba(239,68,68,.2)", color: "var(--danger)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", flexShrink: 0 }}>
                             <X size={12} /> Remove
                           </button>
                         )}
@@ -4488,7 +4488,7 @@ export default function BuilderPage() {
                           <MiniPreview t={t} active={active} />
                           {/* Recommended badge */}
                           {isRec && (
-                            <div style={{ position: "absolute" as const, top: 5, left: 5, background: "var(--warn)", color: "#78350f", fontSize: 9, fontWeight: 800, padding: "1px 5px", borderRadius: 4, letterSpacing: ".3px" }}>
+                            <div style={{ position: "absolute" as const, top: 5, left: 5, background: "var(--warn)", color: "#000", fontSize: 9, fontWeight: 800, padding: "1px 5px", borderRadius: 4, letterSpacing: ".3px" }}>
                               ⭐ FOR YOU
                             </div>
                           )}
@@ -4613,8 +4613,8 @@ export default function BuilderPage() {
                     <div key={g.category}>
                       <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: ".5px", color: "var(--text3)", marginBottom: 5 }}>{g.category}</div>
                       <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 4 }}>
-                        {g.found.map(kw   => <span key={kw} style={{ padding: "2px 8px", borderRadius: 999, fontSize: 11, fontWeight: 500, background: "#dcfce7", color: "#16a34a" }}>✓ {kw}</span>)}
-                        {g.missing.map(kw => <span key={kw} style={{ padding: "2px 8px", borderRadius: 999, fontSize: 11, fontWeight: 500, background: "#fee2e2", color: "#dc2626" }}>✕ {kw}</span>)}
+                        {g.found.map(kw   => <span key={kw} style={{ padding: "2px 8px", borderRadius: 999, fontSize: 11, fontWeight: 500, background: "rgba(34,197,94,.12)", color: "var(--success)", border: "1px solid rgba(34,197,94,.2)" }}>✓ {kw}</span>)}
+                        {g.missing.map(kw => <span key={kw} style={{ padding: "2px 8px", borderRadius: 999, fontSize: 11, fontWeight: 500, background: "rgba(239,68,68,.1)", color: "var(--danger)", border: "1px solid rgba(239,68,68,.2)" }}>✕ {kw}</span>)}
                       </div>
                     </div>
                   ))}
@@ -4801,7 +4801,7 @@ export default function BuilderPage() {
                     <div style={{ fontSize: 10, color: "rgba(255,255,255,.6)" }}>Upgrade to export with this template</div>
                   </div>
                 </div>
-                <a href="/upgrade" style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 12px", borderRadius: 7, background: "var(--warn)", color: "#78350f", fontSize: 11, fontWeight: 800, textDecoration: "none", flexShrink: 0, whiteSpace: "nowrap" as const }}>
+                <a href="/upgrade" style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 12px", borderRadius: 7, background: "var(--warn)", color: "#000", fontSize: 11, fontWeight: 800, textDecoration: "none", flexShrink: 0, whiteSpace: "nowrap" as const }}>
                   Upgrade ↗
                 </a>
               </div>

@@ -111,7 +111,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               width: 22, height: 22, borderRadius: "50%",
               background: "var(--accent)", flexShrink: 0,
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 10, fontWeight: 900, color: "#000",
+              fontSize: 10, fontWeight: 900, color: "#fff",
             }}>
               {(user.email?.[0] ?? "U").toUpperCase()}
             </div>
