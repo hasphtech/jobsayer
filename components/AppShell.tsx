@@ -36,6 +36,7 @@ const INSIGHT_LINKS = [
   { href: "/career-gps",       label: "Career GPS",  icon: "ti-compass" },
   { href: "/career-health",    label: "Health",      icon: "ti-heart-rate-monitor" },
   { href: "/salary",           label: "Salaries",    icon: "ti-coin" },
+  { href: "/learn",            label: "Courses",     icon: "ti-school" },
   { href: "/vault",            label: "Doc Vault",   icon: "ti-folder-lock" },
   { href: "/company",          label: "Companies",   icon: "ti-building-bank" },
   { href: "/employer-trust",   label: "Trust",       icon: "ti-shield-check" },

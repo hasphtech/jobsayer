@@ -90,6 +90,14 @@
     <priority>0.70</priority>
   </url>
 
+  <!-- Learning & Courses -->
+  <url>
+    <loc>https://jobsayer.com/learn</loc>
+    <lastmod>2026-06-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
   <!-- Employer Intelligence -->
   <url>
     <loc>https://jobsayer.com/company</loc>
