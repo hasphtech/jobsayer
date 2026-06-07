@@ -2,24 +2,24 @@
 /**
  * useTheme — site-wide dark/light mode toggle
  * Persists in localStorage under "jobsayer-theme".
- * Applies by toggling the "light" class on document.body.
+ * Light is the default. Dark mode applies "dark" class on document.body.
  */
 import { useState, useEffect, useCallback } from "react";
 
 const KEY = "jobsayer-theme";
 
 export function useTheme() {
-  const [dark, setDark] = useState(true); // default dark
+  const [dark, setDark] = useState(false); // default light
 
   // Sync from localStorage on mount
   useEffect(() => {
     const stored = typeof localStorage !== "undefined" ? localStorage.getItem(KEY) : null;
-    const isLight = stored === "light";
-    setDark(!isLight);
-    if (isLight) {
-      document.body.classList.add("light");
+    const isDark = stored === "dark";
+    setDark(isDark);
+    if (isDark) {
+      document.body.classList.add("dark");
     } else {
-      document.body.classList.remove("light");
+      document.body.classList.remove("dark");
     }
   }, []);
 
@@ -27,10 +27,10 @@ export function useTheme() {
     setDark(prev => {
       const next = !prev;
       if (next) {
-        document.body.classList.remove("light");
+        document.body.classList.add("dark");
         localStorage.setItem(KEY, "dark");
       } else {
-        document.body.classList.add("light");
+        document.body.classList.remove("dark");
         localStorage.setItem(KEY, "light");
       }
       return next;

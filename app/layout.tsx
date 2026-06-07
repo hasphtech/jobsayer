@@ -58,8 +58,8 @@ export const metadata: Metadata = {
 
 const FOUC_SCRIPT = `(function(){
   var t=localStorage.getItem('jobsayer-theme');
-  if(t==='light'){document.body.classList.add('light');document.documentElement.style.setProperty('background','#f8fafc');}
-  else{document.documentElement.style.setProperty('background','#08080c');}
+  if(t==='dark'){document.body.classList.add('dark');document.documentElement.style.setProperty('background','#08080c');}
+  else{document.documentElement.style.setProperty('background','#f8fafc');}
   if('serviceWorker' in navigator){
     window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
   }

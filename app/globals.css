@@ -1,58 +1,37 @@
 /* ─── Reset ────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ─── Design tokens — Dark (default) ───────────────────────── */
+/* ─── Design tokens — Light (default) ──────────────────────── */
 :root {
-  --bg:        #08080c;
-  --surface:   #111118;
-  --surface2:  #18181f;
-  --border:    rgba(255,255,255,0.06);
-  --border2:   rgba(255,255,255,0.03);
-  --text1:     #fafafa;
-  --text2:     #a1a1aa;
-  --text3:     #71717a;
-  --accent:    #6366f1;   /* indigo-500 — sharper, more modern */
+  --bg:        #f8fafc;
+  --surface:   #ffffff;
+  --surface2:  #f1f5f9;
+  --border:    rgba(0,0,0,0.10);
+  --border2:   rgba(0,0,0,0.05);
+  --text1:     #0f172a;
+  --text2:     #475569;
+  --text3:     #94a3b8;
+  --accent:    #6366f1;   /* indigo-500 */
   --accdim:    rgba(99,102,241,0.10);
   --accborder: rgba(99,102,241,0.25);
-  --danger:    #ef4444;
-  --dangerdim: rgba(239,68,68,0.10);
-  --success:   #22c55e;
-  --warn:      #eab308;
+  --danger:    #dc2626;
+  --dangerdim: rgba(220,38,38,0.10);
+  --success:   #16a34a;
+  --warn:      #d97706;
   --radius:    10px;
-  --shadow:    0 4px 24px rgba(0,0,0,0.5);
+  --shadow:    0 4px 24px rgba(0,0,0,0.12);
 
   /* new tokens */
-  --surface-hover:  rgba(255,255,255,0.04);
-  --border-strong:  rgba(255,255,255,0.12);
-  --nav-bg:         rgba(8,8,12,0.95);      /* sticky nav background */
-  --nav-active-bg:  rgba(255,255,255,0.07); /* active nav link */
-  --nav-hover-col:  #ffffff;
+  --surface-hover:  rgba(0,0,0,0.04);
+  --border-strong:  rgba(0,0,0,0.15);
+  --nav-bg:         rgba(255,255,255,0.97); /* sticky nav background */
+  --nav-active-bg:  rgba(0,0,0,0.06);       /* active nav link */
+  --nav-hover-col:  #0f172a;
 
   /* AppShell layout tokens */
   --shell-sidebar-w:   200px;
   --shell-topbar-h:    46px;
   --shell-ai-panel-w:  240px;
-  --shell-sidebar-bg:  #0b0b16;
-  --shell-topbar-bg:   #0d0d18;
-  --shell-ai-bg:       #0b0b16;
-  --shell-link-active-bg:  rgba(99,102,241,0.15);
-  --shell-link-active-col: #fff;
-  --shell-link-col:        rgba(255,255,255,0.45);
-  --shell-link-hover-col:  rgba(255,255,255,0.8);
-  --shell-section-col:     rgba(255,255,255,0.18);
-}
-
-/* ─── Light theme override ──────────────────────────────────── */
-body.light {
-  --bg:        #f8fafc;
-  --surface:   #ffffff;
-  --nav-bg:        rgba(255,255,255,0.97);
-  --nav-active-bg: rgba(0,0,0,0.06);
-  --nav-hover-col: #0f172a;
-  --surface-hover: rgba(0,0,0,0.04);
-  --border-strong: rgba(0,0,0,0.15);
-
-  /* AppShell light overrides */
   --shell-sidebar-bg:  #ffffff;
   --shell-topbar-bg:   #ffffff;
   --shell-ai-bg:       #f8f9fc;
@@ -61,20 +40,41 @@ body.light {
   --shell-link-col:        #64748b;
   --shell-link-hover-col:  #0f172a;
   --shell-section-col:     #94a3b8;
-  --surface2:  #f1f5f9;
-  --border:    rgba(0,0,0,0.10);
-  --border2:   rgba(0,0,0,0.05);
-  --text1:     #0f172a;
-  --text2:     #475569;
-  --text3:     #94a3b8;
+}
+
+/* ─── Dark theme override ───────────────────────────────────── */
+body.dark {
+  --bg:        #08080c;
+  --surface:   #111118;
+  --surface2:  #18181f;
+  --border:    rgba(255,255,255,0.06);
+  --border2:   rgba(255,255,255,0.03);
+  --text1:     #fafafa;
+  --text2:     #a1a1aa;
+  --text3:     #71717a;
   --accent:    #6366f1;
   --accdim:    rgba(99,102,241,0.10);
   --accborder: rgba(99,102,241,0.25);
-  --danger:    #dc2626;
-  --dangerdim: rgba(220,38,38,0.10);
-  --success:   #16a34a;
-  --warn:      #d97706;
-  --shadow:    0 4px 24px rgba(0,0,0,0.12);
+  --danger:    #ef4444;
+  --dangerdim: rgba(239,68,68,0.10);
+  --success:   #22c55e;
+  --warn:      #eab308;
+  --shadow:    0 4px 24px rgba(0,0,0,0.5);
+
+  --surface-hover:  rgba(255,255,255,0.04);
+  --border-strong:  rgba(255,255,255,0.12);
+  --nav-bg:         rgba(8,8,12,0.95);
+  --nav-active-bg:  rgba(255,255,255,0.07);
+  --nav-hover-col:  #ffffff;
+
+  --shell-sidebar-bg:  #0b0b16;
+  --shell-topbar-bg:   #0d0d18;
+  --shell-ai-bg:       #0b0b16;
+  --shell-link-active-bg:  rgba(99,102,241,0.15);
+  --shell-link-active-col: #fff;
+  --shell-link-col:        rgba(255,255,255,0.45);
+  --shell-link-hover-col:  rgba(255,255,255,0.8);
+  --shell-section-col:     rgba(255,255,255,0.18);
 }
 
 /* ─── Base ─────────────────────────────────────────────────── */

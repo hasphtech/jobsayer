@@ -382,7 +382,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
   const tablet = w < 900;
   const { dark } = useTheme();
   const [featuresTab, setFeaturesTab] = useState<"resume" | "jobseeker" | "recruiter">("resume");
-  const [pricingTab, setPricingTab]   = useState<"resume" | "jobseeker" | "employer">("jobseeker");
+  const [pricingTab, setPricingTab]   = useState<"jobseeker" | "employer">("jobseeker");
 
   return (
     <div style={{ background: "var(--bg)", color: "var(--text1)", overflowX: "hidden" }}>
@@ -733,7 +733,6 @@ function LandingPage({ signIn }: { signIn: () => void }) {
           }}>
             {([
               { key: "jobseeker", label: mobile ? "🎯 Job Seekers" : "🎯 For Job Seekers" },
-              { key: "resume",    label: mobile ? "📄 Resume" : "📄 Resume Builder" },
               { key: "employer",  label: mobile ? "🏢 Employers" : "🏢 For Employers" },
             ] as const).map(tab => (
               <button
@@ -759,57 +758,29 @@ function LandingPage({ signIn }: { signIn: () => void }) {
             {
               name: "Free",
               price: "$0", period: "forever",
-              tagline: "Start growing, no card needed",
+              tagline: "Start your career journey",
               color: "var(--text2)", highlight: false,
-              features: ["2 saved resumes", "4 basic templates", "PDF export", "jobSayer Score", "Matched jobs feed"],
-              missing: ["Interview prep (AI)", "Career GPS roadmap", "AI writing", "Salary intelligence", "Priority support"],
+              features: ["2 saved resumes", "4 basic templates", "PDF export", "ATS score", "Matched jobs feed", "Public share link"],
+              missing: ["All 20+ templates", "AI writing assistant", "Interview prep (AI)", "Career GPS roadmap", "JD Tailor", "Salary intelligence"],
               cta: "Start free", ctaHref: "/builder",
             },
             {
-              name: "Starter",
+              name: "Career Pro",
               price: "$9", period: "/ month",
-              tagline: "For ambitious professionals",
+              tagline: "For active job hunters",
               color: "var(--accent)", highlight: true,
-              features: ["5 saved resumes", "All 20+ templates", "PDF + DOCX export", "jobSayer Score", "Matched jobs feed", "Interview prep (AI)", "Career GPS roadmap"],
-              missing: ["AI writing assistant", "Salary intelligence", "Priority support"],
-              cta: "Get Starter", ctaHref: "/upgrade",
+              features: ["5 saved resumes", "All 20+ templates", "PDF + DOCX export", "ATS score + JD Tailor", "Matched jobs + Job tracker", "AI writing assistant", "Interview prep (AI)", "Career GPS roadmap"],
+              missing: ["Salary intelligence", "LinkedIn optimizer", "Priority support"],
+              cta: "Get Career Pro", ctaHref: "/upgrade",
             },
             {
-              name: "Pro",
+              name: "Career Elite",
               price: "$19", period: "/ month",
               tagline: "For career accelerators",
               color: "#a78bfa", highlight: false,
-              features: ["10 saved resumes", "All 20+ templates", "PDF + DOCX export", "jobSayer Score", "Matched jobs feed", "Interview prep (AI)", "Career GPS roadmap", "AI writing assistant", "Salary intelligence", "Priority support"],
+              features: ["Unlimited resumes", "All 20+ templates", "PDF + DOCX export", "ATS score + JD Tailor", "Matched jobs + Job tracker", "AI writing assistant", "Interview prep (AI)", "Career GPS roadmap", "Salary intelligence", "LinkedIn Optimizer", "Priority support"],
               missing: [],
-              cta: "Get Pro", ctaHref: "/upgrade",
-            },
-          ] : pricingTab === "resume" ? [
-            {
-              name: "Free",
-              price: "$0", period: "forever",
-              tagline: "Build your first resume",
-              color: "var(--text2)", highlight: false,
-              features: ["2 saved resumes", "4 basic templates", "PDF export", "Public share link", "ATS score"],
-              missing: ["DOCX export", "All 20+ templates", "AI writing assistant", "JD tailor", "LinkedIn optimizer"],
-              cta: "Start free", ctaHref: "/builder",
-            },
-            {
-              name: "Resume Pro",
-              price: "$7", period: "/ month",
-              tagline: "For serious job applicants",
-              color: "var(--accent)", highlight: true,
-              features: ["Unlimited resumes", "All 20+ templates", "PDF + DOCX export", "Public share link", "ATS score", "AI writing assistant", "JD Resume Tailor", "LinkedIn Optimizer"],
-              missing: ["Team seats", "Dedicated support"],
-              cta: "Get Resume Pro", ctaHref: "/upgrade",
-            },
-            {
-              name: "Teams",
-              price: "$19", period: "/ month",
-              tagline: "For career coaches & agencies",
-              color: "#a78bfa", highlight: false,
-              features: ["5 member seats", "Unlimited resumes", "All 20+ templates", "PDF + DOCX export", "AI writing assistant", "JD Resume Tailor", "LinkedIn Optimizer", "Bulk export", "Dedicated support"],
-              missing: [],
-              cta: "Get Teams", ctaHref: "/upgrade",
+              cta: "Get Career Elite", ctaHref: "/upgrade",
             },
           ] : [
             {
@@ -890,7 +861,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
           ))}
         </div>
         <p style={{ textAlign: "center", fontSize: 12, color: "var(--text3)", marginTop: 20 }}>
-          All plans include ATS scoring, matched jobs, and share links. Billed in USD. Cancel anytime.
+          All plans include resume builder, ATS scoring, matched jobs, and public share link. Billed in USD. Cancel anytime.
         </p>
       </section>
 
