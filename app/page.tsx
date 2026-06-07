@@ -418,10 +418,12 @@ function LandingPage({ signIn }: { signIn: () => void }) {
           fontSize: mobile ? 38 : tablet ? 54 : 64,
           fontWeight: 800, lineHeight: 1.05, letterSpacing: "-.04em",
           marginBottom: 20, maxWidth: 700,
-          background: dark
-            ? "linear-gradient(160deg, #fff 40%, rgba(255,255,255,.55) 100%)"
-            : "linear-gradient(160deg, #0f172a 40%, rgba(15,23,42,.65) 100%)",
-          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+          color: "var(--text1)",
+          ...(dark ? {
+            background: "linear-gradient(160deg, #fff 40%, rgba(255,255,255,.55) 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          } : {}),
         }}>
           Build the career you deserve
         </h1>
@@ -1292,7 +1294,7 @@ function Dashboard({ user }: { user: any }) {
                     border: `1px solid ${a.accent ? "var(--accborder)" : "var(--border)"}`,
                     transition: "border-color .15s",
                   }}
-                    onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(255,255,255,.14)"}
+                    onMouseEnter={e => e.currentTarget.style.borderColor = "var(--text3)"}
                     onMouseLeave={e => e.currentTarget.style.borderColor = a.accent ? "var(--accborder)" : "var(--border)"}
                   >
                     <div>
