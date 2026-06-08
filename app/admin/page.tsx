@@ -27,7 +27,7 @@ interface AdminJob {
   posted_at: string;
 }
 
-type View = "add" | "scrape" | "queue" | "manage" | "bgv" | "companies";
+type View = "add" | "scrape" | "queue" | "manage" | "bgv" | "companies" | "users" | "flags" | "audit" | "metrics";
 
 const EMPTY_FORM: Omit<AdminJob, "id" | "posted_at" | "is_active" | "is_approved"> = {
   title: "", company: "", location: "Bengaluru", mode: "hybrid",
@@ -143,15 +143,44 @@ export default function AdminPage() {
           ))}
         </div>
 
-        {/* Tabs */}
-        <div style={{ display: "flex", gap: 2, marginBottom: 20, borderBottom: "1px solid var(--border)", flexWrap: "wrap" }}>
-          {(["add", "scrape", "queue", "manage", "bgv", "companies"] as View[]).map(v => (
+        {/* Tabs — Jobs section */}
+        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>Jobs</div>
+        <div style={{ display: "flex", gap: 2, marginBottom: 16, borderBottom: "1px solid var(--border)", flexWrap: "wrap" }}>
+          {(["add", "scrape", "queue", "manage"] as View[]).map(v => (
             <button key={v} onClick={() => { setView(v); if (v === "queue") loadJobs("pending"); if (v === "manage") loadJobs("all"); }}
               style={{ padding: "9px 16px", fontSize: 13, fontWeight: 700, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
                 color: view === v ? "var(--accent)" : "var(--text3)",
                 borderBottom: view === v ? "2px solid var(--accent)" : "2px solid transparent",
               }}>
-              {{ add: "➕ Add Job", scrape: "🤖 Scrape", queue: `🔍 Queue ${pending > 0 ? `(${pending})` : ""}`, manage: "📋 Manage", bgv: "🛡 BGV", companies: "🏅 Companies" }[v]}
+              {{ add: "➕ Add", scrape: "🤖 Scrape", queue: `🔍 Queue ${pending > 0 ? `(${pending})` : ""}`, manage: "📋 Manage" }[v]}
+            </button>
+          ))}
+        </div>
+
+        {/* Tabs — Trust section */}
+        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>Trust & Verification</div>
+        <div style={{ display: "flex", gap: 2, marginBottom: 16, borderBottom: "1px solid var(--border)", flexWrap: "wrap" }}>
+          {(["bgv", "companies"] as View[]).map(v => (
+            <button key={v} onClick={() => setView(v)}
+              style={{ padding: "9px 16px", fontSize: 13, fontWeight: 700, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
+                color: view === v ? "var(--accent)" : "var(--text3)",
+                borderBottom: view === v ? "2px solid var(--accent)" : "2px solid transparent",
+              }}>
+              {{ bgv: "🛡 BGV", companies: "🏅 Companies" }[v]}
+            </button>
+          ))}
+        </div>
+
+        {/* Tabs — Platform section */}
+        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>Platform</div>
+        <div style={{ display: "flex", gap: 2, marginBottom: 20, borderBottom: "1px solid var(--border)", flexWrap: "wrap" }}>
+          {(["users", "flags", "audit", "metrics"] as View[]).map(v => (
+            <button key={v} onClick={() => setView(v)}
+              style={{ padding: "9px 16px", fontSize: 13, fontWeight: 700, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
+                color: view === v ? "var(--accent)" : "var(--text3)",
+                borderBottom: view === v ? "2px solid var(--accent)" : "2px solid transparent",
+              }}>
+              {{ users: "👥 Users", flags: "🚩 Feature Flags", audit: "📜 Audit Log", metrics: "📊 Metrics" }[v]}
             </button>
           ))}
         </div>
@@ -163,6 +192,10 @@ export default function AdminPage() {
         {view === "manage"    && <ManageView    jobs={jobs} token={token!} loading={loading} onRefresh={() => loadJobs("all")} flash={flash} />}
         {view === "bgv"       && <BgvAdminView  token={token!} flash={flash} />}
         {view === "companies" && <CompanyVerifyAdminView token={token!} flash={flash} />}
+        {view === "users"     && <UsersAdminView    token={token!} flash={flash} />}
+        {view === "flags"     && <FeatureFlagsView  token={token!} flash={flash} />}
+        {view === "audit"     && <AuditLogView      token={token!} />}
+        {view === "metrics"   && <MetricsView       token={token!} />}
       </div>
     </div>
   );
@@ -1154,6 +1187,474 @@ function CompanyVerifyAdminView({ token, flash }: { token: string; flash: (m: st
             </div>
           </div>
         </div>
+      )}
+    </div>
+  );
+}
+
+// ── Users Admin View ──────────────────────────────────────────────────────────
+
+interface UserRow {
+  id: string; email: string; full_name: string | null;
+  plan: string; is_admin: boolean; is_suspended: boolean;
+  onboarding_completed: boolean; created_at: string;
+  current_role: string | null; target_role: string | null; location: string | null;
+}
+
+const PLANS = ["free", "pro", "team", "enterprise"];
+
+function UsersAdminView({ token, flash }: { token: string; flash: (m: string) => void }) {
+  const [users,     setUsers]     = useState<UserRow[]>([]);
+  const [loading,   setLoading]   = useState(true);
+  const [search,    setSearch]    = useState("");
+  const [planFilter, setPlanFilter] = useState("all");
+  const [selected,  setSelected]  = useState<UserRow | null>(null);
+  const [saving,    setSaving]    = useState(false);
+  const [editPlan,  setEditPlan]  = useState("free");
+
+  async function load() {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/users", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const json = await res.json();
+      if (res.ok) setUsers(json.users ?? []);
+      else flash(json.error ?? "Failed to load users");
+    } catch { flash("Network error"); }
+    setLoading(false);
+  }
+  useEffect(() => { load(); }, []); // eslint-disable-line
+
+  async function updateUser(id: string, patch: Record<string, unknown>) {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ id, ...patch }),
+      });
+      if (res.ok) { flash("✓ User updated"); await load(); setSelected(null); }
+      else flash("Update failed");
+    } catch { flash("Network error"); }
+    setSaving(false);
+  }
+
+  const filtered = users.filter(u => {
+    const q = search.toLowerCase();
+    const matchSearch = !q || u.email.toLowerCase().includes(q) || (u.full_name ?? "").toLowerCase().includes(q);
+    const matchPlan   = planFilter === "all" || u.plan === planFilter;
+    return matchSearch && matchPlan;
+  });
+
+  const planColor: Record<string, string> = {
+    free: "var(--text3)", pro: "var(--accent)", team: "var(--success)", enterprise: "#a855f7",
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap", alignItems: "center" }}>
+        <input style={{ ...input, maxWidth: 260 }} value={search} onChange={e => setSearch(e.target.value)} placeholder="Search email or name…" />
+        <select style={{ ...input, width: 130 }} value={planFilter} onChange={e => setPlanFilter(e.target.value)}>
+          <option value="all">All plans</option>
+          {PLANS.map(p => <option key={p} value={p}>{p}</option>)}
+        </select>
+        <button style={btn()} onClick={load}>↻ Refresh</button>
+        <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--text3)" }}>{filtered.length} / {users.length} users</span>
+      </div>
+
+      {loading ? <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>Loading…</div> : (
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <thead>
+              <tr style={{ borderBottom: "1px solid var(--border)", color: "var(--text3)" }}>
+                {["Email", "Name", "Role", "Plan", "Status", "Joined", "Actions"].map(h => (
+                  <th key={h} style={{ padding: "8px 10px", fontWeight: 600, fontSize: 11, textAlign: "left" }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(u => (
+                <tr key={u.id} style={{ borderBottom: "1px solid var(--border)", opacity: u.is_suspended ? 0.5 : 1 }}>
+                  <td style={{ padding: "10px 10px" }}>
+                    <div style={{ fontWeight: 600, fontSize: 13 }}>{u.email}</div>
+                    {u.is_admin && <span style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", padding: "1px 6px", borderRadius: 4 }}>ADMIN</span>}
+                  </td>
+                  <td style={{ padding: "10px 10px", color: "var(--text2)" }}>{u.full_name || "—"}</td>
+                  <td style={{ padding: "10px 10px", color: "var(--text3)", fontSize: 12 }}>{u.current_role || "—"}</td>
+                  <td style={{ padding: "10px 10px" }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 6, color: planColor[u.plan] ?? "var(--text3)", background: "var(--surface2)" }}>
+                      {u.plan}
+                    </span>
+                  </td>
+                  <td style={{ padding: "10px 10px" }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 6,
+                      color: u.is_suspended ? "var(--danger)" : u.onboarding_completed ? "var(--success)" : "var(--warn)",
+                      background: u.is_suspended ? "rgba(239,68,68,.08)" : u.onboarding_completed ? "rgba(34,197,94,.08)" : "rgba(234,179,8,.08)",
+                    }}>
+                      {u.is_suspended ? "Suspended" : u.onboarding_completed ? "Active" : "Onboarding"}
+                    </span>
+                  </td>
+                  <td style={{ padding: "10px 10px", color: "var(--text3)", fontSize: 12 }}>
+                    {new Date(u.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "2-digit" })}
+                  </td>
+                  <td style={{ padding: "10px 10px" }}>
+                    <button onClick={() => { setSelected(u); setEditPlan(u.plan); }} style={{ ...btn(), fontSize: 11, padding: "4px 10px" }}>Manage</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {!filtered.length && <div style={{ textAlign: "center", padding: 40, color: "var(--text3)" }}>No users found.</div>}
+        </div>
+      )}
+
+      {selected && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.65)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+          onClick={e => { if (e.target === e.currentTarget) setSelected(null); }}>
+          <div style={{ ...card, width: "100%", maxWidth: 480, display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <div>
+                <div style={{ fontSize: 15, fontWeight: 800 }}>{selected.email}</div>
+                <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 2 }}>{selected.full_name || "No name"} · Joined {new Date(selected.created_at).toLocaleDateString()}</div>
+              </div>
+              <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18 }}>✕</button>
+            </div>
+
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", marginBottom: 8 }}>Plan Override</div>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {PLANS.map(p => (
+                  <button key={p} onClick={() => setEditPlan(p)} style={{ padding: "7px 14px", borderRadius: 8, border: `1px solid ${editPlan === p ? "var(--accent)" : "var(--border)"}`, background: editPlan === p ? "var(--accdim)" : "none", color: editPlan === p ? "var(--accent)" : "var(--text2)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                    {p}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", marginBottom: 8 }}>Quick Actions</div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button onClick={() => updateUser(selected.id, { plan: editPlan })} disabled={saving} style={btn(true)}>
+                  Save Plan: {editPlan}
+                </button>
+                <button onClick={() => updateUser(selected.id, { is_suspended: !selected.is_suspended })} disabled={saving}
+                  style={{ ...btn(), color: selected.is_suspended ? "var(--success)" : "var(--danger)" }}>
+                  {selected.is_suspended ? "↩ Unsuspend" : "⛔ Suspend"}
+                </button>
+                {!selected.is_admin && (
+                  <button onClick={() => { if (confirm(`Grant admin to ${selected.email}?`)) updateUser(selected.id, { is_admin: true }); }} disabled={saving}
+                    style={{ ...btn(), color: "var(--warn)" }}>
+                    ⭐ Make Admin
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div style={{ background: "var(--surface2)", borderRadius: 10, padding: "12px 14px", fontSize: 12, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+              {[
+                ["Current role",  selected.current_role || "—"],
+                ["Target role",   selected.target_role  || "—"],
+                ["Location",      selected.location     || "—"],
+                ["Onboarding",    selected.onboarding_completed ? "✓ Complete" : "⏳ In progress"],
+              ].map(([k, v]) => (
+                <div key={k}>
+                  <div style={{ fontSize: 10, color: "var(--text3)", fontWeight: 700, textTransform: "uppercase" }}>{k}</div>
+                  <div style={{ color: "var(--text1)", marginTop: 2 }}>{v}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Feature Flags View ────────────────────────────────────────────────────────
+
+interface FeatureFlag {
+  id: string; key: string; enabled: boolean; description: string | null; updated_at: string;
+}
+
+function FeatureFlagsView({ token, flash }: { token: string; flash: (m: string) => void }) {
+  const [flags, setFlags] = useState<FeatureFlag[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [toggling, setToggling] = useState<string | null>(null);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const { createBrowserClient } = await import("@supabase/ssr");
+      const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      const { data } = await sb.from("feature_flags").select("*").order("key");
+      setFlags(data ?? []);
+    } catch { flash("Failed to load flags"); }
+    setLoading(false);
+  }
+  useEffect(() => { load(); }, []); // eslint-disable-line
+
+  async function toggle(flag: FeatureFlag) {
+    setToggling(flag.key);
+    try {
+      const res = await fetch("/api/admin/flags", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ key: flag.key, enabled: !flag.enabled }),
+      });
+      if (res.ok) { flash(`✓ ${flag.key} → ${!flag.enabled ? "enabled" : "disabled"}`); await load(); }
+      else flash("Toggle failed");
+    } catch { flash("Network error"); }
+    setToggling(null);
+  }
+
+  const FLAG_ICONS: Record<string, string> = {
+    bgv_live: "🛡", ai_cover_letter: "✉️", salary_predict: "💰",
+    python_ats: "🐍", enterprise_sso: "🔑", stripe_payments: "💳",
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <div style={{ fontSize: 14, fontWeight: 700 }}>🚩 Feature Flags</div>
+        <button onClick={load} style={btn()}>↻ Refresh</button>
+      </div>
+
+      {loading ? <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>Loading…</div> : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 10 }}>
+          {flags.map(f => (
+            <div key={f.id} style={{ ...card, display: "flex", alignItems: "center", gap: 14 }}>
+              <div style={{ fontSize: 24 }}>{FLAG_ICONS[f.key] ?? "🏳"}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)" }}>{f.key}</div>
+                {f.description && <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>{f.description}</div>}
+                <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 3 }}>Updated: {new Date(f.updated_at).toLocaleDateString()}</div>
+              </div>
+              <button
+                disabled={toggling === f.key}
+                onClick={() => toggle(f)}
+                style={{
+                  width: 44, height: 24, borderRadius: 12, border: "none", cursor: "pointer",
+                  background: f.enabled ? "var(--success)" : "var(--surface2)",
+                  position: "relative", transition: "background .2s", flexShrink: 0,
+                }}
+              >
+                <span style={{
+                  position: "absolute", top: 3, width: 18, height: 18, borderRadius: 9,
+                  background: "#fff", transition: "left .2s", left: f.enabled ? 23 : 3,
+                }} />
+              </button>
+            </div>
+          ))}
+          {!flags.length && <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40, gridColumn: "1 / -1" }}>No feature flags configured.</div>}
+        </div>
+      )}
+
+      <div style={{ marginTop: 20, padding: 14, background: "var(--surface2)", borderRadius: 10, fontSize: 12, color: "var(--text3)", lineHeight: 1.7 }}>
+        <strong style={{ color: "var(--text2)" }}>How flags work:</strong> Flags are read from the <code>feature_flags</code> Supabase table at runtime.
+        Toggling here takes effect immediately — no deployment required.
+        Seeded in <code>20260607_audit_logs_and_admin.sql</code>.
+      </div>
+    </div>
+  );
+}
+
+// ── Audit Log View ────────────────────────────────────────────────────────────
+
+interface AuditRow {
+  id: string; action: string; resource: string | null;
+  user_id: string | null; ip_address: string | null;
+  meta: Record<string, unknown> | null; created_at: string;
+}
+
+const ACTION_COLOR: Record<string, string> = {
+  "auth.login": "var(--accent)", "auth.signup": "var(--success)",
+  "plan.upgrade": "var(--success)", "resume.export": "var(--text2)",
+  "bgv.initiated": "var(--warn)", "vault.upload": "var(--text2)",
+  "admin.suspend_user": "var(--danger)", "api.rate_limited": "var(--danger)",
+};
+
+function AuditLogView({ token }: { token: string }) {
+  const [rows,    setRows]    = useState<AuditRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search,  setSearch]  = useState("");
+  const [page,    setPage]    = useState(0);
+  const PER_PAGE = 50;
+
+  async function load() {
+    setLoading(true);
+    try {
+      const { createBrowserClient } = await import("@supabase/ssr");
+      const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      const { data } = await sb
+        .from("audit_logs")
+        .select("id, action, resource, user_id, ip_address, meta, created_at")
+        .order("created_at", { ascending: false })
+        .limit(500);
+      setRows(data ?? []);
+    } finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => { load(); }, []); // eslint-disable-line
+
+  const filtered = rows.filter(r => {
+    const q = search.toLowerCase();
+    return !q || r.action.includes(q) || (r.resource ?? "").includes(q) || (r.user_id ?? "").includes(q);
+  });
+  const pageRows    = filtered.slice(page * PER_PAGE, (page + 1) * PER_PAGE);
+  const totalPages  = Math.ceil(filtered.length / PER_PAGE);
+
+  return (
+    <div>
+      <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 16, flexWrap: "wrap" }}>
+        <input style={{ ...input, maxWidth: 280 }} value={search} onChange={e => { setSearch(e.target.value); setPage(0); }} placeholder="Filter by action, resource, user ID…" />
+        <button style={btn()} onClick={load}>↻ Refresh</button>
+        <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--text3)" }}>{filtered.length} events</span>
+      </div>
+
+      {loading ? <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>Loading…</div> : (
+        <>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+              <thead>
+                <tr style={{ borderBottom: "1px solid var(--border)", color: "var(--text3)" }}>
+                  {["Time", "Action", "Resource", "User", "IP"].map(h => (
+                    <th key={h} style={{ padding: "8px 10px", fontWeight: 600, fontSize: 11, textAlign: "left" }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {pageRows.map(r => (
+                  <tr key={r.id} style={{ borderBottom: "1px solid var(--border)" }}>
+                    <td style={{ padding: "8px 10px", color: "var(--text3)", whiteSpace: "nowrap", fontSize: 11 }}>
+                      {new Date(r.created_at).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                    </td>
+                    <td style={{ padding: "8px 10px" }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: ACTION_COLOR[r.action] ?? "var(--text2)", fontFamily: "monospace" }}>
+                        {r.action}
+                      </span>
+                    </td>
+                    <td style={{ padding: "8px 10px", color: "var(--text3)", fontSize: 11, fontFamily: "monospace", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {r.resource || "—"}
+                    </td>
+                    <td style={{ padding: "8px 10px", color: "var(--text3)", fontSize: 10, fontFamily: "monospace" }}>
+                      {r.user_id ? r.user_id.slice(0, 8) + "…" : "—"}
+                    </td>
+                    <td style={{ padding: "8px 10px", color: "var(--text3)", fontSize: 11 }}>{r.ip_address || "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {!pageRows.length && <div style={{ textAlign: "center", padding: 40, color: "var(--text3)" }}>No events found.</div>}
+          </div>
+
+          {totalPages > 1 && (
+            <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 14 }}>
+              <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0} style={btn()}>← Prev</button>
+              <span style={{ fontSize: 13, color: "var(--text3)", padding: "8px 12px" }}>{page + 1} / {totalPages}</span>
+              <button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page === totalPages - 1} style={btn()}>Next →</button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+// ── Metrics View ──────────────────────────────────────────────────────────────
+
+interface MetricStat { label: string; value: number | string; sub?: string; color?: string; }
+
+function MetricsView({ token }: { token: string }) {
+  const [stats,    setStats]    = useState<MetricStat[]>([]);
+  const [loading,  setLoading]  = useState(true);
+  const [planDist, setPlanDist] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const { createBrowserClient } = await import("@supabase/ssr");
+        const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+
+        const [
+          { count: totalUsers },
+          { count: activeUsers },
+          { count: totalResumes },
+          { data: planData },
+          { count: auditCount },
+        ] = await Promise.all([
+          sb.from("profiles").select("*", { count: "exact", head: true }),
+          sb.from("profiles").select("*", { count: "exact", head: true }).eq("onboarding_completed", true),
+          sb.from("resumes").select("*", { count: "exact", head: true }),
+          sb.from("profiles").select("plan"),
+          sb.from("audit_logs").select("*", { count: "exact", head: true }),
+        ]);
+
+        const dist: Record<string, number> = {};
+        (planData ?? []).forEach((r: { plan: string }) => { dist[r.plan] = (dist[r.plan] ?? 0) + 1; });
+        setPlanDist(dist);
+
+        setStats([
+          { label: "Total Users",     value: totalUsers  ?? 0, color: "var(--accent)" },
+          { label: "Onboarded Users", value: activeUsers ?? 0, sub: `${Math.round(((activeUsers ?? 0) / Math.max(totalUsers ?? 1, 1)) * 100)}% completion`, color: "var(--success)" },
+          { label: "Resumes Created", value: totalResumes ?? 0, color: "var(--text1)" },
+          { label: "Audit Events",    value: auditCount ?? 0, color: "var(--text1)" },
+          { label: "Paying Users",    value: Object.entries(dist).filter(([k]) => k !== "free").reduce((a, [, v]) => a + v, 0), sub: "pro + team + enterprise", color: "var(--success)" },
+          { label: "Free Users",      value: dist.free ?? 0, sub: "conversion opportunity", color: "var(--warn)" },
+        ]);
+      } catch {
+        setStats([{ label: "Error", value: "Could not load metrics", color: "var(--danger)" }]);
+      }
+      setLoading(false);
+    })();
+  }, [token]);
+
+  return (
+    <div>
+      <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}>📊 Platform Metrics</div>
+
+      {loading ? <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>Loading…</div> : (
+        <>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 12, marginBottom: 24 }}>
+            {stats.map(s => (
+              <div key={s.label} style={{ ...card, padding: "16px 18px" }}>
+                <div style={{ fontSize: 28, fontWeight: 800, color: s.color ?? "var(--text1)" }}>{s.value}</div>
+                <div style={{ fontSize: 12, color: "var(--text2)", marginTop: 3, fontWeight: 600 }}>{s.label}</div>
+                {s.sub && <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>{s.sub}</div>}
+              </div>
+            ))}
+          </div>
+
+          <div style={{ ...card }}>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14 }}>Plan Distribution</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {PLANS.map(p => {
+                const n     = planDist[p] ?? 0;
+                const total = Object.values(planDist).reduce((a, b) => a + b, 0) || 1;
+                const pct   = Math.round((n / total) * 100);
+                return (
+                  <div key={p}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, fontSize: 13 }}>
+                      <span style={{ fontWeight: 600 }}>{p}</span>
+                      <span style={{ color: "var(--text3)" }}>{n} users ({pct}%)</span>
+                    </div>
+                    <div style={{ height: 8, background: "var(--surface2)", borderRadius: 4, overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: `${pct}%`, borderRadius: 4,
+                        background: p === "free" ? "var(--text3)" : p === "pro" ? "var(--accent)" : p === "team" ? "var(--success)" : "#a855f7",
+                      }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div style={{ marginTop: 16, padding: 12, background: "var(--surface2)", borderRadius: 10, fontSize: 12, color: "var(--text3)" }}>
+            Live metrics pulled from Supabase on each load. For time-series, connect Posthog or Grafana.
+          </div>
+        </>
       )}
     </div>
   );

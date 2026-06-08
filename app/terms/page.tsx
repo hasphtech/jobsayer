@@ -24,84 +24,120 @@ export default function TermsPage() {
 
       <div style={{ maxWidth: 760, margin: "0 auto", padding: "48px 24px 80px" }}>
         <h1 style={{ fontSize: 32, fontWeight: 800, marginBottom: 6 }}>Terms of Service</h1>
-        <p style={{ fontSize: 13, color: "var(--text3)", marginBottom: 40 }}>Last updated: June 2025</p>
+        <p style={{ fontSize: 13, color: "var(--text3)", marginBottom: 40 }}>Last updated: 1 June 2026 · JobSayer Technologies Pvt. Ltd.</p>
 
         <Section title="1. Acceptance of Terms">
-          By accessing or using jobSayer ("the Service"), you agree to be bound by these Terms of Service.
-          If you do not agree, please do not use the Service. These terms apply to all visitors, users, and
-          anyone who accesses the platform.
+          These Terms constitute a legally binding agreement between you and JobSayer Technologies Pvt. Ltd.
+          ("JobSayer", "we", "us") governing your use of the platform and all associated services. If you
+          use the Service on behalf of a company, you represent you have authority to bind that entity.
+          If you do not agree, please do not use the Service.
         </Section>
 
         <Section title="2. Description of Service">
-          jobSayer is an AI-powered resume builder and job-matching platform. The Service includes resume
-          creation tools, AI writing assistance, job listings, resume scoring, interview preparation, and
-          career guidance features. Some features require a paid subscription.
+          JobSayer is a global career growth platform providing resume building, ATS scoring, interview
+          preparation, salary benchmarks, job matching, background verification (BGV), career path
+          guidance, document vault, and AI-powered career development tools across 50+ countries.
+          We reserve the right to modify or discontinue features with reasonable notice.
         </Section>
 
         <Section title="3. User Accounts">
-          You may create an account using Google OAuth or your email address. You are responsible for
-          maintaining the confidentiality of your account credentials and for all activity that occurs
-          under your account. You must be at least 18 years old to use the Service.
+          You must be at least 18 years old to create an account. You agree to provide accurate, current
+          information and keep credentials confidential. You are responsible for all activity under your
+          account. Notify us immediately at{" "}
+          <a href="mailto:legal@jobsayer.com" style={{ color: "var(--accent)" }}>legal@jobsayer.com</a>{" "}
+          if you suspect unauthorised access.
         </Section>
 
         <Section title="4. Acceptable Use">
           You agree not to:
           <ul style={{ marginTop: 10, paddingLeft: 20, lineHeight: 2 }}>
-            <li>Use the Service for any unlawful purpose or in violation of any regulations</li>
-            <li>Upload content that is defamatory, obscene, fraudulent, or violates others' rights</li>
-            <li>Attempt to reverse-engineer, scrape, or extract data from the platform</li>
-            <li>Use AI features to generate false credentials or misrepresent your qualifications</li>
-            <li>Share your account credentials with others</li>
-            <li>Interfere with or disrupt the Service or its servers</li>
+            <li>Use the Service for any unlawful purpose or in violation of applicable regulations</li>
+            <li>Upload false, misleading, or fraudulent resume or profile information</li>
+            <li>Attempt unauthorised access to any part of the Service or its infrastructure</li>
+            <li>Scrape, copy, or redistribute data from the Service without written permission</li>
+            <li>Use automated bots or crawlers without our express written consent</li>
+            <li>Submit content that infringes third-party intellectual property rights</li>
+            <li>Use AI features to generate false credentials or misrepresent qualifications</li>
+            <li>Reverse-engineer, decompile, or disassemble the Service</li>
+            <li>Interfere with or disrupt the Service, servers, or networks</li>
           </ul>
+          We reserve the right to suspend or terminate accounts that violate these rules without refund.
         </Section>
 
-        <Section title="5. Intellectual Property">
-          The jobSayer platform, including its software, design, and branding, is owned by jobSayer and
-          protected by intellectual property laws. Resume content you create remains yours. By using the
-          Service you grant us a limited licence to store and process your content to provide the Service.
+        <Section title="5. Subscriptions and Payments">
+          Paid subscriptions are billed in advance monthly or annually. Prices are displayed in your
+          local currency (detected by IP address). Payments are processed by Razorpay (India) or Stripe
+          (international). We do not store payment card details. Subscriptions auto-renew unless cancelled
+          at least 24 hours before renewal. Pricing may change with 30 days' notice; continued use
+          constitutes acceptance.
         </Section>
 
-        <Section title="6. AI-Generated Content">
-          jobSayer uses AI (powered by third-party language models) to assist with resume writing,
-          interview preparation, and career guidance. AI-generated content is provided as a starting
-          point and may not always be accurate or suitable. You are solely responsible for reviewing and
-          verifying any AI-generated content before using it.
+        <Section title="6. Enterprise Plans">
+          Enterprise customers ("Enterprise Accounts") receive additional features including SSO/SAML,
+          seat management, audit logs, a dedicated account manager, and a Data Processing Agreement (DPA).
+          Enterprise terms are governed by a separate Master Services Agreement (MSA) which supplements
+          these Terms. Contact{" "}
+          <a href="mailto:enterprise@jobsayer.com" style={{ color: "var(--accent)" }}>enterprise@jobsayer.com</a>.
         </Section>
 
-        <Section title="7. Subscriptions and Payments">
-          Certain features require a paid plan (Starter or Pro). Subscription fees are billed in Indian
-          Rupees (₹) and are non-refundable except as required by law. You may cancel your subscription
-          at any time; access continues until the end of the current billing period.
+        <Section title="7. AI-Generated Content">
+          AI-generated resume suggestions, interview answers, cover letters, and career advice are
+          provided for informational purposes only. You are solely responsible for reviewing AI-generated
+          content before use. Outputs may contain inaccuracies and are not guaranteed to be suitable for
+          your specific situation. JobSayer is not liable for outcomes resulting from use of AI content.
         </Section>
 
-        <Section title="8. Data and Privacy">
-          We collect and process personal data as described in our{" "}
-          <Link href="/privacy" style={{ color: "var(--accent)" }}>Privacy Policy</Link>.
-          Your resume data is stored securely and is never sold to third parties.
+        <Section title="8. Background Verification (BGV)">
+          By using BGV features, you consent to sharing your documents and information with employers
+          for verification. JobSayer does not independently verify submitted documents and is not liable
+          for third-party verification errors. BGV data is handled per applicable laws including the
+          Information Technology Act (India), GDPR (EU/UK), and CCPA (California).
         </Section>
 
-        <Section title="9. Limitation of Liability">
-          To the maximum extent permitted by applicable law, jobSayer shall not be liable for any
-          indirect, incidental, special, or consequential damages arising from your use of the Service,
-          including but not limited to lost profits, loss of data, or inability to find employment.
-          The Service is provided "as is" without warranties of any kind.
+        <Section title="9. Intellectual Property">
+          JobSayer retains all IP rights in the platform including software, design, content, and
+          trademarks. You retain ownership of content you upload. By uploading content, you grant us a
+          non-exclusive, worldwide, royalty-free licence to store and process that content solely to
+          provide the Service. This licence terminates when you delete your account.
         </Section>
 
-        <Section title="10. Changes to Terms">
-          We reserve the right to modify these Terms at any time. We will notify users of material
-          changes by email or prominent notice on the platform. Continued use after changes constitutes
-          acceptance of the updated Terms.
+        <Section title="10. Privacy & Data">
+          Our <Link href="/privacy" style={{ color: "var(--accent)" }}>Privacy Policy</Link> is
+          incorporated into these Terms by reference. By using the Service, you consent to data
+          processing as described therein. Enterprise customers may request a DPA for GDPR Article 28
+          compliance.
         </Section>
 
-        <Section title="11. Governing Law">
-          These Terms are governed by the laws of India. Any disputes shall be subject to the exclusive
-          jurisdiction of the courts in Bangalore, Karnataka, India.
+        <Section title="11. Limitation of Liability">
+          To the maximum extent permitted by law, JobSayer shall not be liable for indirect, incidental,
+          special, consequential, or punitive damages, including loss of profits, data, or employment
+          opportunities. Our total aggregate liability for any claim shall not exceed the greater of
+          (a) the amount you paid us in the 12 months preceding the claim, or (b) USD 100.
         </Section>
 
-        <Section title="12. Contact">
-          For questions about these Terms, contact us at{" "}
-          <a href="mailto:hello@jobsayer.com" style={{ color: "var(--accent)" }}>hello@jobsayer.com</a>.
+        <Section title="12. Disclaimers">
+          The Service is provided "as is" without warranties of any kind. We do not warrant uninterrupted
+          or error-free service. JobSayer is not a recruitment agency and does not guarantee employment
+          outcomes, salary increases, or career advancement.
+        </Section>
+
+        <Section title="13. Governing Law & Disputes">
+          These Terms are governed by the laws of India. Disputes shall first be resolved by good-faith
+          negotiation. If unresolved within 30 days, disputes shall be submitted to binding arbitration
+          in Bangalore, India under the Arbitration and Conciliation Act, 1996. Either party may seek
+          urgent injunctive relief from a court of competent jurisdiction.
+        </Section>
+
+        <Section title="14. Changes to Terms">
+          We may update these Terms and will notify you of material changes by email or in-app notice.
+          Continued use after the effective date of updated Terms constitutes acceptance.
+        </Section>
+
+        <Section title="15. Contact">
+          General:{" "}<a href="mailto:hello@jobsayer.com" style={{ color: "var(--accent)" }}>hello@jobsayer.com</a>
+          {" · "}Legal:{" "}<a href="mailto:legal@jobsayer.com" style={{ color: "var(--accent)" }}>legal@jobsayer.com</a>
+          {" · "}Enterprise:{" "}<a href="mailto:enterprise@jobsayer.com" style={{ color: "var(--accent)" }}>enterprise@jobsayer.com</a>
+          <br />JobSayer Technologies Pvt. Ltd. · Bangalore, India
         </Section>
       </div>
     </div>

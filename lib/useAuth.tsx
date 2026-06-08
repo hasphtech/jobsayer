@@ -12,22 +12,24 @@ import { getSupabaseAsync } from "./supabase";
 import type { User, Session, AuthChangeEvent } from "@supabase/supabase-js";
 
 export interface AuthState {
-  user:             User | null;
-  session:          Session | null;
-  loading:          boolean;
-  isRegistered:     boolean;
-  signInWithGoogle: (redirectTo?: string) => Promise<void>;
-  signInWithOtp:    (email: string) => Promise<{ error: string | null }>;
-  verifyOtp:        (email: string, token: string) => Promise<{ error: string | null }>;
-  signOut:          () => Promise<void>;
+  user:               User | null;
+  session:            Session | null;
+  loading:            boolean;
+  isRegistered:       boolean;
+  signInWithGoogle:   (redirectTo?: string) => Promise<void>;
+  signInWithLinkedIn: (redirectTo?: string) => Promise<void>;
+  signInWithOtp:      (email: string) => Promise<{ error: string | null }>;
+  verifyOtp:          (email: string, token: string) => Promise<{ error: string | null }>;
+  signOut:            () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthState>({
   user: null, session: null, loading: true, isRegistered: false,
-  signInWithGoogle: async () => {},
-  signInWithOtp:    async () => ({ error: null }),
-  verifyOtp:        async () => ({ error: null }),
-  signOut:          async () => {},
+  signInWithGoogle:   async () => {},
+  signInWithLinkedIn: async () => {},
+  signInWithOtp:      async () => ({ error: null }),
+  verifyOtp:          async () => ({ error: null }),
+  signOut:            async () => {},
 });
 
 export function AuthProvider({
@@ -89,6 +91,24 @@ export function AuthProvider({
     }
   }, []);
 
+  // ── signInWithLinkedIn ───────────────────────────────────────────────────
+  const signInWithLinkedIn = useCallback(async (redirectTo?: string) => {
+    const sb = await getSupabaseAsync();
+    const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? window.location.origin;
+    const callbackBase = `${siteUrl}/auth/callback`;
+    const callbackUrl  = redirectTo
+      ? `${callbackBase}?next=${encodeURIComponent(redirectTo)}`
+      : callbackBase;
+    try {
+      await sb.auth.signInWithOAuth({
+        provider: "linkedin_oidc",
+        options: { redirectTo: callbackUrl },
+      });
+    } catch (err) {
+      console.error("@jobsayer/auth: LinkedIn OAuth error", err);
+    }
+  }, []);
+
   // ── signInWithOtp ────────────────────────────────────────────────────────
   const signInWithOtp = useCallback(async (email: string) => {
     const sb = await getSupabaseAsync();
@@ -136,7 +156,7 @@ export function AuthProvider({
       value={{
         user, session, loading,
         isRegistered: !!user,
-        signInWithGoogle, signInWithOtp, verifyOtp, signOut,
+        signInWithGoogle, signInWithLinkedIn, signInWithOtp, verifyOtp, signOut,
       }}
     >
       {children}

@@ -50,6 +50,28 @@ interface AnswerState {
   submitted: boolean;
 }
 
+/* ── Programming languages ──────────────────────────────── */
+export const PROG_LANGUAGES = [
+  { key: "any",        label: "Any / General",  icon: "🧠", color: "#6366f1" },
+  { key: "javascript", label: "JavaScript",      icon: "🟨", color: "#f7df1e" },
+  { key: "typescript", label: "TypeScript",      icon: "🔷", color: "#3178c6" },
+  { key: "python",     label: "Python",          icon: "🐍", color: "#3776ab" },
+  { key: "java",       label: "Java",            icon: "☕", color: "#ed8b00" },
+  { key: "go",         label: "Go",              icon: "🦫", color: "#00add8" },
+  { key: "rust",       label: "Rust",            icon: "🦀", color: "#ce422b" },
+  { key: "cpp",        label: "C++",             icon: "⚙️",  color: "#00599c" },
+  { key: "csharp",     label: "C#",              icon: "🟣", color: "#9b4f96" },
+  { key: "kotlin",     label: "Kotlin",          icon: "🏝️",  color: "#7f52ff" },
+  { key: "swift",      label: "Swift",           icon: "🍎", color: "#fa7343" },
+  { key: "sql",        label: "SQL / DB",        icon: "🗄️",  color: "#00758f" },
+  { key: "ruby",       label: "Ruby",            icon: "💎", color: "#cc342d" },
+  { key: "php",        label: "PHP",             icon: "🐘", color: "#777bb4" },
+  { key: "scala",      label: "Scala",           icon: "🔴", color: "#dc322f" },
+  { key: "r",          label: "R (Data)",        icon: "📊", color: "#276dc3" },
+] as const;
+
+export type ProgLanguageKey = typeof PROG_LANGUAGES[number]["key"];
+
 /* ── Constants ───────────────────────────────────────────── */
 const TARGET_ROLES = [
   "Software Engineer (SDE-1)", "Software Engineer (SDE-2)", "Senior Software Engineer",
@@ -91,6 +113,7 @@ export default function InterviewPage() {
   const [customRole,   setCustomRole]   = useState("");
   const [company,      setCompany]      = useState("Razorpay");
   const [difficulty,   setDifficulty]   = useState<Difficulty>("mid");
+  const [progLang,     setProgLang]     = useState<ProgLanguageKey>("any");
   const [gaps,         setGaps]         = useState<GapAnalysis | null>(null);
   const [practicedGaps,setPracticedGaps]= useState<Set<string>>(new Set());
 
@@ -126,7 +149,7 @@ export default function InterviewPage() {
       const res = await fetch("/api/interview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "analyze_gaps", currentRole, currentSkills, targetRole: effectiveRole, company }),
+        body: JSON.stringify({ action: "analyze_gaps", currentRole, currentSkills, targetRole: effectiveRole, company, progLang }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -310,6 +333,27 @@ export default function InterviewPage() {
                   <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>{d.desc}</div>
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* Programming language */}
+          <div style={{ ...card, padding: 16 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "var(--text2)" }}>💻 Programming language for coding questions</div>
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "repeat(3,1fr)" : "repeat(4,1fr)", gap: 6 }}>
+              {PROG_LANGUAGES.map(l => {
+                const active = progLang === l.key;
+                return (
+                  <button key={l.key} onClick={() => setProgLang(l.key as ProgLanguageKey)} style={{
+                    padding: "8px 6px", borderRadius: 8, cursor: "pointer", textAlign: "center" as const,
+                    border: `1px solid ${active ? l.color : "var(--border)"}`,
+                    background: active ? `${l.color}18` : "var(--surface2)",
+                    display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
+                  }}>
+                    <span style={{ fontSize: 16 }}>{l.icon}</span>
+                    <span style={{ fontSize: 11, fontWeight: active ? 700 : 400, color: active ? l.color : "var(--text2)", lineHeight: 1.2 }}>{l.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 

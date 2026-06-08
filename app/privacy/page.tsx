@@ -24,107 +24,127 @@ export default function PrivacyPage() {
 
       <div style={{ maxWidth: 760, margin: "0 auto", padding: "48px 24px 80px" }}>
         <h1 style={{ fontSize: 32, fontWeight: 800, marginBottom: 6 }}>Privacy Policy</h1>
-        <p style={{ fontSize: 13, color: "var(--text3)", marginBottom: 40 }}>Last updated: June 2025</p>
+        <p style={{ fontSize: 13, color: "var(--text3)", marginBottom: 40 }}>Last updated: 1 June 2026 · GDPR · CCPA · IT Act compliant</p>
 
         <Section title="1. Who We Are">
-          jobSayer ("we", "us", "our") operates the jobSayer platform at jobsayer.com. We are committed
-          to protecting your personal information and your right to privacy. For questions, contact us at{" "}
-          <a href="mailto:hello@jobsayer.com" style={{ color: "var(--accent)" }}>hello@jobsayer.com</a>.
+          JobSayer Technologies Pvt. Ltd. ("JobSayer", "we", "us") operates the JobSayer platform.
+          We are committed to protecting your personal data. Data Controller: JobSayer Technologies Pvt. Ltd.,
+          Bangalore, India. DPO contact:{" "}
+          <a href="mailto:privacy@jobsayer.com" style={{ color: "var(--accent)" }}>privacy@jobsayer.com</a>.
         </Section>
 
         <Section title="2. Information We Collect">
-          <strong style={{ color: "var(--text1)" }}>Account information:</strong> When you sign up, we
-          collect your email address, name, and profile picture (from Google OAuth) or just your email
-          (if you use email OTP sign-in).
+          <strong style={{ color: "var(--text1)" }}>Account information:</strong> Email, name, profile
+          photo (Google/LinkedIn OAuth), IP address, country (detected at login for currency and
+          compliance purposes).
           <br /><br />
-          <strong style={{ color: "var(--text1)" }}>Resume data:</strong> Content you enter into the
-          resume builder — name, contact details, work history, education, skills, and other
-          professional information you choose to provide.
+          <strong style={{ color: "var(--text1)" }}>Resume and career data:</strong> Work history,
+          education, skills, certifications, salary expectations, and other professional information
+          you enter. This is the core of our Service.
           <br /><br />
-          <strong style={{ color: "var(--text1)" }}>Usage data:</strong> Pages visited, features used,
-          and interaction logs to help us improve the Service.
+          <strong style={{ color: "var(--text1)" }}>BGV documents:</strong> Identity documents,
+          certificates, and other materials you submit for background verification. These are treated
+          as sensitive personal data with additional protections.
           <br /><br />
-          <strong style={{ color: "var(--text1)" }}>Payment information:</strong> Subscription payments
-          are processed by Razorpay. We do not store your card or bank details.
+          <strong style={{ color: "var(--text1)" }}>Usage analytics:</strong> Pages visited, features
+          used, session duration, and interaction events (via Posthog, configured without cross-site
+          tracking). No advertising profiles are built.
+          <br /><br />
+          <strong style={{ color: "var(--text1)" }}>Payment metadata:</strong> Plan type, currency,
+          and billing dates. Card details are never stored — processed entirely by Razorpay/Stripe.
         </Section>
 
         <Section title="3. How We Use Your Information">
-          We use your information to:
+          Legal basis (GDPR Article 6): contract performance, legitimate interest, consent where required.
           <ul style={{ marginTop: 10, paddingLeft: 20, lineHeight: 2 }}>
-            <li>Provide and improve the Service</li>
-            <li>Store and retrieve your resume data across devices</li>
-            <li>Process AI enhancement requests (your content is sent to Groq AI servers)</li>
-            <li>Manage your subscription and process payments</li>
-            <li>Send transactional emails (OTP codes, payment receipts)</li>
-            <li>Communicate important Service updates</li>
+            <li>Provide, personalise, and improve the Service</li>
+            <li>Power AI features — your content is sent to Groq AI for processing only; Groq does not retain data per their DPA</li>
+            <li>Manage subscriptions and process payments</li>
+            <li>Send transactional emails (OTP, receipts, account alerts)</li>
+            <li>Maintain security audit logs for enterprise account compliance</li>
+            <li>Detect and prevent fraud and abuse</li>
+            <li>Comply with legal obligations (tax, law enforcement requests)</li>
           </ul>
         </Section>
 
         <Section title="4. Data Sharing">
-          We do <strong style={{ color: "var(--text1)" }}>not sell</strong> your personal data.
-          We share data only with:
+          We do <strong style={{ color: "var(--text1)" }}>not sell</strong> your personal data. Sub-processors:
           <ul style={{ marginTop: 10, paddingLeft: 20, lineHeight: 2 }}>
-            <li><strong style={{ color: "var(--text1)" }}>Supabase</strong> — database and authentication hosting (servers in Singapore/India)</li>
-            <li><strong style={{ color: "var(--text1)" }}>Groq AI</strong> — processes resume text for AI features (no data retained per their policy)</li>
-            <li><strong style={{ color: "var(--text1)" }}>Razorpay</strong> — payment processing</li>
-            <li><strong style={{ color: "var(--text1)" }}>Vercel</strong> — hosting and CDN</li>
-            <li>Law enforcement when required by law</li>
+            <li><strong style={{ color: "var(--text1)" }}>Supabase</strong> — database + auth (servers: Singapore/EU)</li>
+            <li><strong style={{ color: "var(--text1)" }}>Groq AI</strong> — AI processing (servers: US; no data retained)</li>
+            <li><strong style={{ color: "var(--text1)" }}>Razorpay</strong> — India payment processing</li>
+            <li><strong style={{ color: "var(--text1)" }}>Stripe</strong> — international payment processing</li>
+            <li><strong style={{ color: "var(--text1)" }}>Vercel</strong> — hosting and CDN (servers: global edge)</li>
+            <li><strong style={{ color: "var(--text1)" }}>Posthog</strong> — privacy-first analytics (EU-hosted, no cross-site tracking)</li>
+            <li><strong style={{ color: "var(--text1)" }}>Sentry</strong> — error monitoring (stack traces only, no PII)</li>
+            <li>Employers — only for BGV features and only with your explicit consent</li>
+            <li>Law enforcement — only when legally required</li>
           </ul>
+          Full sub-processor list available on request for Enterprise customers.
         </Section>
 
-        <Section title="5. Resume Sharing">
-          When you generate a public share link for your resume (/r/[id]), that resume is accessible
-          to anyone with the link. You can delete your resume at any time to revoke access. We track
-          anonymous view counts on shared resumes.
+        <Section title="5. International Data Transfers">
+          Your data may be processed in countries outside your residence (India, Singapore, US, EU).
+          For EU/UK users, transfers are covered by Standard Contractual Clauses (SCCs). For Enterprise
+          customers, we can execute a GDPR-compliant Data Processing Agreement (DPA) — request at{" "}
+          <a href="mailto:enterprise@jobsayer.com" style={{ color: "var(--accent)" }}>enterprise@jobsayer.com</a>.
         </Section>
 
         <Section title="6. Data Retention">
-          Your resume data is retained as long as your account is active. If you delete your account,
-          all associated data is permanently deleted within 30 days. Draft data stored in your browser's
-          localStorage is controlled entirely by you and never leaves your device until you choose to save.
+          Active accounts: data retained until account deletion. Deleted accounts: all personal data
+          purged within 30 days except where legal obligations require longer retention (e.g., payment
+          records: 7 years per Indian tax law). BGV documents: deleted 90 days after verification
+          completion unless you request earlier deletion. Audit logs: retained 2 years for enterprise
+          compliance.
         </Section>
 
-        <Section title="7. Cookies and Local Storage">
-          We use browser localStorage to save your resume draft and preferences locally on your device.
-          Authentication session cookies are set by Supabase to maintain your login session. We do not
-          use tracking cookies or third-party advertising cookies.
+        <Section title="7. Cookies and Storage">
+          Authentication session cookies (Supabase — strictly necessary). Browser localStorage for
+          resume drafts and UI preferences (no server transmission until you save). We do not use
+          third-party advertising cookies. Analytics (Posthog) uses a first-party cookie only.
+          You can opt out of analytics in Account Settings.
         </Section>
 
         <Section title="8. Your Rights">
-          You have the right to:
+          Depending on your jurisdiction you may have the right to:
           <ul style={{ marginTop: 10, paddingLeft: 20, lineHeight: 2 }}>
-            <li>Access the personal data we hold about you</li>
-            <li>Correct inaccurate information</li>
-            <li>Delete your account and all associated data</li>
-            <li>Export your resume data (available via the builder)</li>
-            <li>Withdraw consent at any time by deleting your account</li>
+            <li><strong style={{ color: "var(--text1)" }}>Access</strong> — request a copy of your personal data</li>
+            <li><strong style={{ color: "var(--text1)" }}>Rectification</strong> — correct inaccurate data</li>
+            <li><strong style={{ color: "var(--text1)" }}>Erasure</strong> — "right to be forgotten" — delete your account in Settings or email us</li>
+            <li><strong style={{ color: "var(--text1)" }}>Portability</strong> — export your resume and profile data (available in Builder)</li>
+            <li><strong style={{ color: "var(--text1)" }}>Restriction</strong> — limit certain processing while a dispute is resolved</li>
+            <li><strong style={{ color: "var(--text1)" }}>Objection</strong> — opt out of processing based on legitimate interest</li>
+            <li><strong style={{ color: "var(--text1)" }}>CCPA / California</strong> — right to know, delete, and opt out of sale (we don't sell data)</li>
           </ul>
-          To exercise these rights, email{" "}
-          <a href="mailto:hello@jobsayer.com" style={{ color: "var(--accent)" }}>hello@jobsayer.com</a>.
+          Submit a Data Subject Access Request (DSAR) at:{" "}
+          <a href="mailto:privacy@jobsayer.com" style={{ color: "var(--accent)" }}>privacy@jobsayer.com</a>.
+          We respond within 30 days. EU users may lodge complaints with their supervisory authority.
         </Section>
 
         <Section title="9. Security">
-          We use industry-standard security practices: HTTPS encryption in transit, row-level security
-          (RLS) in our database ensuring users can only access their own data, and Supabase's managed
-          infrastructure with SOC 2 compliance. No system is 100% secure; use a strong, unique password
-          for your email account.
+          HTTPS/TLS in transit. AES-256 encryption at rest (Supabase). Row-Level Security (RLS) —
+          users can only access their own data. Content Security Policy (CSP) and security headers
+          on all responses. CSRF token validation on all mutating API calls. Input sanitization on
+          all user-submitted data. Regular dependency audits. Incident response plan in place.
+          Report security vulnerabilities to{" "}
+          <a href="mailto:security@jobsayer.com" style={{ color: "var(--accent)" }}>security@jobsayer.com</a>.
         </Section>
 
         <Section title="10. Children's Privacy">
-          The Service is not directed to children under 18. We do not knowingly collect personal
-          information from minors. If you believe a minor has provided us with personal data, please
-          contact us immediately.
+          The Service is not directed to anyone under 18. We do not knowingly collect data from minors.
+          If you believe a minor has provided data, contact us immediately for deletion.
         </Section>
 
         <Section title="11. Changes to This Policy">
-          We may update this Privacy Policy from time to time. We will notify you of significant changes
-          by email or a notice on the platform. The updated policy will be effective immediately upon
-          posting.
+          We will notify you of material changes by email and in-app banner at least 14 days before
+          they take effect. The date at the top of this page indicates the last revision.
         </Section>
 
-        <Section title="12. Contact">
-          For privacy-related questions or to exercise your rights, contact us at{" "}
-          <a href="mailto:hello@jobsayer.com" style={{ color: "var(--accent)" }}>hello@jobsayer.com</a>.
+        <Section title="12. Contact & DPO">
+          Privacy / DSAR:{" "}<a href="mailto:privacy@jobsayer.com" style={{ color: "var(--accent)" }}>privacy@jobsayer.com</a>
+          {" · "}Security:{" "}<a href="mailto:security@jobsayer.com" style={{ color: "var(--accent)" }}>security@jobsayer.com</a>
+          {" · "}Enterprise DPA:{" "}<a href="mailto:enterprise@jobsayer.com" style={{ color: "var(--accent)" }}>enterprise@jobsayer.com</a>
+          <br />JobSayer Technologies Pvt. Ltd. · Bangalore, India
         </Section>
       </div>
     </div>

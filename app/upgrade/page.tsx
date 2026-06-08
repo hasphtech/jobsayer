@@ -94,66 +94,74 @@ export default function UpgradePage() {
 
   const handleUpgrade = useCallback(async (plan: "starter" | "pro") => {
     setPayError("");
-    if (!user) { router.push("/"); return; }
+    if (!user) { router.push("/login?next=/upgrade"); return; }
 
     setPayLoading(plan);
     try {
-      // 1. Create Razorpay order server-side
-      const orderRes = await fetch("/api/payment/create-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan, interval }),
-      });
-      const orderData = await orderRes.json() as { orderId?: string; amount?: number; currency?: string; key?: string; error?: string };
-      if (!orderData.orderId) throw new Error(orderData.error ?? "Could not create order");
-
-      // 2. Load Razorpay checkout
-      const loaded = await loadRazorpay();
-      if (!loaded) throw new Error("Razorpay failed to load. Check your connection.");
-
-      // 3. Open checkout popup
-      await new Promise<void>((resolve, reject) => {
-        const rzp = new (window as any).Razorpay({
-          key:         orderData.key,
-          amount:      orderData.amount,
-          currency:    orderData.currency ?? "INR",
-          order_id:    orderData.orderId,
-          name:        "jobSayer",
-          description: `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan (${interval})`,
-          image:       "/logo.png",
-          prefill: {
-            email: user.email ?? "",
-            name:  user.user_metadata?.full_name ?? "",
-          },
-          theme: { color: "var(--accent)" },
-          handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
-            // 4. Verify payment server-side
-            const verifyRes = await fetch("/api/payment/verify", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ ...response, plan, interval }),
-            });
-            const verifyData = await verifyRes.json() as { success?: boolean; error?: string };
-            if (verifyData.success) {
-              resolve();
-              router.push("/profile?upgraded=1");
-            } else {
-              reject(new Error(verifyData.error ?? "Payment verification failed"));
-            }
-          },
-          modal: {
-            ondismiss: () => reject(new Error("dismissed")),
-          },
+      // ── Route: INR → Razorpay, everything else → Stripe ──────────────────
+      if (currency.code === "INR") {
+        // 1a. Create Razorpay order server-side
+        const orderRes = await fetch("/api/payment/create-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ plan, interval }),
         });
-        rzp.open();
-      });
+        const orderData = await orderRes.json() as { orderId?: string; amount?: number; currency?: string; key?: string; error?: string };
+        if (!orderData.orderId) throw new Error(orderData.error ?? "Could not create order");
+
+        // 1b. Load Razorpay checkout
+        const loaded = await loadRazorpay();
+        if (!loaded) throw new Error("Razorpay failed to load. Check your connection.");
+
+        // 1c. Open checkout popup
+        await new Promise<void>((resolve, reject) => {
+          const rzp = new (window as any).Razorpay({
+            key:         orderData.key,
+            amount:      orderData.amount,
+            currency:    orderData.currency ?? "INR",
+            order_id:    orderData.orderId,
+            name:        "jobSayer",
+            description: `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan (${interval})`,
+            image:       "/logo.png",
+            prefill: {
+              email: user.email ?? "",
+              name:  user.user_metadata?.full_name ?? "",
+            },
+            theme: { color: "var(--accent)" },
+            handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
+              const verifyRes = await fetch("/api/payment/verify", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ...response, plan, interval }),
+              });
+              const verifyData = await verifyRes.json() as { success?: boolean; error?: string };
+              if (verifyData.success) { resolve(); router.push("/profile?upgraded=1"); }
+              else reject(new Error(verifyData.error ?? "Payment verification failed"));
+            },
+            modal: { ondismiss: () => reject(new Error("dismissed")) },
+          });
+          rzp.open();
+        });
+      } else {
+        // 2. Non-INR → Stripe Checkout (hosted page redirect)
+        const res = await fetch("/api/payment/stripe-checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ plan, interval, currency: currency.code }),
+        });
+        const data = await res.json() as { url?: string; error?: string };
+        if (!res.ok || !data.url) throw new Error(data.error ?? "Could not create Stripe session");
+        // Redirect to Stripe-hosted checkout
+        window.location.href = data.url;
+        return; // page is navigating away
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Payment failed";
       if (msg !== "dismissed") setPayError(msg);
     } finally {
       setPayLoading(null);
     }
-  }, [user, interval, router]);
+  }, [user, interval, currency, router]);
 
   return (
     <AppShell>

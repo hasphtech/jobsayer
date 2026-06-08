@@ -27,7 +27,12 @@ export async function POST(req: NextRequest) {
   try { body = await req.json(); }
   catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }
 
-  const { action, currentRole, currentSkills, targetRole, company, focusSkill, difficulty, question, answer } = body;
+  const { action, currentRole, currentSkills, targetRole, company, focusSkill, difficulty, question, answer, progLang } = body;
+
+  // Language context injected into all prompts when a specific language is selected
+  const langCtx = progLang && progLang !== "any"
+    ? `\nProgramming language context: The candidate is specifically targeting ${progLang} roles. Include ${progLang}-specific questions, code snippets, and idioms where relevant.`
+    : "";
 
   /* ══════════════════════════════════════════════════════════
      ACTION: analyze_gaps
@@ -60,7 +65,7 @@ Rules:
 - Include 3–6 critical gaps, 2–4 nice-to-haves
 - currentStrengths: skills the candidate already has that are relevant to the target role
 - Be specific to the Indian tech market and ${company || "top tech companies in India"}
-- studyTime should be realistic for a working professional`;
+- studyTime should be realistic for a working professional${langCtx}`;
 
     const usr = `Current role: ${currentRole || "Not specified"}
 Current skills: ${currentSkills || "Not specified"}
@@ -95,11 +100,12 @@ Target company: ${company || "Top Indian tech companies"}`;
 
     const sys = `You are an expert technical interviewer at top Indian tech companies.
 Generate exactly 5 interview questions SPECIFICALLY testing "${focusSkill}" for a ${targetRole} candidate at ${company || "a top Indian tech company"}.
-Level: ${levelGuide}
+Level: ${levelGuide}${langCtx}
 
 Return ONLY a valid JSON array of 5 strings — no markdown, no explanation.
 Mix question types: 2 conceptual, 2 practical/scenario, 1 design/trade-off.
-Questions must directly test "${focusSkill}" — not general questions.`;
+Questions must directly test "${focusSkill}" — not general questions.
+${progLang && progLang !== "any" ? `At least 2 questions should involve ${progLang} code, syntax, or idioms.` : ""}`;
 
     const usr = `Role: ${targetRole}
 Skill to test: ${focusSkill}
