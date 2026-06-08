@@ -97,7 +97,7 @@ function getCompany(slug: string): CompanyProfile | null {
 
 /* ── Sub-components ─────────────────────────────────────────── */
 function ScoreDot({ score, label }: { score: number; label: string }) {
-  const color = score >= 8 ? "#22c55e" : score >= 6.5 ? "#f59e0b" : "#ef4444";
+  const color = score >= 8 ? "var(--success)" : score >= 6.5 ? "var(--warn)" : "var(--danger)";
   return (
     <div style={{ display: "flex", flex: 1, flexDirection: "column", gap: 4, alignItems: "center" }}>
       <div style={{ width: 48, height: 48, borderRadius: "50%", border: `3px solid ${color}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800, color }}>
@@ -149,7 +149,7 @@ export default function CompanyPage({ params }: { params: { slug: string } }) {
     );
   }
 
-  const attritionColor = company.attritionTrend === "down" ? "#22c55e" : company.attritionTrend === "up" ? "#ef4444" : "#f59e0b";
+  const attritionColor = company.attritionTrend === "down" ? "var(--success)" : company.attritionTrend === "up" ? "var(--danger)" : "var(--warn)";
   const attritionLabel = company.attritionTrend === "down" ? "↓ Improving" : company.attritionTrend === "up" ? "↑ Rising" : "→ Stable";
 
   const TABS = [
@@ -160,7 +160,7 @@ export default function CompanyPage({ params }: { params: { slug: string } }) {
   ] as const;
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg, #08080c)", color: "var(--text1, #f0f0f0)", fontFamily: "var(--font-inter, Inter, sans-serif)" }}>
+    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)", fontFamily: "var(--font-inter, Inter, sans-serif)" }}>
 
       {/* Topbar */}
       <div style={{ borderBottom: "1px solid var(--border)", padding: "0 24px", background: "var(--nav-bg, #0d0d14)", display: "flex", alignItems: "center", height: 52, gap: 12 }}>
@@ -168,7 +168,7 @@ export default function CompanyPage({ params }: { params: { slug: string } }) {
         <div style={{ width: 1, height: 18, background: "var(--border)" }} />
         <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)" }}>{company.name}</span>
         {company.verified && (
-          <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 8px", borderRadius: 10, background: "rgba(34,197,94,.1)", color: "#22c55e", border: "1px solid rgba(34,197,94,.2)" }}>
+          <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 8px", borderRadius: 10, background: "rgba(34,197,94,.1)", color: "var(--success)", border: "1px solid rgba(34,197,94,.2)" }}>
             ✓ Verified
           </span>
         )}
@@ -251,7 +251,7 @@ export default function CompanyPage({ params }: { params: { slug: string } }) {
                 </div>
                 <div style={{ background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 9, padding: "12px 14px" }}>
                   <div style={{ fontSize: 10, color: "var(--text3)", textTransform: "uppercase", fontWeight: 700, marginBottom: 4 }}>Financial Health</div>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: "#22c55e", lineHeight: 1.3 }}>{company.profitability}</div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: "var(--success)", lineHeight: 1.3 }}>{company.profitability}</div>
                   <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 2 }}>{company.lastFunding}</div>
                 </div>
               </div>

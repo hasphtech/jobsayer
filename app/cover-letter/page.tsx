@@ -17,6 +17,7 @@ import {
 } from "@/lib/resumeDb";
 import type { ResumeData } from "@/lib/types";
 import { trackAction } from "@/lib/activityTracker";
+import { useWindowWidth } from "@/lib/useWindowWidth";
 
 /* ── Types ────────────────────────────────────────────────── */
 type Tone   = "professional" | "enthusiastic" | "concise";
@@ -54,6 +55,8 @@ function extractExperience(data: ResumeData): string {
 
 /* ── Main page ───────────────────────────────────────────── */
 export default function CoverLetterPage() {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const { user } = useAuth();
 
   /* resume list */
@@ -260,7 +263,7 @@ export default function CoverLetterPage() {
           </div>
         )}
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 20, alignItems: "start" }}>
 
           {/* ── Left: Input form ─────────────────────────────── */}
           <div>
@@ -275,7 +278,7 @@ export default function CoverLetterPage() {
                   value={name} onChange={e => setName(e.target.value)} />
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 12 }}>
+              <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 10, marginBottom: 12 }}>
                 <div>
                   <label style={lbl}>Job title <span style={{ color: "var(--danger)" }}>*</span></label>
                   <input style={field} placeholder="e.g. Senior PM"

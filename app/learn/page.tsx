@@ -636,7 +636,7 @@ const PROVIDER_KEYWORD_MAP: Record<string, string[]> = {
 
 /* ── Helpers ─────────────────────────────────────────────────── */
 function costColor(cost: Cost) {
-  if (cost === "free")      return { bg: "rgba(34,197,94,.1)",  color: "#22c55e",       border: "rgba(34,197,94,.25)"  };
+  if (cost === "free")      return { bg: "rgba(34,197,94,.1)",  color: "var(--success)",       border: "rgba(34,197,94,.25)"  };
   if (cost === "freemium")  return { bg: "rgba(99,102,241,.1)", color: "var(--accent)",  border: "var(--accborder)"     };
   return                           { bg: "rgba(245,158,11,.1)", color: "#f59e0b",       border: "rgba(245,158,11,.25)" };
 }
@@ -648,9 +648,9 @@ function costLabel(cost: Cost) {
 }
 
 function levelColor(level: Level) {
-  if (level === "Beginner")     return "#22c55e";
+  if (level === "Beginner")     return "var(--success)";
   if (level === "Intermediate") return "#f59e0b";
-  return "#ef4444";
+  return "var(--danger)";
 }
 
 function stars(n: number) {
@@ -741,7 +741,7 @@ function CourseCard({ c }: { c: Course }) {
           {c.hasCert && (
             <>
               <span>·</span>
-              <span style={{ color: "#22c55e" }}>🏅 Cert</span>
+              <span style={{ color: "var(--success)" }}>🏅 Cert</span>
             </>
           )}
           <span style={{ marginLeft: "auto", color: "var(--accent)", fontWeight: 700 }}>
@@ -834,7 +834,7 @@ export default function LearnPage() {
         {/* Stats row */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 10, marginBottom: 24 }}>
           {[
-            { icon: "ti-certificate", label: "With Certificate",  value: certCount,                   color: "#22c55e" },
+            { icon: "ti-certificate", label: "With Certificate",  value: certCount,                   color: "var(--success)" },
             { icon: "ti-gift",        label: "100% Free",          value: freeCount,                   color: "var(--accent)" },
             { icon: "ti-building",    label: "Top Providers",      value: "12+",                       color: "#f59e0b" },
             { icon: "ti-users",       label: "Total Enrolled",     value: "50M+",                      color: "#8b5cf6" },
@@ -969,7 +969,7 @@ export default function LearnPage() {
             No courses match your filters. Try widening the search.
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(440px, 1fr))", gap: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 10 }}>
             {visible.map(c => <CourseCard key={c.id} c={c} />)}
           </div>
         )}

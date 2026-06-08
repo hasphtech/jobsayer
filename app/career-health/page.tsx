@@ -175,7 +175,7 @@ function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
   return (
     <div style={{ position: "relative", width: size, height: size, flexShrink: 0 }}>
       <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,.06)" strokeWidth={8} />
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="var(--surface2)" strokeWidth={8} />
         <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={8}
           strokeDasharray={`${fill} ${circ}`} strokeLinecap="round"
           style={{ transition: "stroke-dasharray 1s ease" }} />
@@ -191,7 +191,7 @@ function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
 /* ── Dimension bar ───────────────────────────────────────────── */
 function DimBar({ score, color }: { score: number; color: string }) {
   return (
-    <div style={{ height: 6, background: "rgba(255,255,255,.06)", borderRadius: 3, overflow: "hidden", flex: 1 }}>
+    <div style={{ height: 6, background: "var(--surface2)", borderRadius: 3, overflow: "hidden", flex: 1 }}>
       <div style={{ height: "100%", width: `${score}%`, background: color, borderRadius: 3, transition: "width 0.8s ease" }} />
     </div>
   );
@@ -335,7 +335,7 @@ export default function CareerHealthPage() {
                 : "Your career profile needs a full refresh. Let's fix the critical gaps first."}
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 16px", borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid var(--border)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 16px", borderRadius: 10, background: "var(--surface2)", border: "1px solid var(--border)" }}>
                 <span style={{ fontSize: 20 }}>🔥</span>
                 <div>
                   <div style={{ fontSize: 18, fontWeight: 800, color: streak > 0 ? "var(--warn)" : "var(--text3)" }}>{streak}</div>
@@ -450,7 +450,7 @@ export default function CareerHealthPage() {
         </div>
 
         {/* Next check-in */}
-        <div style={{ marginTop: 20, padding: "14px 20px", borderRadius: 10, background: "rgba(255,255,255,.02)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+        <div style={{ marginTop: 20, padding: "14px 20px", borderRadius: 10, background: "var(--surface)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
           <div>
             <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text2)" }}>📆 Set a monthly reminder</div>
             <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 2 }}>Professionals who review their career health monthly are 3× more likely to get a 20%+ raise within 2 years.</div>

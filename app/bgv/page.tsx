@@ -4,6 +4,7 @@
  * Multi-step form: Identity → Education → Employment → Review & Submit
  */
 import React, { useState, useEffect } from "react";
+import { useWindowWidth } from "@/lib/useWindowWidth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
@@ -45,6 +46,8 @@ const cardStyle: React.CSSProperties = {
 
 /* ── Status badge ───────────────────────────────────────────── */
 function StatusBadge({ bgv }: { bgv: BgvRecord }) {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const cfg: Record<string, { color: string; bg: string; label: string; icon: string }> = {
     pending:     { color: "var(--warn)", bg: "rgba(234,179,8,.1)",  label: "Pending Review",    icon: "⏳" },
     in_progress: { color: "var(--accent)", bg: "var(--accdim)", label: "In Progress",        icon: "🔍" },
@@ -71,7 +74,7 @@ function StatusBadge({ bgv }: { bgv: BgvRecord }) {
           </div>
         </div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
+      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(4,1fr)", gap: 10 }}>
         {checks.map(c => (
           <div key={c.label} style={{
             padding: "10px 12px", borderRadius: 9, textAlign: "center",
@@ -128,6 +131,8 @@ function StepBar({ current }: { current: Step }) {
 
 /* ── Main page ──────────────────────────────────────────────── */
 export default function BgvPage() {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
 
@@ -244,7 +249,7 @@ export default function BgvPage() {
         {dataLoading && (
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32 }}>
             <div className="skeleton" style={{ height: 100, borderRadius: 14 }} />
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 12 }}>
               {[0,1,2].map(i => <div key={i} className="skeleton" style={{ height: 90, borderRadius: 14 }} />)}
             </div>
           </div>
@@ -257,7 +262,7 @@ export default function BgvPage() {
 
         {/* Trust info bar */}
         {!dataLoading && !existing && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 32 }}>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 12, marginBottom: 32 }}>
             {[
               { icon: "🪪", title: "Identity Check",   desc: "PAN + Aadhaar last 4 digits" },
               { icon: "🎓", title: "Education Check",  desc: "Degree & institution verification" },
@@ -318,7 +323,7 @@ export default function BgvPage() {
                     <label style={labelStyle}>Date of Birth</label>
                     <input type="date" style={inputStyle} value={identity.dob} onChange={e => setId("dob", e.target.value)} />
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 14 }}>
                     <div>
                       <label style={labelStyle}>PAN Number</label>
                       <input style={{ ...inputStyle, borderColor: errors.pan_number ? "var(--danger)" : "", textTransform: "uppercase" }}
@@ -358,7 +363,7 @@ export default function BgvPage() {
                       )}
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
                         <div>
                           <label style={labelStyle}>Degree / Qualification *</label>
                           <input style={{ ...inputStyle, borderColor: errors[`edu_${i}_degree`] ? "var(--danger)" : "" }}
@@ -412,7 +417,7 @@ export default function BgvPage() {
                       )}
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
                         <div>
                           <label style={labelStyle}>Company Name *</label>
                           <input style={{ ...inputStyle, borderColor: errors[`emp_${i}_company`] ? "var(--danger)" : "" }}
@@ -426,7 +431,7 @@ export default function BgvPage() {
                           {errors[`emp_${i}_role`] && <div style={{ fontSize: 12, color: "var(--danger)", marginTop: 4 }}>{errors[`emp_${i}_role`]}</div>}
                         </div>
                       </div>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
                         <div>
                           <label style={labelStyle}>From</label>
                           <input type="month" style={inputStyle} value={em.from_date} onChange={e => setEmp(i, "from_date", e.target.value)} />
@@ -436,7 +441,7 @@ export default function BgvPage() {
                           <input type="month" style={inputStyle} value={em.to_date} onChange={e => setEmp(i, "to_date", e.target.value)} />
                         </div>
                       </div>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
                         <div>
                           <label style={labelStyle}>Manager / HR Name (for reference)</label>
                           <input style={inputStyle} value={em.manager_name} onChange={e => setEmp(i, "manager_name", e.target.value)} placeholder="Amit Kumar" />

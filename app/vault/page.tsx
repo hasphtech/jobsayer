@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useWindowWidth } from "@/lib/useWindowWidth";
 import AppShell from "@/components/AppShell";
 import { useAuth } from "@/lib/useAuth";
 
@@ -212,7 +213,7 @@ function DocCard({ doc, onSelect }: { doc: VaultDoc; onSelect: (d: VaultDoc) => 
         )}
       </div>
       {doc.ai_summary && (
-        <div style={{ marginTop: 10, fontSize: 11.5, color: "var(--text3)", lineHeight: 1.5, background: "rgba(255,255,255,.03)", borderRadius: 6, padding: "7px 10px" }}>
+        <div style={{ marginTop: 10, fontSize: 11.5, color: "var(--text3)", lineHeight: 1.5, background: "var(--surface2)", borderRadius: 6, padding: "7px 10px" }}>
           {doc.ai_summary.length > 100 ? doc.ai_summary.slice(0, 100) + "…" : doc.ai_summary}
         </div>
       )}
@@ -222,6 +223,8 @@ function DocCard({ doc, onSelect }: { doc: VaultDoc; onSelect: (d: VaultDoc) => 
 
 /* ── Detail Panel ────────────────────────────────────────────── */
 function DetailPanel({ doc, onClose }: { doc: VaultDoc; onClose: () => void }) {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const cfg = docTypeConfig(doc.type);
   const [copied, setCopied] = useState(false);
 
@@ -233,7 +236,7 @@ function DetailPanel({ doc, onClose }: { doc: VaultDoc; onClose: () => void }) {
 
   return (
     <div style={{
-      position: "fixed", top: 0, right: 0, bottom: 0, width: 360,
+      position: "fixed", top: 0, right: 0, bottom: 0, width: mobile ? "100%" : 360,
       background: "var(--surface)", borderLeft: "1px solid var(--border)",
       zIndex: 100, display: "flex", flexDirection: "column", overflow: "hidden",
     }}>
@@ -303,7 +306,7 @@ function DetailPanel({ doc, onClose }: { doc: VaultDoc; onClose: () => void }) {
             {copied ? "Link copied!" : "Copy share link"}
           </button>
           <button style={{
-            padding: "10px 0", borderRadius: 9, background: "rgba(255,255,255,.04)",
+            padding: "10px 0", borderRadius: 9, background: "var(--surface2)",
             border: "1px solid var(--border)", color: "var(--text2)", fontSize: 12, fontWeight: 600,
             cursor: "pointer", fontFamily: "inherit",
           }}>
@@ -326,6 +329,8 @@ function DetailPanel({ doc, onClose }: { doc: VaultDoc; onClose: () => void }) {
 
 /* ── Main Page ───────────────────────────────────────────────── */
 export default function VaultPage() {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const { user } = useAuth();
   const [docs, setDocs] = useState<VaultDoc[]>(DEMO_DOCS);
   const [activeType, setActiveType] = useState<DocType | "all">("all");
@@ -359,7 +364,7 @@ export default function VaultPage() {
       )}
       {selected && <DetailPanel doc={selected} onClose={() => setSelected(null)} />}
 
-      <div style={{ padding: "24px 24px 48px", maxWidth: selected ? "calc(100% - 370px)" : "100%" }}>
+      <div style={{ padding: "24px 24px 48px", maxWidth: selected && !mobile ? "calc(100% - 370px)" : "100%" }}>
 
         {/* Header */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>

@@ -94,42 +94,38 @@ const PRICES = {
 const FEATURES = {
   free: [
     "2 saved resumes",
-    "8 core templates",
+    "4 basic templates",
     "PDF export",
-    "Shareable public link",
-    "ATS score checker",
-    "JD match scoring",
-    "Career Health Score",
-    "Global salary benchmarks",
+    "ATS score",
+    "Matched jobs feed",
+    "Public share link",
   ],
   starter: [
     "5 saved resumes",
-    "All 35 templates",
+    "All 20+ templates",
     "PDF + DOCX export",
-    "Shareable public link",
-    "ATS score checker",
-    "JD match scoring",
-    "Draft auto-save",
-    "Resume upload & parse",
-    "Career GPS roadmaps",
+    "ATS score + JD Tailor",
+    "Matched jobs + Job tracker",
+    "AI writing assistant",
     "Interview prep (AI)",
-    "Career Health Score",
-    "Global salary + negotiation coach",
+    "Career GPS roadmap",
+    "Resume upload & parse",
+    "Draft auto-save",
   ],
   pro: [
-    "10 saved resumes",
-    "All 35 templates",
-    "PDF + DOCX + JSON export",
-    "Shareable public link",
-    "ATS score checker",
-    "AI JD Resume Tailor",
-    "AI LinkedIn Optimizer",
-    "AI summary & bullet rewriter",
+    "Unlimited resumes",
+    "All 20+ templates",
+    "PDF + DOCX export",
+    "ATS score + JD Tailor",
+    "Matched jobs + Job tracker",
+    "AI writing assistant",
+    "Interview prep (AI)",
+    "Career GPS roadmap",
+    "Salary intelligence",
+    "LinkedIn Optimizer",
     "AI cover letter writer",
-    "Draft auto-save",
     "Resume upload & parse",
-    "Career GPS + interview prep",
-    "Employer API access (50 pulls/mo)",
+    "Draft auto-save",
     "Priority support",
   ],
 } as const;
@@ -247,10 +243,10 @@ export default function UpgradePage() {
         </div>
 
         <h1 style={{ fontSize: 32, fontWeight: 900, color: "var(--text1)", margin: "0 0 10px" }}>
-          Build résumés that get interviews
+          Grow your career with jobSayer
         </h1>
         <p style={{ fontSize: 15, color: "var(--text3)", margin: "0 0 28px", lineHeight: 1.6 }}>
-          Start free. Upgrade when you need AI or more templates.
+          Start free. Upgrade to unlock AI, unlimited resumes, and the full career toolkit.
         </p>
 
         {/* ── Interval toggle ── */}
@@ -275,7 +271,7 @@ export default function UpgradePage() {
                 <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   Annual
                   <span style={{
-                    background: "#16a34a", color: "#fff",
+                    background: "var(--success)", color: "#fff",
                     fontSize: 9, fontWeight: 800, borderRadius: 4,
                     padding: "1px 5px",
                   }}>
@@ -306,26 +302,26 @@ export default function UpgradePage() {
             onCta={() => router.push("/builder")}
           />
 
-          {/* Starter */}
+          {/* Career Pro */}
           <PlanCard
-            name="Starter"
+            name="Career Pro"
             price={getDisplayPrice("starter")}
             interval={interval}
-            badge={interval === "annual" ? `Save ${annualSavingStarter}%` : null}
+            badge={interval === "annual" ? `Save ${annualSavingStarter}%` : "Most popular"}
             features={FEATURES.starter}
-            cta={payLoading === "starter" ? "Opening checkout…" : "Upgrade to Starter"}
+            cta={payLoading === "starter" ? "Opening checkout…" : "Upgrade to Career Pro"}
             ctaStyle="secondary"
             onCta={() => handleUpgrade("starter")}
           />
 
-          {/* Pro — highlighted */}
+          {/* Career Elite — highlighted */}
           <PlanCard
-            name="Pro"
+            name="Career Elite"
             price={getDisplayPrice("pro")}
             interval={interval}
-            badge="Most popular"
+            badge={interval === "annual" ? `Save ${annualSavingPro}%` : null}
             features={FEATURES.pro}
-            cta={payLoading === "pro" ? "Opening checkout…" : "Upgrade to Pro"}
+            cta={payLoading === "pro" ? "Opening checkout…" : "Upgrade to Career Elite"}
             ctaStyle="primary"
             highlight
             icon={<Star size={14} fill="currentColor" />}

@@ -38,8 +38,8 @@ const CANDIDATES: Candidate[] = [
 const PLAN_FEATURES = {
   free:       { name: "Free",       price: "₹0",        color: "#94a3b8", roles: 1,   seats: 1,   bgv: false, bots: false, whitelabel: false },
   starter:    { name: "Starter",    price: "₹4,999/mo", color: "#6366f1", roles: 5,   seats: 3,   bgv: true,  bots: true,  whitelabel: false },
-  growth:     { name: "Growth",     price: "₹14,999/mo",color: "#f59e0b", roles: 20,  seats: 10,  bgv: true,  bots: true,  whitelabel: false },
-  enterprise: { name: "Enterprise", price: "Custom",    color: "#22c55e", roles: 999, seats: 999, bgv: true,  bots: true,  whitelabel: true  },
+  growth:     { name: "Growth",     price: "₹14,999/mo",color: "var(--warn)", roles: 20,  seats: 10,  bgv: true,  bots: true,  whitelabel: false },
+  enterprise: { name: "Enterprise", price: "Custom",    color: "var(--success)", roles: 999, seats: 999, bgv: true,  bots: true,  whitelabel: true  },
 };
 
 /* ── Sub-components ──────────────────────────────────────────── */
@@ -62,8 +62,8 @@ function StageBadge({ stage }: { stage: Candidate["stage"] }) {
   const cfg = {
     new:         { label: "New",         bg: "rgba(148,163,184,.1)", color: "#94a3b8"       },
     shortlisted: { label: "Shortlisted", bg: "rgba(99,102,241,.1)",  color: "var(--accent)" },
-    interview:   { label: "Interview",   bg: "rgba(251,191,36,.1)",  color: "#f59e0b"       },
-    offer:       { label: "Offer Sent",  bg: "rgba(34,197,94,.1)",   color: "#22c55e"       },
+    interview:   { label: "Interview",   bg: "rgba(251,191,36,.1)",  color: "var(--warn)"       },
+    offer:       { label: "Offer Sent",  bg: "rgba(34,197,94,.1)",   color: "var(--success)"       },
   }[stage];
   return (
     <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 20, background: cfg.bg, color: cfg.color }}>
@@ -129,8 +129,8 @@ function EmployerDashboardContent() {
           <div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10, marginBottom: 28 }}>
               <StatCard icon="ti-briefcase"    label="Open Roles"       value={ROLES.length} sub="All fresh (<30d)"    color="var(--accent)" />
-              <StatCard icon="ti-users"        label="Total Applicants" value={149}          sub="+23 this week"      color="#22c55e"       />
-              <StatCard icon="ti-shield-check" label="BGV Cleared"      value={44}           sub="29% of pool"        color="#f59e0b"       />
+              <StatCard icon="ti-users"        label="Total Applicants" value={149}          sub="+23 this week"      color="var(--success)"       />
+              <StatCard icon="ti-shield-check" label="BGV Cleared"      value={44}           sub="29% of pool"        color="var(--warn)"       />
               <StatCard icon="ti-clock"        label="Avg Hire Time"    value="11d"          sub="vs 28d industry"    color="#8b5cf6"       />
               <StatCard icon="ti-send"         label="Offers Sent"      value={3}            sub="2 accepted"         color="#ec4899"       />
             </div>
@@ -147,10 +147,10 @@ function EmployerDashboardContent() {
                   </div>
                   <div style={{ display: "flex", gap: 16, fontSize: 11, color: "var(--text3)" }}>
                     <span><strong style={{ color: "var(--text1)" }}>{r.applicants}</strong> applied</span>
-                    <span><strong style={{ color: "#22c55e" }}>{r.bgvCleared}</strong> BGV ✓</span>
-                    <span><strong style={{ color: "#f59e0b" }}>{r.interviews}</strong> interviews</span>
+                    <span><strong style={{ color: "var(--success)" }}>{r.bgvCleared}</strong> BGV ✓</span>
+                    <span><strong style={{ color: "var(--warn)" }}>{r.interviews}</strong> interviews</span>
                   </div>
-                  <div style={{ fontSize: 9, fontWeight: 800, padding: "3px 8px", borderRadius: 10, background: "rgba(34,197,94,.1)", color: "#22c55e", border: "1px solid rgba(34,197,94,.2)" }}>
+                  <div style={{ fontSize: 9, fontWeight: 800, padding: "3px 8px", borderRadius: 10, background: "rgba(34,197,94,.1)", color: "var(--success)", border: "1px solid rgba(34,197,94,.2)" }}>
                     FRESH
                   </div>
                 </div>
@@ -170,7 +170,7 @@ function EmployerDashboardContent() {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {CANDIDATES.filter(c => (stages[c.id] ?? c.stage) === stage).map(c => (
-                    <div key={c.id} style={{ background: "rgba(255,255,255,.03)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px" }}>
+                    <div key={c.id} style={{ background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                         <div style={{ width: 28, height: 28, borderRadius: "50%", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800, color: "#fff", flexShrink: 0 }}>
                           {c.initials}
@@ -207,7 +207,7 @@ function EmployerDashboardContent() {
                   <div style={{ fontSize: 11, color: "var(--text3)" }}>{c.role} · {c.notice}d notice · {c.salary}</div>
                 </div>
                 <div style={{ fontSize: 13, fontWeight: 800, color: "var(--accent)" }}>{c.match}%</div>
-                <div style={{ fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 10, background: c.bgv === "cleared" ? "rgba(34,197,94,.1)" : "rgba(251,191,36,.1)", color: c.bgv === "cleared" ? "#22c55e" : "#f59e0b" }}>
+                <div style={{ fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 10, background: c.bgv === "cleared" ? "rgba(34,197,94,.1)" : "rgba(251,191,36,.1)", color: c.bgv === "cleared" ? "var(--success)" : "var(--warn)" }}>
                   {c.bgv === "cleared" ? "✓ BGV" : "⟳ BGV"}
                 </div>
                 <StageBadge stage={stages[c.id] ?? c.stage} />
@@ -224,9 +224,9 @@ function EmployerDashboardContent() {
         {tab === "bgv" && (
           <div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10, marginBottom: 24 }}>
-              <StatCard icon="ti-check"    label="Cleared"         value={44}    color="#22c55e"       />
-              <StatCard icon="ti-clock"    label="In Progress"     value={12}    sub="Avg 4.2 days"    color="#f59e0b"       />
-              <StatCard icon="ti-x"        label="Failed"          value={3}     color="#ef4444"       />
+              <StatCard icon="ti-check"    label="Cleared"         value={44}    color="var(--success)"       />
+              <StatCard icon="ti-clock"    label="In Progress"     value={12}    sub="Avg 4.2 days"    color="var(--warn)"       />
+              <StatCard icon="ti-x"        label="Failed"          value={3}     color="var(--danger)"       />
               <StatCard icon="ti-calendar" label="Avg Turnaround"  value="4.2d"  sub="vs 14d industry" color="var(--accent)" />
             </div>
             {CANDIDATES.map(c => (
@@ -242,7 +242,7 @@ function EmployerDashboardContent() {
                   <div style={{
                     fontSize: 10, fontWeight: 800, padding: "3px 8px", borderRadius: 10,
                     background: c.bgv === "cleared" ? "rgba(34,197,94,.1)" : "rgba(251,191,36,.1)",
-                    color: c.bgv === "cleared" ? "#22c55e" : "#f59e0b",
+                    color: c.bgv === "cleared" ? "var(--success)" : "var(--warn)",
                     border: "1px solid " + (c.bgv === "cleared" ? "rgba(34,197,94,.25)" : "rgba(251,191,36,.25)"),
                   }}>
                     {c.bgv === "cleared" ? "All Cleared" : "In Progress"}
@@ -253,7 +253,7 @@ function EmployerDashboardContent() {
                     <span key={check} style={{
                       fontSize: 10, padding: "2px 8px", borderRadius: 6,
                       background: (c.bgv === "cleared" || i < 4) ? "rgba(34,197,94,.1)" : "rgba(251,191,36,.1)",
-                      color: (c.bgv === "cleared" || i < 4) ? "#22c55e" : "#f59e0b",
+                      color: (c.bgv === "cleared" || i < 4) ? "var(--success)" : "var(--warn)",
                       border: "1px solid " + ((c.bgv === "cleared" || i < 4) ? "rgba(34,197,94,.2)" : "rgba(251,191,36,.2)"),
                     }}>
                       {c.bgv === "cleared" || i < 4 ? "✓" : "⟳"} {check}
@@ -288,7 +288,7 @@ function EmployerDashboardContent() {
                   <i className={`ti ${tool.icon}`} style={{ fontSize: 20, color: tool.available ? "var(--accent)" : "var(--text3)", display: "block", marginBottom: 8 }} />
                   <div style={{ fontSize: 13, fontWeight: 700, color: tool.available ? "var(--text1)" : "var(--text3)", marginBottom: 4 }}>{tool.title}</div>
                   <div style={{ fontSize: 11, color: "var(--text3)", lineHeight: 1.55 }}>{tool.desc}</div>
-                  {!tool.available && <div style={{ fontSize: 10, fontWeight: 700, color: "#f59e0b", marginTop: 8 }}>Enterprise only</div>}
+                  {!tool.available && <div style={{ fontSize: 10, fontWeight: 700, color: "var(--warn)", marginTop: 8 }}>Enterprise only</div>}
                 </div>
               ))}
             </div>
@@ -303,7 +303,7 @@ function EmployerDashboardContent() {
                   "Pre-BGV-ready workforce: Employees already have verified profiles when you need to hire internally",
                 ].map(p => (
                   <div key={p} style={{ display: "flex", gap: 8, fontSize: 12, color: "var(--text2)", lineHeight: 1.5 }}>
-                    <span style={{ color: "#22c55e", flexShrink: 0 }}>✓</span> {p}
+                    <span style={{ color: "var(--success)", flexShrink: 0 }}>✓</span> {p}
                   </div>
                 ))}
               </div>
@@ -326,9 +326,9 @@ function EmployerDashboardContent() {
                   <div style={{ display: "flex", flexDirection: "column", gap: 5, fontSize: 11, color: "var(--text3)" }}>
                     <span>{p.roles === 999 ? "Unlimited" : p.roles} active roles</span>
                     <span>{p.seats === 999 ? "Unlimited" : p.seats} team seats</span>
-                    <span style={{ color: p.bgv ? "#22c55e" : "var(--text3)" }}>{p.bgv ? "✓" : "✗"} Integrated BGV</span>
-                    <span style={{ color: p.bots ? "#22c55e" : "var(--text3)" }}>{p.bots ? "✓" : "✗"} Bot integrations</span>
-                    <span style={{ color: p.whitelabel ? "#22c55e" : "var(--text3)" }}>{p.whitelabel ? "✓" : "✗"} White-label portal</span>
+                    <span style={{ color: p.bgv ? "var(--success)" : "var(--text3)" }}>{p.bgv ? "✓" : "✗"} Integrated BGV</span>
+                    <span style={{ color: p.bots ? "var(--success)" : "var(--text3)" }}>{p.bots ? "✓" : "✗"} Bot integrations</span>
+                    <span style={{ color: p.whitelabel ? "var(--success)" : "var(--text3)" }}>{p.whitelabel ? "✓" : "✗"} White-label portal</span>
                   </div>
                   {key === currentPlan ? (
                     <div style={{ marginTop: 12, fontSize: 10, fontWeight: 800, color: p.color, textAlign: "center" }}>CURRENT PLAN</div>

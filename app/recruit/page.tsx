@@ -9,6 +9,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { ArrowLeft, Plus, Search, Users, Check, Star } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { useWindowWidth } from "@/lib/useWindowWidth";
 
 /* ═══════════════════════════════════════════════════════════════
    EMPLOYER AUTH MODAL
@@ -169,7 +170,7 @@ function EmployerAuthModal({
 
   /* ── Error box ── */
   const ErrBox = ({ msg }: { msg: string }) => (
-    <div style={{ fontSize: 12, color: "#ef4444", padding: "8px 12px", borderRadius: 7, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.2)", marginBottom: 10 }}>
+    <div style={{ fontSize: 12, color: "var(--danger)", padding: "8px 12px", borderRadius: 7, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.2)", marginBottom: 10 }}>
       {msg}
     </div>
   );
@@ -505,6 +506,8 @@ function EmployerPricing({
    POST JOB FORM (connected to real API)
 ═══════════════════════════════════════════════════════════════ */
 function PostJobForm({ onSuccess }: { onSuccess: () => void }) {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const [form, setForm] = useState({
     title: "", location: "Bangalore", mode: "hybrid",
     exp: "", salaryMin: "", salaryMax: "", skills: "", jd: "",
@@ -553,7 +556,7 @@ function PostJobForm({ onSuccess }: { onSuccess: () => void }) {
       <div><label style={label}>Job Title *</label>
         <input required value={form.title} onChange={e => set("title", e.target.value)} placeholder="e.g. Senior React Developer" style={input} />
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
+      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 14 }}>
         <div><label style={label}>Location</label>
           <input value={form.location} onChange={e => set("location", e.target.value)} placeholder="Bangalore" style={input} />
         </div>
@@ -568,7 +571,7 @@ function PostJobForm({ onSuccess }: { onSuccess: () => void }) {
           <input value={form.exp} onChange={e => set("exp", e.target.value)} placeholder="2–4 yrs" style={input} />
         </div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 14 }}>
         <div><label style={label}>Min Salary (LPA)</label>
           <input type="number" value={form.salaryMin} onChange={e => set("salaryMin", e.target.value)} placeholder="18" style={input} />
         </div>
@@ -615,6 +618,8 @@ const MOCK_CANDIDATES = [
    RECRUITER DASHBOARD
 ═══════════════════════════════════════════════════════════════ */
 function RecruiterDashboard({ profile, onViewPricing }: { profile: EmployerProfile; onViewPricing: () => void }) {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const card: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "20px" };
   const stats = [
     { icon: "💼", label: "Active Jobs",          value: "3",   trend: "+1 this week" },
@@ -645,7 +650,7 @@ function RecruiterDashboard({ profile, onViewPricing }: { profile: EmployerProfi
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(4,1fr)", gap: 14, marginBottom: 20 }}>
         {stats.map(s => (
           <div key={s.label} style={{ ...card, textAlign: "center" }}>
             <div style={{ fontSize: 24, marginBottom: 6 }}>{s.icon}</div>
@@ -656,7 +661,7 @@ function RecruiterDashboard({ profile, onViewPricing }: { profile: EmployerProfi
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 320px", gap: 18 }}>
         <div style={card}>
           <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 16 }}>Active Job Posts</div>
           {[
@@ -714,6 +719,8 @@ function loadRazorpay(): Promise<boolean> {
 }
 
 export default function RecruitPage() {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const { user } = useAuth();
   const [view, setView]               = useState<View>("landing");
   const [showAuthModal, setAuthModal] = useState(false);
@@ -854,7 +861,7 @@ export default function RecruitPage() {
                 style={{ padding: "8px 12px 8px 30px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--surface2)", color: "var(--text1)", fontSize: 13, width: 200 }} />
             </div>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 14 }}>
             {filteredCandidates.map(c => {
               const scoreColor = c.score >= 80 ? "var(--success)" : c.score >= 70 ? "var(--warn)" : "var(--danger)";
               return (
@@ -1016,7 +1023,7 @@ export default function RecruitPage() {
         </div>
 
         {/* ── Stats ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 56 }}>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(4,1fr)", gap: 16, marginBottom: 56 }}>
           {[
             { value: "2,400+", label: "Scored Candidates" },
             { value: "91%",    label: "ATS Pass Rate" },
@@ -1032,7 +1039,7 @@ export default function RecruitPage() {
 
         {/* ── Features ── */}
         <h2 style={{ fontSize: 22, fontWeight: 700, textAlign: "center", marginBottom: 24 }}>Why recruiters choose jobSayer</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 56 }}>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 16, marginBottom: 56 }}>
           {[
             { icon: "🎯", title: "AI-Scored Profiles",      desc: "Every candidate has a resume score (0–100) across ATS compatibility, keywords, and impact language." },
             { icon: "🔍", title: "JD-to-Profile Matching",  desc: "Paste your JD and instantly see ranked candidate match % — no manual shortlisting." },

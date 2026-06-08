@@ -4,6 +4,7 @@
  * Score + AI-rewrite headline, about, skills for a target role.
  */
 import React, { useState } from "react";
+import { useWindowWidth } from "@/lib/useWindowWidth";
 import AppShell from "@/components/AppShell";
 import Link from "next/link";
 import { trackAction } from "@/lib/activityTracker";
@@ -26,7 +27,7 @@ function ScoreRing({ score, size = 72 }: { score: number; size?: number }) {
   return (
     <div style={{ position: "relative", width: size, height: size, flexShrink: 0 }}>
       <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,.06)" strokeWidth={6} />
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="var(--surface2)" strokeWidth={6} />
         <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={col} strokeWidth={6}
           strokeDasharray={`${(score/100)*circ} ${circ}`} strokeLinecap="round"
           style={{ transition: "stroke-dasharray 0.8s ease" }} />
@@ -63,6 +64,8 @@ const TARGET_ROLES = [
 
 /* ── Page ────────────────────────────────────────────────────── */
 export default function LinkedInPage() {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const [headline,    setHeadline]    = useState("");
   const [about,       setAbout]       = useState("");
   const [skills,      setSkills]      = useState("");
@@ -116,7 +119,7 @@ export default function LinkedInPage() {
           </p>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 16, marginBottom: 20 }}>
 
           {/* Input form */}
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -212,7 +215,7 @@ export default function LinkedInPage() {
                 </div>
 
                 {/* Section scores */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+                <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 10 }}>
                   {(["headline","about","skills"] as const).map(section => {
                     const s = result.scores[section];
                     return (

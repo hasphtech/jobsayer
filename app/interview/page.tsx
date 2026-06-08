@@ -1,4 +1,5 @@
 "use client";
+import { useWindowWidth } from "@/lib/useWindowWidth";
 /**
  * /interview — Career Path Builder & Interview Prep
  *
@@ -81,6 +82,8 @@ function qScoreColor(n: number) {
    MAIN PAGE
 ══════════════════════════════════════════════════════════ */
 export default function InterviewPage() {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const [stage,        setStage]        = useState<Stage>("profile");
   const [currentRole,  setCurrentRole]  = useState("");
   const [currentSkills,setCurrentSkills]= useState("");
@@ -375,7 +378,7 @@ export default function InterviewPage() {
           </div>
 
           {/* Two columns: strengths + gaps */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 16, marginBottom: 24 }}>
 
             {/* Current strengths */}
             <div style={card}>
@@ -554,7 +557,7 @@ export default function InterviewPage() {
           </button>
 
           {showGuide && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8, marginBottom: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(4,1fr)", gap: 8, marginBottom: 14 }}>
               {[
                 { l: "S", w: "Situation", c: "var(--accent)",  t: "Set the scene — what was the context?" },
                 { l: "T", w: "Task",      c: "#a78bfa",        t: "What was your responsibility?" },

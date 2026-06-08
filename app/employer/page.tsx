@@ -234,7 +234,7 @@ export default function EmployerPortalPage() {
                         )}
                       </div>
                       {/* Quota bar */}
-                      <div style={{ marginTop: 10, height: 4, background: "rgba(255,255,255,.06)", borderRadius: 2, overflow: "hidden" }}>
+                      <div style={{ marginTop: 10, height: 4, background: "var(--surface2)", borderRadius: 2, overflow: "hidden" }}>
                         <div style={{ height: "100%", borderRadius: 2, background: "var(--accent)", width: `${Math.min(100, (key.monthly_used/key.monthly_quota)*100)}%`, transition: "width .5s ease" }} />
                       </div>
                     </div>
@@ -356,7 +356,7 @@ export default function EmployerPortalPage() {
                 </div>
               ))}
             </div>
-            <div style={{ marginTop: 20, padding: "14px 18px", borderRadius: 10, background: "rgba(255,255,255,.02)", border: "1px solid var(--border)", fontSize: 12, color: "var(--text3)", lineHeight: 1.7 }}>
+            <div style={{ marginTop: 20, padding: "14px 18px", borderRadius: 10, background: "var(--surface)", border: "1px solid var(--border)", fontSize: 12, color: "var(--text3)", lineHeight: 1.7 }}>
               All plans include: GDPR-compliant opt-in system, full audit log, candidate data deletion support, and standard SLA.
               Employer accounts are domain-verified before growth+ tier activation.
             </div>

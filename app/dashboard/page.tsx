@@ -10,6 +10,7 @@ import {
   getXPState, getLevelInfo, getDerivedStats, BADGES, LEVELS,
   type XPState, type ActivityEntry,
 } from "@/lib/activityTracker";
+import { useWindowWidth } from "@/lib/useWindowWidth";
 
 /* ── Score sparkline ─────────────────────────────────────────── */
 function ScoreChart({ data }: { data: { score: number; ts: string }[] }) {
@@ -159,7 +160,7 @@ const PH_PHASES: { key: PHPhase; label: string; color: string; goals: string[] }
     ],
   },
   {
-    key: "90", label: "Days 61–90", color: "#22c55e",
+    key: "90", label: "Days 61–90", color: "var(--success)",
     goals: [
       "Document your wins + metrics impact",
       "Propose a growth plan to manager",
@@ -170,6 +171,8 @@ const PH_PHASES: { key: PHPhase; label: string; color: string; goals: string[] }
 ];
 
 function PostHirePanel() {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const STORAGE_KEY = "jobsayer-posthire";
 
   // Load/save state from localStorage after mount
@@ -294,7 +297,7 @@ function PostHirePanel() {
 
       {/* Expanded section: promotion readiness + appraisal prep + counteroffer */}
       {expanded && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 10 }}>
 
           {/* Promotion readiness */}
           <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px" }}>
@@ -308,7 +311,7 @@ function PostHirePanel() {
                 { label: "Next-level skills in progress", done: false },
               ].map((item, i) => (
                 <div key={i} style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 12 }}>
-                  <span style={{ color: item.done ? "#22c55e" : "var(--text3)", flexShrink: 0 }}>{item.done ? "✓" : "○"}</span>
+                  <span style={{ color: item.done ? "var(--success)" : "var(--text3)", flexShrink: 0 }}>{item.done ? "✓" : "○"}</span>
                   <span style={{ color: item.done ? "var(--text1)" : "var(--text3)" }}>{item.label}</span>
                 </div>
               ))}
@@ -333,7 +336,7 @@ function PostHirePanel() {
                   style={{ width: "100%", padding: "8px 10px", borderRadius: 7, background: "var(--surface2)", border: "1px solid var(--border)", color: "var(--text1)", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
               </div>
               <div style={{ padding: "12px", borderRadius: 8, background: isGood ? "rgba(34,197,94,.07)" : "rgba(239,68,68,.07)", border: `1px solid ${isGood ? "rgba(34,197,94,.25)" : "rgba(239,68,68,.25)"}` }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: isGood ? "#22c55e" : "#ef4444", marginBottom: 4 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: isGood ? "var(--success)" : "var(--danger)", marginBottom: 4 }}>
                   {isGood ? `+${deltaPct}% raise` : `${deltaPct}% cut — reconsider`}
                 </div>
                 <div style={{ fontSize: 11, color: "var(--text3)" }}>Delta: {fmt(Math.abs(delta))}</div>
@@ -389,6 +392,8 @@ function PostHirePanel() {
 
 /* ── Page ────────────────────────────────────────────────────── */
 export default function DashboardPage() {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const { user } = useAuth();
   const [state, setState] = useState<XPState | null>(null);
   const [derived, setDerived] = useState({
@@ -475,7 +480,7 @@ export default function DashboardPage() {
         </div>
 
         {/* ── 4 stat cards ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: 10, marginBottom: 16 }}>
           <StatCard
             label="ATS Score"
             value={derived.resumeScore ?? "—"}
@@ -503,7 +508,7 @@ export default function DashboardPage() {
         </div>
 
         {/* ── 2-col: focus tasks + recent activity ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12, marginBottom: 14 }}>
 
           {/* Today's focus */}
           <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px" }}>
@@ -571,7 +576,7 @@ export default function DashboardPage() {
         </div>
 
         {/* ── Score trend + Badges ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12, marginBottom: 14 }}>
 
           {/* Score trend */}
           <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px" }}>
@@ -688,7 +693,7 @@ export default function DashboardPage() {
                       {goal.progress}/{goal.target} {goal.unit}
                     </div>
                   </div>
-                  <div style={{ height: 4, background: "rgba(255,255,255,.06)", borderRadius: 2, overflow: "hidden" }}>
+                  <div style={{ height: 4, background: "var(--surface2)", borderRadius: 2, overflow: "hidden" }}>
                     <div style={{
                       height: "100%", borderRadius: 2,
                       width: `${Math.min(100, (goal.progress / goal.target) * 100)}%`,

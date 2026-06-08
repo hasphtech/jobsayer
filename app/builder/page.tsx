@@ -1826,11 +1826,13 @@ export default function BuilderPage() {
             <span style={{ fontSize: 11, fontWeight: 800, color: ats.scoreColor }}>{ats.score}</span>
           </button>
 
-          {/* Page count badge */}
-          <span title={pageCount > 1 ? "Recruiters prefer 1-page resumes" : "Fits on 1 page"}
-            style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 5, borderWidth: 1, borderStyle: "solid", borderColor: pageCount > 1 ? "var(--warn)" : "var(--border)", background: pageCount > 1 ? "rgba(234,179,8,.1)" : "var(--surface2)", color: pageCount > 1 ? "var(--warn)" : "var(--text3)" }}>
-            {pageCount === 1 ? "1 page" : `${pageCount} pages`}
-          </span>
+          {/* Page count badge — only show warning when > 1 page */}
+          {pageCount > 1 && (
+            <span title="Recruiters prefer 1-page resumes"
+              style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 5, borderWidth: 1, borderStyle: "solid", borderColor: "var(--warn)", background: "rgba(234,179,8,.1)", color: "var(--warn)" }}>
+              ⚠ {pageCount} pages
+            </span>
+          )}
 
           <div style={{ marginLeft: "auto", display: "flex", gap: 6, alignItems: "center" }}>
             <span style={{ fontSize: 9, fontWeight: 600, color: "var(--text3)", opacity: autoSaved ? 1 : 0, transition: "opacity .3s", pointerEvents: "none" }}>✓ Saved</span>
@@ -1890,11 +1892,13 @@ export default function BuilderPage() {
                 {badge && <span style={{ fontSize: 10, fontWeight: 800, color: step === s ? "var(--bg)" : (badgeColor ?? "var(--text3)") }}>{badge}</span>}
               </button>
             ))}
-            {/* Page length indicator */}
-            <span title={pageCount > 1 ? `~${pageCount} pages — recruiters prefer 1 page` : "Fits on 1 page"}
-              style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 3, padding: "5px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap", borderWidth: 1.5, borderStyle: "solid", borderColor: pageCount > 1 ? "var(--warn)" : "var(--border)", background: pageCount > 1 ? "rgba(234,179,8,.1)" : "var(--surface2)", color: pageCount > 1 ? "var(--warn)" : "var(--text3)" }}>
-              {pageCount > 1 ? "⚠" : "✓"} {pageCount === 1 ? "1 page" : `${pageCount} pages`}
-            </span>
+            {/* Page length indicator — only show warning when > 1 page */}
+            {pageCount > 1 && (
+              <span title={`~${pageCount} pages — recruiters prefer 1 page`}
+                style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 3, padding: "5px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap", borderWidth: 1.5, borderStyle: "solid", borderColor: "var(--warn)", background: "rgba(234,179,8,.1)", color: "var(--warn)" }}>
+                ⚠ {pageCount} pages
+              </span>
+            )}
 
             <div style={{ width: 1, height: 14, background: "var(--border)", flexShrink: 0, margin: "0 2px" }} />
 
@@ -2671,7 +2675,7 @@ export default function BuilderPage() {
                 {getSuggestions(w.role).length > 0 && (
                   <button
                     onClick={() => setOpenSuggestions(openSuggestions === i ? -1 : i)}
-                    style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10, fontWeight: 700, color: openSuggestions === i ? "#fff" : "#d97706", background: openSuggestions === i ? "#d97706" : "#fffbeb", borderWidth: 1, borderStyle: "solid", borderColor: "#fde68a", borderRadius: 5, padding: "3px 9px", cursor: "pointer", fontFamily: "inherit" }}>
+                    style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10, fontWeight: 700, color: openSuggestions === i ? "#fff" : "var(--warn)", background: openSuggestions === i ? "var(--warn)" : "rgba(234,179,8,.08)", borderWidth: 1, borderStyle: "solid", borderColor: "rgba(234,179,8,.3)", borderRadius: 5, padding: "3px 9px", cursor: "pointer", fontFamily: "inherit" }}>
                     <Lightbulb size={10} /> Bullet suggestions {openSuggestions === i ? "▲" : "▼"}
                   </button>
                 )}
@@ -2750,7 +2754,7 @@ export default function BuilderPage() {
                 {skillList.map((s, i) => {
                   const isDupe = dupes.has(s.toLowerCase());
                   return (
-                    <span key={i} style={{ display: "inline-flex", alignItems: "center", background: isDupe ? "#fef2f2" : "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: isDupe ? "#fecaca" : "var(--border)", borderRadius: 6, padding: "4px 9px", fontSize: 11, fontWeight: 600, color: isDupe ? "#dc2626" : "var(--text2)", gap: 4 }}>
+                    <span key={i} style={{ display: "inline-flex", alignItems: "center", background: isDupe ? "rgba(239,68,68,.08)" : "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: isDupe ? "rgba(239,68,68,.2)" : "var(--border)", borderRadius: 6, padding: "4px 9px", fontSize: 11, fontWeight: 600, color: isDupe ? "var(--danger)" : "var(--text2)", gap: 4 }}>
                       {isDupe && <span title="Duplicate">⚠</span>}{s}
                     </span>
                   );
@@ -2806,7 +2810,7 @@ export default function BuilderPage() {
                 {cats.map(c => (
                   <div key={c.label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ fontSize: 10, fontWeight: 600, color: c.color, minWidth: 68 }}>{c.label}</span>
-                    <div style={{ flex: 1, height: 5, background: "rgba(255,255,255,.08)", borderRadius: 99, overflow: "hidden" }}>
+                    <div style={{ flex: 1, height: 5, background: "var(--surface2)", borderRadius: 99, overflow: "hidden" }}>
                       <div style={{ height: "100%", width: `${Math.min((c.items.length / 5) * 100, 100)}%`, background: c.color, borderRadius: 99, opacity: .8 }} />
                     </div>
                     <span style={{ fontSize: 10, color: "var(--text3)", minWidth: 16, textAlign: "right" as const }}>{c.items.length}</span>
@@ -2900,7 +2904,7 @@ export default function BuilderPage() {
                   ? <div style={{ position: "relative" }}>
                       <img src={c.logo} alt="Logo" style={{ width: 36, height: 36, objectFit: "contain", borderRadius: 6, borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", background: "#fff", padding: 2 }} />
                       <button onClick={() => set("certifications", (data.certifications ?? []).map((x, j) => j === i ? { ...x, logo: undefined } : x))}
-                        style={{ position: "absolute", top: -5, right: -5, width: 16, height: 16, borderRadius: "50%", background: "#dc2626", border: "1.5px solid var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: 0 }}>
+                        style={{ position: "absolute", top: -5, right: -5, width: 16, height: 16, borderRadius: "50%", background: "var(--danger)", border: "1.5px solid var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: 0 }}>
                         <X size={8} color="#fff" />
                       </button>
                     </div>
@@ -2943,7 +2947,7 @@ export default function BuilderPage() {
                 <option>Native</option>
               </select>
             </div>
-            <button onClick={() => set("languages", (data.languages ?? []).filter((_, j) => j !== i))} style={{ color: "#dc2626", background: "none", border: "none", padding: "0 0 12px 0", cursor: "pointer" }}><X size={14} /></button>
+            <button onClick={() => set("languages", (data.languages ?? []).filter((_, j) => j !== i))} style={{ color: "var(--danger)", background: "none", border: "none", padding: "0 0 12px 0", cursor: "pointer" }}><X size={14} /></button>
           </div>
         ))}
         <AddBtn onClick={() => set("languages", [...(data.languages ?? []), { id: uid(), name: "", level: "Fluent" }])} label="Add Language" />
@@ -3420,8 +3424,8 @@ export default function BuilderPage() {
                       </div>
                       {importMsg && (
                         <div style={{ fontSize: 11, padding: "5px 8px", borderRadius: 5,
-                          background: importStatus === "error" ? "#fef2f2" : "#f0fdf4",
-                          color: importStatus === "error" ? "#dc2626" : "#16a34a",
+                          background: importStatus === "error" ? "rgba(239,68,68,.08)" : "rgba(34,197,94,.08)",
+                          color: importStatus === "error" ? "var(--danger)" : "var(--success)",
                           display: "flex", alignItems: "center", gap: 6 }}>
                           {importStatus === "error" ? <X size={11} /> : <Check size={11} />}
                           {importMsg}
@@ -4065,7 +4069,7 @@ export default function BuilderPage() {
                   <RotateCcw size={10} /> Reset
                 </button>
                 <button onClick={() => { if (confirm("Clear all content?")) { setData(BLANK); setActiveSection("profile"); setStep(0); } }}
-                  style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 600, color: "#dc2626", background: "none", borderWidth: 1, borderStyle: "solid", borderColor: "#fecaca", borderRadius: 6, padding: "6px 0", cursor: "pointer", fontFamily: "inherit" }}>
+                  style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 600, color: "var(--danger)", background: "none", borderWidth: 1, borderStyle: "solid", borderColor: "rgba(239,68,68,.3)", borderRadius: 6, padding: "6px 0", cursor: "pointer", fontFamily: "inherit" }}>
                   Clear all
                 </button>
               </div>
@@ -4810,7 +4814,7 @@ export default function BuilderPage() {
             {/* Page badge + autosave pill */}
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
               <span title={pageCount > 1 ? "Recruiters prefer 1-page resumes" : "Fits on 1 page"}
-                style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 5, borderWidth: 1, borderStyle: "solid", borderColor: pageCount > 1 ? "var(--warn)" : "rgba(255,255,255,.3)", background: pageCount > 1 ? "#fffbeb" : "rgba(0,0,0,.2)", color: pageCount > 1 ? "#b45309" : "rgba(255,255,255,.8)" }}>
+                style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 5, borderWidth: 1, borderStyle: "solid", borderColor: pageCount > 1 ? "var(--warn)" : "var(--border)", background: pageCount > 1 ? "rgba(234,179,8,.1)" : "var(--surface2)", color: pageCount > 1 ? "var(--warn)" : "var(--text3)" }}>
                 {pageCount === 1 ? "✓ 1 page" : `~${pageCount} pages`}
               </span>
               <span style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,.7)", opacity: autoSaved ? 1 : 0, transition: "opacity .3s", pointerEvents: "none" as const }}>

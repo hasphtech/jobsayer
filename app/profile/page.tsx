@@ -11,6 +11,7 @@ import { useResumePlan } from "@/lib/resumePlan";
 import { getSupabaseAsync } from "@/lib/auth";
 import AppShell from "@/components/AppShell";
 import type { SkillProof } from "@/lib/types";
+import { useWindowWidth } from "@/lib/useWindowWidth";
 
 /* ── Availability types ─────────────────────────────────────── */
 type OpenToWork   = "active" | "passive" | "not_looking";
@@ -36,7 +37,7 @@ const PROOF_TYPE_CONFIG: Record<SkillProof["proofType"], { label: string; icon: 
 };
 
 const OTW_CONFIG: Record<OpenToWork, { label: string; color: string; bg: string; dot: string }> = {
-  active:      { label: "Actively looking",  color: "var(--success)", bg: "rgba(34,197,94,.1)",  dot: "#22c55e" },
+  active:      { label: "Actively looking",  color: "var(--success)", bg: "rgba(34,197,94,.1)",  dot: "var(--success)" },
   passive:     { label: "Open to offers",    color: "var(--warn)",    bg: "rgba(234,179,8,.1)",  dot: "#eab308" },
   not_looking: { label: "Not looking",       color: "var(--text3)",   bg: "var(--surface2)",     dot: "#71717a" },
 };
@@ -70,6 +71,8 @@ interface BgvStatus {
 }
 
 export default function ProfilePage() {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const router = useRouter();
   const { user, signOut, loading: authLoading } = useAuth();
   const plan = useResumePlan();
@@ -361,7 +364,7 @@ export default function ProfilePage() {
               </Link>
             )}
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
             <PlanStat label="Resume Saves" value={`${saves.length} / ${plan.maxSaves}`} />
             <PlanStat label="AI Features" value={plan.hasAiFeatures ? "✓ Enabled" : "✗ Upgrade needed"} />
             <PlanStat label="DOCX Export" value={plan.hasDocxExport ? "✓ Enabled" : "✗ Starter+"} />

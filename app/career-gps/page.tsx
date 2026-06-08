@@ -5,6 +5,7 @@
  * Globally framed: USD salary ranges, worldwide top companies.
  */
 import React, { useState, useEffect } from "react";
+import { useWindowWidth } from "@/lib/useWindowWidth";
 import Link from "next/link";
 import { ArrowLeft, ChevronRight, ExternalLink, CheckCircle2, AlertCircle } from "lucide-react";
 import AppShell from "@/components/AppShell";
@@ -466,6 +467,8 @@ function ResourceBadge({ type }: { type: ResourceType }) {
 
 /* ── Page ────────────────────────────────────────────────────── */
 export default function CareerGpsPage() {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const [selectedRole, setSelectedRole] = useState<RoleBlueprint | null>(null);
   const [userSkills,   setUserSkills]   = useState<Set<string>>(new Set());
   const [resumeLoaded, setResumeLoaded] = useState(false);
@@ -666,7 +669,7 @@ export default function CareerGpsPage() {
 
         {/* Stats */}
         {resumeLoaded && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 20 }}>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 12, marginBottom: 20 }}>
             {[
               { label: "Skills you have",  value: matchedSkills.length, color: "var(--success)" },
               { label: "Skill gaps",        value: gapSkills.length,     color: "var(--danger)"  },

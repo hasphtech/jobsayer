@@ -5,6 +5,7 @@
  * a 4-dimension score with improvement suggestions.
  */
 import React, { useEffect, useState } from "react";
+import { useWindowWidth } from "@/lib/useWindowWidth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -145,7 +146,7 @@ function ScoreGauge({ score }: { score: number }) {
               <stop offset="100%" stopColor={color} />
             </linearGradient>
           </defs>
-          <circle cx="80" cy="80" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="14" />
+          <circle cx="80" cy="80" r={r} fill="none" stroke="var(--surface2)" strokeWidth="14" />
           <circle
             cx="80" cy="80" r={r} fill="none"
             stroke="url(#gaugeFill)" strokeWidth="14" strokeLinecap="round"
@@ -177,7 +178,7 @@ function DimBar({ pct, status }: { pct: number; status: string }) {
     status === "green" ? "var(--success)" :
     status === "amber" ? "var(--warn)" : "var(--danger)";
   return (
-    <div style={{ height: 6, background: "rgba(255,255,255,.06)", borderRadius: 3, overflow: "hidden" }}>
+    <div style={{ height: 6, background: "var(--surface2)", borderRadius: 3, overflow: "hidden" }}>
       <div style={{
         height: "100%", borderRadius: 3, width: `${pct}%`,
         background: `linear-gradient(90deg,${color}88,${color})`,
@@ -232,6 +233,8 @@ function checkFormat(data: ResumeData): FormatIssue[] {
 
 /* ── Page ──────────────────────────────────────────────────────── */
 export default function ScorePage() {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const router = useRouter();
   const [result,      setResult]      = useState<ScoreResult | null>(null);
   const [resumeData,  setResumeData]  = useState<ResumeData | null>(null);
@@ -303,13 +306,13 @@ export default function ScorePage() {
         </div>
 
         {/* ── Main grid ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: 20, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "280px 1fr", gap: 20, marginBottom: 20 }}>
 
           {/* Gauge card */}
           <div style={{ ...card, textAlign: "center" }}>
             <ScoreGauge score={result.total} />
             <hr style={{ border: "none", borderTop: "1px solid var(--border)", margin: "16px 0" }} />
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
               <div style={{ textAlign: "center" }}>
                 <div style={{ fontSize: 18, fontWeight: 700, color: "var(--success)" }}>
                   +{result.improvements.reduce((s, i) => s + i.points, 0)}
@@ -430,10 +433,10 @@ export default function ScorePage() {
                       </span>
                     </div>
                   </div>
-                  <div style={{ height: 6, background: "rgba(255,255,255,.06)", borderRadius: 3, overflow: "hidden", position: "relative" }}>
+                  <div style={{ height: 6, background: "var(--surface2)", borderRadius: 3, overflow: "hidden", position: "relative" }}>
                     <div style={{ height: "100%", width: `${score}%`, background: `linear-gradient(90deg,${color}88,${color})`, borderRadius: 3, transition: "width .6s ease" }} />
                     {/* safe threshold marker */}
-                    <div style={{ position: "absolute", top: 0, left: `${ats.safeScore}%`, width: 2, height: "100%", background: "rgba(255,255,255,.3)" }} />
+                    <div style={{ position: "absolute", top: 0, left: `${ats.safeScore}%`, width: 2, height: "100%", background: "var(--text3)" }} />
                   </div>
                   <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 4 }}>Safe threshold: {ats.safeScore} · Your score: {score}</div>
                 </div>
@@ -488,7 +491,7 @@ export default function ScorePage() {
           <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 16 }}>
             🧩 Skills detected vs. market demand
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 24 }}>
             <div>
               <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".05em", color: "var(--text3)", marginBottom: 10 }}>
                 ✅ Matched ({result.matchedSkills.length})

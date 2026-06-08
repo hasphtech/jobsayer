@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AppShell from "@/components/AppShell";
+import { useWindowWidth } from "@/lib/useWindowWidth";
 
 /* ── Types ─────────────────────────────────────────────────── */
 type Platform = "slack" | "teams" | "whatsapp" | "telegram";
@@ -134,6 +135,8 @@ function PlatformCard({
   onConnect: (platform: Platform) => void;
   onDisconnect: (platform: Platform) => void;
 }) {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const [expanded, setExpanded] = useState(false);
   const [demoStep, setDemoStep] = useState(0);
   const isConnected = integration?.status === "connected";
@@ -150,11 +153,11 @@ function PlatformCard({
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
             <span style={{ fontSize: 14, fontWeight: 800, color: "var(--text1)" }}>{p.name}</span>
             {isConnected && (
-              <span style={{ fontSize: 9, fontWeight: 800, padding: "2px 7px", borderRadius: 10, background: "rgba(34,197,94,.12)", color: "#22c55e", border: "1px solid rgba(34,197,94,.25)", textTransform: "uppercase" }}>
+              <span style={{ fontSize: 9, fontWeight: 800, padding: "2px 7px", borderRadius: 10, background: "rgba(34,197,94,.12)", color: "var(--success)", border: "1px solid rgba(34,197,94,.25)", textTransform: "uppercase" }}>
                 ● Connected
               </span>
             )}
-            <span style={{ fontSize: 9, fontWeight: 800, padding: "2px 7px", borderRadius: 10, background: "rgba(34,197,94,.1)", color: "#22c55e", border: "1px solid rgba(34,197,94,.2)", textTransform: "uppercase", letterSpacing: ".05em" }}>
+            <span style={{ fontSize: 9, fontWeight: 800, padding: "2px 7px", borderRadius: 10, background: "rgba(34,197,94,.1)", color: "var(--success)", border: "1px solid rgba(34,197,94,.2)", textTransform: "uppercase", letterSpacing: ".05em" }}>
               Free
             </span>
           </div>
@@ -175,7 +178,7 @@ function PlatformCard({
       {/* Features list */}
       <div style={{ padding: "0 20px 14px", display: "flex", flexWrap: "wrap", gap: 6 }}>
         {p.features.slice(0, 3).map(f => (
-          <span key={f} style={{ fontSize: 11, color: "var(--text3)", background: "rgba(255,255,255,.04)", border: "1px solid var(--border)", borderRadius: 6, padding: "3px 8px" }}>
+          <span key={f} style={{ fontSize: 11, color: "var(--text3)", background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 6, padding: "3px 8px" }}>
             {f}
           </span>
         ))}
@@ -183,13 +186,13 @@ function PlatformCard({
 
       {/* Expand toggle */}
       <button onClick={() => setExpanded(e => !e)}
-        style={{ width: "100%", padding: "10px 20px", background: "rgba(255,255,255,.02)", border: "none", borderTop: "1px solid var(--border)", cursor: "pointer", fontSize: 11, fontWeight: 600, color: "var(--text3)", fontFamily: "inherit", textAlign: "left", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        style={{ width: "100%", padding: "10px 20px", background: "var(--surface)", border: "none", borderTop: "1px solid var(--border)", cursor: "pointer", fontSize: 11, fontWeight: 600, color: "var(--text3)", fontFamily: "inherit", textAlign: "left", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <span>{expanded ? "Hide" : "See live demo & setup steps"}</span>
         <i className={`ti ti-chevron-${expanded ? "up" : "down"}`} style={{ fontSize: 12 }} />
       </button>
 
       {expanded && (
-        <div style={{ padding: "18px 20px", borderTop: "1px solid var(--border)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+        <div style={{ padding: "18px 20px", borderTop: "1px solid var(--border)", display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 20 }}>
 
           {/* Chat demo */}
           <div>
@@ -199,7 +202,7 @@ function PlatformCard({
                 <div key={i} style={{ display: "flex", justifyContent: m.from === "user" ? "flex-end" : "flex-start" }}>
                   <div style={{
                     maxWidth: "85%", padding: "7px 10px", borderRadius: 10, fontSize: 11, lineHeight: 1.5,
-                    background: m.from === "user" ? p.color : "rgba(255,255,255,.08)",
+                    background: m.from === "user" ? p.color : "var(--surface2)",
                     color: m.from === "user" ? "#fff" : "var(--text2)",
                     whiteSpace: "pre-line",
                   }}>
@@ -245,6 +248,8 @@ function PlatformCard({
 
 /* ── Main Page ───────────────────────────────────────────────── */
 export default function IntegrationsPage() {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const [integrations, setIntegrations] = useState<Integration[]>([
     { platform: "slack", status: "connected", workspace: "acme-eng.slack.com", connectedAt: "2026-05-12" },
   ]);
@@ -274,13 +279,13 @@ export default function IntegrationsPage() {
         <div style={{ marginBottom: 24 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
             <h1 style={{ fontSize: 20, fontWeight: 900, color: "var(--text1)", margin: 0 }}>Bot Integrations</h1>
-            <span style={{ fontSize: 10, fontWeight: 800, padding: "3px 9px", borderRadius: 20, background: "rgba(34,197,94,.12)", color: "#22c55e", border: "1px solid rgba(34,197,94,.25)", textTransform: "uppercase" }}>
+            <span style={{ fontSize: 10, fontWeight: 800, padding: "3px 9px", borderRadius: 20, background: "rgba(34,197,94,.12)", color: "var(--success)", border: "1px solid rgba(34,197,94,.25)", textTransform: "uppercase" }}>
               All Free
             </span>
           </div>
           <p style={{ fontSize: 13, color: "var(--text3)", margin: 0 }}>
             Hire where your team already works — no new app to learn.
-            {connectedCount > 0 && <span style={{ color: "#22c55e", fontWeight: 600 }}> {connectedCount} platform{connectedCount > 1 ? "s" : ""} connected.</span>}
+            {connectedCount > 0 && <span style={{ color: "var(--success)", fontWeight: 600 }}> {connectedCount} platform{connectedCount > 1 ? "s" : ""} connected.</span>}
           </p>
         </div>
 
@@ -288,7 +293,7 @@ export default function IntegrationsPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 10, marginBottom: 28 }}>
           {[
             { v: "All 4", label: "Platforms", icon: "ti-plug-connected", c: "var(--accent)" },
-            { v: "Free", label: "Forever", icon: "ti-heart", c: "#22c55e" },
+            { v: "Free", label: "Forever", icon: "ti-heart", c: "var(--success)" },
             { v: "<2 min", label: "Setup time", icon: "ti-clock", c: "#f59e0b" },
             { v: "98%", label: "WhatsApp open rate", icon: "ti-mail-opened", c: "#25d366" },
           ].map(s => (

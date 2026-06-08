@@ -90,12 +90,12 @@ export default function CompanyIndexPage() {
                   <div style={{ fontSize: 11, color: "var(--text3)" }}>{c.tagline}</div>
                 </div>
                 {c.verified && (
-                  <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 8px", borderRadius: 10, background: "rgba(34,197,94,.1)", color: "#22c55e", border: "1px solid rgba(34,197,94,.2)", flexShrink: 0 }}>
+                  <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 8px", borderRadius: 10, background: "rgba(34,197,94,.1)", color: "var(--success)", border: "1px solid rgba(34,197,94,.2)", flexShrink: 0 }}>
                     ✓ Verified
                   </span>
                 )}
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
-                  <div style={{ fontSize: 15, fontWeight: 900, color: c.score >= 7.5 ? "#22c55e" : c.score >= 6.5 ? "#f59e0b" : "#ef4444" }}>
+                  <div style={{ fontSize: 15, fontWeight: 900, color: c.score >= 7.5 ? "var(--success)" : c.score >= 6.5 ? "var(--warn)" : "var(--danger)" }}>
                     {c.score}
                   </div>
                   <div style={{ fontSize: 9, color: "var(--text3)" }}>/ 10</div>

@@ -5,6 +5,7 @@
  * Shows before/after diff with keyword highlighting.
  */
 import React, { useState, useEffect } from "react";
+import { useWindowWidth } from "@/lib/useWindowWidth";
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import { trackAction } from "@/lib/activityTracker";
@@ -39,6 +40,8 @@ function HighlightedText({ text, keywords, color }: { text: string; keywords: st
 
 /* ── Page ────────────────────────────────────────────────────── */
 export default function TailorPage() {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const [jdText,    setJdText]    = useState("");
   const [bullets,   setBullets]   = useState<string[]>([]);
   const [resumeLoaded, setResumeLoaded] = useState(false);
@@ -138,7 +141,7 @@ export default function TailorPage() {
           </p>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 16, marginBottom: 20 }}>
 
           {/* Left: JD input */}
           <div style={{ ...card, padding: "20px 22px", display: "flex", flexDirection: "column", gap: 12 }}>
@@ -276,7 +279,7 @@ export default function TailorPage() {
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {result.tailored.map((item, i) => (
                 <div key={i} style={{ ...card, overflow: "hidden" }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 0 }}>
                     {/* Before */}
                     <div style={{ padding: "16px 18px", borderRight: "1px solid var(--border2)" }}>
                       <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--text3)", marginBottom: 8 }}>

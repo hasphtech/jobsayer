@@ -262,7 +262,7 @@ function JdScannerTab({ resumeText }: { resumeText: string }) {
                   color: result.resumeMatch >= 70 ? "var(--success)" : result.resumeMatch >= 45 ? "var(--warn)" : "var(--danger)",
                 }}>{result.resumeMatch}%</div>
               </div>
-              <div style={{ height: 6, background: "rgba(255,255,255,.06)", borderRadius: 3, marginBottom: 14 }}>
+              <div style={{ height: 6, background: "var(--surface2)", borderRadius: 3, marginBottom: 14 }}>
                 <div style={{
                   height: "100%", borderRadius: 3,
                   width: `${result.resumeMatch}%`,
@@ -419,7 +419,7 @@ function JobCard({ job, selected, onClick }: { job: ScoredJob; selected: boolean
         transition: "background .15s, border-left-color .15s",
         opacity: job.ghost ? .75 : 1,
       }}
-      onMouseEnter={e => { if (!selected) e.currentTarget.style.background = "rgba(255,255,255,.02)"; }}
+      onMouseEnter={e => { if (!selected) e.currentTarget.style.background = "var(--surface2)"; }}
       onMouseLeave={e => { if (!selected) e.currentTarget.style.background = "none"; }}
     >
       {/* Top row */}
@@ -436,8 +436,8 @@ function JobCard({ job, selected, onClick }: { job: ScoredJob; selected: boolean
 
       {/* Tags row */}
       <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
-        <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 99, background: "rgba(255,255,255,.05)", color: "var(--text2)", border: "1px solid var(--border)" }}>{job.mode}</span>
-        <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 99, background: "rgba(255,255,255,.05)", color: "var(--text2)", border: "1px solid var(--border)" }}>{job.salary}</span>
+        <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 99, background: "var(--surface2)", color: "var(--text2)", border: "1px solid var(--border)" }}>{job.mode}</span>
+        <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 99, background: "var(--surface2)", color: "var(--text2)", border: "1px solid var(--border)" }}>{job.salary}</span>
         {job.postedDays <= 1 && <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 99, background: "var(--accdim)", color: "var(--accent)", border: "1px solid var(--accborder)" }}>{daysAgo(job.postedDays)}</span>}
         {job.ghost && <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 99, background: "rgba(234,179,8,.08)", color: "var(--warn)", border: "1px solid rgba(234,179,8,.2)" }}>⚠ Ghost risk</span>}
         {job.verified && <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 99, background: "rgba(34,197,94,.08)", color: "var(--success)", border: "1px solid rgba(34,197,94,.15)" }}>✓ Verified</span>}
@@ -492,7 +492,7 @@ function DetailPanel({ job, resumeText }: { job: ScoredJob; resumeText: string }
       <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px", background: `${mColor}0d`, border: `1px solid ${mColor}30`, borderRadius: 12, marginBottom: 16 }}>
         <div style={{ position: "relative", width: 52, height: 52, flexShrink: 0 }}>
           <svg width="52" height="52" style={{ transform: "rotate(-90deg)" }}>
-            <circle cx="26" cy="26" r="22" fill="none" stroke="rgba(255,255,255,.06)" strokeWidth="5" />
+            <circle cx="26" cy="26" r="22" fill="none" stroke="var(--surface2)" strokeWidth="5" />
             <circle cx="26" cy="26" r="22" fill="none" stroke={mColor} strokeWidth="5" strokeLinecap="round"
               strokeDasharray={circ} strokeDashoffset={circ * (1 - job.matchPct / 100)} />
           </svg>
@@ -657,13 +657,13 @@ export default function JobsPage() {
   const tabBtn = (t: Tab): React.CSSProperties => ({
     padding: "5px 14px", borderRadius: 7, border: "none", cursor: "pointer",
     fontSize: 12, fontWeight: 600, fontFamily: "inherit", transition: "all .15s",
-    background: tab === t ? "rgba(255,255,255,.12)" : "none",
+    background: tab === t ? "var(--surface2)" : "none",
     color: tab === t ? "var(--text1)" : "var(--text3)",
   });
 
   return (
     <AppShell actions={
-        <div style={{ display: "flex", gap: 1, background: "rgba(255,255,255,.05)", borderRadius: 9, padding: 3 }}>
+        <div style={{ display: "flex", gap: 1, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 9, padding: 3 }}>
           <button onClick={() => setTab("jobs")} style={tabBtn("jobs")}>💼 Jobs</button>
           <button onClick={() => setTab("scanner")} style={tabBtn("scanner")}>🔍 Scanner</button>
         </div>

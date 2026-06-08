@@ -848,7 +848,7 @@ function BgvAdminView({ token, flash }: { token: string; flash: (m: string) => v
                           {acr.autoScore}/100
                         </span>
                       </div>
-                      <div style={{ height: 6, background: "rgba(255,255,255,.06)", borderRadius: 3 }}>
+                      <div style={{ height: 6, background: "var(--surface2)", borderRadius: 3 }}>
                         <div style={{ height: "100%", borderRadius: 3, width: `${acr.autoScore}%`, transition: "width .6s",
                           background: acr.autoScore >= 70 ? "var(--success)" : acr.autoScore >= 45 ? "var(--warn)" : "var(--danger)" }} />
                       </div>

@@ -87,7 +87,7 @@ function MiniRing({ score, size = 52 }: { score: number; size?: number }) {
   return (
     <div style={{ position: "relative", width: size, height: size, flexShrink: 0 }}>
       <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,.06)" strokeWidth={5} />
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="var(--surface2)" strokeWidth={5} />
         <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={col} strokeWidth={5}
           strokeDasharray={`${fill} ${circ}`} strokeLinecap="round" />
       </svg>
@@ -288,7 +288,7 @@ export default function EmployerTrustPage() {
               <span key={label} style={{ padding: "6px 14px", borderRadius: 99, fontSize: 12, fontWeight: 600, background: "var(--accdim)", border: "1px solid var(--accborder)", color: "var(--accent)" }}>{label}</span>
             ))}
           </div>
-          <div style={{ marginTop: 16, padding: "10px 14px", borderRadius: 9, background: "rgba(255,255,255,.03)", border: "1px solid var(--border)", fontSize: 12, color: "var(--text3)" }}>
+          <div style={{ marginTop: 16, padding: "10px 14px", borderRadius: 9, background: "var(--surface2)", border: "1px solid var(--border)", fontSize: 12, color: "var(--text3)" }}>
             Community ratings coming soon — we'll notify you when submissions open.
           </div>
         </div>

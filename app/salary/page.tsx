@@ -7,6 +7,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import AppShell from "@/components/AppShell";
 import Link from "next/link";
 import { trackAction } from "@/lib/activityTracker";
+import { useWindowWidth } from "@/lib/useWindowWidth";
 
 /* ── Currency config ─────────────────────────────────────────── */
 type Currency = "USD" | "EUR" | "GBP" | "SGD" | "AED" | "INR";
@@ -139,6 +140,8 @@ function underpaidVerdict(currentUSD: number, row: SalaryRow, cur: Currency) {
 
 /* ── Page ────────────────────────────────────────────────────── */
 export default function SalaryPage() {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const [region,    setRegion]    = useState("All regions");
   const [category,  setCategory]  = useState("All");
   const [exp,       setExp]       = useState<"all"|"0-2"|"2-5"|"5-10"|"10+">("all");
@@ -295,7 +298,7 @@ export default function SalaryPage() {
                 const { verdict, row, currentUSD } = upResult;
                 const maxUSD = row.p75 * 1.2;
                 return (
-                  <div style={{ background: "rgba(255,255,255,.02)", borderRadius: 14, border: `2px solid ${verdict.color}44`, padding: 22 }}>
+                  <div style={{ background: "var(--surface)", borderRadius: 14, border: `2px solid ${verdict.color}44`, padding: 22 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
                       <div style={{ fontSize: 22, fontWeight: 900, color: verdict.color }}>{verdict.label}</div>
                       <div style={{ fontSize: 20, fontWeight: 800, color: verdict.color }}>{verdict.pct > 0 ? "+" : ""}{Math.round(verdict.pct)}%</div>
@@ -307,7 +310,7 @@ export default function SalaryPage() {
                         <span>Median: {fmtSalary(row.median, upCur)}</span>
                         <span>P75: {fmtSalary(row.p75, upCur)}</span>
                       </div>
-                      <div style={{ position: "relative", height: 10, background: "rgba(255,255,255,.06)", borderRadius: 5 }}>
+                      <div style={{ position: "relative", height: 10, background: "var(--surface2)", borderRadius: 5 }}>
                         <div style={{ position: "absolute", left: `${(row.p25/maxUSD)*100}%`, width: `${((row.p75-row.p25)/maxUSD)*100}%`, height: "100%", background: "rgba(99,102,241,.3)", borderRadius: 5 }} />
                         <div style={{ position: "absolute", left: `${(row.median/maxUSD)*100}%`, transform: "translateX(-50%)", width: 3, height: "100%", background: "var(--accent)", borderRadius: 2 }} />
                         <div style={{ position: "absolute", left: `${Math.min(95,Math.max(2,(currentUSD/maxUSD)*100))}%`, transform: "translateX(-50%)", width: 4, height: "140%", top: "-20%", background: verdict.color, borderRadius: 2 }} />
@@ -339,7 +342,7 @@ export default function SalaryPage() {
             {/* Offer analyser */}
             <div style={{ ...card, padding: 24, marginBottom: 24 }}>
               <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}>📋 Analyse this offer</h3>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12, marginBottom: 16 }}>
                 {[
                   { label: `Current salary (${currency}${currency==="INR"?" LPA":"/yr"})`, val: negCurrent, set: setNegCurrent, ph: currency==="INR"?"e.g. 25":"e.g. 120000" },
                   { label: `Offer amount (${currency}${currency==="INR"?" LPA":"/yr"})`,    val: negOffer,   set: setNegOffer,   ph: currency==="INR"?"e.g. 38":"e.g. 160000" },
@@ -371,8 +374,8 @@ export default function SalaryPage() {
                 const shouldCounter = market ? negResult.offUSD < market.p75 : hikePct < 20;
                 const targetLocal   = market ? fmtSalary(market.p75, currency) : null;
                 return (
-                  <div style={{ background: "rgba(255,255,255,.02)", borderRadius: 12, border: "1px solid var(--border)", padding: 20 }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14, marginBottom: 18 }}>
+                  <div style={{ background: "var(--surface)", borderRadius: 12, border: "1px solid var(--border)", padding: 20 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 14, marginBottom: 18 }}>
                       <div style={{ textAlign: "center" }}>
                         <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 4 }}>Hike</div>
                         <div style={{ fontSize: 24, fontWeight: 900, color: hikePct >= 30 ? "var(--success)" : hikePct >= 15 ? "var(--warn)" : "var(--danger)" }}>+{hikePct}%</div>
@@ -450,7 +453,7 @@ export default function SalaryPage() {
               <div style={{ fontSize: 12, fontWeight: 700, color: "var(--accent)", marginBottom: 12 }}>🔥 Fastest-growing roles globally (2025–26 YoY)</div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(175px,1fr))", gap: 10 }}>
                 {topGainers.map(r => (
-                  <div key={r.role+r.city} style={{ padding: "10px 12px", background: "rgba(255,255,255,.03)", borderRadius: 9, border: "1px solid var(--border)" }}>
+                  <div key={r.role+r.city} style={{ padding: "10px 12px", background: "var(--surface2)", borderRadius: 9, border: "1px solid var(--border)" }}>
                     <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text1)", marginBottom: 2, lineHeight: 1.3 }}>{r.role}</div>
                     <div style={{ fontSize: 10, color: "var(--text3)", marginBottom: 4 }}>{r.city}</div>
                     <div style={{ fontSize: 20, fontWeight: 800, color: "var(--success)" }}>+{r.yoyGrowth}%</div>
@@ -497,7 +500,7 @@ export default function SalaryPage() {
                         <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>{fmtSalary(row.p25, currency)} – {fmtSalary(row.p75, currency)}</div>
                       </div>
                       <div style={{ minWidth: 140, display: "flex", flexDirection: "column", gap: 4, justifyContent: "center" }}>
-                        <div style={{ position: "relative", height: 8, background: "rgba(255,255,255,.06)", borderRadius: 4, overflow: "hidden" }}>
+                        <div style={{ position: "relative", height: 8, background: "var(--surface2)", borderRadius: 4, overflow: "hidden" }}>
                           <div style={{ position: "absolute", left: `${(row.p25/(row.p75*1.2))*100}%`, width: `${((row.p75-row.p25)/(row.p75*1.2))*100}%`, height: "100%", background: "rgba(99,102,241,.3)", borderRadius: 4 }} />
                           <div style={{ position: "absolute", left: `${(row.median/(row.p75*1.2))*100}%`, transform: "translateX(-50%)", width: 3, height: "100%", background: "var(--accent)", borderRadius: 2 }} />
                         </div>
@@ -512,7 +515,7 @@ export default function SalaryPage() {
                 ))}
               </div>
             )}
-            <div style={{ marginTop: 28, padding: "14px 18px", background: "rgba(255,255,255,.02)", borderRadius: 10, border: "1px solid var(--border)" }}>
+            <div style={{ marginTop: 28, padding: "14px 18px", background: "var(--surface)", borderRadius: 10, border: "1px solid var(--border)" }}>
               <p style={{ fontSize: 12, color: "var(--text3)", lineHeight: 1.7 }}>
                 <strong style={{ color: "var(--text2)" }}>Sources:</strong> 2025–2026 offer letters, levels.fyi, Glassdoor, and community-reported compensation. All figures annual gross pre-tax. INR shown as LPA.{" "}
                 <Link href="/builder" style={{ color: "var(--accent)" }}>Build your resume →</Link>

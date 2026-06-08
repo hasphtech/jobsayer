@@ -9,6 +9,7 @@ import AppShell from "@/components/AppShell";
 import { useAuth } from "@/lib/auth";
 import { Plus, Trash2, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
 import { trackAction } from "@/lib/activityTracker";
+import { useWindowWidth } from "@/lib/useWindowWidth";
 
 /* ── Types ──────────────────────────────────────────────────── */
 type Stage = "saved" | "applied" | "screening" | "interview" | "offer" | "rejected";
@@ -38,7 +39,7 @@ function noticeDays(period: string): number {
 
 /* ── Config ─────────────────────────────────────────────────── */
 const STAGES: { key: Stage; label: string; icon: string; color: string; bg: string }[] = [
-  { key: "saved",       label: "Saved",      icon: "🔖", color: "var(--text2)",    bg: "rgba(255,255,255,.04)" },
+  { key: "saved",       label: "Saved",      icon: "🔖", color: "var(--text2)",    bg: "var(--surface2)" },
   { key: "applied",     label: "Applied",    icon: "📤", color: "var(--accent)",   bg: "rgba(99,102,241,.08)"  },
   { key: "screening",   label: "Screening",  icon: "📞", color: "var(--warn)",     bg: "rgba(234,179,8,.08)"   },
   { key: "interview",   label: "Interview",  icon: "🎤", color: "#a78bfa",         bg: "rgba(167,139,250,.08)" },
@@ -78,6 +79,8 @@ function AppModal({
   onSave: (app: Application) => void;
   onClose: () => void;
 }) {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const [form, setForm] = useState(initial ?? { ...emptyApp(), id: newId(), updatedAt: new Date().toISOString() });
   function set(k: keyof typeof form, v: string) { setForm(p => ({ ...p, [k]: v })); }
 
@@ -101,7 +104,7 @@ function AppModal({
         </h2>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
             <div>
               <label style={lbl}>Company *</label>
               <input style={inp} placeholder="Razorpay" value={form.company} onChange={e => set("company", e.target.value)} />
@@ -112,7 +115,7 @@ function AppModal({
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
             <div>
               <label style={lbl}>Location</label>
               <input style={inp} placeholder="Bangalore" value={form.location} onChange={e => set("location", e.target.value)} />
@@ -128,7 +131,7 @@ function AppModal({
             <input style={inp} placeholder="https://..." value={form.url} onChange={e => set("url", e.target.value)} />
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
             <div>
               <label style={lbl}>Stage</label>
               <select value={form.stage} onChange={e => set("stage", e.target.value)}
@@ -142,7 +145,7 @@ function AppModal({
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
             <div>
               <label style={lbl}>Notice period required</label>
               <select value={form.noticePeriod} onChange={e => set("noticePeriod", e.target.value)}
@@ -369,7 +372,7 @@ function AppCard({ app, onEdit, onDelete, onStageChange }: {
             {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />} Notes
           </button>
           {expanded && (
-            <div style={{ marginTop: 6, padding: "8px 10px", background: "rgba(255,255,255,.03)", borderRadius: 8, fontSize: 12, color: "var(--text2)", lineHeight: 1.6, border: "1px solid var(--border)" }}>
+            <div style={{ marginTop: 6, padding: "8px 10px", background: "var(--surface2)", borderRadius: 8, fontSize: 12, color: "var(--text2)", lineHeight: 1.6, border: "1px solid var(--border)" }}>
               {app.notes}
             </div>
           )}
@@ -381,6 +384,8 @@ function AppCard({ app, onEdit, onDelete, onStageChange }: {
 
 /* ── Main Page ───────────────────────────────────────────────── */
 export default function ApplicationsPage() {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const { user } = useAuth();
   const [apps, setApps]         = useState<Application[]>([]);
   const [modal, setModal]       = useState<"add" | Application | null>(null);
@@ -430,7 +435,7 @@ export default function ApplicationsPage() {
         </div>
 
         {/* Stage summary cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 8, marginBottom: 24 }}>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(6,1fr)", gap: 8, marginBottom: 24 }}>
           {STAGES.map(s => (
             <button key={s.key} onClick={() => setFilter(f => f === s.key ? "all" : s.key)}
               style={{
