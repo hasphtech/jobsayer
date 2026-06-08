@@ -602,11 +602,12 @@ export default function JobsPage() {
     setLoading(false);
   }, []);
 
-  // Fetch live jobs from Supabase — falls back to static JOBS if DB is empty
+  // Fetch live jobs: Supabase first → Remotive auto-seed → static pool fallback
   useEffect(() => {
     let cancelled = false;
     async function loadJobs() {
       try {
+        // 1. Try Supabase DB
         const res = await fetch("/api/jobs");
         if (!res.ok || cancelled) return;
         const { jobs: dbJobs } = await res.json();
@@ -614,6 +615,22 @@ export default function JobsPage() {
           const mapped = (dbJobs as Record<string, unknown>[]).map(mapDbJob);
           setJobs(mapped);
           setSelectedId(mapped[0].id);
+          return;
+        }
+        // 2. DB empty → trigger Remotive seed (free public API, no key needed)
+        if (!cancelled) {
+          await fetch("/api/jobs/remotive");
+          if (!cancelled) {
+            const res2 = await fetch("/api/jobs");
+            if (res2.ok && !cancelled) {
+              const { jobs: seeded } = await res2.json();
+              if (Array.isArray(seeded) && seeded.length > 0 && !cancelled) {
+                const mapped = (seeded as Record<string, unknown>[]).map(mapDbJob);
+                setJobs(mapped);
+                setSelectedId(mapped[0].id);
+              }
+            }
+          }
         }
       } catch { /* keep static fallback */ }
     }

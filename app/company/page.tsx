@@ -5,21 +5,52 @@ import Link from "next/link";
 import AppShell from "@/components/AppShell";
 
 const COMPANIES = [
-  { slug: "razorpay", name: "Razorpay",  tagline: "FinTech · Bangalore",    logo: "R", verified: true,  score: 7.8, tag: "🔥 Hot" },
-  { slug: "swiggy",   name: "Swiggy",    tagline: "Food-Tech · Bangalore",  logo: "S", verified: true,  score: 7.2, tag: null   },
-  { slug: "phonepe",  name: "PhonePe",   tagline: "FinTech · Bangalore",    logo: "P", verified: false, score: 7.4, tag: "🔥 Hot" },
-  { slug: "groww",    name: "Groww",     tagline: "FinTech · Bangalore",    logo: "G", verified: false, score: 7.1, tag: null   },
-  { slug: "zomato",   name: "Zomato",    tagline: "Food-Tech · Gurgaon",    logo: "Z", verified: false, score: 7.0, tag: null   },
-  { slug: "meesho",   name: "Meesho",    tagline: "E-Commerce · Bangalore", logo: "M", verified: false, score: 6.6, tag: null   },
-  { slug: "cred",     name: "CRED",      tagline: "FinTech · Bangalore",    logo: "C", verified: false, score: 6.8, tag: null   },
-  { slug: "zepto",    name: "Zepto",     tagline: "Q-Commerce · Mumbai",    logo: "Z", verified: false, score: 6.9, tag: "🚀 Rising" },
-  { slug: "flipkart", name: "Flipkart",  tagline: "E-Commerce · Bangalore", logo: "F", verified: false, score: 6.5, tag: null   },
-  { slug: "amazon",   name: "Amazon",    tagline: "Big Tech · Hyderabad",   logo: "A", verified: false, score: 7.3, tag: null   },
-  { slug: "google",   name: "Google",    tagline: "Big Tech · Hyderabad",   logo: "G", verified: false, score: 8.1, tag: null   },
-  { slug: "microsoft",name: "Microsoft", tagline: "Big Tech · Hyderabad",   logo: "M", verified: false, score: 7.9, tag: null   },
+  // FinTech
+  { slug: "razorpay",     name: "Razorpay",       tagline: "FinTech · Bangalore",      logo: "R", verified: true,  score: 7.8, tag: "🔥 Hot"     },
+  { slug: "phonepe",      name: "PhonePe",         tagline: "FinTech · Bangalore",      logo: "P", verified: true,  score: 7.4, tag: "🔥 Hot"     },
+  { slug: "groww",        name: "Groww",           tagline: "FinTech · Bangalore",      logo: "G", verified: false, score: 7.1, tag: null          },
+  { slug: "cred",         name: "CRED",            tagline: "FinTech · Bangalore",      logo: "C", verified: false, score: 6.8, tag: null          },
+  { slug: "juspay",       name: "Juspay",          tagline: "FinTech · Bangalore",      logo: "J", verified: false, score: 7.3, tag: "🚀 Rising"   },
+  { slug: "zerodha",      name: "Zerodha",         tagline: "FinTech · Bangalore",      logo: "Z", verified: false, score: 7.5, tag: null          },
+  { slug: "paytm",        name: "Paytm",           tagline: "FinTech · Noida",          logo: "P", verified: false, score: 5.8, tag: null          },
+  // Food & Quick Commerce
+  { slug: "swiggy",       name: "Swiggy",          tagline: "Food-Tech · Bangalore",    logo: "S", verified: true,  score: 7.2, tag: null          },
+  { slug: "zomato",       name: "Zomato",          tagline: "Food-Tech · Gurgaon",      logo: "Z", verified: false, score: 7.0, tag: null          },
+  { slug: "zepto",        name: "Zepto",           tagline: "Q-Commerce · Mumbai",      logo: "Z", verified: false, score: 6.9, tag: "🚀 Rising"   },
+  { slug: "blinkit",      name: "Blinkit (Zomato)",tagline: "Q-Commerce · Gurgaon",     logo: "B", verified: false, score: 6.7, tag: null          },
+  // E-Commerce
+  { slug: "flipkart",     name: "Flipkart",        tagline: "E-Commerce · Bangalore",   logo: "F", verified: false, score: 6.5, tag: null          },
+  { slug: "meesho",       name: "Meesho",          tagline: "E-Commerce · Bangalore",   logo: "M", verified: false, score: 6.6, tag: null          },
+  { slug: "myntra",       name: "Myntra",          tagline: "E-Commerce · Bangalore",   logo: "M", verified: false, score: 6.4, tag: null          },
+  { slug: "nykaa",        name: "Nykaa",           tagline: "E-Commerce · Mumbai",      logo: "N", verified: false, score: 6.2, tag: null          },
+  // Big Tech India
+  { slug: "google",       name: "Google India",    tagline: "Big Tech · Hyderabad",     logo: "G", verified: false, score: 8.1, tag: null          },
+  { slug: "microsoft",    name: "Microsoft India", tagline: "Big Tech · Hyderabad",     logo: "M", verified: false, score: 7.9, tag: null          },
+  { slug: "amazon",       name: "Amazon India",    tagline: "Big Tech · Hyderabad",     logo: "A", verified: false, score: 7.3, tag: null          },
+  { slug: "meta",         name: "Meta India",      tagline: "Big Tech · Hyderabad",     logo: "M", verified: false, score: 7.6, tag: null          },
+  { slug: "adobe",        name: "Adobe India",     tagline: "Big Tech · Bangalore",     logo: "A", verified: false, score: 7.8, tag: null          },
+  // SaaS / Product
+  { slug: "freshworks",   name: "Freshworks",      tagline: "SaaS · Chennai",           logo: "F", verified: true,  score: 7.6, tag: "🔥 Hot"     },
+  { slug: "zoho",         name: "Zoho",            tagline: "SaaS · Chennai",           logo: "Z", verified: false, score: 7.0, tag: null          },
+  { slug: "browserstack", name: "BrowserStack",    tagline: "DevTools · Mumbai",        logo: "B", verified: false, score: 7.9, tag: "🚀 Rising"   },
+  { slug: "chargebee",    name: "Chargebee",       tagline: "SaaS · Chennai",           logo: "C", verified: false, score: 7.2, tag: null          },
+  { slug: "postman",      name: "Postman",         tagline: "DevTools · Bangalore",     logo: "P", verified: false, score: 7.7, tag: null          },
+  // IT Services
+  { slug: "infosys",      name: "Infosys",         tagline: "IT Services · Bangalore",  logo: "I", verified: false, score: 5.5, tag: null          },
+  { slug: "tcs",          name: "TCS",             tagline: "IT Services · Mumbai",     logo: "T", verified: false, score: 5.2, tag: null          },
+  { slug: "wipro",        name: "Wipro",           tagline: "IT Services · Bangalore",  logo: "W", verified: false, score: 5.3, tag: null          },
+  { slug: "hcl",          name: "HCL Technologies",tagline: "IT Services · Noida",      logo: "H", verified: false, score: 5.4, tag: null          },
+  // Mobility & Logistics
+  { slug: "ola",          name: "Ola",             tagline: "Mobility · Bangalore",     logo: "O", verified: false, score: 6.0, tag: null          },
+  { slug: "rapido",       name: "Rapido",          tagline: "Mobility · Bangalore",     logo: "R", verified: false, score: 6.5, tag: "🚀 Rising"   },
+  { slug: "porter",       name: "Porter",          tagline: "Logistics · Bangalore",    logo: "P", verified: false, score: 6.8, tag: null          },
+  // EdTech
+  { slug: "byjus",        name: "BYJU'S",          tagline: "EdTech · Bangalore",       logo: "B", verified: false, score: 4.5, tag: null          },
+  { slug: "unacademy",    name: "Unacademy",       tagline: "EdTech · Bangalore",       logo: "U", verified: false, score: 5.8, tag: null          },
+  { slug: "scaler",       name: "Scaler Academy",  tagline: "EdTech · Bangalore",       logo: "S", verified: false, score: 6.9, tag: null          },
 ];
 
-const FILTERS = ["All", "FinTech", "Food-Tech", "E-Commerce", "Big Tech", "Q-Commerce"];
+const FILTERS = ["All", "FinTech", "Food-Tech", "E-Commerce", "Big Tech", "SaaS", "IT Services", "DevTools", "Q-Commerce", "Mobility", "EdTech", "Logistics"];
 
 export default function CompanyIndexPage() {
   const [filter, setFilter] = useState("All");
