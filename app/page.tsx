@@ -11,6 +11,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { useTheme } from "@/lib/useTheme";
+import { useCurrency, formatPrice } from "@/lib/useCurrency";
 import { computeScore } from "@/lib/scoreEngine";
 import { resumeToText } from "@/lib/jdMatcher";
 import JOBS from "@/lib/jobPool";
@@ -383,6 +384,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
   const { dark } = useTheme();
   const [featuresTab, setFeaturesTab] = useState<"resume" | "jobseeker" | "recruiter">("resume");
   const [pricingTab, setPricingTab]   = useState<"jobseeker" | "employer">("jobseeker");
+  const currency = useCurrency();
 
   return (
     <div style={{ background: "var(--bg)", color: "var(--text1)", overflowX: "hidden" }}>
@@ -757,7 +759,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
           {(pricingTab === "jobseeker" ? [
             {
               name: "Free",
-              price: "$0", period: "forever",
+              price: "Free", period: "forever",
               tagline: "Start your career journey",
               color: "var(--text2)", highlight: false,
               features: ["2 saved resumes", "4 basic templates", "PDF export", "ATS score", "Matched jobs feed", "Public share link"],
@@ -766,7 +768,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
             },
             {
               name: "Career Pro",
-              price: "$9", period: "/ month",
+              price: formatPrice(9, currency), period: "/ month",
               tagline: "For active job hunters",
               color: "var(--accent)", highlight: true,
               features: ["5 saved resumes", "All 20+ templates", "PDF + DOCX export", "ATS score + JD Tailor", "Matched jobs + Job tracker", "AI writing assistant", "Interview prep (AI)", "Career GPS roadmap"],
@@ -775,7 +777,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
             },
             {
               name: "Career Elite",
-              price: "$19", period: "/ month",
+              price: formatPrice(19, currency), period: "/ month",
               tagline: "For career accelerators",
               color: "#a78bfa", highlight: false,
               features: ["Unlimited resumes", "All 20+ templates", "PDF + DOCX export", "ATS score + JD Tailor", "Matched jobs + Job tracker", "AI writing assistant", "Interview prep (AI)", "Career GPS roadmap", "Salary intelligence", "LinkedIn Optimizer", "Priority support"],
@@ -785,7 +787,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
           ] : [
             {
               name: "Free",
-              price: "$0", period: "forever",
+              price: "Free", period: "forever",
               tagline: "Post your first jobs",
               color: "var(--text2)", highlight: false,
               features: ["3 job posts", "Basic candidate listing", "Company profile page", "AI job description helper"],
@@ -794,7 +796,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
             },
             {
               name: "Growth",
-              price: "$49", period: "/ month",
+              price: formatPrice(49, currency), period: "/ month",
               tagline: "For growing teams",
               color: "var(--accent)", highlight: true,
               features: ["20 active job posts", "AI candidate matching", "Verified company badge", "Candidate pipeline", "Hiring analytics", "Priority job placement"],
@@ -803,7 +805,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
             },
             {
               name: "Scale",
-              price: "$149", period: "/ month",
+              price: formatPrice(149, currency), period: "/ month",
               tagline: "For high-volume hiring",
               color: "#a78bfa", highlight: false,
               features: ["Unlimited job posts", "AI candidate matching", "Verified company badge", "Candidate pipeline", "Hiring analytics", "Priority placement", "API access", "Dedicated account manager"],
@@ -861,7 +863,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
           ))}
         </div>
         <p style={{ textAlign: "center", fontSize: 12, color: "var(--text3)", marginTop: 20 }}>
-          All plans include resume builder, ATS scoring, matched jobs, and public share link. Billed in USD. Cancel anytime.
+          All plans include resume builder, ATS scoring, matched jobs, and public share link. Billed in {currency.code}. Cancel anytime.
         </p>
       </section>
 

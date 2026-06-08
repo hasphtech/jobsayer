@@ -10,6 +10,7 @@ import { Check, Zap, Star, Sparkles } from "lucide-react";
 import { PLAN_DEFAULTS } from "@/lib/resumePlan";
 import { useAuth } from "@/lib/auth";
 import AppShell from "@/components/AppShell";
+import { useCurrency, formatPrice, type CurrencyInfo } from "@/lib/useCurrency";
 
 /* ── Razorpay script loader ─────────────────────────────────── */
 function loadRazorpay(): Promise<boolean> {
@@ -21,68 +22,6 @@ function loadRazorpay(): Promise<boolean> {
     script.onerror = () => resolve(false);
     document.body.appendChild(script);
   });
-}
-
-/* ── Currency detection ─────────────────────────────────────── */
-interface CurrencyInfo {
-  code: string;
-  symbol: string;
-  rate: number; // multiplier from USD base
-}
-
-const CURRENCIES: Record<string, CurrencyInfo> = {
-  IN:  { code: "INR", symbol: "₹",  rate: 83.5  },
-  GB:  { code: "GBP", symbol: "£",  rate: 0.79  },
-  AU:  { code: "AUD", symbol: "A$", rate: 1.53  },
-  CA:  { code: "CAD", symbol: "C$", rate: 1.36  },
-  SG:  { code: "SGD", symbol: "S$", rate: 1.34  },
-  AE:  { code: "AED", symbol: "AED ", rate: 3.67 },
-  SA:  { code: "SAR", symbol: "SAR ", rate: 3.75 },
-  DE:  { code: "EUR", symbol: "€",  rate: 0.92  },
-  FR:  { code: "EUR", symbol: "€",  rate: 0.92  },
-  NL:  { code: "EUR", symbol: "€",  rate: 0.92  },
-  ES:  { code: "EUR", symbol: "€",  rate: 0.92  },
-  IT:  { code: "EUR", symbol: "€",  rate: 0.92  },
-  NZ:  { code: "NZD", symbol: "NZ$", rate: 1.63 },
-  JP:  { code: "JPY", symbol: "¥",  rate: 149.5 },
-  MY:  { code: "MYR", symbol: "RM ", rate: 4.47  },
-  PH:  { code: "PHP", symbol: "₱",  rate: 56.5  },
-  NG:  { code: "NGN", symbol: "₦",  rate: 1580  },
-  ZA:  { code: "ZAR", symbol: "R",  rate: 18.6  },
-  BR:  { code: "BRL", symbol: "R$", rate: 4.97  },
-  MX:  { code: "MXN", symbol: "MX$", rate: 17.2 },
-};
-
-// Timezone → country code mapping for common regions
-const TZ_TO_COUNTRY: Record<string, string> = {
-  "Asia/Calcutta": "IN", "Asia/Kolkata": "IN",
-  "Europe/London": "GB", "Europe/Berlin": "DE", "Europe/Paris": "FR",
-  "Europe/Amsterdam": "NL", "Europe/Madrid": "ES", "Europe/Rome": "IT",
-  "Australia/Sydney": "AU", "Australia/Melbourne": "AU", "Australia/Perth": "AU",
-  "America/Toronto": "CA", "America/Vancouver": "CA",
-  "Asia/Singapore": "SG", "Asia/Dubai": "AE", "Asia/Riyadh": "SA",
-  "Pacific/Auckland": "NZ", "Asia/Tokyo": "JP",
-  "Asia/Kuala_Lumpur": "MY", "Asia/Manila": "PH",
-  "Africa/Lagos": "NG", "Africa/Johannesburg": "ZA",
-  "America/Sao_Paulo": "BR", "America/Mexico_City": "MX",
-};
-
-function useCurrency(): CurrencyInfo {
-  const [currency, setCurrency] = useState<CurrencyInfo>({ code: "USD", symbol: "$", rate: 1 });
-  useEffect(() => {
-    try {
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const country = TZ_TO_COUNTRY[tz];
-      if (country && CURRENCIES[country]) setCurrency(CURRENCIES[country]);
-    } catch { /* fallback to USD */ }
-  }, []);
-  return currency;
-}
-
-function formatPrice(usd: number, currency: CurrencyInfo): string {
-  const amount = Math.round(usd * currency.rate);
-  // For JPY / NGN don't show decimals, others round to nearest whole
-  return `${currency.symbol}${amount.toLocaleString()}`;
 }
 
 /* ── Base USD prices ────────────────────────────────────────── */
