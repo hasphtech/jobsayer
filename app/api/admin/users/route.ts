@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
   // Join auth.users email via the view or service-role select
   const { data, error } = await sb
     .from("profiles")
-    .select("id, full_name, plan, is_admin, is_suspended, onboarding_completed, created_at, current_role, target_role, location")
+    .select("id, full_name, plan, is_admin, is_suspended, onboarding_completed, created_at, current_job_role, target_role, location")
     .order("created_at", { ascending: false })
     .limit(500);
 

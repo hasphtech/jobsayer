@@ -13,7 +13,10 @@ const inter = Inter({
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0f1117",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)",  color: "#09090b" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+  ],
 };
 
 export const metadata: Metadata = {
@@ -46,14 +49,20 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/favicon.ico",               sizes: "any" },
-      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
-      { url: "/icon-512.png", type: "image/png", sizes: "512x512" },
+      { url: "/favicon.ico",                      sizes: "any" },
+      { url: "/icons/icon-192.png", type: "image/png", sizes: "192x192" },
+      { url: "/icons/icon-512.png", type: "image/png", sizes: "512x512" },
     ],
-    apple: "/apple-touch-icon.png",
+    apple: "/icons/icon-192.png",
     shortcut: "/favicon.ico",
   },
+  manifest: "/manifest.json",
   metadataBase: new URL("https://jobsayer.com"),
+  appleWebApp: {
+    capable:    true,
+    title:      "jobSayer",
+    statusBarStyle: "black-translucent",
+  },
 };
 
 const FOUC_SCRIPT = `(function(){

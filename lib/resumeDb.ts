@@ -104,6 +104,14 @@ export async function saveNamedResume(
       .eq("id", existingId)
       .eq("user_id", userId);
     if (error) throw new Error(error.message);
+
+    // Auto-snapshot (fire-and-forget, client-side)
+    fetch(`/api/resume/${existingId}/versions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ label: `Auto-save ${new Date().toLocaleTimeString()}` }),
+    }).catch(() => {});
+
     return existingId;
   }
   const { data: row, error } = await supabase

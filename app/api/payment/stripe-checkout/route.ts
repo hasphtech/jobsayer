@@ -89,29 +89,56 @@ export async function POST(req: NextRequest) {
   };
   const intervalLabel = interval === "annual" ? "/ year" : "/ month";
 
+  // Look up or create Stripe customer (idempotent)
+  let customerId: string | undefined;
+  try {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("stripe_customer_id")
+      .eq("id", user.id)
+      .single();
+    if (profile?.stripe_customer_id) {
+      customerId = profile.stripe_customer_id;
+    } else {
+      const customer = await stripe.customers.create({
+        email: user.email ?? undefined,
+        metadata: { user_id: user.id },
+      });
+      customerId = customer.id;
+      await supabase
+        .from("profiles")
+        .update({ stripe_customer_id: customer.id })
+        .eq("id", user.id);
+    }
+  } catch { /* non-fatal — continue without customer */ }
+
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
-      mode: "payment",
+      mode: "subscription",
+      ...(customerId ? { customer: customerId } : { customer_email: user.email ?? undefined }),
       line_items: [{
         price_data: {
           currency: cur.toLowerCase(),
           product_data: {
             name: `jobSayer ${planLabels[plan] ?? plan} Plan`,
-            description: `${intervalLabel === "/ month" ? "Monthly" : "Annual"} subscription`,
+            description: `${interval === "monthly" ? "Monthly" : "Annual"} subscription`,
             images: [`${siteUrl}/logo.png`],
           },
           unit_amount: amount,
+          recurring: { interval: interval === "annual" ? "year" : "month" },
         },
         quantity: 1,
       }],
-      customer_email: user.email,
       client_reference_id: user.id,
       metadata: {
         user_id: user.id,
         plan,
         interval,
         currency: cur,
+      },
+      subscription_data: {
+        metadata: { user_id: user.id, plan, interval },
       },
       success_url: `${siteUrl}/upgrade/success?session_id={CHECKOUT_SESSION_ID}&plan=${plan}`,
       cancel_url: `${siteUrl}/upgrade?cancelled=1`,

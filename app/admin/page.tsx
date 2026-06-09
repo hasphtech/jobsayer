@@ -1198,7 +1198,7 @@ interface UserRow {
   id: string; email: string; full_name: string | null;
   plan: string; is_admin: boolean; is_suspended: boolean;
   onboarding_completed: boolean; created_at: string;
-  current_role: string | null; target_role: string | null; location: string | null;
+  current_job_role: string | null; target_role: string | null; location: string | null;
 }
 
 const PLANS = ["free", "pro", "team", "enterprise"];
@@ -1281,7 +1281,7 @@ function UsersAdminView({ token, flash }: { token: string; flash: (m: string) =>
                     {u.is_admin && <span style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", background: "var(--accdim)", padding: "1px 6px", borderRadius: 4 }}>ADMIN</span>}
                   </td>
                   <td style={{ padding: "10px 10px", color: "var(--text2)" }}>{u.full_name || "—"}</td>
-                  <td style={{ padding: "10px 10px", color: "var(--text3)", fontSize: 12 }}>{u.current_role || "—"}</td>
+                  <td style={{ padding: "10px 10px", color: "var(--text3)", fontSize: 12 }}>{u.current_job_role || "—"}</td>
                   <td style={{ padding: "10px 10px" }}>
                     <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 6, color: planColor[u.plan] ?? "var(--text3)", background: "var(--surface2)" }}>
                       {u.plan}
@@ -1353,7 +1353,7 @@ function UsersAdminView({ token, flash }: { token: string; flash: (m: string) =>
 
             <div style={{ background: "var(--surface2)", borderRadius: 10, padding: "12px 14px", fontSize: 12, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
               {[
-                ["Current role",  selected.current_role || "—"],
+                ["Current role",  selected.current_job_role || "—"],
                 ["Target role",   selected.target_role  || "—"],
                 ["Location",      selected.location     || "—"],
                 ["Onboarding",    selected.onboarding_completed ? "✓ Complete" : "⏳ In progress"],

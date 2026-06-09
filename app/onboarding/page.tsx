@@ -62,7 +62,7 @@ export default function OnboardingPage() {
       if (user) {
         await supabase.from("profiles").upsert({
           id:                    user.id,
-          current_role:          currentRole,
+          current_job_role:          currentRole,
           target_role:           targetRole,
           location:              location,
           onboarding_completed:  true,

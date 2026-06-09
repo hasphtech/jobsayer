@@ -75,12 +75,16 @@ export default function ProfilePage() {
   const mobile = w < 640;
   const router = useRouter();
   const { user, signOut, loading: authLoading } = useAuth();
-  const plan = useResumePlan();
+  const plan = useResumePlan() as string;
   const [saves, setSaves] = useState<SaveMeta[]>([]);
   const [savesLoading, setSavesLoading] = useState(true);
   const [bgv, setBgv] = useState<BgvStatus | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [deleting, setDeleting]           = useState(false);
+  const [billingLoading, setBillingLoading] = useState(false);
+  const [exportLoading,  setExportLoading]  = useState(false);
+  const [referralCode,   setReferralCode]   = useState<string | null>(null);
+  const [referralStats,  setReferralStats]  = useState({ total: 0, rewarded: 0 });
   const [discoverable, setDiscoverable] = useState(false);
   const [discoverableSaving, setDiscoverableSaving] = useState(false);
   const [avail, setAvail] = useState<Availability>({ openToWork: "active", noticePeriod: "30", workPref: "full_time" });
@@ -163,6 +167,11 @@ export default function ProfilePage() {
     })();
     // Load BGV status
     fetch("/api/bgv/status").then(r => r.json()).then(d => { if (d.bgv) setBgv(d.bgv); }).catch(() => {});
+    // Load referral info
+    fetch("/api/referral").then(r => r.json()).then(d => {
+      setReferralCode(d.referral_code ?? null);
+      setReferralStats({ total: d.total ?? 0, rewarded: d.rewarded ?? 0 });
+    }).catch(() => {});
     // Load discoverable setting from Supabase
     (async () => {
       try {
@@ -182,16 +191,45 @@ export default function ProfilePage() {
     if (!user) return;
     setDeleting(true);
     try {
-      const sb = await getSupabaseAsync();
-      // Delete all user data — RLS cascade handles the rest
-      await sb.from("resume_saves").delete().eq("user_id", user.id);
-      await sb.from("resume_shares").delete().eq("user_id", user.id);
-      await sb.auth.admin?.deleteUser(user.id); // only works server-side, will silently fail client-side
+      await fetch("/api/gdpr/delete", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirm: "DELETE MY ACCOUNT" }),
+      });
       signOut();
     } catch {
-      // sign out anyway — user can contact support for full deletion
       signOut();
     }
+  }
+
+  async function handleBillingPortal() {
+    setBillingLoading(true);
+    try {
+      const res = await fetch("/api/payment/billing-portal", { method: "POST" });
+      const json = await res.json();
+      if (json.url) window.location.href = json.url;
+      else alert(json.error ?? "Could not open billing portal");
+    } catch {
+      alert("Could not open billing portal");
+    }
+    setBillingLoading(false);
+  }
+
+  async function handleExportData() {
+    setExportLoading(true);
+    try {
+      const res  = await fetch("/api/gdpr/export");
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement("a");
+      a.href     = url;
+      a.download = `jobsayer-export-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      alert("Export failed — please try again");
+    }
+    setExportLoading(false);
   }
 
   if (authLoading || !user) return (
@@ -570,6 +608,78 @@ export default function ProfilePage() {
               }}>{l.label}</Link>
             ))}
           </div>
+        </div>
+
+        {/* Billing — Manage subscription */}
+        {plan !== "free" && (
+          <div style={{ ...card, marginBottom: 20 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", marginBottom: 10 }}>💳 Billing</div>
+            <p style={{ fontSize: 13, color: "var(--text2)", marginBottom: 14 }}>
+              Manage your subscription, view invoices, and update your payment method via the Stripe billing portal.
+            </p>
+            <button
+              onClick={handleBillingPortal}
+              disabled={billingLoading}
+              style={{
+                padding: "9px 20px", borderRadius: 8, border: "1px solid var(--border)",
+                background: "var(--surface2)", color: "var(--text1)", fontSize: 13, fontWeight: 600,
+                cursor: "pointer", fontFamily: "inherit",
+              }}
+            >
+              {billingLoading ? "Opening…" : "Manage Billing →"}
+            </button>
+          </div>
+        )}
+
+        {/* Referral programme */}
+        <div style={{ ...card, marginBottom: 20 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", marginBottom: 10 }}>🎁 Refer & Earn</div>
+          <p style={{ fontSize: 13, color: "var(--text2)", marginBottom: 14 }}>
+            Share your link — when someone signs up, you both get <strong>1 month of Career Pro free</strong>.
+          </p>
+          {referralCode ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <input readOnly value={`${typeof window !== "undefined" ? window.location.origin : "https://jobsayer.com"}/?ref=${referralCode}`}
+                  style={{ flex: 1, padding: "8px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--surface2)", color: "var(--text1)", fontSize: 12, fontFamily: "monospace" }} />
+                <button
+                  onClick={() => navigator.clipboard?.writeText(`${window.location.origin}/?ref=${referralCode}`)}
+                  style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--surface2)", color: "var(--accent)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}
+                >
+                  Copy link
+                </button>
+              </div>
+              <div style={{ display: "flex", gap: 16 }}>
+                <div style={{ fontSize: 12, color: "var(--text3)" }}>
+                  Referred: <strong style={{ color: "var(--text1)" }}>{referralStats.total}</strong>
+                </div>
+                <div style={{ fontSize: 12, color: "var(--text3)" }}>
+                  Rewards earned: <strong style={{ color: "var(--success)" }}>{referralStats.rewarded}</strong>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div style={{ fontSize: 13, color: "var(--text3)" }}>Loading referral code…</div>
+          )}
+        </div>
+
+        {/* Data & Privacy */}
+        <div style={{ ...card, marginBottom: 20 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", marginBottom: 10 }}>🔒 Your Data (GDPR)</div>
+          <p style={{ fontSize: 13, color: "var(--text2)", marginBottom: 14 }}>
+            Download all data we hold about you, or permanently delete your account under GDPR Art. 17 &amp; 20.
+          </p>
+          <button
+            onClick={handleExportData}
+            disabled={exportLoading}
+            style={{
+              padding: "9px 20px", borderRadius: 8, border: "1px solid var(--border)",
+              background: "var(--surface2)", color: "var(--text1)", fontSize: 13, fontWeight: 600,
+              cursor: "pointer", fontFamily: "inherit",
+            }}
+          >
+            {exportLoading ? "Preparing export…" : "⬇ Download my data"}
+          </button>
         </div>
 
         {/* Danger zone */}

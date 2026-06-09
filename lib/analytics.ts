@@ -92,6 +92,7 @@ export type AnalyticsEvent =
   | "career_gps_viewed"
   | "salary_insights_viewed"
   | "linkedin_optimised"
+  | "linkedin_tips_generated"
   | "bgv_initiated"
   | "vault_document_uploaded"
   // Monetisation

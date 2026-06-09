@@ -11,6 +11,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { useTheme } from "@/lib/useTheme";
+import NotificationBell from "@/components/NotificationBell";
 
 function useWidth() {
   const [w, setW] = useState(1200);
@@ -103,6 +104,9 @@ export default function AppNav({ actions }: { actions?: React.ReactNode }) {
         {/* Right side: page actions + profile */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: mobile ? 0 : 12, flexShrink: 0 }}>
           {!mobile && actions}
+
+          {/* Notification bell */}
+          {!mobile && user && <NotificationBell />}
 
           {/* Theme toggle */}
           {!mobile && (
