@@ -32,8 +32,8 @@ const SSO_PROVIDERS: Record<string, string> = JSON.parse(
 export async function POST(req: NextRequest) {
   // Rate limit: 10 req/min per IP (prevent domain enumeration)
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
-  const { success } = await rateLimit(`sso:${ip}`, 10, 60_000);
-  if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  const { allowed } = await rateLimit(`sso:${ip}`, 10, 60_000);
+  if (!allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
   let body: { org?: string; next?: string };
   try { body = await req.json(); } catch { return NextResponse.json({ error: "Invalid body" }, { status: 400 }); }

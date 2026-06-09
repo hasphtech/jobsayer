@@ -47,8 +47,8 @@ export async function POST(req: NextRequest) {
 
   // Rate limit
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
-  const { success } = await rateLimit(`stripe-checkout:${ip}`, 5, 60_000);
-  if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  const { allowed } = await rateLimit(`stripe-checkout:${ip}`, 5, 60_000);
+  if (!allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
   // Auth
   const cookieStore = await cookies();
@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
   const factor = ZERO_DECIMAL.has(cur) ? 1 : 100;
   const amount = Math.round(usdCents * rate * (ZERO_DECIMAL.has(cur) ? 0.01 : 1));
 
-  const stripe = new Stripe(stripeKey, { apiVersion: "2024-04-10" });
+  const stripe = new Stripe(stripeKey, { apiVersion: "2026-05-27.dahlia" });
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "http://localhost:3000";
 
   const planLabels: Record<string, string> = {

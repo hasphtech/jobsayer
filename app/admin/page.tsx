@@ -152,7 +152,7 @@ export default function AdminPage() {
                 color: view === v ? "var(--accent)" : "var(--text3)",
                 borderBottom: view === v ? "2px solid var(--accent)" : "2px solid transparent",
               }}>
-              {{ add: "➕ Add", scrape: "🤖 Scrape", queue: `🔍 Queue ${pending > 0 ? `(${pending})` : ""}`, manage: "📋 Manage" }[v]}
+              {{ add: "➕ Add", scrape: "🤖 Scrape", queue: `🔍 Queue ${pending > 0 ? `(${pending})` : ""}`, manage: "📋 Manage" }[v as "add" | "scrape" | "queue" | "manage"]}
             </button>
           ))}
         </div>
@@ -166,7 +166,7 @@ export default function AdminPage() {
                 color: view === v ? "var(--accent)" : "var(--text3)",
                 borderBottom: view === v ? "2px solid var(--accent)" : "2px solid transparent",
               }}>
-              {{ bgv: "🛡 BGV", companies: "🏅 Companies" }[v]}
+              {{ bgv: "🛡 BGV", companies: "🏅 Companies" }[v as "bgv" | "companies"]}
             </button>
           ))}
         </div>
@@ -180,7 +180,7 @@ export default function AdminPage() {
                 color: view === v ? "var(--accent)" : "var(--text3)",
                 borderBottom: view === v ? "2px solid var(--accent)" : "2px solid transparent",
               }}>
-              {{ users: "👥 Users", flags: "🚩 Feature Flags", audit: "📜 Audit Log", metrics: "📊 Metrics" }[v]}
+              {{ users: "👥 Users", flags: "🚩 Feature Flags", audit: "📜 Audit Log", metrics: "📊 Metrics" }[v as "users" | "flags" | "audit" | "metrics"]}
             </button>
           ))}
         </div>

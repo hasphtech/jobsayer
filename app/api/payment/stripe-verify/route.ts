@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const stripe = new Stripe(stripeKey, { apiVersion: "2024-04-10" });
+  const stripe = new Stripe(stripeKey, { apiVersion: "2026-05-27.dahlia" });
 
   let session: Stripe.Checkout.Session;
   try {
