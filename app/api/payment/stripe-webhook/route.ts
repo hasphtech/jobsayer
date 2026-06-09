@@ -155,13 +155,19 @@ export async function POST(req: NextRequest) {
 
   // ── invoice.payment_succeeded → renew plan ────────────────────────────────
   if (event.type === "invoice.payment_succeeded") {
-    const inv    = event.data.object as Stripe.Invoice;
-    if (!inv.subscription) return NextResponse.json({ received: true });
+    // In Stripe API ≥2026-05-27, subscription may live under inv.parent or
+    // directly as inv.subscription depending on SDK shape — use runtime access.
+    const inv = event.data.object as Stripe.Invoice & {
+      subscription?: string | Stripe.Subscription | null;
+    };
+    const rawSub = inv.subscription;
+    if (!rawSub) return NextResponse.json({ received: true });
+    const subIdStr = typeof rawSub === "string" ? rawSub : rawSub.id;
     const userId = await findUserByCustomer(sb, inv.customer as string);
     if (!userId) return NextResponse.json({ received: true });
 
     // Retrieve subscription to get interval
-    const sub     = await stripe.subscriptions.retrieve(inv.subscription as string);
+    const sub      = await stripe.subscriptions.retrieve(subIdStr);
     const interval = sub.items.data[0]?.plan?.interval === "year" ? "annual" : "monthly";
     const plan    = sub.metadata?.plan ?? "starter";
 
