@@ -75,7 +75,7 @@ export default function ProfilePage() {
   const mobile = w < 640;
   const router = useRouter();
   const { user, signOut, loading: authLoading } = useAuth();
-  const plan = useResumePlan() as unknown as string;
+  const plan = useResumePlan();
   const [saves, setSaves] = useState<SaveMeta[]>([]);
   const [savesLoading, setSavesLoading] = useState(true);
   const [bgv, setBgv] = useState<BgvStatus | null>(null);
@@ -611,7 +611,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Billing — Manage subscription */}
-        {plan !== "free" && (
+        {plan.tier !== "free" && (
           <div style={{ ...card, marginBottom: 20 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", marginBottom: 10 }}>💳 Billing</div>
             <p style={{ fontSize: 13, color: "var(--text2)", marginBottom: 14 }}>
