@@ -75,7 +75,7 @@ export default function ProfilePage() {
   const mobile = w < 640;
   const router = useRouter();
   const { user, signOut, loading: authLoading } = useAuth();
-  const plan = useResumePlan() as string;
+  const plan = useResumePlan() as unknown as string;
   const [saves, setSaves] = useState<SaveMeta[]>([]);
   const [savesLoading, setSavesLoading] = useState(true);
   const [bgv, setBgv] = useState<BgvStatus | null>(null);
