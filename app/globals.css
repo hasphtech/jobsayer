@@ -35,10 +35,10 @@
   --shell-sidebar-bg:  #ffffff;
   --shell-topbar-bg:   #ffffff;
   --shell-ai-bg:       #f8f9fc;
-  --shell-link-active-bg:  rgba(99,102,241,0.08);
+  --shell-link-active-bg:  rgba(99,102,241,0.12);
   --shell-link-active-col: #4338ca;
-  --shell-link-col:        #64748b;
-  --shell-link-hover-col:  #0f172a;
+  --shell-link-col:        #475569;
+  --shell-link-hover-col:  #1e293b;
   --shell-section-col:     #94a3b8;
 }
 

@@ -25,40 +25,40 @@ const TOOL_LINKS = [
   { href: "/dashboard",    label: "Dashboard",      icon: "ti-layout-dashboard" },
   { href: "/builder",      label: "Resume Builder", icon: "ti-file-text" },
   { href: "/score",        label: "ATS Score",      icon: "ti-target" },
-  { href: "/tailor",       label: "JD Tailor",      icon: "ti-scissors" },
+  { href: "/tailor",       label: "JD Tailor",      icon: "ti-cut" },
   { href: "/cover-letter", label: "Cover Letter",   icon: "ti-mail" },
   { href: "/interview",    label: "Interview",      icon: "ti-microphone" },
 ];
 
 const INSIGHT_LINKS = [
   { href: "/jobs",             label: "Jobs",        icon: "ti-briefcase" },
-  { href: "/applications",     label: "Tracker",     icon: "ti-list-check" },
+  { href: "/applications",     label: "Tracker",     icon: "ti-checklist" },
   { href: "/career-gps",       label: "Career GPS",  icon: "ti-compass" },
-  { href: "/career-health",    label: "Health",      icon: "ti-heart-rate-monitor" },
+  { href: "/career-health",    label: "Health",      icon: "ti-activity" },
   { href: "/salary",           label: "Salaries",    icon: "ti-coin" },
   { href: "/learn",            label: "Courses",     icon: "ti-school" },
-  { href: "/vault",            label: "Doc Vault",   icon: "ti-folder-lock" },
-  { href: "/company",          label: "Companies",   icon: "ti-building-bank" },
+  { href: "/vault",            label: "Doc Vault",   icon: "ti-lock" },
+  { href: "/company",          label: "Companies",   icon: "ti-building" },
   { href: "/employer-trust",   label: "Trust",       icon: "ti-shield-check" },
   { href: "/bgv",              label: "BGV",         icon: "ti-certificate" },
   { href: "/linkedin",         label: "LinkedIn",    icon: "ti-brand-linkedin" },
-  { href: "/integrations",     label: "Bot Integ.",  icon: "ti-plug-connected" },
+  { href: "/integrations",     label: "Bot Integ.",  icon: "ti-plug" },
 ];
 
 /* ── Recruiter nav ───────────────────────────────────────────── */
 const RECRUITER_TOOL_LINKS = [
   { href: "/employer-dashboard",               label: "Overview",    icon: "ti-layout-dashboard" },
-  { href: "/employer-dashboard?tab=pipeline",  label: "Pipeline",    icon: "ti-funnel" },
+  { href: "/employer-dashboard?tab=pipeline",  label: "Pipeline",    icon: "ti-filter" },
   { href: "/employer-dashboard?tab=candidates",label: "Candidates",  icon: "ti-users" },
   { href: "/employer-dashboard?tab=bgv",       label: "BGV",         icon: "ti-shield-check" },
   { href: "/jobs/post",                         label: "Post a Job",  icon: "ti-circle-plus" },
 ];
 
 const RECRUITER_INSIGHT_LINKS = [
-  { href: "/employer-dashboard?tab=team-tools", label: "Team Tools",  icon: "ti-tools" },
+  { href: "/employer-dashboard?tab=team-tools", label: "Team Tools",  icon: "ti-tool" },
   { href: "/employer-dashboard?tab=billing",    label: "Billing",     icon: "ti-credit-card" },
-  { href: "/integrations",                       label: "Bot Integ.", icon: "ti-plug-connected" },
-  { href: "/company",                            label: "Companies",  icon: "ti-building-bank" },
+  { href: "/integrations",                       label: "Bot Integ.", icon: "ti-plug" },
+  { href: "/company",                            label: "Companies",  icon: "ti-building" },
 ];
 
 const ALL_LINKS = [
@@ -279,27 +279,41 @@ function NavLink({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        display: "flex", alignItems: "center", gap: 9,
+        display: "flex", alignItems: "center", gap: 8,
         padding: "7px 10px", borderRadius: 7,
-        fontSize: 13,
-        fontWeight: active ? 600 : 400,
+        fontSize: 12.5,
+        fontWeight: active ? 700 : 500,
         color: active
-          ? "var(--shell-link-active-col)"
+          ? "var(--accent)"
           : hovered
             ? "var(--shell-link-hover-col)"
             : "var(--shell-link-col)",
-        background: active ? "var(--shell-link-active-bg)" : "transparent",
+        background: active
+          ? "var(--accdim)"
+          : hovered
+            ? "var(--surface2)"
+            : "transparent",
         textDecoration: "none",
         transition: "color .12s, background .12s",
         whiteSpace: "nowrap",
-        borderLeft: active ? "2px solid var(--accent)" : "2px solid transparent",
+        borderTop: "1px solid transparent",
+        borderRight: "1px solid transparent",
+        borderBottom: "1px solid transparent",
+        borderLeft: active ? "2px solid var(--accent)" : "1px solid transparent",
+        ...(active ? { borderColor: "var(--accborder)", borderLeftColor: "var(--accent)" } : {}),
       }}
     >
       <i className={`ti ${icon}`} style={{
-        fontSize: 14, width: 16, textAlign: "center", flexShrink: 0,
-        color: active ? "var(--accent)" : "inherit",
+        fontSize: 15, width: 16, textAlign: "center", flexShrink: 0,
+        color: active ? "var(--accent)" : hovered ? "var(--shell-link-hover-col)" : "var(--shell-link-col)",
       }} />
-      {label}
+      <span style={{ flex: 1 }}>{label}</span>
+      {active && (
+        <span style={{
+          width: 5, height: 5, borderRadius: "50%",
+          background: "var(--accent)", flexShrink: 0,
+        }} />
+      )}
     </Link>
   );
 }
@@ -447,19 +461,24 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
                 {dark ? "☀" : "🌙"} {dark ? "Light" : "Dark"}
               </button>
             </div>
-            {[...toolLinks, ...insightLinks].map(l => (
-              <Link key={l.href} href={l.href} onClick={closeDrawer} style={{
-                padding: "10px 14px", borderRadius: 9, fontSize: 14, fontWeight: 500,
-                color: isActive(l.href) ? "var(--accent)" : "var(--text1)",
-                textDecoration: "none",
-                background: isActive(l.href) ? "var(--accdim)" : "var(--surface2)",
-                border: `1px solid ${isActive(l.href) ? "var(--accborder)" : "var(--border)"}`,
-                display: "flex", alignItems: "center", gap: 10,
-              }}>
-                <i className={`ti ${l.icon}`} style={{ fontSize: 15 }} />
-                {l.label}
-              </Link>
-            ))}
+            {[...toolLinks, ...insightLinks].map(l => {
+              const a = isActive(l.href);
+              return (
+                <Link key={l.href} href={l.href} onClick={closeDrawer} style={{
+                  padding: "10px 14px", borderRadius: 9, fontSize: 13, fontWeight: a ? 700 : 500,
+                  color: a ? "var(--accent)" : "var(--text1)",
+                  textDecoration: "none",
+                  background: a ? "var(--accdim)" : "var(--surface2)",
+                  border: `1px solid ${a ? "var(--accborder)" : "var(--border)"}`,
+                  borderLeft: a ? "3px solid var(--accent)" : `1px solid var(--border)`,
+                  display: "flex", alignItems: "center", gap: 10,
+                }}>
+                  <i className={`ti ${l.icon}`} style={{ fontSize: 15, color: a ? "var(--accent)" : "inherit" }} />
+                  <span style={{ flex: 1 }}>{l.label}</span>
+                  {a && <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--accent)" }} />}
+                </Link>
+              );
+            })}
           </div>
         )}
 
