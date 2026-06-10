@@ -141,7 +141,7 @@ export default function CompanyPage({ params }: { params: { slug: string } }) {
   if (!company) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--bg)", color: "var(--text1)", fontFamily: "var(--font-inter, Inter, sans-serif)" }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>🏢</div>
+        <div style={{ fontSize: 48, marginBottom: 16 }}><i className="ti ti-building"/></div>
         <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 8 }}>Company not found</h1>
         <p style={{ color: "var(--text3)", marginBottom: 24 }}>We don't have verified data for this company yet.</p>
         <Link href="/jobs" style={{ padding: "10px 20px", background: "var(--accent)", color: "#fff", borderRadius: 8, textDecoration: "none", fontWeight: 700, fontSize: 13 }}>Browse Jobs</Link>
@@ -150,7 +150,7 @@ export default function CompanyPage({ params }: { params: { slug: string } }) {
   }
 
   const attritionColor = company.attritionTrend === "down" ? "var(--success)" : company.attritionTrend === "up" ? "var(--danger)" : "var(--warn)";
-  const attritionLabel = company.attritionTrend === "down" ? "↓ Improving" : company.attritionTrend === "up" ? "↑ Rising" : "→ Stable";
+  const attritionLabel = company.attritionTrend === "down" ? "↓ Improving" : company.attritionTrend === "up" ? "↑ Rising" : "Stable";
 
   const TABS = [
     { key: "overview", label: "Overview" },
@@ -164,7 +164,7 @@ export default function CompanyPage({ params }: { params: { slug: string } }) {
 
       {/* Topbar */}
       <div style={{ borderBottom: "1px solid var(--border)", padding: "0 24px", background: "var(--nav-bg, #0d0d14)", display: "flex", alignItems: "center", height: 52, gap: 12 }}>
-        <Link href="/jobs" style={{ color: "var(--accent)", fontSize: 13, fontWeight: 800, textDecoration: "none" }}>← Jobs</Link>
+        <Link href="/jobs" style={{ color: "var(--accent)", fontSize: 13, fontWeight: 800, textDecoration: "none" }}><i className="ti ti-arrow-left"/> Jobs</Link>
         <div style={{ width: 1, height: 18, background: "var(--border)" }} />
         <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)" }}>{company.name}</span>
         {company.verified && (
@@ -173,7 +173,7 @@ export default function CompanyPage({ params }: { params: { slug: string } }) {
           </span>
         )}
         <div style={{ flex: 1 }} />
-        <Link href="/employer-dashboard" style={{ fontSize: 11, color: "var(--text3)", textDecoration: "none" }}>Are you hiring? →</Link>
+        <Link href="/employer-dashboard" style={{ fontSize: 11, color: "var(--text3)", textDecoration: "none" }}>Are you hiring? <i className="ti ti-arrow-right"/></Link>
       </div>
 
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "28px 24px" }}>
@@ -188,13 +188,15 @@ export default function CompanyPage({ params }: { params: { slug: string } }) {
             <p style={{ fontSize: 13, color: "var(--text3)", marginBottom: 8 }}>{company.tagline}</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {[
-                `📍 ${company.hq}`,
-                `🏭 ${company.industry}`,
-                `👥 ${company.size} employees`,
-                `📅 Est. ${company.founded}`,
-                `💰 ${company.fundingStage}`,
+                { icon: "ti-map-pin",  text: company.hq },
+                { icon: "ti-building-factory", text: company.industry },
+                { icon: "ti-users",   text: `${company.size} employees` },
+                { icon: "ti-calendar",text: `Est. ${company.founded}` },
+                { icon: "ti-coin",    text: company.fundingStage },
               ].map(tag => (
-                <span key={tag} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 20, background: "var(--surface)", border: "1px solid var(--border)", color: "var(--text3)" }}>{tag}</span>
+                <span key={tag.text} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 20, background: "var(--surface)", border: "1px solid var(--border)", color: "var(--text3)", display: "inline-flex", alignItems: "center", gap: 4 }}>
+                  <i className={`ti ${tag.icon}`} style={{ fontSize: 11 }}/>{tag.text}
+                </span>
               ))}
             </div>
           </div>
@@ -256,7 +258,7 @@ export default function CompanyPage({ params }: { params: { slug: string } }) {
                 </div>
               </div>
               <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: 8, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.15)", fontSize: 11, color: "var(--text3)", lineHeight: 1.6 }}>
-                💡 <strong style={{ color: "var(--accent)" }}>What this means for you:</strong> A high boomerang rate ({company.rehireRate}%) means the company is worth returning to — a good sign for culture and growth. An attrition rate of {company.attritionRate}% {company.attritionRate > 25 ? "is above average — probe for burnout in interviews." : "is typical for Indian tech."} Avg tenure of {company.avgTenure}y suggests {company.avgTenure < 2 ? "high churn — validate growth paths carefully." : "reasonable stability for career building."}.
+                <i className="ti ti-bulb"/> <strong style={{ color: "var(--accent)" }}>What this means for you:</strong> A high boomerang rate ({company.rehireRate}%) means the company is worth returning to — a good sign for culture and growth. An attrition rate of {company.attritionRate}% {company.attritionRate > 25 ? "is above average — probe for burnout in interviews." : "is typical for Indian tech."} Avg tenure of {company.avgTenure}y suggests {company.avgTenure < 2 ? "high churn — validate growth paths carefully." : "reasonable stability for career building."}.
               </div>
             </div>
           </div>
@@ -273,7 +275,7 @@ export default function CompanyPage({ params }: { params: { slug: string } }) {
               {company.salaryBands.map(b => <SalaryBar key={b.role} band={b} />)}
             </div>
             <div style={{ background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.15)", borderRadius: 10, padding: "14px 16px", fontSize: 12, color: "var(--text3)", lineHeight: 1.65 }}>
-              💡 These are real reported figures, not posted JD ranges. Use the median as your anchor in salary negotiations, not the JD range — the JD range is usually set 20–30% lower than what strong candidates actually get.
+              <i className="ti ti-bulb"/> These are real reported figures, not posted JD ranges. Use the median as your anchor in salary negotiations, not the JD range — the JD range is usually set 20–30% lower than what strong candidates actually get.
             </div>
           </div>
         )}
@@ -313,10 +315,10 @@ export default function CompanyPage({ params }: { params: { slug: string } }) {
 
             <div style={{ display: "flex", gap: 10 }}>
               <Link href="/interview" style={{ flex: 1, padding: "11px 16px", borderRadius: 9, background: "var(--accent)", color: "#fff", textDecoration: "none", fontSize: 13, fontWeight: 700, textAlign: "center" }}>
-                🎤 Practice Interview Now
+                <i className="ti ti-microphone"/> Practice Interview Now
               </Link>
               <Link href="/score" style={{ flex: 1, padding: "11px 16px", borderRadius: 9, background: "var(--surface)", border: "1px solid var(--border)", color: "var(--text1)", textDecoration: "none", fontSize: 13, fontWeight: 700, textAlign: "center" }}>
-                🎯 Score Resume for {company.name}
+                <i className="ti ti-target"/> Score Resume for {company.name}
               </Link>
             </div>
           </div>
@@ -331,8 +333,8 @@ export default function CompanyPage({ params }: { params: { slug: string } }) {
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", marginBottom: 4 }}>{role.title}</div>
                     <div style={{ display: "flex", gap: 8 }}>
-                      <span style={{ fontSize: 11, color: "var(--text3)" }}>📍 {role.city}</span>
-                      <span style={{ fontSize: 11, color: "var(--text3)" }}>🏠 {role.type}</span>
+                      <span style={{ fontSize: 11, color: "var(--text3)" }}><i className="ti ti-map-pin"/> {role.city}</span>
+                      <span style={{ fontSize: 11, color: "var(--text3)" }}><i className="ti ti-home"/> {role.type}</span>
                       <span style={{ fontSize: 11, color: "var(--accent)", fontWeight: 700 }}>{role.band}</span>
                     </div>
                   </div>
@@ -341,14 +343,14 @@ export default function CompanyPage({ params }: { params: { slug: string } }) {
                       Tailor Resume
                     </Link>
                     <Link href="/applications" style={{ padding: "7px 12px", borderRadius: 7, background: "var(--accent)", color: "#fff", textDecoration: "none", fontSize: 11, fontWeight: 700 }}>
-                      Apply →
+                      Apply <i className="ti ti-arrow-right"/>
                     </Link>
                   </div>
                 </div>
               ))}
             </div>
             <div style={{ marginTop: 16, padding: "14px 16px", background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.15)", borderRadius: 10, fontSize: 12, color: "var(--text3)", lineHeight: 1.65 }}>
-              💡 <strong style={{ color: "var(--accent)" }}>Pro tip:</strong> Tailor your resume with the exact JD keywords before applying. Candidates who tailor get 3× more callbacks on average.
+              <i className="ti ti-bulb"/> <strong style={{ color: "var(--accent)" }}>Pro tip:</strong> Tailor your resume with the exact JD keywords before applying. Candidates who tailor get 3× more callbacks on average.
             </div>
           </div>
         )}

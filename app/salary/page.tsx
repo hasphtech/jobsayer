@@ -318,7 +318,7 @@ export default function SalaryPage() {
         {/* Header */}
         <div style={{ marginBottom: 28 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 99, background: "var(--accdim)", border: "1px solid var(--accborder)", fontSize: 11, fontWeight: 700, color: "var(--accent)", marginBottom: 12 }}>
-            🌍 Global · 2025–2026
+            <i className="ti ti-world"/> Global · 2025–2026
           </div>
           <h1 style={{ fontSize: 28, fontWeight: 800, marginBottom: 8, letterSpacing: "-.02em" }}>Global Salary Intelligence</h1>
           <p style={{ fontSize: 14, color: "var(--text3)", lineHeight: 1.7, maxWidth: 580 }}>
@@ -339,7 +339,7 @@ export default function SalaryPage() {
 
         {/* Tabs */}
         <div style={{ display: "flex", gap: 4, marginBottom: 28, background: "var(--surface2)", borderRadius: 12, padding: 4, width: "fit-content" }}>
-          {([["browse","📊 Browse"],["underpaid","🔍 Am I Underpaid?"],["negotiate","🤝 Negotiate"]] as const).map(([key, label]) => (
+          {([["browse","Browse"],["underpaid","Am I Underpaid?"],["negotiate","Negotiate"]] as const).map(([key, label]) => (
             <button key={key} onClick={() => setActiveTab(key)} style={{
               padding: "7px 16px", borderRadius: 9, border: "none", fontSize: 12, fontWeight: 600,
               background: activeTab === key ? "var(--surface)" : "transparent",
@@ -418,11 +418,11 @@ export default function SalaryPage() {
                         <div style={{ position: "absolute", left: `${(row.median/maxUSD)*100}%`, transform: "translateX(-50%)", width: 3, height: "100%", background: "var(--accent)", borderRadius: 2 }} />
                         <div style={{ position: "absolute", left: `${Math.min(95,Math.max(2,(currentUSD/maxUSD)*100))}%`, transform: "translateX(-50%)", width: 4, height: "140%", top: "-20%", background: verdict.color, borderRadius: 2 }} />
                       </div>
-                      <div style={{ fontSize: 11, color: verdict.color, marginTop: 4, fontWeight: 600, textAlign: "right" }}>← You are here</div>
+                      <div style={{ fontSize: 11, color: verdict.color, marginTop: 4, fontWeight: 600, textAlign: "right" }}><i className="ti ti-arrow-left"/> You are here</div>
                     </div>
                     {verdict.pct < 0 && (
                       <button onClick={() => { setNegRole(upRole); setNegCity(upCity); setActiveTab("negotiate"); }} style={{ padding: "9px 18px", borderRadius: 9, background: "var(--accent)", color: "#fff", border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
-                        Get the negotiation script →
+                        Get the negotiation script <i className="ti ti-arrow-right"/>
                       </button>
                     )}
                   </div>
@@ -444,7 +444,7 @@ export default function SalaryPage() {
 
             {/* Offer analyser */}
             <div style={{ ...card, padding: 24, marginBottom: 24 }}>
-              <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}>📋 Analyse this offer</h3>
+              <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}><i className="ti ti-layout-list"/> Analyse this offer</h3>
               <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12, marginBottom: 16 }}>
                 {[
                   { label: `Current salary (${currency}${currency==="INR"?" LPA":"/yr"})`, val: negCurrent, set: setNegCurrent, ph: currency==="INR"?"e.g. 25":"e.g. 120000" },
@@ -498,14 +498,14 @@ export default function SalaryPage() {
                     </div>
                     {shouldCounter ? (
                       <div style={{ padding: 16, background: "var(--accdim)", borderRadius: 10, border: "1px solid var(--accborder)" }}>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--accent)", marginBottom: 8 }}>💡 Counter this offer. Here's what to say:</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--accent)", marginBottom: 8 }}><i className="ti ti-bulb"/> Counter this offer. Here's what to say:</div>
                         <div style={{ fontSize: 13, color: "var(--text2)", lineHeight: 1.7, fontStyle: "italic" }}>
                           {`"Thank you for the offer — I'm excited about this role. Based on my research, the market range for this position in ${negCity} is ${market ? fmtSalary(market.p25, currency) : "—"}–${targetLocal ?? "—"}. Given my experience, I'm targeting ${targetLocal ?? "the upper range"}. Is there flexibility to get closer to that?"`}
                         </div>
                       </div>
                     ) : (
                       <div style={{ padding: 16, background: "rgba(34,197,94,.06)", borderRadius: 10, border: "1px solid rgba(34,197,94,.2)" }}>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--success)", marginBottom: 4 }}>✅ Strong offer — at or above P75 market rate.</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--success)", marginBottom: 4 }}><i className="ti ti-circle-check"/> Strong offer — at or above P75 market rate.</div>
                         <div style={{ fontSize: 13, color: "var(--text2)", lineHeight: 1.6 }}>Still worth asking for equity or sign-on bonus. Asking once never hurts.</div>
                       </div>
                     )}
@@ -515,7 +515,7 @@ export default function SalaryPage() {
             </div>
 
             {/* Tactics library */}
-            <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>🎯 Proven negotiation tactics</h3>
+            <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}><i className="ti ti-target"/> Proven negotiation tactics</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {TACTICS.map((t, i) => (
                 <div key={i} style={{ ...card, overflow: "hidden" }}>
@@ -543,7 +543,7 @@ export default function SalaryPage() {
               ))}
             </div>
             <div style={{ marginTop: 14, padding: "12px 16px", borderRadius: 10, background: "var(--accdim)", border: "1px solid var(--accborder)", fontSize: 12, color: "var(--text2)", lineHeight: 1.7 }}>
-              💡 <strong style={{ color: "var(--accent)" }}>Always negotiate.</strong> The worst outcome is "no" — you keep the offer. The best outcome adds $5K–$30K with a single 5-minute conversation.
+              <i className="ti ti-bulb"/> <strong style={{ color: "var(--accent)" }}>Always negotiate.</strong> The worst outcome is "no" — you keep the offer. The best outcome adds $5K–$30K with a single 5-minute conversation.
             </div>
           </div>
         )}
@@ -553,7 +553,7 @@ export default function SalaryPage() {
           <>
             {/* Hot roles */}
             <div style={{ ...card, padding: "18px 20px", marginBottom: 24, background: "linear-gradient(135deg,rgba(99,102,241,.06),rgba(99,102,241,.02))", borderColor: "var(--accborder)" }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--accent)", marginBottom: 12 }}>🔥 Fastest-growing roles globally (2025–26 YoY)</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--accent)", marginBottom: 12 }}><i className="ti ti-flame"/> Fastest-growing roles globally (2025–26 YoY)</div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(175px,1fr))", gap: 10 }}>
                 {topGainers.map(r => (
                   <div key={r.role+r.city} style={{ padding: "10px 12px", background: "var(--surface2)", borderRadius: 9, border: "1px solid var(--border)" }}>
@@ -612,7 +612,7 @@ export default function SalaryPage() {
                         <div style={{ fontSize: 16, fontWeight: 800, color: row.yoyGrowth>=20?"var(--success)":row.yoyGrowth>=10?"var(--warn)":"var(--text2)" }}>+{row.yoyGrowth}%</div>
                         <div style={{ fontSize: 11, color: "var(--text3)" }}>YoY</div>
                       </div>
-                      <button onClick={() => { setNegRole(row.role); setNegCity(row.city); setActiveTab("negotiate"); }} style={{ padding: "7px 14px", borderRadius: 8, background: "var(--accdim)", border: "1px solid var(--accborder)", color: "var(--accent)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>Negotiate →</button>
+                      <button onClick={() => { setNegRole(row.role); setNegCity(row.city); setActiveTab("negotiate"); }} style={{ padding: "7px 14px", borderRadius: 8, background: "var(--accdim)", border: "1px solid var(--accborder)", color: "var(--accent)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>Negotiate <i className="ti ti-arrow-right"/></button>
                     </div>
                   </div>
                 ))}
@@ -621,7 +621,7 @@ export default function SalaryPage() {
             <div style={{ marginTop: 28, padding: "14px 18px", background: "var(--surface)", borderRadius: 10, border: "1px solid var(--border)" }}>
               <p style={{ fontSize: 12, color: "var(--text3)", lineHeight: 1.7 }}>
                 <strong style={{ color: "var(--text2)" }}>Sources:</strong> 2025–2026 offer letters, levels.fyi, Glassdoor, and community-reported compensation. All figures annual gross pre-tax. INR shown as LPA.{" "}
-                <Link href="/builder" style={{ color: "var(--accent)" }}>Build your resume →</Link>
+                <Link href="/builder" style={{ color: "var(--accent)" }}>Build your resume <i className="ti ti-arrow-right"/></Link>
               </p>
             </div>
           </>

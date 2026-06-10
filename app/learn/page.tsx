@@ -32,7 +32,7 @@ const COURSES: Course[] = [
   {
     id: "goog-it",
     title: "Google IT Support Professional Certificate",
-    provider: "Google / Coursera", providerLogo: "🔍",
+    provider: "Google / Coursera", providerLogo: "ti-search",
     url: "https://grow.google/certificates/it-support/",
     cost: "freemium", level: "Beginner", durationHrs: 120,
     skills: ["networking", "linux", "cloud computing", "cybersecurity", "troubleshooting"],
@@ -44,7 +44,7 @@ const COURSES: Course[] = [
   {
     id: "goog-da",
     title: "Google Data Analytics Professional Certificate",
-    provider: "Google / Coursera", providerLogo: "🔍",
+    provider: "Google / Coursera", providerLogo: "ti-search",
     url: "https://grow.google/certificates/data-analytics/",
     cost: "freemium", level: "Beginner", durationHrs: 180,
     skills: ["sql", "r", "tableau", "spreadsheets", "data visualisation", "analytics"],
@@ -56,7 +56,7 @@ const COURSES: Course[] = [
   {
     id: "goog-pm",
     title: "Google Project Management Professional Certificate",
-    provider: "Google / Coursera", providerLogo: "🔍",
+    provider: "Google / Coursera", providerLogo: "ti-search",
     url: "https://grow.google/certificates/project-management/",
     cost: "freemium", level: "Beginner", durationHrs: 180,
     skills: ["project management", "agile", "scrum", "risk management"],
@@ -68,7 +68,7 @@ const COURSES: Course[] = [
   {
     id: "goog-ux",
     title: "Google UX Design Professional Certificate",
-    provider: "Google / Coursera", providerLogo: "🔍",
+    provider: "Google / Coursera", providerLogo: "ti-search",
     url: "https://grow.google/certificates/ux-design/",
     cost: "freemium", level: "Beginner", durationHrs: 200,
     skills: ["figma", "user research", "wireframing", "prototyping", "usability testing"],
@@ -80,7 +80,7 @@ const COURSES: Course[] = [
   {
     id: "goog-cyber",
     title: "Google Cybersecurity Professional Certificate",
-    provider: "Google / Coursera", providerLogo: "🔍",
+    provider: "Google / Coursera", providerLogo: "ti-search",
     url: "https://grow.google/certificates/cybersecurity/",
     cost: "freemium", level: "Beginner", durationHrs: 170,
     skills: ["cybersecurity", "linux", "python", "siem", "networking", "sql"],
@@ -92,7 +92,7 @@ const COURSES: Course[] = [
   {
     id: "goog-ml",
     title: "Machine Learning Crash Course",
-    provider: "Google / ML Education", providerLogo: "🔍",
+    provider: "Google / ML Education", providerLogo: "ti-search",
     url: "https://developers.google.com/machine-learning/crash-course",
     cost: "free", level: "Intermediate", durationHrs: 15,
     skills: ["machine learning", "tensorflow", "python", "neural networks"],
@@ -179,7 +179,7 @@ const COURSES: Course[] = [
   {
     id: "ibm-ds",
     title: "IBM Data Science Professional Certificate",
-    provider: "IBM / Coursera", providerLogo: "🔵",
+    provider: "IBM / Coursera", providerLogo: "ti-circle",
     url: "https://www.coursera.org/professional-certificates/ibm-data-science",
     cost: "freemium", level: "Beginner", durationHrs: 200,
     skills: ["python", "sql", "machine learning", "data visualisation", "jupyter", "pandas", "scikit-learn"],
@@ -191,7 +191,7 @@ const COURSES: Course[] = [
   {
     id: "ibm-fullstack",
     title: "IBM Full Stack Software Developer Certificate",
-    provider: "IBM / Coursera", providerLogo: "🔵",
+    provider: "IBM / Coursera", providerLogo: "ti-circle",
     url: "https://www.coursera.org/professional-certificates/ibm-full-stack-cloud-developer",
     cost: "freemium", level: "Beginner", durationHrs: 240,
     skills: ["html", "css", "javascript", "react", "node.js", "docker", "kubernetes", "cloud"],
@@ -203,7 +203,7 @@ const COURSES: Course[] = [
   {
     id: "ibm-ai",
     title: "IBM AI Engineering Professional Certificate",
-    provider: "IBM / Coursera", providerLogo: "🔵",
+    provider: "IBM / Coursera", providerLogo: "ti-circle",
     url: "https://www.coursera.org/professional-certificates/ai-engineer",
     cost: "freemium", level: "Intermediate", durationHrs: 180,
     skills: ["machine learning", "deep learning", "pytorch", "tensorflow", "keras", "python"],
@@ -217,7 +217,7 @@ const COURSES: Course[] = [
   {
     id: "meta-fe",
     title: "Meta Front-End Developer Professional Certificate",
-    provider: "Meta / Coursera", providerLogo: "🔷",
+    provider: "Meta / Coursera", providerLogo: "ti-diamond",
     url: "https://www.coursera.org/professional-certificates/meta-front-end-developer",
     cost: "freemium", level: "Beginner", durationHrs: 240,
     skills: ["html", "css", "javascript", "react", "ux", "testing"],
@@ -229,7 +229,7 @@ const COURSES: Course[] = [
   {
     id: "meta-be",
     title: "Meta Back-End Developer Professional Certificate",
-    provider: "Meta / Coursera", providerLogo: "🔷",
+    provider: "Meta / Coursera", providerLogo: "ti-diamond",
     url: "https://www.coursera.org/professional-certificates/meta-back-end-developer",
     cost: "freemium", level: "Beginner", durationHrs: 240,
     skills: ["python", "django", "rest api", "sql", "linux", "version control"],
@@ -241,7 +241,7 @@ const COURSES: Course[] = [
   {
     id: "meta-ds",
     title: "Meta Data Analyst Professional Certificate",
-    provider: "Meta / Coursera", providerLogo: "🔷",
+    provider: "Meta / Coursera", providerLogo: "ti-diamond",
     url: "https://www.coursera.org/professional-certificates/facebook-data-analyst",
     cost: "freemium", level: "Beginner", durationHrs: 150,
     skills: ["sql", "python", "statistics", "analytics", "excel", "tableau"],
@@ -255,7 +255,7 @@ const COURSES: Course[] = [
   {
     id: "fcc-webdev",
     title: "Responsive Web Design Certification",
-    provider: "freeCodeCamp", providerLogo: "🔥",
+    provider: "freeCodeCamp", providerLogo: "ti-flame",
     url: "https://www.freecodecamp.org/learn/2022/responsive-web-design/",
     cost: "free", level: "Beginner", durationHrs: 300,
     skills: ["html", "css", "responsive design", "accessibility", "flexbox", "grid"],
@@ -267,7 +267,7 @@ const COURSES: Course[] = [
   {
     id: "fcc-js",
     title: "JavaScript Algorithms and Data Structures",
-    provider: "freeCodeCamp", providerLogo: "🔥",
+    provider: "freeCodeCamp", providerLogo: "ti-flame",
     url: "https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures/",
     cost: "free", level: "Beginner", durationHrs: 300,
     skills: ["javascript", "algorithms", "data structures", "oop", "functional programming"],
@@ -279,7 +279,7 @@ const COURSES: Course[] = [
   {
     id: "fcc-ds",
     title: "Data Analysis with Python Certification",
-    provider: "freeCodeCamp", providerLogo: "🔥",
+    provider: "freeCodeCamp", providerLogo: "ti-flame",
     url: "https://www.freecodecamp.org/learn/data-analysis-with-python/",
     cost: "free", level: "Beginner", durationHrs: 300,
     skills: ["python", "pandas", "numpy", "matplotlib", "data analysis"],
@@ -293,7 +293,7 @@ const COURSES: Course[] = [
   {
     id: "kaggle-python",
     title: "Python for Data Science",
-    provider: "Kaggle", providerLogo: "🐍",
+    provider: "Kaggle", providerLogo: "ti-brand-python",
     url: "https://www.kaggle.com/learn/python",
     cost: "free", level: "Beginner", durationHrs: 5,
     skills: ["python", "pandas", "data science"],
@@ -305,7 +305,7 @@ const COURSES: Course[] = [
   {
     id: "kaggle-ml",
     title: "Intro to Machine Learning",
-    provider: "Kaggle", providerLogo: "🐍",
+    provider: "Kaggle", providerLogo: "ti-brand-python",
     url: "https://www.kaggle.com/learn/intro-to-machine-learning",
     cost: "free", level: "Beginner", durationHrs: 4,
     skills: ["machine learning", "python", "scikit-learn", "decision trees", "random forest"],
@@ -317,7 +317,7 @@ const COURSES: Course[] = [
   {
     id: "kaggle-sql",
     title: "Intro to SQL + Advanced SQL",
-    provider: "Kaggle", providerLogo: "🐍",
+    provider: "Kaggle", providerLogo: "ti-brand-python",
     url: "https://www.kaggle.com/learn/intro-to-sql",
     cost: "free", level: "Beginner", durationHrs: 6,
     skills: ["sql", "bigquery", "data analysis"],
@@ -331,7 +331,7 @@ const COURSES: Course[] = [
   {
     id: "nptel-ds",
     title: "Programming, Data Structures and Algorithms using Python",
-    provider: "NPTEL / IIT Madras", providerLogo: "🎓",
+    provider: "NPTEL / IIT Madras", providerLogo: "ti-school",
     url: "https://nptel.ac.in/courses/106106145",
     cost: "free", level: "Beginner", durationHrs: 120,
     skills: ["python", "data structures", "algorithms", "programming"],
@@ -343,7 +343,7 @@ const COURSES: Course[] = [
   {
     id: "nptel-ml",
     title: "Introduction to Machine Learning",
-    provider: "NPTEL / IIT Kharagpur", providerLogo: "🎓",
+    provider: "NPTEL / IIT Kharagpur", providerLogo: "ti-school",
     url: "https://nptel.ac.in/courses/106105152",
     cost: "free", level: "Intermediate", durationHrs: 120,
     skills: ["machine learning", "probability", "statistics", "python"],
@@ -355,7 +355,7 @@ const COURSES: Course[] = [
   {
     id: "nptel-dbms",
     title: "Database Management Systems",
-    provider: "NPTEL / IIT Madras", providerLogo: "🎓",
+    provider: "NPTEL / IIT Madras", providerLogo: "ti-school",
     url: "https://nptel.ac.in/courses/106106093",
     cost: "free", level: "Intermediate", durationHrs: 80,
     skills: ["sql", "dbms", "postgresql", "indexing", "transactions"],
@@ -367,7 +367,7 @@ const COURSES: Course[] = [
   {
     id: "nptel-os",
     title: "Operating Systems and System Programming",
-    provider: "NPTEL / IIT Bombay", providerLogo: "🎓",
+    provider: "NPTEL / IIT Bombay", providerLogo: "ti-school",
     url: "https://nptel.ac.in/courses/106101183",
     cost: "free", level: "Intermediate", durationHrs: 80,
     skills: ["linux", "os concepts", "c", "concurrency", "memory management"],
@@ -394,7 +394,7 @@ const COURSES: Course[] = [
   {
     id: "cs50-main",
     title: "CS50: Introduction to Computer Science",
-    provider: "Harvard / edX", providerLogo: "🏛️",
+    provider: "Harvard / edX", providerLogo: "ti-building",
     url: "https://cs50.harvard.edu/x/",
     cost: "free", level: "Beginner", durationHrs: 100,
     skills: ["c", "python", "sql", "html", "css", "javascript", "algorithms"],
@@ -406,7 +406,7 @@ const COURSES: Course[] = [
   {
     id: "cs50-python",
     title: "CS50's Introduction to Python",
-    provider: "Harvard / edX", providerLogo: "🏛️",
+    provider: "Harvard / edX", providerLogo: "ti-building",
     url: "https://cs50.harvard.edu/python/",
     cost: "free", level: "Beginner", durationHrs: 40,
     skills: ["python", "oop", "testing", "regular expressions", "libraries"],
@@ -418,7 +418,7 @@ const COURSES: Course[] = [
   {
     id: "cs50-sql",
     title: "CS50's Introduction to Databases with SQL",
-    provider: "Harvard / edX", providerLogo: "🏛️",
+    provider: "Harvard / edX", providerLogo: "ti-building",
     url: "https://cs50.harvard.edu/sql/",
     cost: "free", level: "Beginner", durationHrs: 30,
     skills: ["sql", "sqlite", "postgresql", "database design", "indexing"],
@@ -432,7 +432,7 @@ const COURSES: Course[] = [
   {
     id: "cncf-k8s",
     title: "Introduction to Kubernetes (LFS158)",
-    provider: "Linux Foundation / edX", providerLogo: "🐧",
+    provider: "Linux Foundation / edX", providerLogo: "ti-brand-debian",
     url: "https://www.edx.org/learn/kubernetes/the-linux-foundation-introduction-to-kubernetes",
     cost: "free", level: "Intermediate", durationHrs: 20,
     skills: ["kubernetes", "docker", "containers", "microservices", "devops"],
@@ -443,7 +443,7 @@ const COURSES: Course[] = [
   {
     id: "docker-official",
     title: "Docker Get Started + Docker Deep Dive",
-    provider: "Docker / Play with Docker", providerLogo: "🐳",
+    provider: "Docker / Play with Docker", providerLogo: "ti-brand-docker",
     url: "https://docs.docker.com/get-started/",
     cost: "free", level: "Beginner", durationHrs: 10,
     skills: ["docker", "containers", "microservices", "devops"],
@@ -456,7 +456,7 @@ const COURSES: Course[] = [
   {
     id: "hs-digital",
     title: "Digital Marketing Certification",
-    provider: "HubSpot Academy", providerLogo: "🟠",
+    provider: "HubSpot Academy", providerLogo: "ti-circle",
     url: "https://academy.hubspot.com/courses/digital-marketing",
     cost: "free", level: "Beginner", durationHrs: 5,
     skills: ["digital marketing", "seo", "content marketing", "social media", "email marketing"],
@@ -468,7 +468,7 @@ const COURSES: Course[] = [
   {
     id: "hs-content",
     title: "Content Marketing Certification",
-    provider: "HubSpot Academy", providerLogo: "🟠",
+    provider: "HubSpot Academy", providerLogo: "ti-circle",
     url: "https://academy.hubspot.com/courses/content-marketing",
     cost: "free", level: "Beginner", durationHrs: 7,
     skills: ["content marketing", "storytelling", "seo", "content strategy"],
@@ -482,7 +482,7 @@ const COURSES: Course[] = [
   {
     id: "mongo-university",
     title: "MongoDB for Developers (M101)",
-    provider: "MongoDB University", providerLogo: "🍃",
+    provider: "MongoDB University", providerLogo: "ti-leaf",
     url: "https://learn.mongodb.com/learning-paths/introduction-to-mongodb",
     cost: "free", level: "Beginner", durationHrs: 10,
     skills: ["mongodb", "nosql", "aggregation", "indexing", "node.js"],
@@ -496,7 +496,7 @@ const COURSES: Course[] = [
   {
     id: "hashi-terraform",
     title: "Terraform Fundamentals",
-    provider: "HashiCorp / Developer Portal", providerLogo: "🔷",
+    provider: "HashiCorp / Developer Portal", providerLogo: "ti-diamond",
     url: "https://developer.hashicorp.com/terraform/tutorials",
     cost: "free", level: "Intermediate", durationHrs: 12,
     skills: ["terraform", "aws", "infrastructure as code", "devops", "cloud"],
@@ -522,7 +522,7 @@ const COURSES: Course[] = [
   {
     id: "scrum-org-psm",
     title: "Professional Scrum Master I (PSM I) Prep",
-    provider: "Scrum.org", providerLogo: "🔄",
+    provider: "Scrum.org", providerLogo: "ti-refresh",
     url: "https://www.scrum.org/pathway/scrum-master",
     cost: "free", level: "Beginner", durationHrs: 16,
     skills: ["scrum", "agile", "sprint planning", "product backlog", "retrospectives"],
@@ -535,7 +535,7 @@ const COURSES: Course[] = [
   {
     id: "github-foundations",
     title: "GitHub Foundations Certification",
-    provider: "GitHub", providerLogo: "🐙",
+    provider: "GitHub", providerLogo: "ti-brand-github",
     url: "https://resources.github.com/learn/certifications/",
     cost: "free", level: "Beginner", durationHrs: 8,
     skills: ["git", "github", "version control", "pull requests", "github actions"],
@@ -549,7 +549,7 @@ const COURSES: Course[] = [
   {
     id: "gl-python",
     title: "Python for Machine Learning",
-    provider: "Great Learning", providerLogo: "📘",
+    provider: "Great Learning", providerLogo: "ti-book",
     url: "https://www.mygreatlearning.com/academy/learn-for-free/courses/python-for-machine-learning",
     cost: "free", level: "Beginner", durationHrs: 6,
     skills: ["python", "machine learning", "pandas", "scikit-learn"],
@@ -561,7 +561,7 @@ const COURSES: Course[] = [
   {
     id: "gl-sql",
     title: "SQL for Data Science",
-    provider: "Great Learning", providerLogo: "📘",
+    provider: "Great Learning", providerLogo: "ti-book",
     url: "https://www.mygreatlearning.com/academy/learn-for-free/courses/sql-for-data-science1",
     cost: "free", level: "Beginner", durationHrs: 4,
     skills: ["sql", "data science", "queries", "joins", "aggregations"],
@@ -575,7 +575,7 @@ const COURSES: Course[] = [
   {
     id: "dlai-ml",
     title: "Machine Learning Specialization",
-    provider: "DeepLearning.AI / Coursera", providerLogo: "🧠",
+    provider: "DeepLearning.AI / Coursera", providerLogo: "ti-brain",
     url: "https://www.coursera.org/specializations/machine-learning-introduction",
     cost: "freemium", level: "Intermediate", durationHrs: 90,
     skills: ["machine learning", "python", "tensorflow", "neural networks", "supervised learning"],
@@ -587,7 +587,7 @@ const COURSES: Course[] = [
   {
     id: "dlai-dl",
     title: "Deep Learning Specialization",
-    provider: "DeepLearning.AI / Coursera", providerLogo: "🧠",
+    provider: "DeepLearning.AI / Coursera", providerLogo: "ti-brain",
     url: "https://www.coursera.org/specializations/deep-learning",
     cost: "freemium", level: "Advanced", durationHrs: 120,
     skills: ["deep learning", "cnn", "rnn", "nlp", "pytorch", "tensorflow"],
@@ -670,9 +670,9 @@ function costColor(cost: Cost) {
 }
 
 function costLabel(cost: Cost) {
-  if (cost === "free")     return "🟢 Free";
-  if (cost === "freemium") return "🔵 Audit Free";
-  return "💳 Paid";
+  if (cost === "free")     return "Free";
+  if (cost === "freemium") return "Audit Free";
+  return "Paid";
 }
 
 function levelColor(level: Level) {
@@ -751,7 +751,7 @@ function CourseCard({ c }: { c: Course }) {
               background: "rgba(34,197,94,.07)", border: "1px solid rgba(34,197,94,.2)",
               borderRadius: 6, padding: "5px 9px", marginBottom: 10,
             }}>
-              <span style={{ fontSize: 13 }}>📈</span>
+              <span style={{ fontSize: 13 }}><i className="ti ti-trending-up"/></span>
               <span style={{ fontSize: 10, color: "var(--success)", lineHeight: 1.45 }}>
                 Professionals who added this cert got{" "}
                 <strong>{roi.multiplier} more calls</strong> for {roi.roles} roles
@@ -790,7 +790,7 @@ function CourseCard({ c }: { c: Course }) {
           {c.hasCert && (
             <>
               <span>·</span>
-              <span style={{ color: "var(--success)" }}>🏅 Cert</span>
+              <span style={{ color: "var(--success)" }}><i className="ti ti-award"/> Cert</span>
             </>
           )}
           <span style={{ marginLeft: "auto", color: "var(--accent)", fontWeight: 700 }}>
@@ -915,7 +915,7 @@ export default function LearnPage() {
             padding: "7px 14px", borderRadius: 8, background: "var(--accent)", color: "#fff",
             fontSize: 12, fontWeight: 700, textDecoration: "none", flexShrink: 0,
           }}>
-            Run GPS →
+            Run GPS <i className="ti ti-arrow-right"/>
           </a>
         </div>
 
@@ -947,7 +947,7 @@ export default function LearnPage() {
                   background: costFilter === c ? "var(--accent)" : "var(--surface2)",
                   color:      costFilter === c ? "#fff"          : "var(--text3)",
                 }}>
-                  {c === "all" ? "All" : c === "free" ? "🟢 Free only" : "🔵 Audit free"}
+                  {c === "all" ? "All" : c === "free" ? "Free only" : "Audit free"}
                 </button>
               ))}
             </div>
@@ -959,7 +959,7 @@ export default function LearnPage() {
               background: certOnly ? "var(--accent)" : "var(--surface2)",
               color:      certOnly ? "#fff"          : "var(--text3)",
             }}>
-              🏅 With cert
+              <i className="ti ti-award"/> With cert
             </button>
 
             {/* Sort */}
@@ -1029,8 +1029,8 @@ export default function LearnPage() {
           border: "1px solid var(--border)", borderRadius: 10,
           fontSize: 12, color: "var(--text3)", lineHeight: 1.7,
         }}>
-          <strong style={{ color: "var(--text2)" }}>💡 Pro tip:</strong>{" "}
-          &quot;Audit free&quot; courses (marked 🔵) are free to learn but charge for the certificate.
+          <strong style={{ color: "var(--text2)" }}><i className="ti ti-bulb"/> Pro tip:</strong>{" "}
+          &quot;Audit free&quot; courses (marked "Audit free") are free to learn but charge for the certificate.
           Many employers value the skill over the cert — audit freely, pay only if you need the badge for your resume.
           NPTEL courses are 100% free and exams cost ~₹1,000 — highest ROI for Indian tech professionals.
         </div>

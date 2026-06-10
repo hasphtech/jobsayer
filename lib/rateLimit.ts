@@ -5,9 +5,20 @@
  * are set (production / Vercel). Falls back to an in-memory Map for local dev
  * so no Redis setup is needed to run the project locally.
  *
+ * Bug fix (scalability): the previous implementation shared a single
+ * _upstashLimiter instance across all callers. A second endpoint with a
+ * different `limit` / `windowMs` would silently reuse the first endpoint's
+ * settings. Now instances are keyed by `${limit}:${windowMs}`.
+ *
  * Usage (always await):
  *   const { allowed, retryAfter } = await rateLimit(`interview:${ip}`, 5, 60_000);
  *   if (!allowed) return 429 with Retry-After: retryAfter
+ *
+ * Preset helpers (preferred — documents intent at call sites):
+ *   rateLimitAi(ip)        — 10 req / 60 s  (AI endpoints)
+ *   rateLimitUpload(ip)    —  5 req / 60 s  (file uploads)
+ *   rateLimitAuth(ip)      — 20 req / 60 s  (auth endpoints)
+ *   rateLimitPublic(ip)    — 60 req / 60 s  (public read endpoints)
  */
 
 /* ── Types ─────────────────────────────────────────────────────── */
@@ -21,10 +32,9 @@ export interface RateLimitResult {
 /* ── In-memory fallback (local dev / no Redis) ──────────────────── */
 
 interface Bucket { count: number; reset: number }
-const store = new Map<string, Bucket>();
-
+const store    = new Map<string, Bucket>();
+let lastPurge  = Date.now();
 const PURGE_EVERY = 5 * 60_000;
-let lastPurge = Date.now();
 
 function memoryRateLimit(key: string, limit: number, windowMs: number): RateLimitResult {
   const now = Date.now();
@@ -44,29 +54,46 @@ function memoryRateLimit(key: string, limit: number, windowMs: number): RateLimi
   return { allowed: true, retryAfter: 0, remaining: limit - bucket.count };
 }
 
-/* ── Upstash Redis limiter (production) ─────────────────────────── */
+/* ── Upstash Redis limiter pool (production) ────────────────────── */
+//
+// Key insight: Ratelimit instances are stateless wrappers — they don't hold
+// connections, just config + a reference to the Redis client. Cache them by
+// config key so each unique (limit, window) pair gets exactly one instance.
 
-let _upstashLimiter: import("@upstash/ratelimit").Ratelimit | null = null;
+type RatelimitInstance = import("@upstash/ratelimit").Ratelimit;
+const _limiterPool = new Map<string, RatelimitInstance>();
+let   _redisReady  = false;
+let   _redis: import("@upstash/redis").Redis | null = null;
+
+async function ensureRedis(): Promise<import("@upstash/redis").Redis> {
+  if (_redis) return _redis;
+  const { Redis } = await import("@upstash/redis");
+  _redis = Redis.fromEnv();
+  _redisReady = true;
+  return _redis;
+}
 
 async function getUpstashLimiter(
-  limit: number,
+  limit:    number,
   windowMs: number,
-): Promise<import("@upstash/ratelimit").Ratelimit> {
-  if (_upstashLimiter) return _upstashLimiter;
+): Promise<RatelimitInstance> {
+  const poolKey = `${limit}:${windowMs}`;
+  const cached  = _limiterPool.get(poolKey);
+  if (cached) return cached;
 
   const { Ratelimit } = await import("@upstash/ratelimit");
-  const { Redis }     = await import("@upstash/redis");
+  const redis         = await ensureRedis();
+  const windowSec     = Math.round(windowMs / 1000);
 
-  const windowSec = Math.round(windowMs / 1000);
-
-  _upstashLimiter = new Ratelimit({
-    redis:     Redis.fromEnv(),
+  const instance = new Ratelimit({
+    redis,
     limiter:   Ratelimit.slidingWindow(limit, `${windowSec} s`),
     analytics: false,
     prefix:    "jobsayer:rl",
   });
 
-  return _upstashLimiter;
+  _limiterPool.set(poolKey, instance);
+  return instance;
 }
 
 async function upstashRateLimit(
@@ -95,8 +122,28 @@ export async function rateLimit(
   limit:    number,
   windowMs: number,
 ): Promise<RateLimitResult> {
-  if (hasUpstash) {
-    return upstashRateLimit(key, limit, windowMs);
-  }
-  return memoryRateLimit(key, limit, windowMs);
+  return hasUpstash
+    ? upstashRateLimit(key, limit, windowMs)
+    : memoryRateLimit(key, limit, windowMs);
 }
+
+/* ── Preset helpers ──────────────────────────────────────────────── */
+
+/** AI generation endpoints — 10 req / 60 s per IP */
+export const rateLimitAi = (ip: string) =>
+  rateLimit(`ai:${ip}`, 10, 60_000);
+
+/** File upload endpoints — 5 req / 60 s per IP */
+export const rateLimitUpload = (ip: string) =>
+  rateLimit(`upload:${ip}`, 5, 60_000);
+
+/** Auth endpoints — 20 req / 60 s per IP */
+export const rateLimitAuth = (ip: string) =>
+  rateLimit(`auth:${ip}`, 20, 60_000);
+
+/** Public read endpoints — 60 req / 60 s per IP */
+export const rateLimitPublic = (ip: string) =>
+  rateLimit(`pub:${ip}`, 60, 60_000);
+
+/** Returns true if Redis is currently initialised (useful for health checks) */
+export const redisReady = () => _redisReady;

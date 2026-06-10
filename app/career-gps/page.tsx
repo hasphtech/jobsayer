@@ -1,7 +1,7 @@
 "use client";
 /**
  * /career-gps — Career GPS (Global)
- * Target role selector → skill gap analysis vs resume → personalised learning roadmap.
+ * Target role selector <i className="ti ti-arrow-right"/> skill gap analysis vs resume <i className="ti ti-arrow-right"/> personalised learning roadmap.
  * Globally framed: USD salary ranges, worldwide top companies.
  */
 import React, { useState, useEffect } from "react";
@@ -34,7 +34,7 @@ const ROLE_BLUEPRINTS: RoleBlueprint[] = [
   {
     title: "Full Stack Engineer",
     category: "Engineering",
-    icon: "⚡",
+    icon: "ti-bolt",
     salaryRange: "$120K–$220K",
     demand: "very high",
     topCompanies: ["Stripe", "Shopify", "Vercel", "Linear", "Notion"],
@@ -71,7 +71,7 @@ const ROLE_BLUEPRINTS: RoleBlueprint[] = [
   {
     title: "Backend Engineer",
     category: "Engineering",
-    icon: "🔧",
+    icon: "ti-tool",
     salaryRange: "$130K–$240K",
     demand: "very high",
     topCompanies: ["Cloudflare", "PlanetScale", "Neon", "Fly.io", "Turso"],
@@ -106,7 +106,7 @@ const ROLE_BLUEPRINTS: RoleBlueprint[] = [
   {
     title: "Frontend Engineer",
     category: "Engineering",
-    icon: "🎨",
+    icon: "ti-palette",
     salaryRange: "$100K–$195K",
     demand: "high",
     topCompanies: ["Vercel", "Figma", "Webflow", "Framer", "Linear"],
@@ -137,7 +137,7 @@ const ROLE_BLUEPRINTS: RoleBlueprint[] = [
   {
     title: "DevOps / Platform Engineer",
     category: "Engineering",
-    icon: "🛠️",
+    icon: "ti-tools",
     salaryRange: "$140K–$250K",
     demand: "very high",
     topCompanies: ["HashiCorp", "Datadog", "PagerDuty", "Grafana Labs", "Cloudflare"],
@@ -171,7 +171,7 @@ const ROLE_BLUEPRINTS: RoleBlueprint[] = [
   {
     title: "Site Reliability Engineer (SRE)",
     category: "Engineering",
-    icon: "📡",
+    icon: "ti-radio",
     salaryRange: "$150K–$270K",
     demand: "very high",
     topCompanies: ["Google", "Meta", "Stripe", "Cloudflare", "Datadog"],
@@ -203,7 +203,7 @@ const ROLE_BLUEPRINTS: RoleBlueprint[] = [
   {
     title: "ML / AI Engineer",
     category: "Data & AI",
-    icon: "🤖",
+    icon: "ti-robot",
     salaryRange: "$160K–$350K+",
     demand: "very high",
     topCompanies: ["OpenAI", "Anthropic", "Google DeepMind", "Mistral", "Cohere"],
@@ -240,7 +240,7 @@ const ROLE_BLUEPRINTS: RoleBlueprint[] = [
   {
     title: "Data Engineer",
     category: "Data & AI",
-    icon: "📊",
+    icon: "ti-chart-bar",
     salaryRange: "$120K–$210K",
     demand: "high",
     topCompanies: ["dbt Labs", "Databricks", "Snowflake", "Airbyte", "Fivetran"],
@@ -273,7 +273,7 @@ const ROLE_BLUEPRINTS: RoleBlueprint[] = [
   {
     title: "Data Scientist",
     category: "Data & AI",
-    icon: "🔬",
+    icon: "ti-microscope",
     salaryRange: "$110K–$200K",
     demand: "high",
     topCompanies: ["Airbnb", "Spotify", "Netflix", "Duolingo", "Stripe"],
@@ -306,7 +306,7 @@ const ROLE_BLUEPRINTS: RoleBlueprint[] = [
   {
     title: "Product Manager",
     category: "Product",
-    icon: "🚀",
+    icon: "ti-rocket",
     salaryRange: "$130K–$280K",
     demand: "high",
     topCompanies: ["Stripe", "Linear", "Figma", "Notion", "Intercom"],
@@ -334,7 +334,7 @@ const ROLE_BLUEPRINTS: RoleBlueprint[] = [
   {
     title: "Product Designer (UX)",
     category: "Product",
-    icon: "🎭",
+    icon: "ti-masks-theater",
     salaryRange: "$100K–$185K",
     demand: "high",
     topCompanies: ["Figma", "Airbnb", "Duolingo", "Canva", "Linear"],
@@ -364,7 +364,7 @@ const ROLE_BLUEPRINTS: RoleBlueprint[] = [
   {
     title: "Security Engineer",
     category: "Security",
-    icon: "🔐",
+    icon: "ti-lock",
     salaryRange: "$140K–$260K",
     demand: "very high",
     topCompanies: ["CrowdStrike", "Palo Alto Networks", "Wiz", "Snyk", "Cloudflare"],
@@ -392,9 +392,9 @@ const ROLE_BLUEPRINTS: RoleBlueprint[] = [
 
   /* ── Transition ────────────────────────────────────────────── */
   {
-    title: "IT Services → Product / Tech",
+    title: "IT Services <i className="ti ti-arrow-right"/> Product / Tech",
     category: "Transition",
-    icon: "🔀",
+    icon: "ti-arrows-shuffle",
     salaryRange: "$120K–$280K (2–4× current TC)",
     demand: "very high",
     topCompanies: ["Stripe", "Shopify", "Airbnb", "Figma", "Linear", "Notion", "Atlassian"],
@@ -507,9 +507,9 @@ export default function CareerGpsPage() {
 
           <div style={{ marginBottom: 32 }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 99, background: "var(--accdim)", border: "1px solid var(--accborder)", fontSize: 11, fontWeight: 700, color: "var(--accent)", marginBottom: 12 }}>
-              🌍 Global · Any city, any market
+              <i className="ti ti-world"/> Global · Any city, any market
             </div>
-            <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 8 }}>🧭 Career GPS</h1>
+            <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 8 }}><i className="ti ti-compass"/> Career GPS</h1>
             <p style={{ fontSize: 14, color: "var(--text3)", lineHeight: 1.6, maxWidth: 520 }}>
               Pick your target role — we'll analyse your skill gaps and give you a personalised learning roadmap.
             </p>
@@ -518,7 +518,7 @@ export default function CareerGpsPage() {
                 <AlertCircle size={13} />
                 <span>
                   Build your resume first for a personalised gap analysis.{" "}
-                  <Link href="/builder" style={{ color: "var(--warn)", fontWeight: 600 }}>Go to Builder →</Link>
+                  <Link href="/builder" style={{ color: "var(--warn)", fontWeight: 600 }}>Go to Builder <i className="ti ti-arrow-right"/></Link>
                 </span>
               </div>
             )}
@@ -633,7 +633,7 @@ export default function CareerGpsPage() {
           <span style={{ fontSize: 14, fontWeight: 600 }}>{selectedRole.icon} {selectedRole.title}</span>
         </div>
         <Link href="/jobs" style={{ padding: "7px 16px", background: "var(--accent)", borderRadius: 8, color: "#fff", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
-          Find Jobs →
+          Find Jobs <i className="ti ti-arrow-right"/>
         </Link>
       </div>
 
@@ -645,9 +645,9 @@ export default function CareerGpsPage() {
           <div style={{ flex: 1 }}>
             <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{selectedRole.title}</h1>
             <div style={{ display: "flex", gap: 16, fontSize: 13, color: "var(--text3)", flexWrap: "wrap" }}>
-              <span>💰 {selectedRole.salaryRange} / yr</span>
-              <span>📈 {selectedRole.demand} demand</span>
-              <span>🏢 {selectedRole.topCompanies.slice(0, 3).join(", ")}</span>
+              <span><i className="ti ti-coin"/> {selectedRole.salaryRange} / yr</span>
+              <span><i className="ti ti-trending-up"/> {selectedRole.demand} demand</span>
+              <span><i className="ti ti-building"/> {selectedRole.topCompanies.slice(0, 3).join(", ")}</span>
             </div>
           </div>
           {resumeLoaded && (
@@ -798,7 +798,7 @@ export default function CareerGpsPage() {
             color: selectedRole.category === "Transition" ? "#fff" : "var(--text1)",
             fontSize: 14, fontWeight: 700, textDecoration: "none",
           }}>
-            🎤 Practice interviews <ChevronRight size={14} />
+            <i className="ti ti-microphone"/> Practice interviews <ChevronRight size={14} />
           </Link>
           <Link href="/salary" style={{
             display: "flex", alignItems: "center", gap: 8, padding: "13px 28px",
@@ -806,7 +806,7 @@ export default function CareerGpsPage() {
             borderRadius: 12, color: "var(--text1)",
             fontSize: 14, fontWeight: 600, textDecoration: "none",
           }}>
-            💰 Check global salaries
+            <i className="ti ti-coin"/> Check global salaries
           </Link>
         </div>
       </div>

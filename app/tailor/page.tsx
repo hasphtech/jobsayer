@@ -1,7 +1,7 @@
 "use client";
 /**
  * /tailor — AI Resume JD Tailor
- * Paste a JD → AI rewrites your resume bullets to match keywords.
+ * Paste a JD <i className="ti ti-arrow-right"/> AI rewrites your resume bullets to match keywords.
  * Shows before/after diff with keyword highlighting.
  */
 import React, { useState, useEffect } from "react";
@@ -136,7 +136,7 @@ export default function TailorPage() {
           </div>
           <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 8, letterSpacing: "-.02em" }}>Resume JD Tailor</h1>
           <p style={{ fontSize: 14, color: "var(--text3)", lineHeight: 1.6, maxWidth: 560 }}>
-            Paste any job description → AI rewrites your resume bullets to match its keywords and requirements.
+            Paste any job description <i className="ti ti-arrow-right"/> AI rewrites your resume bullets to match its keywords and requirements.
             See exactly what changed and why.
           </p>
         </div>
@@ -145,7 +145,7 @@ export default function TailorPage() {
 
           {/* Left: JD input */}
           <div style={{ ...card, padding: "20px 22px", display: "flex", flexDirection: "column", gap: 12 }}>
-            <div style={{ fontSize: 13, fontWeight: 700 }}>📋 Job Description</div>
+            <div style={{ fontSize: 13, fontWeight: 700 }}><i className="ti ti-layout-list"/> Job Description</div>
             <textarea
               value={jdText}
               onChange={e => setJdText(e.target.value)}
@@ -167,10 +167,10 @@ export default function TailorPage() {
           {/* Right: Bullet selector */}
           <div style={{ ...card, padding: "20px 22px", display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <div style={{ fontSize: 13, fontWeight: 700 }}>📝 Your Resume Bullets</div>
+              <div style={{ fontSize: 13, fontWeight: 700 }}><i className="ti ti-note"/> Your Resume Bullets</div>
               {!resumeLoaded && (
                 <Link href="/builder" style={{ fontSize: 12, color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>
-                  Build resume first →
+                  Build resume first <i className="ti ti-arrow-right"/>
                 </Link>
               )}
             </div>
@@ -324,7 +324,7 @@ export default function TailorPage() {
                   {copied === -1 ? "✓ Copied!" : "Copy all"}
                 </button>
                 <Link href="/builder" style={{ padding: "9px 18px", borderRadius: 9, background: "var(--surface2)", border: "1px solid var(--border)", color: "var(--text1)", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
-                  Open Builder →
+                  Open Builder <i className="ti ti-arrow-right"/>
                 </Link>
               </div>
             </div>

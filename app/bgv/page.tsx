@@ -1,7 +1,7 @@
 "use client";
 /**
  * /bgv — Candidate Background Verification
- * Multi-step form: Identity → Education → Employment → Review & Submit
+ * Multi-step form: Identity <i className="ti ti-arrow-right"/> Education <i className="ti ti-arrow-right"/> Employment <i className="ti ti-arrow-right"/> Review & Submit
  */
 import React, { useState, useEffect } from "react";
 import { useWindowWidth } from "@/lib/useWindowWidth";
@@ -19,10 +19,10 @@ interface BgvRecord { status: string; verification_score: number | null; id_veri
 type Step = "identity" | "education" | "employment" | "review" | "submitted";
 
 const STEPS: { key: Step; label: string; icon: string }[] = [
-  { key: "identity",   label: "Identity",   icon: "🪪" },
-  { key: "education",  label: "Education",  icon: "🎓" },
-  { key: "employment", label: "Employment", icon: "💼" },
-  { key: "review",     label: "Review",     icon: "✅" },
+  { key: "identity",   label: "Identity",   icon: "ti-id-badge" },
+  { key: "education",  label: "Education",  icon: "ti-school" },
+  { key: "employment", label: "Employment", icon: "ti-briefcase" },
+  { key: "review",     label: "Review",     icon: "ti-circle-check" },
 ];
 
 const emptyEdu  = (): EduEntry => ({ degree: "", institution: "", year: "", result: "" });
@@ -49,9 +49,9 @@ function StatusBadge({ bgv }: { bgv: BgvRecord }) {
   const w = useWindowWidth();
   const mobile = w < 640;
   const cfg: Record<string, { color: string; bg: string; label: string; icon: string }> = {
-    pending:     { color: "var(--warn)", bg: "rgba(234,179,8,.1)",  label: "Pending Review",    icon: "⏳" },
-    in_progress: { color: "var(--accent)", bg: "var(--accdim)", label: "In Progress",        icon: "🔍" },
-    verified:    { color: "var(--success)", bg: "rgba(34,197,94,.1)",  label: "Verified ✓",         icon: "🛡" },
+    pending:     { color: "var(--warn)", bg: "rgba(234,179,8,.1)",  label: "Pending Review",    icon: "ti-hourglass" },
+    in_progress: { color: "var(--accent)", bg: "var(--accdim)", label: "In Progress",        icon: "ti-search" },
+    verified:    { color: "var(--success)", bg: "rgba(34,197,94,.1)",  label: "Verified ✓",         icon: "ti-shield-check" },
     partial:     { color: "var(--warn)", bg: "rgba(234,179,8,.1)",  label: "Partially Verified", icon: "⚠" },
     failed:      { color: "var(--danger)", bg: "rgba(239,68,68,.1)", label: "Verification Failed","icon": "✗" },
   };
@@ -81,14 +81,14 @@ function StatusBadge({ bgv }: { bgv: BgvRecord }) {
             background: c.done ? "rgba(34,197,94,.08)" : "var(--surface2)",
             border: `1px solid ${c.done ? "rgba(34,197,94,.2)" : "var(--border)"}`,
           }}>
-            <div style={{ fontSize: 18, marginBottom: 4 }}>{c.done ? "✅" : "⭕"}</div>
+            <div style={{ fontSize: 18, marginBottom: 4 }}>{c.done ? "ti-circle-check" : "⭕"}</div>
             <div style={{ fontSize: 11, color: c.done ? "var(--success)" : "var(--text3)", fontWeight: 600 }}>{c.label}</div>
           </div>
         ))}
       </div>
       {bgv.admin_notes && (
         <div style={{ marginTop: 14, padding: "10px 14px", background: "var(--accdim)", borderRadius: 9, fontSize: 13, color: "var(--text2)", border: "1px solid var(--accborder)" }}>
-          📝 Admin note: {bgv.admin_notes}
+          <i className="ti ti-note"/> Admin note: {bgv.admin_notes}
         </div>
       )}
       {bgv.rejection_reason && (
@@ -244,7 +244,7 @@ export default function BgvPage() {
             background: "rgba(34,197,94,.08)", border: "1px solid rgba(34,197,94,.2)",
             borderRadius: 99, padding: "5px 14px",
           }}>
-            <span style={{ fontSize: 14 }}>🛡</span>
+            <span style={{ fontSize: 14 }}><i className="ti ti-shield-check"/></span>
             <span style={{ fontSize: 12, fontWeight: 700, color: "var(--success)" }}>
               Verified professionals get 3× more employer views
             </span>
@@ -278,9 +278,9 @@ export default function BgvPage() {
         {!dataLoading && !existing && (
           <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 12, marginBottom: 28 }}>
             {[
-              { icon: "🪪", title: "3× more views",      desc: "Verified profiles surface first in employer searches", accent: "var(--success)" },
-              { icon: "⚡", title: "Faster shortlisting", desc: "Skip the screening queue — employers trust verified candidates", accent: "var(--warn)" },
-              { icon: "💰", title: "Better offers",       desc: "Verified pros report 12–18% higher starting salaries on average", accent: "var(--accent)" },
+              { icon: "ti-id-badge", title: "3× more views",      desc: "Verified profiles surface first in employer searches", accent: "var(--success)" },
+              { icon: "ti-bolt", title: "Faster shortlisting", desc: "Skip the screening queue — employers trust verified candidates", accent: "var(--warn)" },
+              { icon: "ti-coin", title: "Better offers",       desc: "Verified pros report 12–18% higher starting salaries on average", accent: "var(--accent)" },
             ].map(c => (
               <div key={c.title} style={{ ...cardStyle, padding: "16px", textAlign: "center", borderTop: `3px solid ${c.accent}` }}>
                 <div style={{ fontSize: 24, marginBottom: 8 }}>{c.icon}</div>
@@ -294,7 +294,7 @@ export default function BgvPage() {
         {/* Submitted confirmation */}
         {!dataLoading && step === "submitted" && (
           <div style={{ ...cardStyle, textAlign: "center", padding: "48px" }}>
-            <div style={{ fontSize: 56, marginBottom: 16 }}>🛡</div>
+            <div style={{ fontSize: 56, marginBottom: 16 }}><i className="ti ti-shield-check"/></div>
             <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 10 }}>BGV Submitted Successfully!</h2>
             <p style={{ fontSize: 14, color: "var(--text3)", marginBottom: 16, lineHeight: 1.7 }}>
               {submitMsg || "Our verification team will review your details within 2–5 business days. You'll receive an email once your BGV is complete."}
@@ -306,7 +306,7 @@ export default function BgvPage() {
                 color: existing.auto_check_results.autoScore >= 70 ? "var(--success)" : "var(--warn)",
                 fontSize: 13, fontWeight: 700,
               }}>
-                ⚡ Auto-check score: {existing.auto_check_results.autoScore}/100
+                <i className="ti ti-bolt"/> Auto-check score: {existing.auto_check_results.autoScore}/100
               </div>
             )}
             <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
@@ -324,7 +324,7 @@ export default function BgvPage() {
             {/* ── Identity ── */}
             {step === "identity" && (
               <div style={cardStyle}>
-                <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>🪪 Identity Verification</h2>
+                <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}><i className="ti ti-id-badge"/> Identity Verification</h2>
                 <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                   <div>
                     <label style={labelStyle}>Full Name (as per ID) *</label>
@@ -356,7 +356,7 @@ export default function BgvPage() {
                     </div>
                   </div>
                   <div style={{ padding: "12px 14px", background: "rgba(99,102,241,.06)", border: "1px solid var(--accborder)", borderRadius: 9, fontSize: 12, color: "var(--text2)" }}>
-                    🔒 <strong>Privacy:</strong> Only the last 4 digits of Aadhaar are stored. PAN is used for identity matching only and is never shared with third parties.
+                    <i className="ti ti-lock"/> <strong>Privacy:</strong> Only the last 4 digits of Aadhaar are stored. PAN is used for identity matching only and is never shared with third parties.
                   </div>
                 </div>
               </div>
@@ -368,7 +368,7 @@ export default function BgvPage() {
                 {education.map((ed, i) => (
                   <div key={i} style={{ ...cardStyle, marginBottom: 14, position: "relative" }}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-                      <h3 style={{ fontSize: 14, fontWeight: 700 }}>🎓 Education {i + 1}</h3>
+                      <h3 style={{ fontSize: 14, fontWeight: 700 }}><i className="ti ti-school"/> Education {i + 1}</h3>
                       {education.length > 1 && (
                         <button onClick={() => setEducation(p => p.filter((_, j) => j !== i))}
                           style={{ background: "none", border: "none", cursor: "pointer", color: "var(--danger)", fontSize: 12, fontWeight: 600 }}>
@@ -422,7 +422,7 @@ export default function BgvPage() {
                 {employment.map((em, i) => (
                   <div key={i} style={{ ...cardStyle, marginBottom: 14 }}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-                      <h3 style={{ fontSize: 14, fontWeight: 700 }}>💼 Employment {i + 1} {i === 0 ? "(Most Recent)" : ""}</h3>
+                      <h3 style={{ fontSize: 14, fontWeight: 700 }}><i className="ti ti-briefcase"/> Employment {i + 1} {i === 0 ? "(Most Recent)" : ""}</h3>
                       {employment.length > 1 && (
                         <button onClick={() => setEmployment(p => p.filter((_, j) => j !== i))}
                           style={{ background: "none", border: "none", cursor: "pointer", color: "var(--danger)", fontSize: 12, fontWeight: 600 }}>
@@ -483,7 +483,7 @@ export default function BgvPage() {
             {/* ── Review ── */}
             {step === "review" && (
               <div style={cardStyle}>
-                <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>✅ Review & Submit</h2>
+                <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}><i className="ti ti-circle-check"/> Review & Submit</h2>
 
                 <Section title="Identity">
                   <Row label="Full Name"     value={identity.full_name} />
@@ -507,7 +507,7 @@ export default function BgvPage() {
                     <div key={i} style={{ marginBottom: i < employment.length - 1 ? 10 : 0, paddingBottom: i < employment.length - 1 ? 10 : 0, borderBottom: i < employment.length - 1 ? "1px solid var(--border)" : "none" }}>
                       <Row label="Company"  value={em.company || "—"} />
                       <Row label="Role"     value={em.role || "—"} />
-                      <Row label="Period"   value={`${em.from_date || "?"} → ${em.to_date || "Present"}`} />
+                      <Row label="Period"   value={`${em.from_date || "?"} <i className="ti ti-arrow-right"/> ${em.to_date || "Present"}`} />
                     </div>
                   ))}
                 </Section>
@@ -526,7 +526,7 @@ export default function BgvPage() {
                 fontSize: 14, fontWeight: 600, cursor: step === "identity" ? "not-allowed" : "pointer",
                 fontFamily: "inherit",
               }}>
-                ← Back
+                <i className="ti ti-arrow-left"/> Back
               </button>
               {step === "review" ? (
                 <button onClick={handleSubmit} disabled={submitting} style={{
@@ -534,7 +534,7 @@ export default function BgvPage() {
                   background: "var(--accent)", color: "#fff", fontSize: 14, fontWeight: 700,
                   cursor: "pointer", fontFamily: "inherit",
                 }}>
-                  {submitting ? "Submitting…" : "Submit BGV →"}
+                  {submitting ? "Submitting…" : "Submit BGV <i className="ti ti-arrow-right"/>"}
                 </button>
               ) : (
                 <button onClick={nextStep} style={{
@@ -542,7 +542,7 @@ export default function BgvPage() {
                   background: "var(--accent)", color: "#fff", fontSize: 14, fontWeight: 700,
                   cursor: "pointer", fontFamily: "inherit",
                 }}>
-                  Continue →
+                  Continue <i className="ti ti-arrow-right"/>
                 </button>
               )}
             </div>

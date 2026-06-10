@@ -21,10 +21,17 @@ interface Notification {
 }
 
 const TYPE_ICON: Record<string, string> = {
-  info:    "ℹ️",
-  success: "✅",
-  warn:    "⚠️",
-  alert:   "🚨",
+  info:    "ti-info-circle",
+  success: "ti-circle-check",
+  warn:    "ti-alert-triangle",
+  alert:   "ti-alert-circle",
+};
+
+const TYPE_COLOR: Record<string, string> = {
+  info:    "var(--accent)",
+  success: "var(--success)",
+  warn:    "var(--warn)",
+  alert:   "var(--danger)",
 };
 
 function timeAgo(iso: string) {
@@ -102,7 +109,7 @@ export default function NotificationBell() {
         }}
         aria-label={`Notifications${unread ? ` (${unread} unread)` : ""}`}
       >
-        🔔
+        <i className="ti ti-bell" style={{ fontSize: 18 }} />
         {unread > 0 && (
           <span style={{
             position: "absolute", top: 0, right: 0,
@@ -152,7 +159,7 @@ export default function NotificationBell() {
           <div style={{ overflowY: "auto", flex: 1 }}>
             {notifications.length === 0 ? (
               <div style={{ padding: 32, textAlign: "center", color: "var(--text3)", fontSize: 14 }}>
-                <div style={{ fontSize: 32, marginBottom: 8 }}>🔕</div>
+                <div style={{ marginBottom: 8 }}><i className="ti ti-bell-off" style={{ fontSize: 28, color: "var(--text3)" }} /></div>
                 No notifications
               </div>
             ) : (
@@ -168,8 +175,8 @@ export default function NotificationBell() {
                     transition: "background .15s",
                   }}
                 >
-                  <div style={{ fontSize: 18, lineHeight: 1, paddingTop: 2, flexShrink: 0 }}>
-                    {TYPE_ICON[n.type] ?? "ℹ️"}
+                  <div style={{ paddingTop: 2, flexShrink: 0 }}>
+                    <i className={`ti ${TYPE_ICON[n.type] ?? "ti-info-circle"}`} style={{ fontSize: 16, color: TYPE_COLOR[n.type] ?? "var(--accent)" }} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -196,7 +203,7 @@ export default function NotificationBell() {
                           onClick={(e) => { e.stopPropagation(); dismiss(n.id); }}
                           style={{ background: "none", border: "none", cursor: "pointer", fontSize: 11, color: "var(--text3)", padding: 0 }}
                         >
-                          ✕
+                          <i className="ti ti-x" style={{ fontSize: 12 }} />
                         </button>
                       </div>
                     </div>

@@ -165,7 +165,7 @@ function UploadModal({ onClose, onUploaded }: { onClose: () => void; onUploaded:
 
         {step === "parsing" && (
           <div style={{ textAlign: "center", padding: "30px 0" }}>
-            <div style={{ fontSize: 36, marginBottom: 16 }}>🔍</div>
+            <div style={{ fontSize: 36, marginBottom: 16 }}><i className="ti ti-search"/></div>
             <div style={{ fontSize: 13, color: "var(--text2)", marginBottom: 8 }}>Reading your document…</div>
             <div style={{ fontSize: 12, color: "var(--text3)" }}>Extracting company, dates, amounts, and key terms</div>
           </div>
@@ -173,7 +173,7 @@ function UploadModal({ onClose, onUploaded }: { onClose: () => void; onUploaded:
 
         {step === "done" && (
           <div style={{ textAlign: "center", padding: "30px 0" }}>
-            <div style={{ fontSize: 36, marginBottom: 12 }}>✅</div>
+            <div style={{ fontSize: 36, marginBottom: 12 }}><i className="ti ti-circle-check"/></div>
             <div style={{ fontSize: 14, fontWeight: 700, color: "#22c55e" }}>Saved to your Vault</div>
           </div>
         )}
@@ -457,7 +457,7 @@ export default function VaultPage() {
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200, padding: 20 }}>
             <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, width: "100%", maxWidth: 440, padding: 28 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: "var(--text1)" }}>🛡️ BGV Pack</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "var(--text1)" }}><i className="ti ti-shield-check"/>️ BGV Pack</div>
                 <button onClick={() => setShowBgvModal(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18 }}>✕</button>
               </div>
               <p style={{ fontSize: 13, color: "var(--text3)", marginBottom: 18, lineHeight: 1.6 }}>

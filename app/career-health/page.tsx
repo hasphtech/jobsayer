@@ -92,34 +92,34 @@ function computeDimensions(resume: ResumeData | null, lastUpdatedDays: number): 
     {
       id:      "completeness",
       label:   "Profile Completeness",
-      icon:    "📋",
+      icon:    "ti-layout-list",
       score:   profScore,
       status:  scoreStatus(profScore),
       summary: profScore >= 90
         ? "Your profile is thorough — recruiters see everything they need."
         : `Missing: ${missingFields.slice(0, 3).join(", ")}. Incomplete profiles get 60% fewer recruiter views.`,
       actions: profScore < 90
-        ? [{ label: "Complete your profile →", href: "/builder" }]
+        ? [{ label: "Complete your profile <i className="ti ti-arrow-right"/>", href: "/builder" }]
         : [],
     },
     {
       id:      "skill_freshness",
       label:   "Skill Freshness",
-      icon:    "⚡",
+      icon:    "ti-bolt",
       score:   skillScore,
       status:  scoreStatus(skillScore),
       summary: trendingMissing.length > 0
         ? `Trending skills not in your profile: ${trendingMissing.join(", ")}. The market moves fast.`
         : "Your skill set is current and well-aligned with 2026 market demand.",
       actions: [
-        { label: "Check skill gaps →", href: "/career-gps" },
-        ...(trendingMissing.length > 0 ? [{ label: "Update resume skills →", href: "/builder" }] : []),
+        { label: "Check skill gaps <i className="ti ti-arrow-right"/>", href: "/career-gps" },
+        ...(trendingMissing.length > 0 ? [{ label: "Update resume skills <i className="ti ti-arrow-right"/>", href: "/builder" }] : []),
       ],
     },
     {
       id:      "recency",
       label:   "Resume Recency",
-      icon:    "📅",
+      icon:    "ti-calendar",
       score:   recencyScore,
       status:  scoreStatus(recencyScore),
       summary: recencyScore >= 80
@@ -128,13 +128,13 @@ function computeDimensions(resume: ResumeData | null, lastUpdatedDays: number): 
           ? `Last updated ${Math.round(lastUpdatedDays / 30)} months ago. Stale resumes miss recent achievements and keywords.`
           : `Updated ${lastUpdatedDays} days ago. Aim for a monthly refresh.`,
       actions: recencyScore < 80
-        ? [{ label: "Refresh your resume →", href: "/builder" }]
+        ? [{ label: "Refresh your resume <i className="ti ti-arrow-right"/>", href: "/builder" }]
         : [],
     },
     {
       id:      "depth",
       label:   "Experience Depth",
-      icon:    "🏆",
+      icon:    "ti-trophy",
       score:   Math.min(100, depthScore),
       status:  scoreStatus(Math.min(100, depthScore)),
       summary: depthScore >= 70
@@ -142,24 +142,24 @@ function computeDimensions(resume: ResumeData | null, lastUpdatedDays: number): 
         : `Add ${projectCount === 0 ? "projects, " : ""}${certCount === 0 ? "certifications, " : ""}more work detail to strengthen your profile.`,
       actions: depthScore < 70
         ? [
-            { label: "Add projects/certs →", href: "/builder" },
-            { label: "Get certified →", href: "/career-gps" },
+            { label: "Add projects/certs <i className="ti ti-arrow-right"/>", href: "/builder" },
+            { label: "Get certified <i className="ti ti-arrow-right"/>", href: "/career-gps" },
           ]
         : [],
     },
     {
       id:      "visibility",
       label:   "Market Visibility",
-      icon:    "👁",
+      icon:    "ti-eye",
       score:   visScore,
       status:  scoreStatus(visScore),
       summary: visScore >= 75
         ? "Strong online presence — recruiters can find and vet you easily."
         : `${!hasLinkedIn ? "LinkedIn URL missing — 87% of recruiters check it. " : ""}${!hasGitHub ? "GitHub not linked — key for tech roles." : ""}`,
       actions: [
-        ...(!hasLinkedIn  ? [{ label: "Add LinkedIn →",  href: "/builder" }] : []),
-        ...(!hasGitHub    ? [{ label: "Add GitHub →",    href: "/builder" }] : []),
-        ...(!hasPortfolio ? [{ label: "Add portfolio →", href: "/builder" }] : []),
+        ...(!hasLinkedIn  ? [{ label: "Add LinkedIn <i className="ti ti-arrow-right"/>",  href: "/builder" }] : []),
+        ...(!hasGitHub    ? [{ label: "Add GitHub <i className="ti ti-arrow-right"/>",    href: "/builder" }] : []),
+        ...(!hasPortfolio ? [{ label: "Add portfolio <i className="ti ti-arrow-right"/>", href: "/builder" }] : []),
       ],
     },
   ];
@@ -305,7 +305,7 @@ export default function CareerHealthPage() {
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 99, background: "var(--accdim)", border: "1px solid var(--accborder)", fontSize: 11, fontWeight: 700, color: "var(--accent)", marginBottom: 12 }}>
-            🏥 Monthly Career Checkup
+            <i className="ti ti-stethoscope"/> Monthly Career Checkup
           </div>
           <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 8, letterSpacing: "-.02em" }}>Career Health Score</h1>
           <p style={{ fontSize: 14, color: "var(--text3)", lineHeight: 1.6, maxWidth: 540 }}>
@@ -315,8 +315,8 @@ export default function CareerHealthPage() {
 
         {!resume && (
           <div style={{ padding: "14px 18px", borderRadius: 10, background: "rgba(234,179,8,.07)", border: "1px solid rgba(234,179,8,.2)", fontSize: 13, color: "var(--warn)", marginBottom: 24, display: "flex", alignItems: "center", gap: 10 }}>
-            ⚠️ Build your resume first for a personalised health score.{" "}
-            <Link href="/builder" style={{ color: "var(--warn)", fontWeight: 700 }}>Go to Builder →</Link>
+            <i className="ti ti-alert-triangle"/> Build your resume first for a personalised health score.{" "}
+            <Link href="/builder" style={{ color: "var(--warn)", fontWeight: 700 }}>Go to Builder <i className="ti ti-arrow-right"/></Link>
           </div>
         )}
 
@@ -336,7 +336,7 @@ export default function CareerHealthPage() {
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 16px", borderRadius: 10, background: "var(--surface2)", border: "1px solid var(--border)" }}>
-                <span style={{ fontSize: 20 }}>🔥</span>
+                <span style={{ fontSize: 20 }}><i className="ti ti-flame"/></span>
                 <div>
                   <div style={{ fontSize: 18, fontWeight: 800, color: streak > 0 ? "var(--warn)" : "var(--text3)" }}>{streak}</div>
                   <div style={{ fontSize: 11, color: "var(--text3)" }}>week streak</div>
@@ -431,7 +431,7 @@ export default function CareerHealthPage() {
 
         {/* Trending skills callout */}
         <div style={{ ...card, padding: "20px 24px", marginTop: 24, background: "linear-gradient(135deg,rgba(99,102,241,.06),rgba(99,102,241,.02))", borderColor: "var(--accborder)" }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--accent)", marginBottom: 10 }}>🚀 Top skills growing in demand — 2026</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--accent)", marginBottom: 10 }}><i className="ti ti-rocket"/> Top skills growing in demand — 2026</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {TRENDING_SKILLS_2026.map(skill => (
               <span key={skill} style={{ padding: "5px 12px", borderRadius: 99, background: "var(--accdim)", border: "1px solid var(--accborder)", fontSize: 12, color: "var(--accent)", fontWeight: 600 }}>
@@ -441,7 +441,7 @@ export default function CareerHealthPage() {
           </div>
           <div style={{ marginTop: 14, display: "flex", gap: 10 }}>
             <Link href="/career-gps" style={{ display: "inline-flex", alignItems: "center", padding: "8px 18px", borderRadius: 8, background: "var(--accent)", color: "#fff", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
-              Build your skill roadmap →
+              Build your skill roadmap <i className="ti ti-arrow-right"/>
             </Link>
             <Link href="/interview" style={{ display: "inline-flex", alignItems: "center", padding: "8px 18px", borderRadius: 8, background: "var(--surface2)", border: "1px solid var(--border)", color: "var(--text1)", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
               Practice interviews
@@ -452,11 +452,11 @@ export default function CareerHealthPage() {
         {/* Next check-in */}
         <div style={{ marginTop: 20, padding: "14px 20px", borderRadius: 10, background: "var(--surface)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text2)" }}>📆 Set a monthly reminder</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text2)" }}><i className="ti ti-calendar" style={{marginRight:4}}/>Set a monthly reminder</div>
             <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 2 }}>Professionals who review their career health monthly are 3× more likely to get a 20%+ raise within 2 years.</div>
           </div>
           <Link href="/salary" style={{ padding: "8px 18px", borderRadius: 8, background: "var(--surface2)", border: "1px solid var(--border)", fontSize: 13, fontWeight: 600, color: "var(--text1)", textDecoration: "none", whiteSpace: "nowrap" }}>
-            Check salary →
+            Check salary <i className="ti ti-arrow-right"/>
           </Link>
         </div>
       </div>

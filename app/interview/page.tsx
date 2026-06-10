@@ -52,22 +52,22 @@ interface AnswerState {
 
 /* ── Programming languages ──────────────────────────────── */
 export const PROG_LANGUAGES = [
-  { key: "any",        label: "Any / General",  icon: "🧠", color: "#6366f1" },
-  { key: "javascript", label: "JavaScript",      icon: "🟨", color: "#f7df1e" },
-  { key: "typescript", label: "TypeScript",      icon: "🔷", color: "#3178c6" },
-  { key: "python",     label: "Python",          icon: "🐍", color: "#3776ab" },
+  { key: "any",        label: "Any / General",  icon: "ti-brain", color: "#6366f1" },
+  { key: "javascript", label: "JavaScript",      icon: "ti-brand-javascript", color: "#f7df1e" },
+  { key: "typescript", label: "TypeScript",      icon: "ti-brand-typescript", color: "#3178c6" },
+  { key: "python",     label: "Python",          icon: "ti-brand-python", color: "#3776ab" },
   { key: "java",       label: "Java",            icon: "☕", color: "#ed8b00" },
-  { key: "go",         label: "Go",              icon: "🦫", color: "#00add8" },
-  { key: "rust",       label: "Rust",            icon: "🦀", color: "#ce422b" },
-  { key: "cpp",        label: "C++",             icon: "⚙️",  color: "#00599c" },
-  { key: "csharp",     label: "C#",              icon: "🟣", color: "#9b4f96" },
-  { key: "kotlin",     label: "Kotlin",          icon: "🏝️",  color: "#7f52ff" },
-  { key: "swift",      label: "Swift",           icon: "🍎", color: "#fa7343" },
-  { key: "sql",        label: "SQL / DB",        icon: "🗄️",  color: "#00758f" },
-  { key: "ruby",       label: "Ruby",            icon: "💎", color: "#cc342d" },
-  { key: "php",        label: "PHP",             icon: "🐘", color: "#777bb4" },
-  { key: "scala",      label: "Scala",           icon: "🔴", color: "#dc322f" },
-  { key: "r",          label: "R (Data)",        icon: "📊", color: "#276dc3" },
+  { key: "go",         label: "Go",              icon: "ti-brand-golang", color: "#00add8" },
+  { key: "rust",       label: "Rust",            icon: "ti-brand-rust", color: "#ce422b" },
+  { key: "cpp",        label: "C++",             icon: "ti-settings",  color: "#00599c" },
+  { key: "csharp",     label: "C#",              icon: "ti-brand-c", color: "#9b4f96" },
+  { key: "kotlin",     label: "Kotlin",          icon: "ti-brand-kotlin", color: "#7f52ff" },
+  { key: "swift",      label: "Swift",           icon: "ti-brand-apple", color: "#fa7343" },
+  { key: "sql",        label: "SQL / DB",        icon: "ti-database", color: "#00758f" },
+  { key: "ruby",       label: "Ruby",            icon: "ti-diamond", color: "#cc342d" },
+  { key: "php",        label: "PHP",             icon: "ti-brand-php", color: "#777bb4" },
+  { key: "scala",      label: "Scala",           icon: "ti-circle", color: "#dc322f" },
+  { key: "r",          label: "R (Data)",        icon: "ti-chart-bar", color: "#276dc3" },
 ] as const;
 
 export type ProgLanguageKey = typeof PROG_LANGUAGES[number]["key"];
@@ -255,7 +255,7 @@ export default function InterviewPage() {
       <div style={{ padding: "24px 24px 48px" }}>
 
         <div style={{ textAlign: "center", marginBottom: 36 }}>
-          <div style={{ fontSize: 44, marginBottom: 12 }}>🧭</div>
+          <div style={{ fontSize: 44, marginBottom: 12 }}><i className="ti ti-compass"/></div>
           <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-.02em", marginBottom: 10 }}>
             Career Path Builder
           </h1>
@@ -268,7 +268,7 @@ export default function InterviewPage() {
 
           {/* Current state */}
           <div style={card}>
-            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, color: "var(--text2)" }}>📍 Where you are now</div>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, color: "var(--text2)" }}><i className="ti ti-map-pin"/> Where you are now</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div>
                 <label style={lbl}>Current role / title</label>
@@ -290,7 +290,7 @@ export default function InterviewPage() {
 
           {/* Target */}
           <div style={card}>
-            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, color: "var(--text2)" }}>🎯 Where you want to go</div>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, color: "var(--text2)" }}><i className="ti ti-target"/> Where you want to go</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div>
                 <label style={lbl}>Target role</label>
@@ -321,7 +321,7 @@ export default function InterviewPage() {
 
           {/* Level */}
           <div style={{ ...card, padding: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "var(--text2)" }}>📊 Question difficulty for practice</div>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "var(--text2)" }}><i className="ti ti-chart-bar"/> Question difficulty for practice</div>
             <div style={{ display: "flex", gap: 8 }}>
               {DIFFICULTIES.map(d => (
                 <button key={d.key} onClick={() => setDifficulty(d.key)} style={{
@@ -338,7 +338,7 @@ export default function InterviewPage() {
 
           {/* Programming language */}
           <div style={{ ...card, padding: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "var(--text2)" }}>💻 Programming language for coding questions</div>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "var(--text2)" }}><i className="ti ti-device-laptop"/> Programming language for coding questions</div>
             <div style={{ display: "grid", gridTemplateColumns: mobile ? "repeat(3,1fr)" : "repeat(4,1fr)", gap: 6 }}>
               {PROG_LANGUAGES.map(l => {
                 const active = progLang === l.key;
@@ -349,7 +349,7 @@ export default function InterviewPage() {
                     background: active ? `${l.color}18` : "var(--surface2)",
                     display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
                   }}>
-                    <span style={{ fontSize: 16 }}>{l.icon}</span>
+                    <i className={`ti ${l.icon}`} style={{ fontSize: 16, color: l.color }}/>
                     <span style={{ fontSize: 11, fontWeight: active ? 700 : 400, color: active ? l.color : "var(--text2)", lineHeight: 1.2 }}>{l.label}</span>
                   </button>
                 );
@@ -401,7 +401,7 @@ export default function InterviewPage() {
 
     return (
       <AppShell actions={
-          <button onClick={() => setStage("profile")} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 7, color: "var(--text3)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>← Re-analyse
+          <button onClick={() => setStage("profile")} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 7, color: "var(--text3)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}><i className="ti ti-arrow-left"/> Re-analyse
           </button>
         }>
         <div style={{ padding: "24px 24px 48px" }}>
@@ -483,7 +483,7 @@ export default function InterviewPage() {
                           ⏱ {g.studyTime}
                         </span>
                         {done && <span style={{ fontSize: 11, color: "var(--success)", fontWeight: 600 }}>Practiced ✓</span>}
-                        {isNext && !done && <span style={{ fontSize: 11, color: "var(--accent)", fontWeight: 600 }}>← Start here</span>}
+                        {isNext && !done && <span style={{ fontSize: 11, color: "var(--accent)", fontWeight: 600 }}><i className="ti ti-arrow-left"/> Start here</span>}
                       </div>
                       <div style={{ fontSize: 13, color: "var(--text2)", lineHeight: 1.55, marginBottom: 8 }}>{g.why}</div>
                       {g.resources?.length > 0 && (
@@ -504,7 +504,7 @@ export default function InterviewPage() {
                         color: done ? "var(--text3)" : "#fff",
                         fontSize: 12, fontWeight: 700, whiteSpace: "nowrap", flexShrink: 0,
                       }}>
-                      {done ? "Re-practice" : "Practice →"}
+                      {done ? "Re-practice" : "Practice <i className="ti ti-arrow-right"/>"}
                     </button>
                   </div>
                 </div>
@@ -524,7 +524,7 @@ export default function InterviewPage() {
           )}
           {!nextGap && (
             <div style={{ marginTop: 24, padding: 20, borderRadius: 12, background: "rgba(34,197,94,.08)", border: "1px solid rgba(34,197,94,.2)", textAlign: "center" }}>
-              <div style={{ fontSize: 24, marginBottom: 8 }}>🎉</div>
+              <div style={{ fontSize: 24, marginBottom: 8 }}><i className="ti ti-confetti"/></div>
               <div style={{ fontSize: 15, fontWeight: 700, color: "var(--success)", marginBottom: 6 }}>All critical gaps practiced!</div>
               <div style={{ fontSize: 13, color: "var(--text2)" }}>You've worked through every skill gap. Keep revising and apply with confidence.</div>
             </div>
@@ -547,7 +547,7 @@ export default function InterviewPage() {
     return (
       <AppShell actions={
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <button onClick={() => setStage("gaps")} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 7, color: "var(--text3)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>← Gap Plan
+            <button onClick={() => setStage("gaps")} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 7, color: "var(--text3)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}><i className="ti ti-arrow-left"/> Gap Plan
             </button>
             <span style={{ padding: "4px 12px", borderRadius: 99, background: "var(--accdim)", border: "1px solid var(--accborder)", fontSize: 12, fontWeight: 600, color: "var(--accent)" }}>
               Practicing: {focusSkill}
@@ -673,13 +673,13 @@ export default function InterviewPage() {
               )}
               {fb.improvements.length > 0 && (
                 <div style={{ ...card, borderLeft: "3px solid var(--warn)" }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--warn)", marginBottom: 8 }}>→ Improve</div>
-                  {fb.improvements.map((s, i) => <div key={i} style={{ fontSize: 13, color: "var(--text2)", marginBottom: 4, display: "flex", gap: 7 }}><span style={{ color: "var(--warn)", flexShrink: 0 }}>→</span>{s}</div>)}
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--warn)", marginBottom: 8 }}><i className="ti ti-arrow-right"/> Improve</div>
+                  {fb.improvements.map((s, i) => <div key={i} style={{ fontSize: 13, color: "var(--text2)", marginBottom: 4, display: "flex", gap: 7 }}><span style={{ color: "var(--warn)", flexShrink: 0 }}><i className="ti ti-arrow-right"/></span>{s}</div>)}
                 </div>
               )}
               {fb.betterAnswer && (
                 <div style={{ ...card, borderLeft: "3px solid var(--accent)" }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--accent)", marginBottom: 8 }}>💡 Stronger answer</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--accent)", marginBottom: 8 }}><i className="ti ti-bulb"/> Stronger answer</div>
                   <p style={{ fontSize: 13, color: "var(--text2)", margin: 0, lineHeight: 1.7, fontStyle: "italic", borderLeft: "2px solid var(--accborder)", paddingLeft: 11 }}>"{fb.betterAnswer}"</p>
                 </div>
               )}
@@ -701,7 +701,7 @@ export default function InterviewPage() {
             ) : allAnswered ? (
               <button onClick={finishPractice}
                 style={{ padding: "10px 22px", borderRadius: 8, background: "var(--success)", color: "#fff", border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-                See Results 🏆
+                See Results <i className="ti ti-trophy"/>
               </button>
             ) : (
               <span style={{ fontSize: 12, color: "var(--text3)" }}>Answer to continue</span>
@@ -724,7 +724,7 @@ export default function InterviewPage() {
 
     return (
       <AppShell actions={
-          <button onClick={() => setStage("gaps")} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 7, color: "var(--text3)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>← Gap Plan
+          <button onClick={() => setStage("gaps")} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 7, color: "var(--text3)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}><i className="ti ti-arrow-left"/> Gap Plan
           </button>
         }>
         <div style={{ padding: "24px 24px 48px" }}>
@@ -767,7 +767,7 @@ export default function InterviewPage() {
             return (
               <div style={{ ...card, marginBottom: 4 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
-                  📚 Deepen your {focusSkill} skills
+                  <i className="ti ti-books" style={{marginRight:4}}/>Deepen your {focusSkill} skills
                 </div>
                 <p style={{ fontSize: 12, color: "var(--text3)", marginBottom: 12, lineHeight: 1.5 }}>
                   Practice helps — structured learning accelerates it.
@@ -787,7 +787,7 @@ export default function InterviewPage() {
               </button>
             ) : (
               <div style={{ padding: 18, borderRadius: 12, background: "rgba(34,197,94,.08)", border: "1px solid rgba(34,197,94,.2)", textAlign: "center" }}>
-                <div style={{ fontSize: 20, marginBottom: 6 }}>🎉</div>
+                <div style={{ fontSize: 20, marginBottom: 6 }}><i className="ti ti-confetti"/></div>
                 <div style={{ fontSize: 14, fontWeight: 700, color: "var(--success)" }}>All critical gaps practiced!</div>
               </div>
             )}

@@ -66,21 +66,29 @@ const ACTION_LABELS: Record<string, string> = {
 };
 
 const ACTION_ICONS: Record<string, string> = {
-  resume_built: "✏️", resume_updated: "✏️", resume_scored: "🎯",
-  cover_letter_generated: "✉️", interview_practiced: "🎤",
-  job_saved: "🔖", job_applied: "💼", skill_proof_added: "⚡",
-  career_health_checked: "🏥", salary_checked: "💰",
-  bgv_submitted: "🛡", career_gps_used: "🧭",
-  profile_completed: "👤", daily_login: "☀️",
+  resume_built:           "ti-pencil",
+  resume_updated:         "ti-pencil",
+  resume_scored:          "ti-target",
+  cover_letter_generated: "ti-mail",
+  interview_practiced:    "ti-microphone",
+  job_saved:              "ti-bookmark",
+  job_applied:            "ti-briefcase",
+  skill_proof_added:      "ti-bolt",
+  career_health_checked:  "ti-stethoscope",
+  salary_checked:         "ti-coin",
+  bgv_submitted:          "ti-shield-check",
+  career_gps_used:        "ti-compass",
+  profile_completed:      "ti-user",
+  daily_login:            "ti-sun",
 };
 
 /* ── Today's focus tasks ─────────────────────────────────────── */
 function buildFocusTasks(state: XPState) {
   const recent = new Set(state.log.slice(0, 10).map(l => l.type));
   return [
-    { label: "Score your resume",         href: "/score",     xp: 30, done: recent.has("resume_scored"),       icon: "🎯" },
-    { label: "Tailor for a job listing",  href: "/tailor",    xp: 50, done: recent.has("resume_updated"),      icon: "✂️" },
-    { label: "Practice an interview",     href: "/interview", xp: 45, done: recent.has("interview_practiced"), icon: "🎤" },
+    { label: "Score your resume",         href: "/score",     xp: 30, done: recent.has("resume_scored"),       icon: "ti-target" },
+    { label: "Tailor for a job listing",  href: "/tailor",    xp: 50, done: recent.has("resume_updated"),      icon: "ti-cut" },
+    { label: "Practice an interview",     href: "/interview", xp: 45, done: recent.has("interview_practiced"), icon: "ti-microphone" },
   ];
 }
 
@@ -130,7 +138,7 @@ function QuickAction({ href, icon, label, xp }: { href: string; icon: string; la
         (e.currentTarget as HTMLAnchorElement).style.background = "var(--surface2)";
       }}
     >
-      <span style={{ fontSize: 18 }}>{icon}</span>
+      <i className={`ti ${icon}`} style={{ fontSize: 18, color: "var(--accent)" }} />
       <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text1)" }}>{label}</span>
       <span style={{ fontSize: 10, color: "var(--success)", fontWeight: 600 }}>{xp}</span>
     </Link>
@@ -141,7 +149,7 @@ function QuickAction({ href, icon, label, xp }: { href: string; icon: string; la
 type Milestone = {
   monthsMin: number;
   monthsMax: number;
-  emoji: string;
+  icon: string;
   headline: string;
   body: string;
   cta: string;
@@ -154,7 +162,7 @@ type Milestone = {
 const MILESTONES: Milestone[] = [
   {
     monthsMin: 3, monthsMax: 5,
-    emoji: "🌱",
+    icon: "ti-leaf",
     headline: "You've hit 3 months in your role",
     body: "You're past the ramp-up phase. A great time to document your early wins and benchmark your salary against the market before your first review.",
     cta: "Check salary benchmark", ctaHref: "/salary",
@@ -163,7 +171,7 @@ const MILESTONES: Milestone[] = [
   },
   {
     monthsMin: 6, monthsMax: 11,
-    emoji: "⚡",
+    icon: "ti-bolt",
     headline: "6 months in — time to check your market value",
     body: "Professionals who benchmark their salary at 6 months are 2.4× more likely to negotiate a raise at their next review. Your market rate may have shifted.",
     cta: "Get salary benchmark", ctaHref: "/salary",
@@ -172,7 +180,7 @@ const MILESTONES: Milestone[] = [
   },
   {
     monthsMin: 12, monthsMax: 17,
-    emoji: "🏆",
+    icon: "ti-trophy",
     headline: "1 year in — your next move starts now",
     body: "Your impact is proven. Run Career GPS to see what 3 skills separate you from a senior title, and get your resume ready for internal or external opportunities.",
     cta: "Run Career GPS", ctaHref: "/career-gps",
@@ -181,7 +189,7 @@ const MILESTONES: Milestone[] = [
   },
   {
     monthsMin: 18, monthsMax: 23,
-    emoji: "🚀",
+    icon: "ti-rocket",
     headline: "18 months — the sweet spot for a move",
     body: "18–24 months is when professionals see the biggest salary jumps from switching roles. See what your profile looks like to recruiters right now.",
     cta: "Score your resume", ctaHref: "/score",
@@ -190,7 +198,7 @@ const MILESTONES: Milestone[] = [
   },
   {
     monthsMin: 24, monthsMax: 9999,
-    emoji: "💡",
+    icon: "ti-bulb",
     headline: "2+ years — you have serious leverage",
     body: "Staying beyond 2 years? Make sure your profile and salary reflect the experience and impact you've built. Now is the time to negotiate or explore.",
     cta: "Optimise LinkedIn", ctaHref: "/linkedin",
@@ -240,7 +248,7 @@ function CareerMilestonePrompt() {
         borderRadius: 12, padding: "14px 16px", marginBottom: 16,
         display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap",
       }}>
-        <span style={{ fontSize: 18 }}>📅</span>
+        <span style={{ fontSize: 18 }}><i className="ti ti-calendar"/></span>
         <div style={{ flex: 1, minWidth: 180 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)", marginBottom: 3 }}>
             When did you start your current role?
@@ -294,7 +302,7 @@ function CareerMilestonePrompt() {
         aria-label="Dismiss"
       >×</button>
       <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-        <span style={{ fontSize: 22, flexShrink: 0 }}>{milestone.emoji}</span>
+        <i className={`ti ${milestone.icon}`} style={{ fontSize: 20, color: milestone.color, flexShrink: 0 }} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text1)", marginBottom: 5 }}>
             {milestone.headline}
@@ -308,7 +316,7 @@ function CareerMilestonePrompt() {
               background: milestone.color, color: "#fff",
               fontSize: 12, fontWeight: 700, textDecoration: "none",
             }}>
-              {milestone.cta} →
+              {milestone.cta} <i className="ti ti-arrow-right"/>
             </Link>
             {milestone.ctaSecondary && (
               <Link href={milestone.ctaSecondaryHref!} style={{
@@ -490,7 +498,7 @@ function PostHirePanel() {
 
           {/* Promotion readiness */}
           <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px" }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)", marginBottom: 10 }}>🚀 Promotion Readiness</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)", marginBottom: 10 }}><i className="ti ti-rocket"/> Promotion Readiness</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {[
                 { label: "Performance above expectations", done: doneCount >= 2 },
@@ -506,13 +514,13 @@ function PostHirePanel() {
               ))}
             </div>
             <div style={{ marginTop: 12, padding: "8px 10px", borderRadius: 7, background: "rgba(99,102,241,.07)", border: "1px solid rgba(99,102,241,.15)", fontSize: 11, color: "var(--text3)" }}>
-              💡 <strong style={{ color: "var(--accent)" }}>Tip:</strong> Most promotions happen when you do the next level&apos;s job before the title change. Focus on scope, not time served.
+              <i className="ti ti-bulb"/> <strong style={{ color: "var(--accent)" }}>Tip:</strong> Most promotions happen when you do the next level&apos;s job before the title change. Focus on scope, not time served.
             </div>
           </div>
 
           {/* Counteroffer calculator */}
           <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px" }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)", marginBottom: 10 }}>💰 Counteroffer Calculator</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)", marginBottom: 10 }}><i className="ti ti-coin"/> Counteroffer Calculator</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <div>
                 <label style={{ fontSize: 10, color: "var(--text3)", fontWeight: 700, textTransform: "uppercase", display: "block", marginBottom: 4 }}>Your Current CTC (₹/year)</label>
@@ -531,7 +539,7 @@ function PostHirePanel() {
                 <div style={{ fontSize: 11, color: "var(--text3)" }}>Delta: {fmt(Math.abs(delta))}</div>
                 <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 4 }}>Counter at: <strong style={{ color: "var(--accent)" }}>{fmt(counterTarget)}</strong></div>
                 <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 4, lineHeight: 1.5 }}>
-                  {Number(deltaPct) < 20 && Number(deltaPct) > 0 ? "⚠️ Less than 20% — typically not worth the switch unless role or growth is materially better." : ""}
+                  {Number(deltaPct) < 20 && Number(deltaPct) > 0 ? <span style={{ display: "flex", alignItems: "center", gap: 4 }}><i className="ti ti-alert-triangle" style={{ fontSize: 11, color: "var(--warn)" }} /> Less than 20% — typically not worth the switch unless role or growth is materially better.</span> : ""}
                 </div>
               </div>
             </div>
@@ -539,18 +547,18 @@ function PostHirePanel() {
 
           {/* Appraisal prep */}
           <div style={{ gridColumn: "1 / -1", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px" }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)", marginBottom: 10 }}>📊 Appraisal Prep — What to Document</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}><i className="ti ti-chart-bar" style={{ fontSize: 14, color: "var(--accent)" }} /> Appraisal Prep — What to Document</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
               {[
-                { icon: "📈", title: "Quantified Impact", desc: "Revenue influenced, cost saved, load reduced — anything with a number." },
-                { icon: "🤝", title: "Cross-team Work", desc: "Projects where you collaborated outside your team. Shows breadth." },
-                { icon: "🎓", title: "Skills Acquired", desc: "Certifications, new tools adopted, technologies picked up." },
-                { icon: "🚀", title: "Initiatives Launched", desc: "Processes you started, problems you found and solved without being asked." },
-                { icon: "👥", title: "People Grown", desc: "If you mentored, onboarded, or unblocked others — document it." },
-                { icon: "💡", title: "Feedback Received", desc: "Positive 360 feedback, awards, shoutouts — keep receipts." },
+                { icon: "ti-trending-up", title: "Quantified Impact", desc: "Revenue influenced, cost saved, load reduced — anything with a number." },
+                { icon: "ti-link",        title: "Cross-team Work", desc: "Projects where you collaborated outside your team. Shows breadth." },
+                { icon: "ti-school",      title: "Skills Acquired", desc: "Certifications, new tools adopted, technologies picked up." },
+                { icon: "ti-rocket",      title: "Initiatives Launched", desc: "Processes you started, problems you found and solved without being asked." },
+                { icon: "ti-users",       title: "People Grown", desc: "If you mentored, onboarded, or unblocked others — document it." },
+                { icon: "ti-bulb",        title: "Feedback Received", desc: "Positive 360 feedback, awards, shoutouts — keep receipts." },
               ].map(item => (
                 <div key={item.title} style={{ padding: "10px", borderRadius: 8, background: "var(--surface2)", border: "1px solid var(--border)" }}>
-                  <div style={{ fontSize: 16, marginBottom: 4 }}>{item.icon}</div>
+                  <div style={{ marginBottom: 6 }}><i className={`ti ${item.icon}`} style={{ fontSize: 16, color: "var(--accent)" }} /></div>
                   <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)", marginBottom: 3 }}>{item.title}</div>
                   <div style={{ fontSize: 11, color: "var(--text3)", lineHeight: 1.5 }}>{item.desc}</div>
                 </div>
@@ -561,7 +569,7 @@ function PostHirePanel() {
                 fontSize: 12, fontWeight: 700, padding: "7px 14px", borderRadius: 7,
                 background: "var(--accent)", color: "#fff", textDecoration: "none",
               }}>
-                📁 Store in Doc Vault
+                <i className="ti ti-folder"/> Store in Doc Vault
               </Link>
               <Link href="/builder" style={{
                 fontSize: 12, fontWeight: 700, padding: "7px 14px", borderRadius: 7,
@@ -635,11 +643,12 @@ export default function DashboardPage() {
         {/* ── Greeting ── */}
         <div style={{ marginBottom: 18 }}>
           <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-.03em", marginBottom: 3 }}>
-            {greet()}, {firstName} 👋
+            {greet()}, {firstName}
           </h1>
-          <p style={{ fontSize: 13, color: "var(--text3)" }}>
-            {levelInfo.icon} Level {levelInfo.level} · {levelInfo.title}
-            {streak > 0 && ` · 🔥 ${streak} day streak`}
+          <p style={{ fontSize: 13, color: "var(--text3)", display: "flex", alignItems: "center", gap: 5 }}>
+            <i className={`ti ${levelInfo.icon}`} style={{ fontSize: 13, color: levelInfo.color }} />
+            Level {levelInfo.level} · {levelInfo.title}
+            {streak > 0 && <><i className="ti ti-flame" style={{ fontSize: 12, color: "var(--danger)", marginLeft: 6 }} />{streak} day streak</>}
           </p>
         </div>
 
@@ -655,7 +664,7 @@ export default function DashboardPage() {
             <span style={{ fontSize: 11, color: "var(--text3)" }}>
               {levelInfo.level < 7
                 ? `${levelInfo.xpToNext.toLocaleString()} XP to Level ${levelInfo.level + 1} · ${LEVELS[levelInfo.level]?.title ?? ""}`
-                : "Max level reached 🏆"}
+                : "Max level reached <i className="ti ti-trophy"/>"}
             </span>
           </div>
           <div style={{ height: 5, background: "var(--border)", borderRadius: 3, overflow: "hidden" }}>
@@ -722,10 +731,10 @@ export default function DashboardPage() {
                     border: `1.5px solid ${t.done ? "var(--accent)" : "var(--border)"}`,
                     display: "flex", alignItems: "center", justifyContent: "center",
                   }}>
-                    {t.done && <span style={{ fontSize: 10, color: "#fff" }}>✓</span>}
+                    {t.done && <i className="ti ti-check" style={{ fontSize: 10, color: "#fff" }} />}
                   </div>
-                  <span style={{ fontSize: 13, flex: 1, color: t.done ? "var(--text3)" : "var(--text1)", textDecoration: t.done ? "line-through" : "none" }}>
-                    {t.icon} {t.label}
+                  <span style={{ fontSize: 13, flex: 1, color: t.done ? "var(--text3)" : "var(--text1)", textDecoration: t.done ? "line-through" : "none", display: "flex", alignItems: "center", gap: 6 }}>
+                    <i className={`ti ${t.icon}`} style={{ fontSize: 13, color: t.done ? "var(--text3)" : "var(--accent)" }} />{t.label}
                   </span>
                   <span style={{ fontSize: 10, color: "var(--accent)", background: "var(--accdim)", padding: "1px 6px", borderRadius: 4 }}>
                     +{t.xp} XP
@@ -754,7 +763,10 @@ export default function DashboardPage() {
                   }}>
                     <div style={{ width: 5, height: 5, borderRadius: "50%", background: i === 0 ? "var(--accent)" : "var(--border)", flexShrink: 0 }} />
                     <span style={{ fontSize: 12, color: i === 0 ? "var(--text1)" : "var(--text2)", flex: 1 }}>
-                      {ACTION_ICONS[entry.type] ?? "•"} {ACTION_LABELS[entry.type] ?? entry.type}
+                      {ACTION_ICONS[entry.type]
+                        ? <><i className={`ti ${ACTION_ICONS[entry.type]}`} style={{ fontSize: 11, color: "var(--text3)", marginRight: 4 }} />{ACTION_LABELS[entry.type] ?? entry.type}</>
+                        : ACTION_LABELS[entry.type] ?? entry.type
+                      }
                     </span>
                     <span style={{ fontSize: 10, color: i === 0 ? "var(--accent)" : "var(--text3)" }}>
                       +{entry.xp} XP
@@ -777,7 +789,7 @@ export default function DashboardPage() {
                 ATS Score trend
               </div>
               <Link href="/score" style={{ fontSize: 11, color: "var(--accent)", textDecoration: "none" }}>
-                Score now →
+                Score now <i className="ti ti-arrow-right"/>
               </Link>
             </div>
             <ScoreChart data={state.scoreHistory ?? []} />
@@ -797,9 +809,9 @@ export default function DashboardPage() {
                     background: earned ? "var(--accdim)" : "var(--surface2)",
                     border: `1px solid ${earned ? "var(--accborder)" : "var(--border)"}`,
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 16, opacity: earned ? 1 : 0.3,
+                    opacity: earned ? 1 : 0.3,
                   }}>
-                    {b.icon}
+                    <i className={`ti ${b.icon}`} style={{ fontSize: 15, color: earned ? "var(--accent)" : "var(--text3)" }} />
                   </div>
                 );
               })}
@@ -813,14 +825,14 @@ export default function DashboardPage() {
             Quick actions
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 8 }}>
-            <QuickAction href="/builder"       icon="✏️" label="Update Resume"       xp="+20 XP" />
-            <QuickAction href="/score"         icon="🎯" label="Score Resume"         xp="+30 XP" />
-            <QuickAction href="/interview"     icon="🎤" label="Practice Interview"   xp="+45 XP" />
-            <QuickAction href="/jobs"          icon="💼" label="Apply to Jobs"         xp="+25 XP" />
-            <QuickAction href="/career-gps"    icon="🧭" label="Career GPS"            xp="+15 XP" />
-            <QuickAction href="/career-health" icon="🏥" label="Health Checkup"        xp="+40 XP" />
-            <QuickAction href="/salary"        icon="💰" label="Salary Intel"          xp="+10 XP" />
-            <QuickAction href="/profile"       icon="⚡" label="Add Skill Proof"       xp="+35 XP" />
+            <QuickAction href="/builder"       icon="ti-pencil"       label="Update Resume"       xp="+20 XP" />
+            <QuickAction href="/score"         icon="ti-target"       label="Score Resume"         xp="+30 XP" />
+            <QuickAction href="/interview"     icon="ti-microphone"   label="Practice Interview"   xp="+45 XP" />
+            <QuickAction href="/jobs"          icon="ti-briefcase"    label="Apply to Jobs"         xp="+25 XP" />
+            <QuickAction href="/career-gps"    icon="ti-compass"      label="Career GPS"            xp="+15 XP" />
+            <QuickAction href="/career-health" icon="ti-stethoscope"  label="Health Checkup"        xp="+40 XP" />
+            <QuickAction href="/salary"        icon="ti-coin"         label="Salary Intel"          xp="+10 XP" />
+            <QuickAction href="/profile"       icon="ti-bolt"         label="Add Skill Proof"       xp="+35 XP" />
           </div>
         </div>
 
@@ -842,9 +854,7 @@ export default function DashboardPage() {
                     background: isActive ? "var(--accdim)" : "transparent",
                     border: isActive ? "1px solid var(--accborder)" : "1px solid transparent",
                   }}>
-                    <span style={{ fontSize: 18, filter: isPassed || isActive ? "none" : "grayscale(1) opacity(0.4)" }}>
-                      {lvl.icon}
-                    </span>
+                    <i className={`ti ${lvl.icon}`} style={{ fontSize: 18, color: isPassed || isActive ? lvl.color : "var(--text3)", opacity: isPassed || isActive ? 1 : 0.4 }} />
                     <div style={{ fontSize: 10, fontWeight: isActive ? 700 : 400, color: isActive ? lvl.color : isPassed ? "var(--text2)" : "var(--text3)", textAlign: "center", maxWidth: 60 }}>
                       {lvl.title}
                     </div>
@@ -879,7 +889,7 @@ export default function DashboardPage() {
                 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                     <div style={{ fontSize: 12, fontWeight: 600, color: goal.done ? "var(--success)" : "var(--text1)" }}>
-                      {goal.done ? "✅ " : ""}{goal.label}
+                      {goal.done ? "" : ""}{goal.label}
                     </div>
                     <div style={{ fontSize: 11, color: "var(--text3)" }}>
                       {goal.progress}/{goal.target} {goal.unit}

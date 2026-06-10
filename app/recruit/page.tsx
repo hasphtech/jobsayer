@@ -208,7 +208,7 @@ function EmployerAuthModal({
               background: "var(--accdim)", border: "1px solid var(--accborder)",
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: 16, flexShrink: 0,
-            }}>🏢</div>
+            }}><i className="ti ti-building" style={{fontSize:22, color:"var(--text3)"}}/></div>
             <div>
               <div style={{ fontSize: 15, fontWeight: 800, color: "var(--text1)", lineHeight: 1.2 }}>
                 {step === "checking"
@@ -545,7 +545,7 @@ function PostJobForm({ onSuccess }: { onSuccess: () => void }) {
 
   if (submitted) return (
     <div style={{ textAlign: "center", padding: "60px 20px" }}>
-      <div style={{ fontSize: 48, marginBottom: 12 }}>🎉</div>
+      <div style={{ fontSize: 48, marginBottom: 12, color: "var(--success)" }}><i className="ti ti-circle-check"/></div>
       <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Job Submitted for Review!</div>
       <div style={{ fontSize: 14, color: "var(--text3)" }}>Our team will approve your post within 24 hours. You'll receive a confirmation email.</div>
     </div>
@@ -590,7 +590,7 @@ function PostJobForm({ onSuccess }: { onSuccess: () => void }) {
       </div>
       {error && <div style={{ fontSize: 13, color: "var(--danger)", padding: "10px 14px", background: "rgba(239,68,68,.08)", borderRadius: 8 }}>{error}</div>}
       <div style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(99,102,241,.06)", border: "1px solid var(--accborder)", fontSize: 12, color: "var(--text2)" }}>
-        🤖 jobSayer AI will match your JD against our candidate pool and rank by fit score. Your job goes live after admin review (usually within 24 hours).
+        <i className="ti ti-robot" style={{marginRight:4}}/>jobSayer AI will match your JD against our candidate pool and rank by fit score. Your job goes live after admin review (usually within 24 hours).
       </div>
       <button type="submit" disabled={submitting} style={{
         padding: "14px", border: "none", borderRadius: 10,
@@ -622,9 +622,9 @@ function RecruiterDashboard({ profile, onViewPricing }: { profile: EmployerProfi
   const mobile = w < 640;
   const card: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "20px" };
   const stats = [
-    { icon: "💼", label: "Active Jobs",          value: "3",   trend: "+1 this week" },
-    { icon: "👥", label: "Candidates Reached",   value: "142", trend: "+28 today" },
-    { icon: "📨", label: "Interview Invites",    value: "18",  trend: "5 pending reply" },
+    { icon: "ti-briefcase", label: "Active Jobs",          value: "3",   trend: "+1 this week" },
+    { icon: "ti-users", label: "Candidates Reached",   value: "142", trend: "+28 today" },
+    { icon: "ti-mail-forward", label: "Interview Invites",    value: "18",  trend: "5 pending reply" },
     { icon: "✅", label: "Offers Extended",      value: "2",   trend: "1 accepted" },
   ];
   const planColor = profile.plan === "scale" ? "var(--accent)" : profile.plan === "growth" ? "var(--warn)" : "var(--text3)";
@@ -641,7 +641,7 @@ function RecruiterDashboard({ profile, onViewPricing }: { profile: EmployerProfi
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <Link href="/verify" style={{ padding: "8px 16px", background: profile.plan !== "free" ? "rgba(34,197,94,.08)" : "var(--surface2)", border: `1px solid ${profile.plan !== "free" ? "rgba(34,197,94,.2)" : "var(--border)"}`, borderRadius: 8, color: profile.plan !== "free" ? "var(--success)" : "var(--text3)", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
-            🏅 Verify Company
+            <i className="ti ti-building-store" style={{marginRight:4}}/>Verify Company
           </Link>
           <button onClick={onViewPricing} style={{ padding: "8px 16px", background: "var(--accdim)", border: "1px solid var(--accborder)", borderRadius: 8, color: "var(--accent)", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
             ⚡ {profile.plan === "free" ? "Upgrade Plan" : "View Plans"}
@@ -653,7 +653,7 @@ function RecruiterDashboard({ profile, onViewPricing }: { profile: EmployerProfi
       <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(4,1fr)", gap: 14, marginBottom: 20 }}>
         {stats.map(s => (
           <div key={s.label} style={{ ...card, textAlign: "center" }}>
-            <div style={{ fontSize: 24, marginBottom: 6 }}>{s.icon}</div>
+            <div style={{ fontSize: 24, marginBottom: 6, color: "var(--accent)" }}><i className={`ti ${s.icon}`}/></div>
             <div style={{ fontSize: 26, fontWeight: 800, color: "var(--text1)", lineHeight: 1 }}>{s.value}</div>
             <div style={{ fontSize: 12, color: "var(--text2)", marginTop: 4, fontWeight: 600 }}>{s.label}</div>
             <div style={{ fontSize: 11, color: "var(--success)", marginTop: 2 }}>{s.trend}</div>
@@ -812,9 +812,9 @@ export default function RecruitPage() {
           {title && <><span style={{ color: "var(--border)", fontSize: 18 }}>›</span><span style={{ fontSize: 14, fontWeight: 600 }}>{title}</span></>}
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          {profile && <span style={{ fontSize: 12, color: "var(--text3)", padding: "6px 12px", background: "var(--surface2)", borderRadius: 7, border: "1px solid var(--border)" }}>🏢 {profile.company_name}</span>}
+          {profile && <span style={{ fontSize: 12, color: "var(--text3)", padding: "6px 12px", background: "var(--surface2)", borderRadius: 7, border: "1px solid var(--border)" }}><i className="ti ti-building" style={{marginRight:4}}/>{profile.company_name}</span>}
           {/* Dual-role: if also a candidate, show switch link */}
-          {user && <Link href="/" style={{ padding: "6px 12px", borderRadius: 7, border: "1px solid var(--border)", background: "none", color: "var(--text3)", fontSize: 12, fontWeight: 500, textDecoration: "none" }}>👤 Candidate view</Link>}
+          {user && <Link href="/" style={{ padding: "6px 12px", borderRadius: 7, border: "1px solid var(--border)", background: "none", color: "var(--text3)", fontSize: 12, fontWeight: 500, textDecoration: "none" }}><i className="ti ti-user" style={{marginRight:4}}/>Candidate view</Link>}
           <button onClick={() => requireAuth(() => setView("post"))} style={{ padding: "7px 14px", borderRadius: 8, border: "none", background: "var(--accent)", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
             <Plus size={13} /> Post Job
           </button>
@@ -899,7 +899,7 @@ export default function RecruitPage() {
     if (!user || !profile) { setAuthModal(true); setView("landing"); return null; }
     return (
       <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
-        <PageNav title="📊 Dashboard" />
+        <PageNav title="Dashboard" />
         <div style={{ maxWidth: 1000, margin: "0 auto", padding: "28px 20px" }}>
           <RecruiterDashboard profile={profile} onViewPricing={() => { setView("landing"); setTimeout(() => { document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" }); }, 100); }} />
         </div>
@@ -917,7 +917,7 @@ export default function RecruitPage() {
             <ArrowLeft size={14} /> Home
           </Link>
           <span style={{ color: "var(--border)", fontSize: 18 }}>›</span>
-          <span style={{ fontSize: 14, fontWeight: 700 }}>🏢 For Employers</span>
+          <span style={{ fontSize: 14, fontWeight: 700 }}><i className="ti ti-building" style={{marginRight:6}}/>For Employers</span>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <a href="#pricing" style={{ padding: "6px 14px", borderRadius: 8, background: "none", color: "var(--text2)", fontSize: 13, fontWeight: 600, cursor: "pointer", textDecoration: "none" }}>
@@ -926,7 +926,7 @@ export default function RecruitPage() {
           {profile ? (
             <>
               <button onClick={() => setView("dashboard")} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--surface2)", color: "var(--text2)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-                📊 Dashboard
+                <i className="ti ti-layout-dashboard" style={{marginRight:4}}/>Dashboard
               </button>
               <button onClick={() => requireAuth(() => setView("post"))} style={{ padding: "7px 16px", borderRadius: 8, border: "none", background: "var(--accent)", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
                 Post a Job →
@@ -970,7 +970,7 @@ export default function RecruitPage() {
                 <Plus size={16} /> Post a Job
               </button>
               <button onClick={() => setView("dashboard")} style={{ display: "flex", alignItems: "center", gap: 8, padding: "14px 28px", borderRadius: 12, border: "1px solid var(--border)", background: "var(--surface)", color: "var(--text1)", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>
-                📊 Go to Dashboard
+                <i className="ti ti-layout-dashboard" style={{marginRight:4}}/>Go to Dashboard
               </button>
             </div>
           ) : (
@@ -980,7 +980,7 @@ export default function RecruitPage() {
                 onClick={() => setAuthModal(true)}
                 style={{ display: "flex", alignItems: "center", gap: 10, padding: "16px 40px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#fff", fontSize: 16, fontWeight: 800, cursor: "pointer" }}
               >
-                🏢 Sign in as Recruiter — it&apos;s free
+                <i className="ti ti-building" style={{marginRight:4}}/>Sign in as Recruiter — it&apos;s free
               </button>
               <div style={{ display: "flex", gap: 12 }}>
                 <button onClick={() => setView("pool")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: 9, border: "1px solid var(--border)", background: "var(--surface)", color: "var(--text2)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
@@ -1041,15 +1041,15 @@ export default function RecruitPage() {
         <h2 style={{ fontSize: 22, fontWeight: 700, textAlign: "center", marginBottom: 24 }}>Why recruiters choose jobSayer</h2>
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 16, marginBottom: 56 }}>
           {[
-            { icon: "🎯", title: "AI-Scored Profiles",      desc: "Every candidate has a resume score (0–100) across ATS compatibility, keywords, and impact language." },
-            { icon: "🔍", title: "JD-to-Profile Matching",  desc: "Paste your JD and instantly see ranked candidate match % — no manual shortlisting." },
-            { icon: "👻", title: "Ghost-Proof Posting",      desc: "We flag JDs with ghost signals. Your posts are reviewed so candidates trust your openings." },
+            { icon: "ti-target", title: "AI-Scored Profiles",      desc: "Every candidate has a resume score (0–100) across ATS compatibility, keywords, and impact language." },
+            { icon: "ti-search", title: "JD-to-Profile Matching",  desc: "Paste your JD and instantly see ranked candidate match % — no manual shortlisting." },
+            { icon: "ti-ghost", title: "Ghost-Proof Posting",      desc: "We flag JDs with ghost signals. Your posts are reviewed so candidates trust your openings." },
             { icon: "⚡", title: "Fast Response Pool",       desc: "Candidates are actively job hunting — average reply rate 78%, 3× higher than job boards." },
-            { icon: "📊", title: "Hiring Analytics",         desc: "Track applicant flow, funnel conversion, and competitor salary benchmarks." },
+            { icon: "ti-chart-bar", title: "Hiring Analytics",         desc: "Track applicant flow, funnel conversion, and competitor salary benchmarks." },
             { icon: "🆓", title: "Free to Start",            desc: "Post your first 3 jobs free. Upgrade when you need scale." },
           ].map(f => (
             <div key={f.title} style={card}>
-              <div style={{ fontSize: 28, marginBottom: 10 }}>{f.icon}</div>
+              <div style={{ fontSize: 28, marginBottom: 10, color: "var(--accent)" }}><i className={`ti ${f.icon}`}/></div>
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{f.title}</div>
               <div style={{ fontSize: 13, color: "var(--text3)", lineHeight: 1.6 }}>{f.desc}</div>
             </div>
@@ -1066,7 +1066,7 @@ export default function RecruitPage() {
             </button>
           ) : (
             <button onClick={() => setAuthModal(true)} style={{ padding: "14px 36px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
-              🏢 Sign in as Recruiter — Free →
+              <i className="ti ti-building" style={{marginRight:4}}/>Sign in as Recruiter — Free →
             </button>
           )}
         </div>

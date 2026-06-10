@@ -1,7 +1,7 @@
 "use client";
 /**
  * /applications — Job Application Tracker
- * Kanban-style board: Saved → Applied → Screening → Interview → Offer / Rejected
+ * Kanban-style board: Saved <i className="ti ti-arrow-right"/> Applied <i className="ti ti-arrow-right"/> Screening <i className="ti ti-arrow-right"/> Interview <i className="ti ti-arrow-right"/> Offer / Rejected
  * Stored in localStorage (guests) and synced to Supabase (signed-in users).
  */
 import React, { useState, useEffect, useCallback } from "react";
@@ -39,11 +39,11 @@ function noticeDays(period: string): number {
 
 /* ── Config ─────────────────────────────────────────────────── */
 const STAGES: { key: Stage; label: string; icon: string; color: string; bg: string }[] = [
-  { key: "saved",       label: "Saved",      icon: "🔖", color: "var(--text2)",    bg: "var(--surface2)" },
-  { key: "applied",     label: "Applied",    icon: "📤", color: "var(--accent)",   bg: "rgba(99,102,241,.08)"  },
-  { key: "screening",   label: "Screening",  icon: "📞", color: "var(--warn)",     bg: "rgba(234,179,8,.08)"   },
-  { key: "interview",   label: "Interview",  icon: "🎤", color: "#a78bfa",         bg: "rgba(167,139,250,.08)" },
-  { key: "offer",       label: "Offer 🎉",   icon: "✅", color: "var(--success)",  bg: "rgba(34,197,94,.08)"   },
+  { key: "saved",       label: "Saved",      icon: "ti-bookmark", color: "var(--text2)",    bg: "var(--surface2)" },
+  { key: "applied",     label: "Applied",    icon: "ti-upload", color: "var(--accent)",   bg: "rgba(99,102,241,.08)"  },
+  { key: "screening",   label: "Screening",  icon: "ti-phone", color: "var(--warn)",     bg: "rgba(234,179,8,.08)"   },
+  { key: "interview",   label: "Interview",  icon: "ti-microphone", color: "#a78bfa",         bg: "rgba(167,139,250,.08)" },
+  { key: "offer",       label: "Offer <i className="ti ti-confetti"/>",   icon: "ti-circle-check", color: "var(--success)",  bg: "rgba(34,197,94,.08)"   },
   { key: "rejected",    label: "Rejected",   icon: "✗",  color: "var(--danger)",   bg: "rgba(239,68,68,.08)"   },
 ];
 
@@ -136,7 +136,7 @@ function AppModal({
               <label style={lbl}>Stage</label>
               <select value={form.stage} onChange={e => set("stage", e.target.value)}
                 style={{ ...inp, appearance: "none" as React.CSSProperties["appearance"] }}>
-                {STAGES.map(s => <option key={s.key} value={s.key}>{s.icon} {s.label}</option>)}
+                {STAGES.map(s => <option key={s.key} value={s.key}><i className={`ti ${s.icon}`}/> {s.label}</option>)}
               </select>
             </div>
             <div>
@@ -289,19 +289,19 @@ function AppCard({ app, onEdit, onDelete, onStageChange }: {
       {/* Stage + date + ghost signal */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
         <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 99, background: stage.bg, color: stage.color }}>
-          {stage.icon} {stage.label}
+          <i className={`ti ${stage.icon}`}/> {stage.label}
         </span>
         <span style={{ fontSize: 11, color: "var(--text3)" }}>
           {daysSince === 0 ? "Today" : daysSince === 1 ? "1 day ago" : `${daysSince} days ago`}
         </span>
         {ghost && (
           <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 99, background: `${ghost.color}15`, border: `1px solid ${ghost.color}40`, color: ghost.color }}>
-            👻 {ghost.pct}% — {ghost.label}
+            <i className="ti ti-ghost"/> {ghost.pct}% — {ghost.label}
           </span>
         )}
         {app.noticePeriod && app.stage !== "offer" && (
           <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 99, background: "var(--surface2)", border: "1px solid var(--border)", color: "var(--text3)" }}>
-            🕐 {app.noticePeriod}
+            <i className="ti ti-clock" style={{marginRight:3}}/>{app.noticePeriod}
           </span>
         )}
       </div>
@@ -309,7 +309,7 @@ function AppCard({ app, onEdit, onDelete, onStageChange }: {
       {/* Joining countdown — shown only on offer stage */}
       {joiningInfo && (
         <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 8, background: `${joiningInfo.color}10`, border: `1px solid ${joiningInfo.color}35` }}>
-          <span style={{ fontSize: 14 }}>{joiningInfo.urgent ? "⚠️" : "📅"}</span>
+          <span style={{ fontSize: 14 }}>{joiningInfo.urgent ? "ti-alert-triangle" : "ti-calendar"}</span>
           <div>
             <div style={{ fontSize: 12, fontWeight: 700, color: joiningInfo.color }}>{joiningInfo.label}</div>
             {app.noticePeriod && app.noticePeriod !== "Immediate" && (
@@ -330,7 +330,7 @@ function AppCard({ app, onEdit, onDelete, onStageChange }: {
             onMouseEnter={e => { e.currentTarget.style.background = s.bg; e.currentTarget.style.color = s.color; e.currentTarget.style.borderColor = s.color + "44"; }}
             onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "var(--text3)"; e.currentTarget.style.borderColor = "var(--border)"; }}
           >
-            → {s.label}
+            <i className="ti ti-arrow-right"/> {s.label}
           </button>
         ))}
       </div>
@@ -344,7 +344,7 @@ function AppCard({ app, onEdit, onDelete, onStageChange }: {
             background: `${ghost.color}08`, color: ghost.color,
             fontSize: 11, fontWeight: 600, cursor: "pointer",
           }}>
-            ✉️ {showEmail ? "Hide" : "Generate follow-up email"}
+            <i className="ti ti-mail"/> {showEmail ? "Hide" : "Generate follow-up email"}
           </button>
           {showEmail && (
             <div style={{ marginTop: 8, background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 10, padding: 12 }}>
@@ -358,7 +358,7 @@ function AppCard({ app, onEdit, onDelete, onStageChange }: {
                 color: emailCopied ? "var(--success)" : "var(--text2)",
                 fontSize: 11, fontWeight: 600, cursor: "pointer",
               }}>
-                {emailCopied ? "✓ Copied!" : "📋 Copy email"}
+                {emailCopied ? "✓ Copied!" : "Copy email"}
               </button>
             </div>
           )}
@@ -444,7 +444,7 @@ export default function ApplicationsPage() {
                 cursor: "pointer", fontFamily: "inherit", textAlign: "center",
                 transition: "all .15s",
               }}>
-              <div style={{ fontSize: 16, marginBottom: 3 }}>{s.icon}</div>
+              <div style={{ fontSize: 16, marginBottom: 3 }}><i className={`ti ${s.icon}`}/></div>
               <div style={{ fontSize: 18, fontWeight: 800, color: s.color, lineHeight: 1 }}>{counts[s.key] ?? 0}</div>
               <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 2, whiteSpace: "nowrap" }}>{s.label}</div>
             </button>
@@ -465,7 +465,7 @@ export default function ApplicationsPage() {
         {/* Empty state */}
         {apps.length === 0 && (
           <div style={{ ...card, padding: "56px 24px", textAlign: "center" }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
+            <div style={{ fontSize: 48, marginBottom: 16 }}><i className="ti ti-layout-list"/></div>
             <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>No applications yet</h2>
             <p style={{ fontSize: 13, color: "var(--text3)", marginBottom: 24, lineHeight: 1.7 }}>
               Start tracking your job applications to stay organised.<br />
@@ -502,7 +502,7 @@ export default function ApplicationsPage() {
         {/* Tips */}
         {apps.length > 0 && (
           <div style={{ ...card, marginTop: 28, padding: "16px 20px", background: "rgba(99,102,241,.04)", borderColor: "var(--accborder)" }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--accent)", marginBottom: 8 }}>💡 Tracker tips</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--accent)", marginBottom: 8 }}><i className="ti ti-bulb"/> Tracker tips</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 8 }}>
               {[
                 "Follow up after 5–7 days of no response",

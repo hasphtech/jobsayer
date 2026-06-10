@@ -30,9 +30,9 @@ interface VerificationRecord {
 }
 
 const STATUS_CFG: Record<string, { label: string; color: string; bg: string; icon: string }> = {
-  pending:            { label: "Pending Review",      color: "var(--warn)", bg: "rgba(234,179,8,.1)",  icon: "⏳" },
-  in_progress:        { label: "Verification In Progress", color: "var(--accent)", bg: "var(--accdim)", icon: "🔍" },
-  verified:           { label: "Fully Verified ✓",    color: "var(--success)", bg: "rgba(34,197,94,.1)",  icon: "🏅" },
+  pending:            { label: "Pending Review",      color: "var(--warn)", bg: "rgba(234,179,8,.1)",  icon: "ti-hourglass" },
+  in_progress:        { label: "Verification In Progress", color: "var(--accent)", bg: "var(--accdim)", icon: "ti-search" },
+  verified:           { label: "Fully Verified ✓",    color: "var(--success)", bg: "rgba(34,197,94,.1)",  icon: "ti-award" },
   partially_verified: { label: "Partially Verified",  color: "var(--warn)", bg: "rgba(234,179,8,.1)",  icon: "⚠" },
   failed:             { label: "Verification Failed", color: "var(--danger)", bg: "rgba(239,68,68,.1)", icon: "✗" },
 };
@@ -130,9 +130,9 @@ export default function VerifyPage() {
           <span style={{ fontSize: 15, fontWeight: 800, color: "var(--text1)" }}>job<span style={{ color: "var(--accent)" }}>Sayer</span></span>
         </Link>
         <span style={{ color: "var(--border)" }}>›</span>
-        <span style={{ fontSize: 14, fontWeight: 600 }}>🏅 Company Verification</span>
+        <span style={{ fontSize: 14, fontWeight: 600 }}><i className="ti ti-award"/> Company Verification</span>
         <div style={{ flex: 1 }} />
-        <Link href="/recruit" style={{ fontSize: 13, color: "var(--text3)", textDecoration: "none" }}>← Employer Portal</Link>
+        <Link href="/recruit" style={{ fontSize: 13, color: "var(--text3)", textDecoration: "none" }}><i className="ti ti-arrow-left"/> Employer Portal</Link>
       </nav>
 
       <div style={{ maxWidth: 700, margin: "0 auto", padding: "40px 20px 80px" }}>
@@ -147,9 +147,9 @@ export default function VerifyPage() {
         {/* What we verify */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 32 }}>
           {[
-            { icon: "🏛", title: "MCA / CIN",  desc: "Ministry of Corporate Affairs — confirms legal registration, directors & status" },
-            { icon: "🧾", title: "GSTIN",       desc: "GST portal live lookup — confirms active GST registration & trade name" },
-            { icon: "📋", title: "PAN",         desc: "Company PAN verification — matches legal entity name" },
+            { icon: "ti-building", title: "MCA / CIN",  desc: "Ministry of Corporate Affairs — confirms legal registration, directors & status" },
+            { icon: "ti-receipt", title: "GSTIN",       desc: "GST portal live lookup — confirms active GST registration & trade name" },
+            { icon: "ti-layout-list", title: "PAN",         desc: "Company PAN verification — matches legal entity name" },
           ].map(c => (
             <div key={c.title} style={{ ...card, padding: "16px", textAlign: "center" }}>
               <div style={{ fontSize: 28, marginBottom: 8 }}>{c.icon}</div>
@@ -185,7 +185,7 @@ export default function VerifyPage() {
                       { label: "PAN",       done: !!existing.pan,           detail: existing.pan ? "Submitted" : "Not provided" },
                     ].map(c => (
                       <div key={c.label} style={{ padding: "10px 12px", borderRadius: 9, background: c.done ? "rgba(34,197,94,.06)" : "var(--surface2)", border: `1px solid ${c.done ? "rgba(34,197,94,.2)" : "var(--border)"}` }}>
-                        <div style={{ fontSize: 18, marginBottom: 4 }}>{c.done ? "✅" : "⭕"}</div>
+                        <div style={{ fontSize: 18, marginBottom: 4 }}>{c.done ? "ti-circle-check" : "⭕"}</div>
                         <div style={{ fontSize: 11, fontWeight: 700, color: c.done ? "var(--success)" : "var(--text2)", marginBottom: 2 }}>{c.label}</div>
                         <div style={{ fontSize: 10, color: "var(--text3)" }}>{c.detail}</div>
                       </div>
@@ -214,7 +214,7 @@ export default function VerifyPage() {
 
                   {existing.admin_notes && (
                     <div style={{ marginTop: 10, padding: "10px 14px", background: "var(--accdim)", borderRadius: 9, fontSize: 13, color: "var(--text2)", border: "1px solid var(--accborder)" }}>
-                      📝 {existing.admin_notes}
+                      <i className="ti ti-note"/> {existing.admin_notes}
                     </div>
                   )}
 
@@ -296,7 +296,7 @@ export default function VerifyPage() {
                 background: "var(--accent)", color: "#fff", fontSize: 14, fontWeight: 700,
                 cursor: "pointer", fontFamily: "inherit",
               }}>
-                {submitting ? "Verifying…" : "Submit for Verification →"}
+                {submitting ? "Verifying…" : "Submit for Verification <i className="ti ti-arrow-right"/>"}
               </button>
 
               <div style={{ fontSize: 11, color: "var(--text3)", textAlign: "center", lineHeight: 1.6 }}>
@@ -309,7 +309,7 @@ export default function VerifyPage() {
 
         {/* Benefits */}
         <div style={{ ...card, marginTop: 28, background: "linear-gradient(135deg,rgba(99,102,241,.06),rgba(99,102,241,.03))", borderColor: "var(--accborder)" }}>
-          <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 14 }}>🏅 Benefits of Verification</h3>
+          <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 14 }}><i className="ti ti-award"/> Benefits of Verification</h3>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
             {[
               "✓ Verified badge on all job listings",

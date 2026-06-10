@@ -116,13 +116,13 @@ export interface LevelInfo {
 }
 
 export const LEVELS: LevelInfo[] = [
-  { level: 1, title: "Job Seeker",     icon: "🌱", minXP: 0,    maxXP: 100,  color: "#94a3b8" },
-  { level: 2, title: "Active Mover",   icon: "🚀", minXP: 101,  maxXP: 300,  color: "#60a5fa" },
-  { level: 3, title: "Career Builder", icon: "⚡", minXP: 301,  maxXP: 600,  color: "#818cf8" },
-  { level: 4, title: "Pro Candidate",  icon: "🎯", minXP: 601,  maxXP: 1000, color: "#a78bfa" },
-  { level: 5, title: "Career Pro",     icon: "🏆", minXP: 1001, maxXP: 1500, color: "#f59e0b" },
-  { level: 6, title: "Top Talent",     icon: "💎", minXP: 1501, maxXP: 2200, color: "#10b981" },
-  { level: 7, title: "Career Master",  icon: "👑", minXP: 2201, maxXP: 99999, color: "#f97316" },
+  { level: 1, title: "Job Seeker",     icon: "ti-leaf",       minXP: 0,    maxXP: 100,  color: "#94a3b8" },
+  { level: 2, title: "Active Mover",   icon: "ti-rocket",     minXP: 101,  maxXP: 300,  color: "#60a5fa" },
+  { level: 3, title: "Career Builder", icon: "ti-bolt",       minXP: 301,  maxXP: 600,  color: "#818cf8" },
+  { level: 4, title: "Pro Candidate",  icon: "ti-target",     minXP: 601,  maxXP: 1000, color: "#a78bfa" },
+  { level: 5, title: "Career Pro",     icon: "ti-trophy",     minXP: 1001, maxXP: 1500, color: "#f59e0b" },
+  { level: 6, title: "Top Talent",     icon: "ti-diamond",    minXP: 1501, maxXP: 2200, color: "#10b981" },
+  { level: 7, title: "Career Master",  icon: "ti-crown",      minXP: 2201, maxXP: 99999, color: "#f97316" },
 ];
 
 export function getLevelInfo(xp: number): LevelInfo & { progressPct: number; xpToNext: number } {
@@ -137,62 +137,62 @@ export function getLevelInfo(xp: number): LevelInfo & { progressPct: number; xpT
 /* ── Badge definitions ───────────────────────────────────────── */
 export const BADGES: BadgeDefinition[] = [
   {
-    id: "first_resume",     icon: "📄", label: "First Resume",
+    id: "first_resume",     icon: "ti-file-text",    label: "First Resume",
     description: "Built your first resume",
     check: s => s.log.some(a => a.type === "resume_built"),
   },
   {
-    id: "score_chaser",     icon: "🎯", label: "Score Chaser",
+    id: "score_chaser",     icon: "ti-target",       label: "Score Chaser",
     description: "Scored your resume 3+ times",
     check: s => s.log.filter(a => a.type === "resume_scored").length >= 3,
   },
   {
-    id: "interview_ready",  icon: "🎤", label: "Interview Ready",
+    id: "interview_ready",  icon: "ti-microphone",   label: "Interview Ready",
     description: "Practiced 5+ interviews",
     check: s => s.log.filter(a => a.type === "interview_practiced").length >= 5,
   },
   {
-    id: "skill_builder",    icon: "⚡", label: "Skill Builder",
+    id: "skill_builder",    icon: "ti-bolt",         label: "Skill Builder",
     description: "Added 3+ skill proofs",
     check: s => s.log.filter(a => a.type === "skill_proof_added").length >= 3,
   },
   {
-    id: "health_guru",      icon: "🏥", label: "Health Guru",
+    id: "health_guru",      icon: "ti-stethoscope",  label: "Health Guru",
     description: "Completed 3 career health checks",
     check: s => s.log.filter(a => a.type === "career_health_checked").length >= 3,
   },
   {
-    id: "negotiator",       icon: "💰", label: "Negotiator",
+    id: "negotiator",       icon: "ti-coin",         label: "Negotiator",
     description: "Used the salary intelligence tool",
     check: s => s.log.some(a => a.type === "salary_checked"),
   },
   {
-    id: "cover_artist",     icon: "✉️", label: "Cover Artist",
+    id: "cover_artist",     icon: "ti-mail",         label: "Cover Artist",
     description: "Generated 3+ cover letters",
     check: s => s.log.filter(a => a.type === "cover_letter_generated").length >= 3,
   },
   {
-    id: "job_hunter",       icon: "🔎", label: "Job Hunter",
+    id: "job_hunter",       icon: "ti-search",       label: "Job Hunter",
     description: "Applied to 10+ jobs",
     check: s => s.log.filter(a => a.type === "job_applied").length >= 10,
   },
   {
-    id: "verified",         icon: "🛡", label: "Verified",
+    id: "verified",         icon: "ti-shield-check", label: "Verified",
     description: "Submitted for background verification",
     check: s => s.log.some(a => a.type === "bgv_submitted"),
   },
   {
-    id: "consistent",       icon: "🔥", label: "Consistent",
+    id: "consistent",       icon: "ti-flame",        label: "Consistent",
     description: "7-day login streak",
     check: s => s.streakDays >= 7,
   },
   {
-    id: "navigator",        icon: "🧭", label: "Navigator",
+    id: "navigator",        icon: "ti-compass",      label: "Navigator",
     description: "Used Career GPS 3+ times",
     check: s => s.log.filter(a => a.type === "career_gps_used").length >= 3,
   },
   {
-    id: "centurion",        icon: "💯", label: "Centurion",
+    id: "centurion",        icon: "ti-award",        label: "Centurion",
     description: "Earned 1000+ XP total",
     check: s => s.totalXP >= 1000,
   },

@@ -136,7 +136,7 @@ export default function EmployerPortalPage() {
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 99, background: "var(--accdim)", border: "1px solid var(--accborder)", fontSize: 11, fontWeight: 700, color: "var(--accent)", marginBottom: 12 }}>
-            🏢 For Employers & Recruiters
+            <i className="ti ti-building"/> For Employers & Recruiters
           </div>
           <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 8, letterSpacing: "-.02em" }}>Employer Portal</h1>
           <p style={{ fontSize: 14, color: "var(--text3)", lineHeight: 1.6, maxWidth: 560 }}>
@@ -147,7 +147,7 @@ export default function EmployerPortalPage() {
 
         {/* Tabs */}
         <div style={{ display: "flex", gap: 4, marginBottom: 28, background: "var(--surface2)", borderRadius: 12, padding: 4, width: "fit-content" }}>
-          {([["keys","🔑 API Keys"],["docs","📖 API Docs"],["tiers","💎 Pricing"]] as const).map(([key, label]) => (
+          {([["keys","API Keys"],["docs","API Docs"],["tiers","Pricing"]] as const).map(([key, label]) => (
             <button key={key} onClick={() => setActiveTab(key)} style={{
               padding: "7px 18px", borderRadius: 9, border: "none", fontSize: 12, fontWeight: 600,
               background: activeTab === key ? "var(--surface)" : "transparent",
@@ -165,7 +165,7 @@ export default function EmployerPortalPage() {
             {newKeyRaw && (
               <div style={{ ...card, padding: "18px 22px", marginBottom: 20, borderColor: "rgba(34,197,94,.3)", background: "rgba(34,197,94,.04)" }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: "var(--success)", marginBottom: 8 }}>
-                  ✅ New API key generated — save it now, it won't be shown again
+                  <i className="ti ti-circle-check"/> New API key generated — save it now, it won't be shown again
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                   <code style={{ flex: 1, padding: "10px 14px", borderRadius: 8, background: "var(--surface2)", border: "1px solid var(--border)", fontSize: 13, fontFamily: "monospace", color: "var(--success)", wordBreak: "break-all" }}>
@@ -194,7 +194,7 @@ export default function EmployerPortalPage() {
               </div>
               <div style={{ marginTop: 10, fontSize: 11, color: "var(--text3)", lineHeight: 1.6 }}>
                 Keys are tied to your account tier. You're currently on the <strong style={{ color: "var(--text2)" }}>Free</strong> tier — 10 pulls/month.
-                {" "}<Link href="#" onClick={() => setActiveTab("tiers")} style={{ color: "var(--accent)" }}>Upgrade →</Link>
+                {" "}<Link href="#" onClick={() => setActiveTab("tiers")} style={{ color: "var(--accent)" }}>Upgrade <i className="ti ti-arrow-right"/></Link>
               </div>
             </div>
 
@@ -307,7 +307,7 @@ export default function EmployerPortalPage() {
             </div>
 
             <div style={{ ...card, padding: "18px 22px", marginTop: 20 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>🔗 ATS Integration</div>
+              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}><i className="ti ti-link"/> ATS Integration</div>
               <p style={{ fontSize: 13, color: "var(--text3)", lineHeight: 1.7, marginBottom: 12 }}>
                 The API follows REST conventions and returns standard JSON — compatible with any ATS that supports webhook/API integrations.
                 Publish your <strong style={{ color: "var(--text2)" }}>OpenAPI spec</strong> to let ATS vendors self-integrate.

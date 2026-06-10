@@ -189,7 +189,7 @@ function JdScannerTab({ resumeText }: { resumeText: string }) {
             }}
           >
             {scanning
-              ? <><span style={{ display: "inline-block", animation: "jsspin 1s linear infinite" }}>⏳</span> Scanning…</>
+              ? <><span style={{ display: "inline-block", animation: "jsspin 1s linear infinite" }}><i className="ti ti-hourglass"/></span> Scanning…</>
               : <><Search size={14} /> Scan JD</>
             }
           </button>
@@ -217,7 +217,7 @@ function JdScannerTab({ resumeText }: { resumeText: string }) {
 
           {/* Signals */}
           <div style={card}>
-            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>🔍 Analysis Signals</div>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}><i className="ti ti-search"/> Analysis Signals</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {result.signals.map((sig, i) => {
                 const c = sig.severity === "red" ? "var(--danger)" : sig.severity === "amber" ? "var(--warn)" : "var(--success)";
@@ -227,7 +227,7 @@ function JdScannerTab({ resumeText }: { resumeText: string }) {
                     background: "var(--surface2)",
                   }}>
                     <div style={{ fontSize: 13, fontWeight: 600, color: c, marginBottom: 3 }}>
-                      {sig.severity === "red" ? "🔴" : sig.severity === "amber" ? "🟡" : "🟢"} {sig.label}
+                      {sig.severity === "red" ? "ti-circle" : sig.severity === "amber" ? "ti-circle" : "ti-circle"} {sig.label}
                     </div>
                     <div style={{ fontSize: 12, color: "var(--text3)", lineHeight: 1.5 }}>{sig.detail}</div>
                   </div>
@@ -239,7 +239,7 @@ function JdScannerTab({ resumeText }: { resumeText: string }) {
           {/* Red flags */}
           {result.redFlags.length > 0 && (
             <div style={{ ...card, borderLeft: "3px solid var(--danger)" }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--danger)", marginBottom: 10 }}>🚨 Red Flags</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--danger)", marginBottom: 10 }}><i className="ti ti-alert-triangle" style={{marginRight:4}}/>Red Flags</div>
               {result.redFlags.map((f, i) => (
                 <div key={i} style={{ fontSize: 13, color: "var(--text2)", marginBottom: 4 }}>• {f}</div>
               ))}
@@ -248,7 +248,7 @@ function JdScannerTab({ resumeText }: { resumeText: string }) {
 
           {/* Salary reality */}
           <div style={{ ...card }}>
-            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>💰 Salary Reality Check</div>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}><i className="ti ti-coin"/> Salary Reality Check</div>
             <div style={{ fontSize: 13, color: "var(--text2)", lineHeight: 1.6 }}>{result.salaryReality}</div>
           </div>
 
@@ -256,7 +256,7 @@ function JdScannerTab({ resumeText }: { resumeText: string }) {
           {result.resumeMatch !== null && (
             <div style={card}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                <div style={{ fontSize: 13, fontWeight: 700 }}>🎯 Your Resume Match</div>
+                <div style={{ fontSize: 13, fontWeight: 700 }}><i className="ti ti-target"/> Your Resume Match</div>
                 <div style={{
                   fontSize: 18, fontWeight: 800,
                   color: result.resumeMatch >= 70 ? "var(--success)" : result.resumeMatch >= 45 ? "var(--warn)" : "var(--danger)",
@@ -273,7 +273,7 @@ function JdScannerTab({ resumeText }: { resumeText: string }) {
 
               {result.matchFound.length > 0 && (
                 <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--success)", marginBottom: 6 }}>✅ Skills you have ({result.matchFound.length})</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--success)", marginBottom: 6 }}><i className="ti ti-circle-check"/> Skills you have ({result.matchFound.length})</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                     {result.matchFound.slice(0, 12).map(s => (
                       <span key={s} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(34,197,94,.08)", color: "var(--success)", border: "1px solid rgba(34,197,94,.2)", fontWeight: 500 }}>{s}</span>
@@ -284,7 +284,7 @@ function JdScannerTab({ resumeText }: { resumeText: string }) {
 
               {result.matchMissing.length > 0 && (
                 <div>
-                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--danger)", marginBottom: 6 }}>❌ Missing skills ({result.matchMissing.length})</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--danger)", marginBottom: 6 }}><i className="ti ti-x"/> Missing skills ({result.matchMissing.length})</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                     {result.matchMissing.map(s => (
                       <span key={s} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(239,68,68,.08)", color: "var(--danger)", border: "1px solid rgba(239,68,68,.2)", fontWeight: 500, textDecoration: "line-through", opacity: .8 }}>{s}</span>
@@ -298,7 +298,7 @@ function JdScannerTab({ resumeText }: { resumeText: string }) {
                   padding: "9px 20px", background: "var(--accent)", borderRadius: 8,
                   color: "#fff", fontSize: 13, fontWeight: 600, textDecoration: "none",
                 }}>
-                  Add missing skills →
+                  Add missing skills <i className="ti ti-arrow-right"/>
                 </Link>
                 <Link href="/score" style={{
                   padding: "9px 20px", background: "var(--surface2)", border: "1px solid var(--border)",
@@ -322,7 +322,7 @@ function JdScannerTab({ resumeText }: { resumeText: string }) {
                 padding: "8px 20px", background: "var(--accent)", borderRadius: 8,
                 color: "#fff", fontSize: 13, fontWeight: 600, textDecoration: "none",
               }}>
-                Build your resume first →
+                Build your resume first <i className="ti ti-arrow-right"/>
               </Link>
             </div>
           )}
@@ -337,7 +337,7 @@ import { matchJd, resumeToText } from "@/lib/jdMatcher";
 import JOBS, { type Job, type JdTrust, type WorkMode } from "@/lib/jobPool";
 import type { ResumeData } from "@/lib/types";
 
-/* ── DB → Job mapper ───────────────────────────────────────────── */
+/* ── DB <i className="ti ti-arrow-right"/> Job mapper ───────────────────────────────────────────── */
 function mapDbJob(j: Record<string, unknown>): Job {
   const postedAt = j.posted_at ? new Date(j.posted_at as string) : new Date();
   const postedDays = Math.max(0, Math.round((Date.now() - postedAt.getTime()) / 86_400_000));
@@ -345,7 +345,7 @@ function mapDbJob(j: Record<string, unknown>): Job {
     id:              String(j.id ?? ""),
     title:           String(j.title ?? ""),
     company:         String(j.company ?? ""),
-    logo:            String(j.logo ?? "🏢"),
+    logo:            String(j.logo ?? "ti-building"),
     location:        String(j.location ?? "India"),
     mode:            ((j.mode as string) || "onsite") as WorkMode,
     exp:             String(j.exp ?? ""),
@@ -371,9 +371,9 @@ function matchColor(pct: number) {
   return pct >= 75 ? "var(--success)" : pct >= 55 ? "var(--warn)" : "var(--danger)";
 }
 function trustLabel(t: Job["trust"]) {
-  return t === "high" ? { label: "🛡 JD Trust: High",   bg: "rgba(34,197,94,.1)",   color: "var(--success)"  }
+  return t === "high" ? { label: "JD Trust: High",   bg: "rgba(34,197,94,.1)",   color: "var(--success)"  }
        : t === "medium" ? { label: "⚠ JD Trust: Medium", bg: "rgba(234,179,8,.1)",  color: "var(--warn)" }
-       : { label: "🔍 Unverified",                        bg: "rgba(239,68,68,.08)", color: "var(--danger)" };
+       : { label: "Unverified",                        bg: "rgba(239,68,68,.08)", color: "var(--danger)" };
 }
 function daysAgo(d: number) {
   return d === 0 ? "Posted today" : d === 1 ? "1 day ago" : `${d} days ago`;
@@ -400,7 +400,7 @@ function SaveJobButton({ jobId }: { jobId: string }) {
       fontSize: 12, fontWeight: 600, cursor: "pointer",
       background: saved ? "rgba(99,102,241,.12)" : "var(--surface2)",
       color: saved ? "var(--accent)" : "var(--text2)",
-    }}>{saved ? "🔖 Saved" : "🔖 Save"}</button>
+    }}><i className="ti ti-bookmark" style={{marginRight:3}}/>{saved ? "Saved" : "Save"}</button>
   );
 }
 
@@ -462,7 +462,7 @@ function JobCard({ job, selected, onClick }: { job: ScoredJob; selected: boolean
               opacity: job.applyUrl ? 1 : 0.5, display: "inline-flex", alignItems: "center",
             }}
           >
-            {job.ghost ? "View ›" : "Apply →"}
+            {job.ghost ? "View ›" : "Apply <i className="ti ti-arrow-right"/>"}
           </a>
         </div>
       </div>
@@ -507,9 +507,9 @@ function DetailPanel({ job, resumeText }: { job: ScoredJob; resumeText: string }
       {/* Details */}
       <div style={{ display: "flex", flexDirection: "column", gap: 7, marginBottom: 14 }}>
         {[
-          { icon: "💰", text: job.salary },
-          { icon: "📍", text: `${job.location} · ${job.mode}` },
-          { icon: "🧑‍💻", text: `${job.exp} experience` },
+          { icon: "ti-coin", text: job.salary },
+          { icon: "ti-map-pin", text: `${job.location} · ${job.mode}` },
+          { icon: "ti-device-laptop", text: `${job.exp} experience` },
           { icon: "⏱",  text: `${daysAgo(job.postedDays)} · ${job.applicants || "—"} applicants` },
         ].map(row => (
           <div key={row.text} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text2)" }}>
@@ -517,7 +517,7 @@ function DetailPanel({ job, resumeText }: { job: ScoredJob; resumeText: string }
           </div>
         ))}
         <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 2 }}>
-          {job.verified && <span style={{ fontSize: 10, padding: "2px 9px", borderRadius: 99, background: "rgba(34,197,94,.08)", color: "var(--success)", border: "1px solid rgba(34,197,94,.15)", fontWeight: 600 }}>🏅 Verified Employer</span>}
+          {job.verified && <span style={{ fontSize: 10, padding: "2px 9px", borderRadius: 99, background: "rgba(34,197,94,.08)", color: "var(--success)", border: "1px solid rgba(34,197,94,.15)", fontWeight: 600 }}><i className="ti ti-award"/> Verified Employer</span>}
           {job.ghost   && <span style={{ fontSize: 10, padding: "2px 9px", borderRadius: 99, background: "rgba(234,179,8,.08)", color: "var(--warn)", border: "1px solid rgba(234,179,8,.2)", fontWeight: 600 }}>⚠ Ghost risk</span>}
         </div>
       </div>
@@ -557,14 +557,14 @@ function DetailPanel({ job, resumeText }: { job: ScoredJob; resumeText: string }
           boxSizing: "border-box" as const,
         }}
       >
-        {job.applyUrl ? "⚡ Apply Now →" : "⚡ No Apply Link"}
+        {job.applyUrl ? "Apply Now <i className="ti ti-arrow-right"/>" : "No Apply Link"}
       </a>
 
       <Link href="/builder" style={{
         display: "block", width: "100%", padding: "10px", textAlign: "center",
         border: "1.5px solid var(--accborder)", borderRadius: 10,
         fontSize: 13, fontWeight: 600, color: "var(--accent)", textDecoration: "none",
-      }}>🎤 Prep for this interview →</Link>
+      }}><i className="ti ti-microphone"/> Prep for this interview <i className="ti ti-arrow-right"/></Link>
 
       {job.avgResponseDays < 10 && (
         <div style={{ marginTop: 12, fontSize: 11, color: "var(--text3)", textAlign: "center" }}>
@@ -602,7 +602,7 @@ export default function JobsPage() {
     setLoading(false);
   }, []);
 
-  // Fetch live jobs: Supabase first → Remotive auto-seed → static pool fallback
+  // Fetch live jobs: Supabase first <i className="ti ti-arrow-right"/> Remotive auto-seed <i className="ti ti-arrow-right"/> static pool fallback
   useEffect(() => {
     let cancelled = false;
     async function loadJobs() {
@@ -617,7 +617,7 @@ export default function JobsPage() {
           setSelectedId(mapped[0].id);
           return;
         }
-        // 2. DB empty → trigger Remotive seed (free public API, no key needed)
+        // 2. DB empty <i className="ti ti-arrow-right"/> trigger Remotive seed (free public API, no key needed)
         if (!cancelled) {
           await fetch("/api/jobs/remotive");
           if (!cancelled) {
@@ -681,15 +681,15 @@ export default function JobsPage() {
   return (
     <AppShell actions={
         <div style={{ display: "flex", gap: 1, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 9, padding: 3 }}>
-          <button onClick={() => setTab("jobs")} style={tabBtn("jobs")}>💼 Jobs</button>
-          <button onClick={() => setTab("scanner")} style={tabBtn("scanner")}>🔍 Scanner</button>
+          <button onClick={() => setTab("jobs")} style={tabBtn("jobs")}><i className="ti ti-briefcase"/> Jobs</button>
+          <button onClick={() => setTab("scanner")} style={tabBtn("scanner")}><i className="ti ti-search"/> Scanner</button>
         </div>
       }>
 
       {tab === "scanner" ? (
         <div style={{ maxWidth: 960, margin: "0 auto", padding: "24px 20px" }}>
           <div style={{ marginBottom: 20 }}>
-            <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}>🔍 Honest JD Scanner</h1>
+            <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}><i className="ti ti-search"/> Honest JD Scanner</h1>
             <p style={{ fontSize: 13, color: "var(--text3)" }}>
               Paste any job description — we&apos;ll score it for ghost-job signals, red flags, requirement inflation, and match it against your resume.
             </p>
@@ -701,8 +701,8 @@ export default function JobsPage() {
           {/* Pill filters strip */}
           <div style={{ padding: "10px 20px", borderBottom: "1px solid var(--border)", display: "flex", gap: 6, alignItems: "center", overflowX: "auto", scrollbarWidth: "none" as const }}>
             <button onClick={() => setFilter("best")}   style={chip("best")}>All jobs</button>
-            <button onClick={() => setFilter("remote")} style={chip("remote")}>🌐 Remote</button>
-            <button onClick={() => setFilter("fresh")}  style={chip("fresh")}>⚡ Today</button>
+            <button onClick={() => setFilter("remote")} style={chip("remote")}><i className="ti ti-world"/> Remote</button>
+            <button onClick={() => setFilter("fresh")}  style={chip("fresh")}><i className="ti ti-bolt"/> Today</button>
             <div style={{ height: 16, width: 1, background: "var(--border)", flexShrink: 0, margin: "0 6px" }} />
             <span style={{ fontSize: 12, color: "var(--text3)", whiteSpace: "nowrap" as const }}>
               <span style={{ fontWeight: 700, color: "var(--text1)" }}>{filtered.filter(j => !j.ghost).length}</span> roles · ranked by match

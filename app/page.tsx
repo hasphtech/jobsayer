@@ -31,12 +31,12 @@ function useWindowWidth() {
 
 /* ── Resume tips pool ───────────────────────────────────────── */
 const TIPS = [
-  { icon: "🎯", text: "Use the exact job title from the JD as your resume headline — ATS matches it directly." },
-  { icon: "📊", text: "Add at least one number to every bullet point. \"Reduced load time by 40%\" beats \"Improved performance\"." },
-  { icon: "🛡", text: "Check the JD Trust Score before applying — ghost jobs waste your time and personal data." },
-  { icon: "⚡", text: "Keep your resume to 1 page if you have under 8 years of experience." },
-  { icon: "🔑", text: "Skills section first for freshers, work experience first for experienced candidates." },
-  { icon: "🤝", text: "Mention the company name in your cover letter — generic letters get ignored." },
+  { icon: "ti-target", text: "Use the exact job title from the JD as your resume headline — ATS matches it directly." },
+  { icon: "ti-chart-bar", text: "Add at least one number to every bullet point. \"Reduced load time by 40%\" beats \"Improved performance\"." },
+  { icon: "ti-shield-check", text: "Check the JD Trust Score before applying — ghost jobs waste your time and personal data." },
+  { icon: "ti-bolt", text: "Keep your resume to 1 page if you have under 8 years of experience." },
+  { icon: "ti-key", text: "Skills section first for freshers, work experience first for experienced candidates." },
+  { icon: "ti-handshake", text: "Mention the company name in your cover letter — generic letters get ignored." },
 ];
 
 /* ── Trending roles ─────────────────────────────────────────── */
@@ -1113,7 +1113,7 @@ function Dashboard({ user }: { user: any }) {
             flexWrap: "wrap", gap: 8,
           }}>
             <span style={{ fontSize: 13, color: "var(--text2)" }}>
-              🏢 You also have a recruiter account — <strong style={{ color: "var(--text1)" }}>{employerProfile.company_name}</strong>
+              <i className="ti ti-building" style={{marginRight:6}}/>You also have a recruiter account — <strong style={{ color: "var(--text1)" }}>{employerProfile.company_name}</strong>
             </span>
             <Link href="/recruit" style={{ fontSize: 12, fontWeight: 700, color: "var(--accent)", textDecoration: "none", padding: "5px 12px", borderRadius: 7, background: "var(--accdim)", border: "1px solid var(--accborder)" }}>
               Switch to Recruiter →
@@ -1125,7 +1125,7 @@ function Dashboard({ user }: { user: any }) {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, gap: 12 }}>
           <div>
             <div style={{ fontSize: mobile ? 22 : 26, fontWeight: 800, letterSpacing: "-.04em", marginBottom: 3 }}>
-              {greeting}, {firstName} 👋
+              {greeting}, {firstName}
             </div>
             {lastSaved
               ? <div style={{ fontSize: 12, color: "var(--text3)" }}>Resume last saved {lastSaved}</div>
@@ -1187,21 +1187,21 @@ function Dashboard({ user }: { user: any }) {
               <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 12, fontWeight: 500 }}>BGV status</div>
               {(() => {
                 if (!bgv) return <>
-                  <div style={{ fontSize: 26, marginBottom: 6 }}>🛡</div>
+                  <div style={{ fontSize: 26, marginBottom: 6, color: "var(--text3)" }}><i className="ti ti-shield-check"/></div>
                   <div style={{ fontSize: 11, color: "var(--text3)", fontWeight: 600 }}>Not started</div>
                   <div style={{ fontSize: 10, color: "var(--accent)", marginTop: 3 }}>Get verified →</div>
                 </>;
                 const cfg: Record<string, { icon: string; label: string; col: string }> = {
-                  pending:     { icon: "⏳", label: "Pending review",    col: "var(--warn)" },
-                  in_progress: { icon: "🔍", label: "In progress",       col: "var(--accent)" },
-                  verified:    { icon: "✅", label: "Verified",           col: "var(--success)" },
-                  partial:     { icon: "⚠",  label: "Partially verified", col: "var(--warn)" },
-                  failed:      { icon: "✗",   label: "Failed",            col: "var(--danger)" },
+                  pending:     { icon: "ti-clock",         label: "Pending review",    col: "var(--warn)" },
+                  in_progress: { icon: "ti-search",        label: "In progress",       col: "var(--accent)" },
+                  verified:    { icon: "ti-circle-check",  label: "Verified",           col: "var(--success)" },
+                  partial:     { icon: "ti-alert-triangle",label: "Partially verified", col: "var(--warn)" },
+                  failed:      { icon: "ti-x",             label: "Failed",            col: "var(--danger)" },
                 };
                 const s = cfg[bgv.status] ?? cfg.pending;
                 const checks = [bgv.id_verified, bgv.edu_verified, bgv.emp_verified].filter(Boolean).length;
                 return <>
-                  <div style={{ fontSize: 22, marginBottom: 5 }}>{s.icon}</div>
+                  <div style={{ fontSize: 22, marginBottom: 5, color: s.col }}><i className={`ti ${s.icon}`}/></div>
                   <div style={{ fontSize: 11, color: s.col, fontWeight: 700 }}>{s.label}</div>
                   <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 3 }}>{checks}/3 checks passed</div>
                 </>;
@@ -1239,7 +1239,7 @@ function Dashboard({ user }: { user: any }) {
               </div>
             ) : (
               <div style={{ textAlign: "center", padding: "28px 0" }}>
-                <div style={{ fontSize: 36, marginBottom: 10 }}>📄</div>
+                <div style={{ fontSize: 36, marginBottom: 10, color: "var(--text3)" }}><i className="ti ti-file-description"/></div>
                 <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>No resume yet</div>
                 <Link href="/builder" style={{ padding: "9px 22px", background: "var(--accent)", borderRadius: 9, color: "#fff", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>Build resume →</Link>
               </div>
@@ -1312,21 +1312,21 @@ function Dashboard({ user }: { user: any }) {
 
             {/* Daily tip */}
             <div style={{ ...card, padding: "18px", flex: 1 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--accent)", marginBottom: 10 }}>💡 Resume tip of the day</div>
-              <div style={{ fontSize: 14, marginBottom: 6 }}>{TIPS[tipIdx].icon}</div>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--accent)", marginBottom: 10 }}><i className="ti ti-bulb" style={{marginRight:4}}/>Resume tip of the day</div>
+              <div style={{ fontSize: 18, marginBottom: 6, color: "var(--accent)" }}><i className={`ti ${TIPS[tipIdx].icon}`}/></div>
               <div style={{ fontSize: 13, color: "var(--text2)", lineHeight: 1.6 }}>{TIPS[tipIdx].text}</div>
             </div>
 
             {/* Recruiter activity */}
             <div style={{ ...card, padding: "18px" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--text3)", marginBottom: 12 }}>📡 Platform activity</div>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--text3)", marginBottom: 12 }}><i className="ti ti-radio" style={{marginRight:4}}/>Platform activity</div>
               {[
-                { icon: "👀", text: "14 recruiters viewed candidate profiles today" },
-                { icon: "✅", text: "3 new verified companies joined this week"      },
-                { icon: "📬", text: "Average recruiter response time: 2.4 days"     },
+                { icon: "ti-eye", text: "14 recruiters viewed candidate profiles today" },
+                { icon: "ti-circle-check", text: "3 new verified companies joined this week"      },
+                { icon: "ti-mail", text: "Average recruiter response time: 2.4 days"     },
               ].map(a => (
                 <div key={a.text} style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 8 }}>
-                  <span style={{ fontSize: 13, flexShrink: 0 }}>{a.icon}</span>
+                  <i className={`ti ${a.icon}`} style={{ fontSize: 14, flexShrink: 0, color: "var(--accent)", marginTop: 1 }}/>
                   <span style={{ fontSize: 12, color: "var(--text3)", lineHeight: 1.5 }}>{a.text}</span>
                 </div>
               ))}

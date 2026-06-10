@@ -28,12 +28,12 @@ const AVAIL_KEY  = "jobsayer-availability";
 const PROOFS_KEY = "jobsayer-skill-proofs";
 
 const PROOF_TYPE_CONFIG: Record<SkillProof["proofType"], { label: string; icon: string; placeholder: string }> = {
-  github:  { label: "GitHub",    icon: "🐙", placeholder: "https://github.com/you/project" },
-  demo:    { label: "Live Demo", icon: "🌐", placeholder: "https://your-project.vercel.app" },
-  article: { label: "Article",   icon: "✍️", placeholder: "https://medium.com/your-article" },
-  project: { label: "Project",   icon: "🚀", placeholder: "https://your-portfolio.com/project" },
-  cert:    { label: "Cert",      icon: "🎓", placeholder: "https://credly.com/badges/..." },
-  other:   { label: "Other",     icon: "🔗", placeholder: "https://..." },
+  github:  { label: "GitHub",    icon: "ti-brand-github", placeholder: "https://github.com/you/project" },
+  demo:    { label: "Live Demo", icon: "ti-world", placeholder: "https://your-project.vercel.app" },
+  article: { label: "Article",   icon: "ti-pencil", placeholder: "https://medium.com/your-article" },
+  project: { label: "Project",   icon: "ti-rocket", placeholder: "https://your-portfolio.com/project" },
+  cert:    { label: "Cert",      icon: "ti-school", placeholder: "https://credly.com/badges/..." },
+  other:   { label: "Other",     icon: "ti-link", placeholder: "https://..." },
 };
 
 const OTW_CONFIG: Record<OpenToWork, { label: string; color: string; bg: string; dot: string }> = {
@@ -292,7 +292,7 @@ export default function ProfilePage() {
               </span>
               {avail.openToWork !== "not_looking" && (
                 <span style={{ fontSize: 11, color: "var(--text3)", padding: "3px 10px", borderRadius: 99, background: "var(--surface2)", border: "1px solid var(--border)" }}>
-                  🕐 {avail.noticePeriod === "immediate" ? "Immediate joiner" : `${avail.noticePeriod}-day notice`}
+                  <i className="ti ti-clock" style={{marginRight:3}}/>{avail.noticePeriod === "immediate" ? "Immediate joiner" : `${avail.noticePeriod}-day notice`}
                 </span>
               )}
             </div>
@@ -312,7 +312,7 @@ export default function ProfilePage() {
         {/* ── Availability & Notice Period ── */}
         <div style={{ ...card, marginBottom: 20 }}>
           <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", marginBottom: 18 }}>
-            🟢 Availability & Notice Period
+            <i className="ti ti-circle"/> Availability & Notice Period
           </div>
 
           {/* Open to Work */}
@@ -398,7 +398,7 @@ export default function ProfilePage() {
                 padding: "10px 20px", background: "var(--accent)", borderRadius: 9,
                 color: "#fff", fontSize: 13, fontWeight: 700, textDecoration: "none",
               }}>
-                Upgrade →
+                Upgrade <i className="ti ti-arrow-right"/>
               </Link>
             )}
           </div>
@@ -413,21 +413,21 @@ export default function ProfilePage() {
         {/* BGV status */}
         <div style={{ ...card, marginBottom: 20 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: bgv ? 14 : 0 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)" }}>🛡 Background Verification</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)" }}><i className="ti ti-shield-check"/> Background Verification</div>
             <Link href="/bgv" style={{ padding: "7px 16px", background: bgv?.status === "verified" ? "rgba(34,197,94,.1)" : "var(--accdim)", border: `1px solid ${bgv?.status === "verified" ? "rgba(34,197,94,.3)" : "var(--accborder)"}`, borderRadius: 8, color: bgv?.status === "verified" ? "var(--success)" : "var(--accent)", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
-              {bgv ? "View / Update →" : "Start BGV →"}
+              {bgv ? "View / Update <i className="ti ti-arrow-right"/>" : "Start BGV <i className="ti ti-arrow-right"/>"}
             </Link>
           </div>
           {bgv ? (
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
                 <span style={{ fontSize: 13, fontWeight: 700, color: bgv.status === "verified" ? "var(--success)" : bgv.status === "failed" ? "var(--danger)" : "var(--warn)", padding: "3px 10px", borderRadius: 8, background: bgv.status === "verified" ? "rgba(34,197,94,.1)" : bgv.status === "failed" ? "rgba(239,68,68,.1)" : "rgba(234,179,8,.1)", textTransform: "capitalize" }}>
-                  {bgv.status === "in_progress" ? "🔍 In Progress" : bgv.status === "verified" ? "🛡 Verified" : bgv.status === "failed" ? "✗ Failed" : "⏳ Pending Review"}
+                  {bgv.status === "in_progress" ? "In Progress" : bgv.status === "verified" ? "Verified" : bgv.status === "failed" ? "✗ Failed" : "Pending Review"}
                 </span>
                 {bgv.verification_score != null && <span style={{ fontSize: 12, color: "var(--text3)" }}>Score: <strong style={{ color: "var(--text1)" }}>{bgv.verification_score}/100</strong></span>}
               </div>
               <div style={{ display: "flex", gap: 8 }}>
-                {[["🪪 ID", bgv.id_verified], ["🎓 Education", bgv.edu_verified], ["💼 Employment", bgv.emp_verified]].map(([l, v]) => (
+                {[["ID", bgv.id_verified], ["Education", bgv.edu_verified], ["Employment", bgv.emp_verified]].map(([l, v]) => (
                   <span key={l as string} style={{ fontSize: 11, padding: "3px 10px", borderRadius: 6, fontWeight: 600, background: v ? "rgba(34,197,94,.08)" : "var(--surface2)", color: v ? "var(--success)" : "var(--text3)", border: `1px solid ${v ? "rgba(34,197,94,.2)" : "var(--border)"}` }}>
                     {l as string} {v ? "✓" : "○"}
                   </span>
@@ -451,7 +451,7 @@ export default function ProfilePage() {
           ) : saves.length === 0 ? (
             <div style={{ fontSize: 13, color: "var(--text3)" }}>
               No saved resumes yet.{" "}
-              <Link href="/builder" style={{ color: "var(--accent)" }}>Open the builder →</Link>
+              <Link href="/builder" style={{ color: "var(--accent)" }}>Open the builder <i className="ti ti-arrow-right"/></Link>
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -485,7 +485,7 @@ export default function ProfilePage() {
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)" }}>🔍 Employer Discoverability</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)" }}><i className="ti ti-search"/> Employer Discoverability</div>
                 <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 99,
                   background: discoverable ? "rgba(34,197,94,.1)" : "var(--surface2)",
                   color: discoverable ? "var(--success)" : "var(--text3)",
@@ -521,7 +521,7 @@ export default function ProfilePage() {
         <div style={{ ...card, marginBottom: 20 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)" }}>⚡ Proof of Skills</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)" }}><i className="ti ti-bolt"/> Proof of Skills</div>
               <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 3 }}>Attach verifiable proof to each skill — GitHub repos, live demos, articles, certs.</div>
             </div>
             <button onClick={() => setProofForm(f => !f)} style={{ padding: "7px 16px", borderRadius: 8, background: "var(--accdim)", border: "1px solid var(--accborder)", color: "var(--accent)", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
@@ -594,12 +594,12 @@ export default function ProfilePage() {
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
             {[
               { href: "/builder",    label: "✏️ Resume Builder" },
-              { href: "/score",      label: "🎯 My Score" },
-              { href: "/jobs",       label: "💼 Matched Jobs" },
-              { href: "/interview",  label: "🎤 Interview Prep" },
-              { href: "/career-gps", label: "🧭 Career GPS" },
-              { href: "/bgv",        label: "🛡 Background Verify" },
-              { href: "/upgrade",    label: "⚡ Upgrade Plan" },
+              { href: "/score",      label: "My Score" },
+              { href: "/jobs",       label: "Matched Jobs" },
+              { href: "/interview",  label: "Interview Prep" },
+              { href: "/career-gps", label: "Career GPS" },
+              { href: "/bgv",        label: "Background Verify" },
+              { href: "/upgrade",    label: "Upgrade Plan" },
             ].map(l => (
               <Link key={l.href} href={l.href} style={{
                 padding: "8px 16px", background: "var(--surface2)", borderRadius: 9,
@@ -613,7 +613,7 @@ export default function ProfilePage() {
         {/* Billing — Manage subscription */}
         {plan.tier !== "free" && (
           <div style={{ ...card, marginBottom: 20 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", marginBottom: 10 }}>💳 Billing</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", marginBottom: 10 }}><i className="ti ti-credit-card"/> Billing</div>
             <p style={{ fontSize: 13, color: "var(--text2)", marginBottom: 14 }}>
               Manage your subscription, view invoices, and update your payment method via the Stripe billing portal.
             </p>
@@ -626,14 +626,14 @@ export default function ProfilePage() {
                 cursor: "pointer", fontFamily: "inherit",
               }}
             >
-              {billingLoading ? "Opening…" : "Manage Billing →"}
+              {billingLoading ? "Opening…" : "Manage Billing <i className="ti ti-arrow-right"/>"}
             </button>
           </div>
         )}
 
         {/* Referral programme */}
         <div style={{ ...card, marginBottom: 20 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", marginBottom: 10 }}>🎁 Refer & Earn</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", marginBottom: 10 }}><i className="ti ti-gift"/> Refer & Earn</div>
           <p style={{ fontSize: 13, color: "var(--text2)", marginBottom: 14 }}>
             Share your link — when someone signs up, you both get <strong>1 month of Career Pro free</strong>.
           </p>
@@ -665,7 +665,7 @@ export default function ProfilePage() {
 
         {/* Data & Privacy */}
         <div style={{ ...card, marginBottom: 20 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", marginBottom: 10 }}>🔒 Your Data (GDPR)</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", marginBottom: 10 }}><i className="ti ti-lock"/> Your Data (GDPR)</div>
           <p style={{ fontSize: 13, color: "var(--text2)", marginBottom: 14 }}>
             Download all data we hold about you, or permanently delete your account under GDPR Art. 17 &amp; 20.
           </p>
@@ -678,7 +678,7 @@ export default function ProfilePage() {
               cursor: "pointer", fontFamily: "inherit",
             }}
           >
-            {exportLoading ? "Preparing export…" : "⬇ Download my data"}
+            {exportLoading ? "Preparing export…" : "Download my data"}
           </button>
         </div>
 

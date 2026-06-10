@@ -1,7 +1,7 @@
 "use client";
 /**
  * /score/free — No-login instant ATS score
- * Acquisition funnel: paste resume text → instant score + 3 fixes.
+ * Acquisition funnel: paste resume text <i className="ti ti-arrow-right"/> instant score + 3 fixes.
  * Full report + builder gated behind signup.
  */
 import React, { useState } from "react";
@@ -222,7 +222,7 @@ export default function FreeScorePage() {
             {/* Paste area */}
             <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: 20, marginBottom: 16 }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text2)", marginBottom: 10 }}>
-                📋 Paste your resume text
+                <i className="ti ti-layout-list"/> Paste your resume text
               </div>
               <textarea
                 value={text}
@@ -253,13 +253,13 @@ export default function FreeScorePage() {
                     fontFamily: "inherit",
                   }}
                 >
-                  {scoring ? "Scoring…" : "⚡ Score my resume"}
+                  {scoring ? "Scoring…" : "Score my resume"}
                 </button>
               </div>
             </div>
 
             <p style={{ textAlign: "center", fontSize: 11, color: "var(--text3)" }}>
-              🔒 Your resume text is processed locally — never stored without an account.
+              <i className="ti ti-lock"/> Your resume text is processed locally — never stored without an account.
             </p>
           </>
         )}
@@ -291,7 +291,7 @@ export default function FreeScorePage() {
             {/* Top 3 fixes — always visible */}
             <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "22px 24px", marginBottom: 20 }}>
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}>
-                🔧 Your top {Math.min(3, result.improvements.length)} fixes
+                <i className="ti ti-tool"/> Your top {Math.min(3, result.improvements.length)} fixes
                 <span style={{ fontSize: 11, color: "var(--text3)", fontWeight: 400, marginLeft: 8 }}>
                   (fix these first for biggest score jump)
                 </span>
@@ -347,7 +347,7 @@ export default function FreeScorePage() {
                   padding: "0 24px", textAlign: "center",
                 }}>
                   <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text1)", marginBottom: 6 }}>
-                    🔒 {result.improvements.length - 3} more improvements found
+                    <i className="ti ti-lock"/> {result.improvements.length - 3} more improvements found
                   </div>
                   <p style={{ fontSize: 13, color: "var(--text3)", marginBottom: 16, maxWidth: 340 }}>
                     Create a free account to unlock the full report, fix your resume in the builder, and get AI-tailored suggestions per job.
@@ -358,7 +358,7 @@ export default function FreeScorePage() {
                     fontSize: 14, fontWeight: 700, textDecoration: "none",
                     display: "inline-flex", alignItems: "center", gap: 8,
                   }}>
-                    Get full report — free →
+                    Get full report — free <i className="ti ti-arrow-right"/>
                   </Link>
                   <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 10 }}>No credit card · 2-min setup · Free forever tier</div>
                 </div>
@@ -369,7 +369,7 @@ export default function FreeScorePage() {
             {result.missingSkills.length > 0 && (
               <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "20px 24px", marginBottom: 20 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>
-                  ⚠️ Missing market-relevant keywords
+                  <i className="ti ti-alert-triangle"/> Missing market-relevant keywords
                   <span style={{ fontSize: 11, color: "var(--text3)", fontWeight: 400, marginLeft: 8 }}>showing 3 of {result.missingSkills.length}</span>
                 </div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
@@ -385,7 +385,7 @@ export default function FreeScorePage() {
                   </span>
                 </div>
                 <Link href="/auth/signup?from=free-score" style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>
-                  Fix keywords in the Resume Builder →
+                  Fix keywords in the Resume Builder <i className="ti ti-arrow-right"/>
                 </Link>
               </div>
             )}
@@ -397,7 +397,7 @@ export default function FreeScorePage() {
                 background: "transparent", color: "var(--text3)", fontSize: 13,
                 cursor: "pointer", fontFamily: "inherit",
               }}>
-                ← Score a different resume
+                <i className="ti ti-arrow-left"/> Score a different resume
               </button>
             </div>
           </>

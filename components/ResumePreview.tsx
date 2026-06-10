@@ -909,7 +909,7 @@ function TemplateSidebarPro({ data, accent, thumbnail = false }: { data: ResumeD
             {data.email    && <span style={{ wordBreak: "break-all" as const }}>✉ {data.email}</span>}
             {data.phone    && <span>✆ {data.phone}</span>}
             {data.location && <span>⌖ {data.location}</span>}
-            {data.website  && <span style={{ wordBreak: "break-all" as const }}>🌐 {data.website}</span>}
+            {data.website  && <span style={{ wordBreak: "break-all" as const }}><i className="ti ti-world"/> {data.website}</span>}
             {data.linkedin && <span style={{ wordBreak: "break-all" as const }}>in {data.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//i, "")}</span>}
             {data.github   && <span style={{ wordBreak: "break-all" as const }}>⌥ {data.github.replace(/^https?:\/\/(www\.)?github\.com\//i, "")}</span>}
           </div>
@@ -1069,7 +1069,7 @@ function TemplateTech({ data, accent, thumbnail = false }: { data: ResumeData; a
                 <strong style={{ fontSize: 13, color: "#111827" }}>{w.role || "Role"}</strong>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ fontSize: 11, color: accent, fontFamily: "monospace" }}>{w.company}</span>
-                  <span style={{ fontSize: 10, color: "#9ca3af", fontFamily: "monospace" }}>{[w.from, w.current ? "Present" : w.to].filter(Boolean).join(" → ")}</span>
+                  <span style={{ fontSize: 10, color: "#9ca3af", fontFamily: "monospace" }}>{[w.from, w.current ? "Present" : w.to].filter(Boolean).join(" <i className="ti ti-arrow-right"/> ")}</span>
                 </div>
                 {w.desc && <p style={{ color: "#4b5563", fontSize: 11, lineHeight: 1.5, marginTop: 3 }}>{w.desc}</p>}
               </div>
@@ -1083,7 +1083,7 @@ function TemplateTech({ data, accent, thumbnail = false }: { data: ResumeData; a
               {data.projects.map((p: ProjectEntry) => (p.name || p.desc) && (
                 <div key={p.id} style={{ marginBottom: 12, borderLeft: `2px solid ${accent}60`, paddingLeft: 12 }}>
                   <strong style={{ fontSize: 12, color: "#111827" }}>{p.name}</strong>
-                  {p.url && <a href={p.url} style={{ marginLeft: 8, fontSize: 10, color: accent, fontFamily: "monospace" }} target="_blank" rel="noopener noreferrer">→ {p.url}</a>}
+                  {p.url && <a href={p.url} style={{ marginLeft: 8, fontSize: 10, color: accent, fontFamily: "monospace" }} target="_blank" rel="noopener noreferrer"><i className="ti ti-arrow-right"/> {p.url}</a>}
                   {p.desc && <p style={{ color: "#4b5563", fontSize: 11, lineHeight: 1.5, marginTop: 2 }}>{p.desc}</p>}
                 </div>
               ))}
@@ -1407,7 +1407,7 @@ function TemplateNordic({ data, accent, thumbnail = false }: { data: ResumeData;
             { icon: "✉", val: data.email },
             { icon: "✆", val: data.phone },
             { icon: "⌖", val: data.location },
-            { icon: "🌐", val: data.website },
+            { icon: "ti-world", val: data.website },
             { icon: "in", val: data.linkedin ? data.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//i, "") : "" },
             { icon: "⌥",  val: data.github   ? data.github.replace(/^https?:\/\/(www\.)?github\.com\//i, "")   : "" },
           ].filter(item => Boolean(item.val)).map((item, i) => (
@@ -1646,7 +1646,7 @@ function TemplateHorizon({ data, accent, thumbnail = false }: { data: ResumeData
             { icon: "✉", val: data.email },
             { icon: "✆", val: data.phone },
             { icon: "⌖", val: data.location },
-            { icon: "🌐", val: data.website },
+            { icon: "ti-world", val: data.website },
             { icon: "in", val: data.linkedin ? data.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//i, "") : "" },
             { icon: "⌥",  val: data.github   ? data.github.replace(/^https?:\/\/(www\.)?github\.com\//i, "")   : "" },
           ].filter(item => Boolean(item.val)).map((item, i) => (
@@ -1789,7 +1789,7 @@ function TemplateOrbit({ data, accent, thumbnail = false }: { data: ResumeData; 
             { icon: "✉", val: data.email },
             { icon: "✆", val: data.phone },
             { icon: "⌖", val: data.location },
-            { icon: "🌐", val: data.website },
+            { icon: "ti-world", val: data.website },
             { icon: "in", val: data.linkedin ? data.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//i, "") : "" },
             { icon: "⌥",  val: data.github   ? data.github.replace(/^https?:\/\/(www\.)?github\.com\//i, "")   : "" },
           ].filter(item => Boolean(item.val)).map((item, i) => (

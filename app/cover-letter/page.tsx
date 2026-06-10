@@ -25,8 +25,8 @@ type Length = "short" | "medium" | "long";
 
 /* ── Constants ───────────────────────────────────────────── */
 const TONES: { value: Tone; label: string; desc: string; icon: string }[] = [
-  { value: "professional",  label: "Professional", desc: "Polished & confident",  icon: "🎩" },
-  { value: "enthusiastic",  label: "Enthusiastic", desc: "Warm & energetic",      icon: "⚡" },
+  { value: "professional",  label: "Professional", desc: "Polished & confident",  icon: "ti-hat" },
+  { value: "enthusiastic",  label: "Enthusiastic", desc: "Warm & energetic",      icon: "ti-bolt" },
   { value: "concise",       label: "Concise",      desc: "Direct & crisp",        icon: "✂️" },
 ];
 const LENGTHS: { value: Length; label: string; words: string }[] = [
@@ -225,7 +225,7 @@ export default function CoverLetterPage() {
 
         {/* Header */}
         <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>✉️ Cover Letter Builder</h1>
+          <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}><i className="ti ti-mail"/> Cover Letter Builder</h1>
           <p style={{ color: "var(--text2)", fontSize: 13 }}>
             AI-tailored cover letters linked to your saved resumes.
           </p>
@@ -235,7 +235,7 @@ export default function CoverLetterPage() {
         {user && (
           <div style={{ ...card, padding: "14px 18px", marginBottom: 20, display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
             <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)", flexShrink: 0 }}>
-              📄 Link to resume:
+              <i className="ti ti-file-text"/> Link to resume:
             </span>
             <select
               value={selectedResumeId}
@@ -270,7 +270,7 @@ export default function CoverLetterPage() {
 
             {/* Role details */}
             <div style={card}>
-              <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>📋 Role details</p>
+              <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}><i className="ti ti-layout-list"/> Role details</p>
 
               <div style={{ marginBottom: 12 }}>
                 <label style={lbl}>Your name</label>
@@ -302,7 +302,7 @@ export default function CoverLetterPage() {
 
             {/* Background */}
             <div style={card}>
-              <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>🧠 Your background</p>
+              <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}><i className="ti ti-brain"/> Your background</p>
               {selectedResumeId && (
                 <p style={{ fontSize: 11, color: "var(--success)", marginBottom: 12 }}>✓ Auto-filled from selected resume — edit as needed</p>
               )}
@@ -328,7 +328,7 @@ export default function CoverLetterPage() {
 
             {/* Tone */}
             <div style={card}>
-              <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 12 }}>🎭 Tone</p>
+              <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 12 }}><i className="ti ti-masks-theater"/> Tone</p>
               <div style={{ display: "flex", gap: 8 }}>
                 {TONES.map(t => (
                   <button key={t.value} onClick={() => setTone(t.value)}
@@ -338,7 +338,7 @@ export default function CoverLetterPage() {
                       background: tone === t.value ? "var(--accdim)" : "var(--surface2)",
                       textAlign: "center" as const,
                     }}>
-                    <div style={{ fontSize: 14, marginBottom: 2 }}>{t.icon}</div>
+                    <div style={{ fontSize: 14, marginBottom: 2 }}><i className={`ti ${t.icon}`}/></div>
                     <div style={{ fontSize: 12, fontWeight: 600, color: tone === t.value ? "var(--accent)" : "var(--text1)" }}>{t.label}</div>
                     <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 1 }}>{t.desc}</div>
                   </button>
@@ -348,7 +348,7 @@ export default function CoverLetterPage() {
 
             {/* Length */}
             <div style={{ ...card, marginBottom: 16 }}>
-              <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 12 }}>📏 Length</p>
+              <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 12 }}><i className="ti ti-ruler-2" style={{marginRight:4}}/>Length</p>
               <div style={{ display: "flex", gap: 8 }}>
                 {LENGTHS.map(l => (
                   <button key={l.value} onClick={() => setLength(l.value)}
@@ -382,7 +382,7 @@ export default function CoverLetterPage() {
                   <span className="spinner" style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,.3)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block" }} />
                   Generating…
                 </>
-              ) : "✨ Generate cover letter"}
+              ) : "Generate cover letter"}
             </button>
           </div>
 
@@ -391,7 +391,7 @@ export default function CoverLetterPage() {
             {/* Empty state */}
             {!letter && !loading && (
               <div style={{ ...card, minHeight: 320, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, color: "var(--text3)", textAlign: "center" }}>
-                <div style={{ fontSize: 44 }}>✉️</div>
+                <div style={{ fontSize: 44 }}><i className="ti ti-mail"/></div>
                 <p style={{ fontSize: 13 }}>
                   Fill in the role details and click<br />
                   <strong style={{ color: "var(--text2)" }}>"Generate cover letter"</strong>
@@ -416,13 +416,13 @@ export default function CoverLetterPage() {
                 {/* Toolbar */}
                 <div style={{ display: "flex", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
                   <button onClick={generate} style={{ padding: "7px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--surface2)", color: "var(--text2)", fontSize: 12, cursor: "pointer" }}>
-                    🔄 Regenerate
+                    <i className="ti ti-refresh"/> Regenerate
                   </button>
                   <button onClick={copyToClipboard} style={{ padding: "7px 12px", borderRadius: 8, border: `1px solid ${copied ? "var(--success)" : "var(--border)"}`, background: copied ? "rgba(34,197,94,.1)" : "var(--surface2)", color: copied ? "var(--success)" : "var(--text2)", fontSize: 12, cursor: "pointer" }}>
-                    {copied ? "✓ Copied!" : "📋 Copy"}
+                    {copied ? "✓ Copied!" : "Copy"}
                   </button>
                   <button onClick={downloadTxt} style={{ padding: "7px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--surface2)", color: "var(--text2)", fontSize: 12, cursor: "pointer" }}>
-                    ⬇ .txt
+                    <i className="ti ti-arrow-down"/> .txt
                   </button>
                   {user && (
                     <button onClick={saveLetter} disabled={saving || !!savedId} style={{
@@ -432,7 +432,7 @@ export default function CoverLetterPage() {
                       color: savedId ? "var(--success)" : "var(--accent)",
                       fontWeight: 600,
                     }}>
-                      {saving ? "Saving…" : savedId ? "✓ Saved" : selectedResumeId ? "💾 Save to resume" : "💾 Save"}
+                      {saving ? "Saving…" : savedId ? "✓ Saved" : selectedResumeId ? "Save to resume" : "Save"}
                     </button>
                   )}
                   {edited && !savedId && <span style={{ fontSize: 11, color: "var(--warn)", alignSelf: "center" }}>● Unsaved edits</span>}
@@ -461,10 +461,10 @@ export default function CoverLetterPage() {
                 </div>
 
                 <div style={{ background: "var(--accdim)", border: "1px solid var(--accborder)", borderRadius: 12, padding: 14 }}>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: "var(--accent)", marginBottom: 8 }}>💡 Before you send</p>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: "var(--accent)", marginBottom: 8 }}><i className="ti ti-bulb"/> Before you send</p>
                   {["Add hiring manager's name if known", "Add date and your contact details above", "Paste into Gmail / Word and format as needed"].map(t => (
                     <div key={t} style={{ fontSize: 12, color: "var(--text2)", display: "flex", gap: 7, alignItems: "flex-start", marginBottom: 4 }}>
-                      <span style={{ color: "var(--accent)", flexShrink: 0 }}>→</span> {t}
+                      <span style={{ color: "var(--accent)", flexShrink: 0 }}><i className="ti ti-arrow-right"/></span> {t}
                     </div>
                   ))}
                 </div>
@@ -475,7 +475,7 @@ export default function CoverLetterPage() {
             {user && selectedResumeId && savedLetters.length > 0 && (
               <div style={{ ...card, marginTop: 16 }}>
                 <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 14, color: "var(--text1)" }}>
-                  💾 Saved letters for this resume
+                  <i className="ti ti-bookmark" style={{marginRight:4}}/>Saved letters for this resume
                   <span style={{ fontSize: 11, color: "var(--text3)", fontWeight: 400, marginLeft: 8 }}>({savedLetters.length})</span>
                 </p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>

@@ -160,7 +160,7 @@ export default function EmployerTrustPage() {
         {/* Header */}
         <div style={{ marginBottom: 28 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 99, background: "var(--accdim)", border: "1px solid var(--accborder)", fontSize: 11, fontWeight: 700, color: "var(--accent)", marginBottom: 12 }}>
-            🌍 Global · Candidate-reported
+            <i className="ti ti-world"/> Global · Candidate-reported
           </div>
           <h1 style={{ fontSize: 28, fontWeight: 800, marginBottom: 8, letterSpacing: "-.02em" }}>Employer Trust Ratings</h1>
           <p style={{ fontSize: 14, color: "var(--text3)", lineHeight: 1.7, maxWidth: 580 }}>
@@ -171,7 +171,7 @@ export default function EmployerTrustPage() {
         {/* Top/Worst callouts */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 28 }}>
           <div style={{ ...card, padding: "16px 20px", borderColor: "rgba(34,197,94,.25)", background: "rgba(34,197,94,.04)" }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--success)", marginBottom: 12 }}>✅ Most trusted employers</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--success)", marginBottom: 12 }}><i className="ti ti-circle-check"/> Most trusted employers</div>
             {topTrusted.map(e => (
               <div key={e.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                 <span style={{ fontSize: 11, color: "var(--text1)", fontWeight: 600, flex: 1 }}>{e.company}</span>
@@ -181,7 +181,7 @@ export default function EmployerTrustPage() {
             ))}
           </div>
           <div style={{ ...card, padding: "16px 20px", borderColor: "rgba(239,68,68,.25)", background: "rgba(239,68,68,.04)" }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--danger)", marginBottom: 12 }}>👻 Highest ghost rates</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--danger)", marginBottom: 12 }}><i className="ti ti-ghost"/> Highest ghost rates</div>
             {worstGhost.map(e => (
               <div key={e.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                 <span style={{ fontSize: 11, color: "var(--text1)", fontWeight: 600, flex: 1 }}>{e.company}</span>
@@ -290,7 +290,7 @@ export default function EmployerTrustPage() {
                     {/* CTA */}
                     <div style={{ display: "flex", gap: 10 }}>
                       <Link href="/jobs" style={{ padding: "8px 18px", borderRadius: 8, background: "var(--accent)", color: "#fff", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
-                        Find jobs here →
+                        Find jobs here <i className="ti ti-arrow-right"/>
                       </Link>
                       <Link href="/interview" style={{ padding: "8px 18px", borderRadius: 8, background: "var(--surface2)", border: "1px solid var(--border)", color: "var(--text1)", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
                         Prep for interview
@@ -305,12 +305,12 @@ export default function EmployerTrustPage() {
 
         {/* Submit rating CTA */}
         <div style={{ marginTop: 32, padding: "20px 24px", borderRadius: 14, background: "linear-gradient(135deg,rgba(99,102,241,.06),rgba(99,102,241,.02))", border: "1px solid var(--accborder)" }}>
-          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>📝 Had a hiring experience?</div>
+          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}><i className="ti ti-note"/> Had a hiring experience?</div>
           <p style={{ fontSize: 13, color: "var(--text3)", lineHeight: 1.6, marginBottom: 14, maxWidth: 500 }}>
             Help other professionals make informed decisions. Rate your interview experience — response time, fairness, ghosting. Anonymous and community-powered.
           </p>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {["⚡ Response time", "👻 Were you ghosted?", "🎯 Interview fairness", "💸 Offer transparency"].map(label => (
+            {["Response time", "Were you ghosted?", "Interview fairness", "Offer transparency"].map(label => (
               <span key={label} style={{ padding: "6px 14px", borderRadius: 99, fontSize: 12, fontWeight: 600, background: "var(--accdim)", border: "1px solid var(--accborder)", color: "var(--accent)" }}>{label}</span>
             ))}
           </div>

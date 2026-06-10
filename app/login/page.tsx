@@ -153,12 +153,12 @@ export default function LoginPage() {
 
             {/* Magic link */}
             <button onClick={() => setMode("email")} style={{ ...socialBtn("none", "var(--text1)"), border: "1px solid var(--border)" }}>
-              ✉️ Continue with Email
+              <i className="ti ti-mail"/> Continue with Email
             </button>
 
             {/* Enterprise SSO */}
             <button onClick={() => setMode("sso")} style={{ padding: "10px", fontSize: 13, color: "var(--text3)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
-              🔑 Enterprise SSO
+              <i className="ti ti-key"/> Enterprise SSO
             </button>
           </>
         )}
@@ -167,7 +167,7 @@ export default function LoginPage() {
         {(mode === "email" || mode === "otp") && (
           <>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-              <button onClick={() => { setMode("options"); setErr(""); setInfo(""); }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18, padding: 0 }}>←</button>
+              <button onClick={() => { setMode("options"); setErr(""); setInfo(""); }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18, padding: 0 }}><i className="ti ti-arrow-left"/></button>
               <h2 style={{ fontSize: 18, fontWeight: 800, margin: 0 }}>
                 {mode === "email" ? "Enter your email" : "Check your inbox"}
               </h2>
@@ -184,7 +184,7 @@ export default function LoginPage() {
                   style={inp}
                 />
                 <button type="submit" disabled={busy} style={{ padding: "13px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
-                  {busy ? "Sending…" : "Send Magic Link →"}
+                  {busy ? "Sending…" : "Send Magic Link <i className="ti ti-arrow-right"/>"}
                 </button>
               </form>
             ) : (
@@ -198,7 +198,7 @@ export default function LoginPage() {
                   style={{ ...inp, textAlign: "center", fontSize: 28, letterSpacing: 8, fontWeight: 700 }}
                 />
                 <button type="submit" disabled={busy || otp.length < 6} style={{ padding: "13px", borderRadius: 12, border: "none", background: otp.length >= 6 ? "var(--accent)" : "var(--surface2)", color: otp.length >= 6 ? "#fff" : "var(--text3)", fontSize: 15, fontWeight: 700, cursor: otp.length >= 6 ? "pointer" : "not-allowed" }}>
-                  {busy ? "Verifying…" : "Sign In →"}
+                  {busy ? "Verifying…" : "Sign In <i className="ti ti-arrow-right"/>"}
                 </button>
                 <button type="button" onClick={() => handleSendOtp({ preventDefault: () => {} } as React.FormEvent)} style={{ padding: "8px", fontSize: 13, color: "var(--text3)", background: "none", border: "none", cursor: "pointer" }}>
                   Resend code
@@ -212,7 +212,7 @@ export default function LoginPage() {
         {mode === "sso" && (
           <>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-              <button onClick={() => { setMode("options"); setErr(""); }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18, padding: 0 }}>←</button>
+              <button onClick={() => { setMode("options"); setErr(""); }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18, padding: 0 }}><i className="ti ti-arrow-left"/></button>
               <h2 style={{ fontSize: 18, fontWeight: 800, margin: 0 }}>Enterprise SSO</h2>
             </div>
 
@@ -229,7 +229,7 @@ export default function LoginPage() {
                 style={inp}
               />
               <button type="submit" disabled={busy} style={{ padding: "13px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
-                {busy ? "Looking up…" : "Continue with SSO →"}
+                {busy ? "Looking up…" : "Continue with SSO <i className="ti ti-arrow-right"/>"}
               </button>
             </form>
 

@@ -41,7 +41,7 @@ function JdMatchPanel({ resumeText }: { resumeText: string }) {
       borderRadius: 16, padding: "22px",
     }}>
       <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 14 }}>
-        🎯 Match Against a Specific JD
+        <i className="ti ti-target"/> Match Against a Specific JD
       </div>
       <textarea
         value={jdText}
@@ -90,7 +90,7 @@ function JdMatchPanel({ resumeText }: { resumeText: string }) {
 
           {result.found.length > 0 && (
             <div style={{ marginBottom: 10 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--success)", marginBottom: 6 }}>✅ Matched</div>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--success)", marginBottom: 6 }}><i className="ti ti-circle-check"/> Matched</div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                 {result.found.slice(0, 10).map(s => (
                   <span key={s} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(34,197,94,.08)", color: "var(--success)", border: "1px solid rgba(34,197,94,.2)", fontWeight: 500 }}>{s}</span>
@@ -101,7 +101,7 @@ function JdMatchPanel({ resumeText }: { resumeText: string }) {
 
           {result.missing.length > 0 && (
             <div>
-              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--danger)", marginBottom: 6 }}>❌ Missing from your resume</div>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--danger)", marginBottom: 6 }}><i className="ti ti-x"/> Missing from your resume</div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                 {result.missing.map(s => (
                   <span key={s} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, background: "rgba(239,68,68,.08)", color: "var(--danger)", border: "1px solid rgba(239,68,68,.2)", fontWeight: 500, textDecoration: "line-through", opacity: .8 }}>{s}</span>
@@ -111,7 +111,7 @@ function JdMatchPanel({ resumeText }: { resumeText: string }) {
                 display: "inline-flex", alignItems: "center", gap: 4, marginTop: 10,
                 fontSize: 12, color: "var(--accent)", fontWeight: 600, textDecoration: "none",
               }}>
-                ✏️ Add missing skills in Builder →
+                ✏️ Add missing skills in Builder <i className="ti ti-arrow-right"/>
               </Link>
             </div>
           )}
@@ -193,14 +193,14 @@ interface AtsSystem {
   name:      string;
   icon:      string;
   safeScore: number;  // score needed to pass
-  weights:   Record<string, number>; // dimension label → weight (must sum 1)
+  weights:   Record<string, number>; // dimension label <i className="ti ti-arrow-right"/> weight (must sum 1)
   usedBy:    string;
 }
 const ATS_SYSTEMS: AtsSystem[] = [
-  { name: "Naukri RMS",       icon: "🔵", safeScore: 75, weights: { "ATS Compatibility": .35, "Keyword Strength": .35, "Experience Clarity": .20, "Impact Statements": .10 }, usedBy: "Naukri job applications" },
-  { name: "Workday",          icon: "🟣", safeScore: 80, weights: { "ATS Compatibility": .30, "Keyword Strength": .30, "Experience Clarity": .30, "Impact Statements": .10 }, usedBy: "TCS, Infosys, Wipro, MNCs" },
-  { name: "Taleo (Oracle)",   icon: "🔴", safeScore: 78, weights: { "ATS Compatibility": .25, "Keyword Strength": .45, "Experience Clarity": .20, "Impact Statements": .10 }, usedBy: "Large enterprises, banks" },
-  { name: "Greenhouse/Lever", icon: "🟢", safeScore: 70, weights: { "ATS Compatibility": .20, "Keyword Strength": .40, "Experience Clarity": .30, "Impact Statements": .10 }, usedBy: "Razorpay, CRED, funded startups" },
+  { name: "Naukri RMS",       icon: "ti-circle", safeScore: 75, weights: { "ATS Compatibility": .35, "Keyword Strength": .35, "Experience Clarity": .20, "Impact Statements": .10 }, usedBy: "Naukri job applications" },
+  { name: "Workday",          icon: "ti-circle", safeScore: 80, weights: { "ATS Compatibility": .30, "Keyword Strength": .30, "Experience Clarity": .30, "Impact Statements": .10 }, usedBy: "TCS, Infosys, Wipro, MNCs" },
+  { name: "Taleo (Oracle)",   icon: "ti-circle", safeScore: 78, weights: { "ATS Compatibility": .25, "Keyword Strength": .45, "Experience Clarity": .20, "Impact Statements": .10 }, usedBy: "Large enterprises, banks" },
+  { name: "Greenhouse/Lever", icon: "ti-circle", safeScore: 70, weights: { "ATS Compatibility": .20, "Keyword Strength": .40, "Experience Clarity": .30, "Impact Statements": .10 }, usedBy: "Razorpay, CRED, funded startups" },
 ];
 
 function deriveAtsScore(result: ScoreResult, ats: AtsSystem): number {
@@ -276,11 +276,11 @@ export default function ScorePage() {
 
   if (!result) return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 16 }}>
-      <div style={{ fontSize: 40 }}>📄</div>
+      <div style={{ fontSize: 40 }}><i className="ti ti-file-text"/></div>
       <div style={{ color: "var(--text1)", fontSize: 18, fontWeight: 600 }}>No resume found</div>
       <div style={{ color: "var(--text3)", fontSize: 14 }}>Build your resume first to see your score.</div>
       <Link href="/builder" style={{ marginTop: 8, padding: "10px 24px", background: "var(--accent)", color: "#fff", borderRadius: 10, fontWeight: 600, textDecoration: "none", fontSize: 14 }}>
-        Go to Resume Builder →
+        Go to Resume Builder <i className="ti ti-arrow-right"/>
       </Link>
     </div>
   );
@@ -364,7 +364,7 @@ export default function ScorePage() {
         {result.improvements.length > 0 && (
           <div style={{ ...card, marginBottom: 20 }}>
             <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 16 }}>
-              🔧 Fix these to reach <span style={{ color: "var(--accent)" }}>{Math.min(result.total + result.improvements.reduce((s, i) => s + i.points, 0), 100)}+</span>
+              <i className="ti ti-tool"/> Fix these to reach <span style={{ color: "var(--accent)" }}>{Math.min(result.total + result.improvements.reduce((s, i) => s + i.points, 0), 100)}+</span>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {result.improvements.map((imp, i) => {
@@ -389,7 +389,7 @@ export default function ScorePage() {
                       <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)", marginBottom: 3 }}>{imp.title}</div>
                       <div style={{ fontSize: 12, color: "var(--text3)", lineHeight: 1.5 }}>{imp.detail}</div>
                       <div style={{ fontSize: 11, color: "var(--accent)", marginTop: 6, fontWeight: 600 }}>
-                        ✏️ Fix in Resume Builder →
+                        ✏️ Fix in Resume Builder <i className="ti ti-arrow-right"/>
                       </div>
                     </div>
                     <div style={{ flexShrink: 0, textAlign: "right" }}>
@@ -417,7 +417,7 @@ export default function ScorePage() {
                 <div style={{ fontSize: 28, fontWeight: 800, color: "var(--danger)", lineHeight: 1 }}>{result.total}</div>
                 <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 2 }}>Now</div>
               </div>
-              <div style={{ fontSize: 18, color: "var(--text3)" }}>→</div>
+              <div style={{ fontSize: 18, color: "var(--text3)" }}><i className="ti ti-arrow-right"/></div>
               <div style={{ textAlign: "center" }}>
                 <div style={{ fontSize: 28, fontWeight: 800, color: "var(--success)", lineHeight: 1 }}>
                   {Math.min(result.total + result.improvements.reduce((s, i) => s + i.points, 0), 100)}
@@ -438,7 +438,7 @@ export default function ScorePage() {
                   background: "var(--accent)", color: "#fff",
                   fontSize: 13, fontWeight: 700, textDecoration: "none",
                   display: "inline-flex", alignItems: "center", gap: 6,
-                }}>⚡ Upgrade to Pro →</a>
+                }}><i className="ti ti-bolt"/> Upgrade to Pro <i className="ti ti-arrow-right"/></a>
                 <a href="/builder" style={{
                   padding: "9px 18px", borderRadius: 9, border: "1px solid var(--border)",
                   background: "var(--surface)", color: "var(--text1)",
@@ -456,7 +456,7 @@ export default function ScorePage() {
 
         {/* ── Per-ATS Breakdown ── */}
         <div style={{ ...card, marginBottom: 20 }}>
-          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>🖥️ Per-ATS Score Breakdown</div>
+          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}><i className="ti ti-device-desktop"/>️ Per-ATS Score Breakdown</div>
           <p style={{ fontSize: 12, color: "var(--text3)", marginBottom: 18, lineHeight: 1.6 }}>
             Different ATS systems weight resume sections differently. A score ≥ safe threshold means your resume reaches a human recruiter.
           </p>
@@ -500,7 +500,7 @@ export default function ScorePage() {
           const sevColor = { high: "var(--danger)", medium: "var(--warn)", low: "var(--accent)" };
           return (
             <div style={{ ...card, marginBottom: 20 }}>
-              <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>⚙️ ATS Parser Compatibility Check</div>
+              <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}><i className="ti ti-settings"/> ATS Parser Compatibility Check</div>
               <p style={{ fontSize: 12, color: "var(--text3)", marginBottom: 16, lineHeight: 1.6 }}>
                 Many Indian ATS systems silently reject resumes due to formatting issues — before a human ever reads them.
               </p>
@@ -519,7 +519,7 @@ export default function ScorePage() {
                       <div>
                         <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)", marginBottom: 3 }}>{issue.message}</div>
                         <div style={{ fontSize: 12, color: "var(--text3)", lineHeight: 1.5 }}>{issue.fix}</div>
-                        <a href="/builder" style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 6, fontSize: 11, color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>✏️ Fix in Builder →</a>
+                        <a href="/builder" style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 6, fontSize: 11, color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>✏️ Fix in Builder <i className="ti ti-arrow-right"/></a>
                       </div>
                       <div style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 99, background: `${sevColor[issue.severity]}15`, color: sevColor[issue.severity], height: "fit-content" }}>
                         {issue.severity.toUpperCase()}
@@ -535,12 +535,12 @@ export default function ScorePage() {
         {/* ── Skills Map ── */}
         <div style={card}>
           <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 16 }}>
-            🧩 Skills detected vs. market demand
+            <i className="ti ti-puzzle"/> Skills detected vs. market demand
           </div>
           <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 24 }}>
             <div>
               <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".05em", color: "var(--text3)", marginBottom: 10 }}>
-                ✅ Matched ({result.matchedSkills.length})
+                <i className="ti ti-circle-check"/> Matched ({result.matchedSkills.length})
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                 {result.matchedSkills.length === 0
@@ -555,11 +555,11 @@ export default function ScorePage() {
             </div>
             <div>
               <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".05em", color: "var(--text3)", marginBottom: 10 }}>
-                ❌ In-demand — missing ({result.missingSkills.length})
+                <i className="ti ti-x"/> In-demand — missing ({result.missingSkills.length})
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                 {result.missingSkills.length === 0
-                  ? <span style={{ fontSize: 12, color: "var(--success)" }}>All key skills covered! 🎉</span>
+                  ? <span style={{ fontSize: 12, color: "var(--success)" }}>All key skills covered! <i className="ti ti-confetti"/></span>
                   : result.missingSkills.map(s => (
                     <span key={s} style={{
                       fontSize: 12, padding: "4px 10px", borderRadius: 20, fontWeight: 500,
@@ -579,7 +579,7 @@ export default function ScorePage() {
           return (
             <div style={{ ...card, marginBottom: 20 }}>
               <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>
-                📚 Courses to close your skill gaps
+                <i className="ti ti-books" style={{marginRight:4}}/>Courses to close your skill gaps
               </div>
               <p style={{ fontSize: 12, color: "var(--text3)", marginBottom: 16, lineHeight: 1.6 }}>
                 Adding these skills to your resume can increase your score significantly.

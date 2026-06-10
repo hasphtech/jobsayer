@@ -8,6 +8,12 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAdmin, isError, createServiceClient } from "@/lib/adminAuth";
+import { cache, CacheKey } from "@/lib/cache";
+
+/** Bust the public jobs cache after any write */
+async function bustJobsCache() {
+  await cache.del(CacheKey.jobsList()).catch(() => {});
+}
 
 // ── GET ──────────────────────────────────────────────────────────────────────
 
@@ -48,6 +54,7 @@ export async function POST(req: NextRequest) {
   const db = createServiceClient();
   const { data, error } = await db.from("jobs").insert([body]).select().single();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  bustJobsCache();
   return NextResponse.json({ job: data }, { status: 201 });
 }
 
@@ -74,6 +81,7 @@ export async function PATCH(req: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  bustJobsCache();
   return NextResponse.json({ job: data });
 }
 
@@ -89,5 +97,6 @@ export async function DELETE(req: NextRequest) {
   const db = createServiceClient();
   const { error } = await db.from("jobs").delete().eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  bustJobsCache();
   return NextResponse.json({ success: true });
 }

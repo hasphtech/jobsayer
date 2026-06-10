@@ -247,8 +247,8 @@ function RoleSwitcher({ role, setRole }: { role: AppRole; setRole: (r: AppRole) 
       background: "var(--surface2)", border: "1px solid var(--border)",
       borderRadius: 8, padding: 2, gap: 1,
     }}>
-      {pill("candidate", "👤 Candidate")}
-      {pill("recruiter", "🏢 Recruiter")}
+      {pill("candidate", "Candidate")}
+      {pill("recruiter", "Recruiter")}
     </div>
   );
 }
@@ -458,7 +458,7 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
                   cursor: "pointer", fontFamily: "inherit",
                 }}
               >
-                {dark ? "☀" : "🌙"} {dark ? "Light" : "Dark"}
+                <><i className={dark ? "ti ti-sun" : "ti ti-moon"}/> {dark ? "Light" : "Dark"}</>
               </button>
             </div>
             {[...toolLinks, ...insightLinks].map(l => {
@@ -559,7 +559,7 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
               display: "flex", alignItems: "center", justifyContent: "center",
             }}
           >
-            {dark ? "☀" : "🌙"}
+            <i className={dark ? "ti ti-sun" : "ti ti-moon"}/>
           </button>
 
           {/* Upgrade link — only in candidate mode */}
@@ -707,7 +707,7 @@ function StreakBadge() {
       background: "var(--surface2)", border: "1px solid var(--border)",
       padding: "3px 9px", borderRadius: 20,
     }}>
-      🔥 {streak}
+      <i className="ti ti-flame" style={{color:"#f97316", marginRight:3}}/>{streak}
     </span>
   );
 }

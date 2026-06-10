@@ -177,13 +177,13 @@ function EmployerDashboardContent() {
                         </div>
                         <div>
                           <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)" }}>{c.name}</div>
-                          <div style={{ fontSize: 10, color: "var(--text3)" }}>{c.notice}d notice · {c.bgv === "cleared" ? "✅ BGV" : "⏳ BGV"}</div>
+                          <div style={{ fontSize: 10, color: "var(--text3)" }}>{c.notice}d notice · {c.bgv === "cleared" ? "BGV" : "BGV"}</div>
                         </div>
                       </div>
                       {stage !== "offer" && (
                         <button onClick={() => advanceStage(c.id)}
                           style={{ width: "100%", padding: "5px 0", borderRadius: 6, background: "var(--accent)", border: "none", color: "#fff", fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
-                          → {stage === "new" ? "Shortlist" : stage === "shortlisted" ? "Schedule" : "Send Offer"}
+                          <i className="ti ti-arrow-right"/> {stage === "new" ? "Shortlist" : stage === "shortlisted" ? "Schedule" : "Send Offer"}
                         </button>
                       )}
                     </div>
@@ -213,7 +213,7 @@ function EmployerDashboardContent() {
                 <StageBadge stage={stages[c.id] ?? c.stage} />
                 <button onClick={() => advanceStage(c.id)}
                   style={{ padding: "7px 12px", borderRadius: 7, background: "var(--accent)", border: "none", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
-                  Advance →
+                  Advance <i className="ti ti-arrow-right"/>
                 </button>
               </div>
             ))}
@@ -269,7 +269,7 @@ function EmployerDashboardContent() {
         {tab === "team-tools" && (
           <div>
             <div style={{ background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)", borderRadius: 12, padding: "18px 20px", marginBottom: 24 }}>
-              <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text1)", marginBottom: 6 }}>🏢 White-Label Career Portal</div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text1)", marginBottom: 6 }}><i className="ti ti-building"/> White-Label Career Portal</div>
               <p style={{ fontSize: 12, color: "var(--text3)", lineHeight: 1.65, margin: 0 }}>
                 Your employees get a branded portal at <strong style={{ color: "var(--accent)" }}>careers.yourcompany.com</strong> — resume builder, interview prep, career GPS, salary insights. Powered by jobSayer, branded as your company. Available on Enterprise plan.
               </p>

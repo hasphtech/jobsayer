@@ -38,11 +38,11 @@ export default function SharePage() {
         background: "#0f172a", color: "#9ca3af", fontFamily: "system-ui",
         flexDirection: "column", gap: 12,
       }}>
-        <div style={{ fontSize: 32 }}>🔍</div>
+        <div style={{ fontSize: 32 }}><i className="ti ti-search"/></div>
         <div style={{ fontSize: 18, fontWeight: 700, color: "#f1f5f9" }}>Resume not found</div>
         <div style={{ fontSize: 13 }}>This share link may have expired or been deleted.</div>
         <a href="/builder" style={{ marginTop: 8, color: "#3b82f6", fontSize: 13 }}>
-          Build your own →
+          Build your own <i className="ti ti-arrow-right"/>
         </a>
       </div>
     );
@@ -72,12 +72,12 @@ export default function SharePage() {
           background: "#3b82f6", color: "#fff", borderRadius: 8,
           padding: "8px 16px", fontSize: 12, fontWeight: 700, textDecoration: "none",
         }}>
-          Build yours free →
+          Build yours free <i className="ti ti-arrow-right"/>
         </a>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2 }}>
           {resume.viewCount > 0 && (
             <span style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>
-              👁 {resume.viewCount.toLocaleString()} view{resume.viewCount !== 1 ? "s" : ""}
+              <i className="ti ti-eye" style={{marginRight:4}}/>{resume.viewCount.toLocaleString()} view{resume.viewCount !== 1 ? "s" : ""}
             </span>
           )}
           <span style={{ fontSize: 11, color: "#64748b" }}>

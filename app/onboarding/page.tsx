@@ -1,7 +1,7 @@
 "use client";
 /**
  * /onboarding — Guided first-run wizard
- * 5 steps: Role → Target → Location → Resume → Done
+ * 5 steps: Role <i className="ti ti-arrow-right"/> Target <i className="ti ti-arrow-right"/> Location <i className="ti ti-arrow-right"/> Resume <i className="ti ti-arrow-right"/> Done
  * Saves progress to Supabase profiles table.
  * Redirected here automatically for new users (middleware / layout).
  */
@@ -31,7 +31,7 @@ const TARGET_ROLES = [
 const LOCATIONS = [
   "Bangalore 🇮🇳", "Mumbai 🇮🇳", "Delhi / NCR 🇮🇳", "Hyderabad 🇮🇳", "Pune 🇮🇳",
   "Remote India 🇮🇳", "San Francisco 🇺🇸", "New York 🇺🇸", "London 🇬🇧",
-  "Singapore 🇸🇬", "Dubai 🇦🇪", "Berlin 🇩🇪", "Remote / Worldwide 🌐", "Other",
+  "Singapore 🇸🇬", "Dubai 🇦🇪", "Berlin 🇩🇪", "Remote / Worldwide <i className="ti ti-world"/>", "Other",
 ];
 
 const STEP_LABELS = ["Your role", "Target role", "Location", "Resume", "Done"];
@@ -133,7 +133,7 @@ export default function OnboardingPage() {
               ))}
             </div>
             <button onClick={next} disabled={!currentRole} style={{ marginTop: 24, width: "100%", padding: 14, borderRadius: 12, border: "none", background: currentRole ? "var(--accent)" : "var(--surface2)", color: currentRole ? "#fff" : "var(--text3)", fontWeight: 700, fontSize: 15, cursor: currentRole ? "pointer" : "not-allowed" }}>
-              Continue →
+              Continue <i className="ti ti-arrow-right"/>
             </button>
             <button onClick={() => { setCurrentRole("Other"); next(); }} style={{ marginTop: 10, width: "100%", padding: 10, borderRadius: 10, border: "1px solid var(--border)", background: "none", color: "var(--text3)", fontSize: 13, cursor: "pointer" }}>
               Skip for now
@@ -154,9 +154,9 @@ export default function OnboardingPage() {
               ))}
             </div>
             <div style={{ display: "flex", gap: 8, marginTop: 24 }}>
-              <button onClick={() => setStep(1)} style={{ flex: "0 0 auto", padding: "14px 20px", borderRadius: 12, border: "1px solid var(--border)", background: "none", color: "var(--text2)", fontWeight: 600, fontSize: 14, cursor: "pointer" }}>← Back</button>
+              <button onClick={() => setStep(1)} style={{ flex: "0 0 auto", padding: "14px 20px", borderRadius: 12, border: "1px solid var(--border)", background: "none", color: "var(--text2)", fontWeight: 600, fontSize: 14, cursor: "pointer" }}><i className="ti ti-arrow-left"/> Back</button>
               <button onClick={next} disabled={!targetRole} style={{ flex: 1, padding: 14, borderRadius: 12, border: "none", background: targetRole ? "var(--accent)" : "var(--surface2)", color: targetRole ? "#fff" : "var(--text3)", fontWeight: 700, fontSize: 15, cursor: targetRole ? "pointer" : "not-allowed" }}>
-                Continue →
+                Continue <i className="ti ti-arrow-right"/>
               </button>
             </div>
           </div>
@@ -175,9 +175,9 @@ export default function OnboardingPage() {
               ))}
             </div>
             <div style={{ display: "flex", gap: 8, marginTop: 24 }}>
-              <button onClick={() => setStep(2)} style={{ flex: "0 0 auto", padding: "14px 20px", borderRadius: 12, border: "1px solid var(--border)", background: "none", color: "var(--text2)", fontWeight: 600, fontSize: 14, cursor: "pointer" }}>← Back</button>
+              <button onClick={() => setStep(2)} style={{ flex: "0 0 auto", padding: "14px 20px", borderRadius: 12, border: "1px solid var(--border)", background: "none", color: "var(--text2)", fontWeight: 600, fontSize: 14, cursor: "pointer" }}><i className="ti ti-arrow-left"/> Back</button>
               <button onClick={next} disabled={!location} style={{ flex: 1, padding: 14, borderRadius: 12, border: "none", background: location ? "var(--accent)" : "var(--surface2)", color: location ? "#fff" : "var(--text3)", fontWeight: 700, fontSize: 15, cursor: location ? "pointer" : "not-allowed" }}>
-                Continue →
+                Continue <i className="ti ti-arrow-right"/>
               </button>
             </div>
           </div>
@@ -190,7 +190,7 @@ export default function OnboardingPage() {
             <p style={{ fontSize: 14, color: "var(--text3)", marginBottom: 24 }}>Build from scratch, import an existing one, or skip for now.</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {[
-                { key: "build",  icon: "✍️", title: "Build resume from scratch",   desc: "Use our AI builder with 20+ templates" },
+                { key: "build",  icon: "ti-pencil", title: "Build resume from scratch",   desc: "Use our AI builder with 20+ templates" },
                 { key: "skip",   icon: "⏭️", title: "Skip — go to dashboard",       desc: "Add your resume later" },
               ].map(opt => (
                 <button key={opt.key} onClick={() => setResumeChoice(opt.key as any)} style={{
@@ -206,9 +206,9 @@ export default function OnboardingPage() {
               ))}
             </div>
             <div style={{ display: "flex", gap: 8, marginTop: 24 }}>
-              <button onClick={() => setStep(3)} style={{ flex: "0 0 auto", padding: "14px 20px", borderRadius: 12, border: "1px solid var(--border)", background: "none", color: "var(--text2)", fontWeight: 600, fontSize: 14, cursor: "pointer" }}>← Back</button>
+              <button onClick={() => setStep(3)} style={{ flex: "0 0 auto", padding: "14px 20px", borderRadius: 12, border: "1px solid var(--border)", background: "none", color: "var(--text2)", fontWeight: 600, fontSize: 14, cursor: "pointer" }}><i className="ti ti-arrow-left"/> Back</button>
               <button onClick={next} disabled={!resumeChoice} style={{ flex: 1, padding: 14, borderRadius: 12, border: "none", background: resumeChoice ? "var(--accent)" : "var(--surface2)", color: resumeChoice ? "#fff" : "var(--text3)", fontWeight: 700, fontSize: 15, cursor: resumeChoice ? "pointer" : "not-allowed" }}>
-                Continue →
+                Continue <i className="ti ti-arrow-right"/>
               </button>
             </div>
           </div>
@@ -217,7 +217,7 @@ export default function OnboardingPage() {
         {/* ── Step 5: Done ── */}
         {step === 5 && (
           <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 56, marginBottom: 16 }}>🎉</div>
+            <div style={{ fontSize: 56, marginBottom: 16 }}><i className="ti ti-confetti"/></div>
             <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>You're all set!</h2>
             <p style={{ fontSize: 14, color: "var(--text3)", marginBottom: 32, lineHeight: 1.7 }}>
               Your personalised career dashboard is ready. We've pre-loaded your target role,
@@ -236,7 +236,7 @@ export default function OnboardingPage() {
               ))}
             </div>
             <button onClick={saveAndFinish} disabled={saving} style={{ width: "100%", padding: 16, borderRadius: 12, border: "none", background: "var(--accent)", color: "#fff", fontWeight: 800, fontSize: 16, cursor: saving ? "wait" : "pointer" }}>
-              {saving ? "Saving…" : resumeChoice === "build" ? "Go to Resume Builder →" : "Go to Dashboard →"}
+              {saving ? "Saving…" : resumeChoice === "build" ? "Go to Resume Builder <i className="ti ti-arrow-right"/>" : "Go to Dashboard <i className="ti ti-arrow-right"/>"}
             </button>
           </div>
         )}

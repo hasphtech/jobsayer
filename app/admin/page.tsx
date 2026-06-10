@@ -25,6 +25,7 @@ interface AdminJob {
   is_active: boolean;
   is_approved: boolean;
   posted_at: string;
+  expires_at: string | null;
 }
 
 type View = "add" | "scrape" | "queue" | "manage" | "bgv" | "companies" | "users" | "flags" | "audit" | "metrics";
@@ -32,7 +33,7 @@ type View = "add" | "scrape" | "queue" | "manage" | "bgv" | "companies" | "users
 const EMPTY_FORM: Omit<AdminJob, "id" | "posted_at" | "is_active" | "is_approved"> = {
   title: "", company: "", location: "Bengaluru", mode: "hybrid",
   type: "Full-time", exp: "", salary: "", salary_num: 0,
-  skills: [], openings: 1, logo: "🏢",
+  skills: [], openings: 1, logo: "",
   description: "", jd_text: "", apply_url: "",
   source: "manual", source_url: "",
 };
@@ -104,7 +105,7 @@ export default function AdminPage() {
 
   if (!isAdmin) return (
     <div style={{ ...bg, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
-      <div style={{ fontSize: 32 }}>🔒</div>
+      <div style={{ marginBottom: 4 }}><i className="ti ti-lock" style={{ fontSize: 32, color: "var(--text3)" }} /></div>
       <div style={{ fontSize: 18, fontWeight: 700 }}>Admin access required</div>
       <div style={{ fontSize: 13, color: "var(--text3)" }}>
         {token ? "Your account is not in the admin list." : "Please sign in first."}
@@ -123,7 +124,7 @@ export default function AdminPage() {
       {/* Top bar */}
       <div style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)", padding: "12px 24px", display: "flex", alignItems: "center", gap: 16 }}>
         <a href="/" style={{ color: "var(--text3)", textDecoration: "none", fontSize: 13 }}>← Home</a>
-        <span style={{ fontSize: 15, fontWeight: 800, color: "var(--text1)" }}>🛠 Admin — Jobs</span>
+        <span style={{ fontSize: 15, fontWeight: 800, color: "var(--text1)", display: "flex", alignItems: "center", gap: 6 }}><i className="ti ti-settings" style={{ fontSize: 15 }} /> Admin Panel</span>
         {msg && <span style={{ fontSize: 12, color: msg.startsWith("✓") ? "var(--success)" : "var(--danger)", marginLeft: "auto" }}>{msg}</span>}
       </div>
 
@@ -152,7 +153,10 @@ export default function AdminPage() {
                 color: view === v ? "var(--accent)" : "var(--text3)",
                 borderBottom: view === v ? "2px solid var(--accent)" : "2px solid transparent",
               }}>
-              {{ add: "➕ Add", scrape: "🤖 Scrape", queue: `🔍 Queue ${pending > 0 ? `(${pending})` : ""}`, manage: "📋 Manage" }[v as "add" | "scrape" | "queue" | "manage"]}
+              {v === "add"    && <><i className="ti ti-plus" style={{ marginRight: 5 }} />Add</>}
+              {v === "scrape" && <><i className="ti ti-robot" style={{ marginRight: 5 }} />Scrape</>}
+              {v === "queue"  && <><i className="ti ti-list-search" style={{ marginRight: 5 }} />Queue{pending > 0 ? ` (${pending})` : ""}</>}
+              {v === "manage" && <><i className="ti ti-layout-list" style={{ marginRight: 5 }} />Manage</>}
             </button>
           ))}
         </div>
@@ -166,7 +170,8 @@ export default function AdminPage() {
                 color: view === v ? "var(--accent)" : "var(--text3)",
                 borderBottom: view === v ? "2px solid var(--accent)" : "2px solid transparent",
               }}>
-              {{ bgv: "🛡 BGV", companies: "🏅 Companies" }[v as "bgv" | "companies"]}
+              {v === "bgv"       && <><i className="ti ti-shield-check" style={{ marginRight: 5 }} />BGV</>}
+              {v === "companies" && <><i className="ti ti-building" style={{ marginRight: 5 }} />Companies</>}
             </button>
           ))}
         </div>
@@ -180,7 +185,10 @@ export default function AdminPage() {
                 color: view === v ? "var(--accent)" : "var(--text3)",
                 borderBottom: view === v ? "2px solid var(--accent)" : "2px solid transparent",
               }}>
-              {{ users: "👥 Users", flags: "🚩 Feature Flags", audit: "📜 Audit Log", metrics: "📊 Metrics" }[v as "users" | "flags" | "audit" | "metrics"]}
+              {v === "users"   && <><i className="ti ti-users" style={{ marginRight: 5 }} />Users</>}
+              {v === "flags"   && <><i className="ti ti-flag" style={{ marginRight: 5 }} />Feature Flags</>}
+              {v === "audit"   && <><i className="ti ti-file-text" style={{ marginRight: 5 }} />Audit Log</>}
+              {v === "metrics" && <><i className="ti ti-chart-bar" style={{ marginRight: 5 }} />Metrics</>}
             </button>
           ))}
         </div>
@@ -213,6 +221,10 @@ function AddView({ token, onSaved }: { token: string; onSaved: () => void }) {
     if (!form.title || !form.company || !form.location) { setErr("Title, company and location are required."); return; }
     setSaving(true);
     setErr("");
+    // Manual posts get 60 days; scraped jobs default to 30 days (set by DB default)
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + (form.source === "manual" ? 60 : 30));
+
     const body = {
       ...form,
       skills: typeof form.skills === "string" ? (form.skills as string).split(",").map((s: string) => s.trim()).filter(Boolean) : form.skills,
@@ -220,6 +232,7 @@ function AddView({ token, onSaved }: { token: string; onSaved: () => void }) {
       openings:   Number(form.openings)   || 1,
       is_active:   true,
       is_approved: false,
+      expires_at: expiresAt.toISOString(),
     };
     const res = await fetch("/api/admin/jobs", {
       method: "POST",
@@ -377,7 +390,7 @@ function ScrapeView({ token, onImported }: { token: string; onImported: () => vo
         </div>
 
         <div style={{ marginTop: 14, display: "flex", gap: 10, alignItems: "center" }}>
-          <button style={btn(true)} onClick={scrape} disabled={scraping}>{scraping ? "⏳ Scraping…" : "🤖 Scrape"}</button>
+          <button style={btn(true)} onClick={scrape} disabled={scraping}>{scraping ? "Scraping…" : <><i className="ti ti-robot" style={{ marginRight: 5 }} />Scrape</>}</button>
           {scraping && <span style={{ fontSize: 12, color: "var(--text3)" }}>This may take 15–30 seconds for JS-heavy sites…</span>}
         </div>
 
@@ -454,7 +467,7 @@ function QueueView({ jobs, token, loading, onRefresh, flash }: {
   if (loading) return <div style={{ color: "var(--text3)", fontSize: 13 }}>Loading…</div>;
   if (!jobs.length) return (
     <div style={{ ...card, textAlign: "center", padding: 40 }}>
-      <div style={{ fontSize: 28, marginBottom: 8 }}>✅</div>
+      <div style={{ marginBottom: 8 }}><i className="ti ti-circle-check" style={{ fontSize: 28, color: "var(--success)" }} /></div>
       <div style={{ fontWeight: 700 }}>Queue is empty</div>
       <div style={{ color: "var(--text3)", fontSize: 13, marginTop: 4 }}>All jobs have been reviewed.</div>
     </div>
@@ -464,7 +477,7 @@ function QueueView({ jobs, token, loading, onRefresh, flash }: {
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div style={{ fontSize: 14, fontWeight: 700 }}>{jobs.length} jobs waiting for review</div>
-        <button style={btn()} onClick={onRefresh}>↻ Refresh</button>
+        <button style={btn()} onClick={onRefresh}><i className="ti ti-refresh" style={{marginRight:4}} />Refresh</button>
       </div>
       {jobs.map(j => (
         <div key={j.id} style={{ ...card, display: "flex", gap: 14, alignItems: "flex-start" }}>
@@ -485,8 +498,8 @@ function QueueView({ jobs, token, loading, onRefresh, flash }: {
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-            <button style={{ ...btn(true) }} onClick={() => action(j.id, true)}>✓ Approve</button>
-            <button style={{ ...btn(), color: "var(--danger)" }} onClick={() => action(j.id, false)}>✕ Reject</button>
+            <button style={{ ...btn(true) }} onClick={() => action(j.id, true)}><i className="ti ti-check" style={{marginRight:4}}/>Approve</button>
+            <button style={{ ...btn(), color: "var(--danger)" }} onClick={() => action(j.id, false)}><i className="ti ti-x" style={{marginRight:4}}/>Reject</button>
           </div>
         </div>
       ))}
@@ -495,6 +508,21 @@ function QueueView({ jobs, token, loading, onRefresh, flash }: {
 }
 
 // ── Manage view ───────────────────────────────────────────────────────────────
+
+/** Days until expires_at. Negative = already expired. */
+function daysUntilExpiry(expiresAt: string | null): number | null {
+  if (!expiresAt) return null;
+  const diff = new Date(expiresAt).getTime() - Date.now();
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
+function ExpiryBadge({ expiresAt }: { expiresAt: string | null }) {
+  const days = daysUntilExpiry(expiresAt);
+  if (days === null) return <span style={{ fontSize: 10, color: "var(--text3)" }}>—</span>;
+  if (days < 0)  return <span style={{ fontSize: 10, fontWeight: 700, color: "var(--danger)", padding: "2px 7px", borderRadius: 4, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.2)" }}>Expired</span>;
+  if (days <= 5) return <span style={{ fontSize: 10, fontWeight: 700, color: "var(--warn)",   padding: "2px 7px", borderRadius: 4, background: "rgba(234,179,8,.1)",  border: "1px solid rgba(234,179,8,.2)"  }}><i className="ti ti-alert-triangle" style={{marginRight:3}}/>{days}d left</span>;
+  return <span style={{ fontSize: 10, color: "var(--text3)" }}>{days}d</span>;
+}
 
 function ManageView({ jobs, token, loading, onRefresh, flash }: {
   jobs: AdminJob[]; token: string; loading: boolean; onRefresh: () => void; flash: (m: string) => void;
@@ -514,6 +542,18 @@ function ManageView({ jobs, token, loading, onRefresh, flash }: {
     if (res.ok) { flash(`✓ ${j.is_active ? "Deactivated" : "Activated"}`); onRefresh(); }
   }
 
+  async function renew(id: string) {
+    const newExpiry = new Date();
+    newExpiry.setDate(newExpiry.getDate() + 30);
+    const res = await fetch("/api/admin/jobs", {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ id, expires_at: newExpiry.toISOString(), is_active: true }),
+    });
+    if (res.ok) { flash("✓ Job renewed — expires in 30 days"); onRefresh(); }
+    else flash("Renew failed");
+  }
+
   async function del(id: string) {
     if (!confirm("Delete this job permanently?")) return;
     const res = await fetch(`/api/admin/jobs?id=${id}`, {
@@ -525,11 +565,18 @@ function ManageView({ jobs, token, loading, onRefresh, flash }: {
 
   if (loading) return <div style={{ color: "var(--text3)", fontSize: 13 }}>Loading…</div>;
 
+  const expiringSoon = filtered.filter(j => { const d = daysUntilExpiry(j.expires_at); return d !== null && d <= 5; }).length;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+      <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
         <input style={{ ...input, maxWidth: 300 }} value={search} onChange={e => setSearch(e.target.value)} placeholder="Search title or company…" />
-        <button style={btn()} onClick={onRefresh}>↻ Refresh</button>
+        <button style={btn()} onClick={onRefresh}><i className="ti ti-refresh" style={{marginRight:4}} />Refresh</button>
+        {expiringSoon > 0 && (
+          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--warn)", padding: "4px 10px", borderRadius: 6, background: "rgba(234,179,8,.08)", border: "1px solid rgba(234,179,8,.2)" }}>
+            <i className="ti ti-alert-triangle" style={{marginRight:4}}/>{expiringSoon} job{expiringSoon > 1 ? "s" : ""} expiring soon
+          </span>
+        )}
         <span style={{ fontSize: 12, color: "var(--text3)", marginLeft: "auto" }}>{filtered.length} jobs</span>
       </div>
 
@@ -537,38 +584,50 @@ function ManageView({ jobs, token, loading, onRefresh, flash }: {
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--border)", color: "var(--text3)", textAlign: "left" }}>
-              {["Title", "Company", "Location", "Source", "Status", "Actions"].map(h => (
+              {["Title", "Company", "Location", "Source", "Status", "Expires", "Actions"].map(h => (
                 <th key={h} style={{ padding: "8px 10px", fontWeight: 600, fontSize: 11 }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {filtered.map(j => (
-              <tr key={j.id} style={{ borderBottom: "1px solid var(--border)", opacity: j.is_active ? 1 : 0.5 }}>
-                <td style={{ padding: "10px 10px" }}><div style={{ fontWeight: 600 }}>{j.title}</div><div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>{j.exp} · {j.salary}</div></td>
-                <td style={{ padding: "10px 10px", color: "var(--text2)" }}>{j.company}</td>
-                <td style={{ padding: "10px 10px", color: "var(--text3)", fontSize: 12 }}>{j.location}</td>
-                <td style={{ padding: "10px 10px" }}>
-                  <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 4, background: "var(--surface2)", color: "var(--text3)" }}>{j.source}</span>
-                </td>
-                <td style={{ padding: "10px 10px" }}>
-                  <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 4, fontWeight: 600,
-                    background: j.is_approved && j.is_active ? "#14532d" : "#7f1d1d",
-                    color: j.is_approved && j.is_active ? "var(--success)" : "var(--danger)",
-                  }}>
-                    {j.is_approved && j.is_active ? "Live" : !j.is_active ? "Inactive" : "Pending"}
-                  </span>
-                </td>
-                <td style={{ padding: "10px 10px" }}>
-                  <div style={{ display: "flex", gap: 6 }}>
-                    <button style={{ ...btn(), fontSize: 11, padding: "4px 10px" }} onClick={() => toggle(j)}>
-                      {j.is_active ? "Deactivate" : "Activate"}
-                    </button>
-                    <button style={{ ...btn(), fontSize: 11, padding: "4px 10px", color: "var(--danger)" }} onClick={() => del(j.id)}>Delete</button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {filtered.map(j => {
+              const days = daysUntilExpiry(j.expires_at);
+              const isExpiredOrSoon = days !== null && days <= 5;
+              return (
+                <tr key={j.id} style={{ borderBottom: "1px solid var(--border)", opacity: j.is_active ? 1 : 0.5, background: isExpiredOrSoon ? "rgba(234,179,8,.03)" : "transparent" }}>
+                  <td style={{ padding: "10px 10px" }}><div style={{ fontWeight: 600 }}>{j.title}</div><div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>{j.exp} · {j.salary}</div></td>
+                  <td style={{ padding: "10px 10px", color: "var(--text2)" }}>{j.company}</td>
+                  <td style={{ padding: "10px 10px", color: "var(--text3)", fontSize: 12 }}>{j.location}</td>
+                  <td style={{ padding: "10px 10px" }}>
+                    <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 4, background: "var(--surface2)", color: "var(--text3)" }}>{j.source}</span>
+                  </td>
+                  <td style={{ padding: "10px 10px" }}>
+                    <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 4, fontWeight: 600,
+                      background: j.is_approved && j.is_active ? "#14532d" : "#7f1d1d",
+                      color: j.is_approved && j.is_active ? "var(--success)" : "var(--danger)",
+                    }}>
+                      {j.is_approved && j.is_active ? "Live" : !j.is_active ? "Inactive" : "Pending"}
+                    </span>
+                  </td>
+                  <td style={{ padding: "10px 10px" }}>
+                    <ExpiryBadge expiresAt={j.expires_at} />
+                  </td>
+                  <td style={{ padding: "10px 10px" }}>
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                      <button style={{ ...btn(), fontSize: 11, padding: "4px 10px" }} onClick={() => toggle(j)}>
+                        {j.is_active ? "Deactivate" : "Activate"}
+                      </button>
+                      {(days === null || days <= 5) && (
+                        <button style={{ ...btn(), fontSize: 11, padding: "4px 10px", color: "var(--accent)", border: "1px solid var(--accborder)" }} onClick={() => renew(j.id)}>
+                          <i className="ti ti-refresh" style={{marginRight:4}}/>Renew
+                        </button>
+                      )}
+                      <button style={{ ...btn(), fontSize: 11, padding: "4px 10px", color: "var(--danger)" }} onClick={() => del(j.id)}>Delete</button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
         {!filtered.length && <div style={{ textAlign: "center", padding: 40, color: "var(--text3)" }}>No jobs found.</div>}
@@ -607,14 +666,14 @@ interface BgvRow {
 type BgvFilter = "all" | "pending" | "in_progress" | "verified" | "failed";
 
 const STATUS_CFG: Record<string, { color: string; bg: string; label: string; icon: string }> = {
-  pending:     { color: "var(--warn)",    bg: "rgba(234,179,8,.12)",   label: "Pending",     icon: "⏳" },
-  in_progress: { color: "var(--accent)",  bg: "rgba(99,102,241,.12)",  label: "In Progress", icon: "🔍" },
-  verified:    { color: "var(--success)", bg: "rgba(34,197,94,.12)",   label: "Verified",    icon: "✅" },
-  partial:     { color: "var(--warn)",    bg: "rgba(234,179,8,.12)",   label: "Partial",     icon: "⚠" },
-  failed:      { color: "var(--danger)",  bg: "rgba(239,68,68,.12)",   label: "Failed",      icon: "✗"  },
+  pending:     { color: "var(--warn)",    bg: "rgba(234,179,8,.12)",   label: "Pending",     icon: "ti-clock" },
+  in_progress: { color: "var(--accent)",  bg: "rgba(99,102,241,.12)",  label: "In Progress", icon: "ti-search" },
+  verified:    { color: "var(--success)", bg: "rgba(34,197,94,.12)",   label: "Verified",    icon: "ti-circle-check" },
+  partial:     { color: "var(--warn)",    bg: "rgba(234,179,8,.12)",   label: "Partial",     icon: "ti-alert-triangle" },
+  failed:      { color: "var(--danger)",  bg: "rgba(239,68,68,.12)",   label: "Failed",      icon: "ti-x" },
 };
 
-const CHECK_ICON: Record<string, string> = { pass: "✅", fail: "❌", warn: "⚠️", skip: "⏭" };
+const CHECK_ICON: Record<string, string> = { pass: "ti-circle-check", fail: "ti-x", warn: "ti-alert-triangle", skip: "ti-player-skip-forward" };
 const CHECK_COLOR: Record<string, string> = {
   pass: "var(--success)", fail: "var(--danger)", warn: "var(--warn)", skip: "var(--text3)",
 };
@@ -713,8 +772,8 @@ function BgvAdminView({ token, flash }: { token: string; flash: (m: string) => v
     <div>
       {/* Header + filter tabs */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
-        <h2 style={{ fontSize: 16, fontWeight: 700 }}>🛡 Candidate BGV Queue</h2>
-        <button onClick={load} style={btn()}>↻ Refresh</button>
+        <h2 style={{ fontSize: 16, fontWeight: 700 }}><i className="ti ti-shield-check" style={{marginRight:6}}/>Candidate BGV Queue</h2>
+        <button onClick={load} style={btn()}><i className="ti ti-refresh" style={{marginRight:4}} />Refresh</button>
       </div>
 
       <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
@@ -749,8 +808,8 @@ function BgvAdminView({ token, flash }: { token: string; flash: (m: string) => v
                     <div style={{ display: "flex", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
 
                       {/* Status icon */}
-                      <div style={{ width: 38, height: 38, borderRadius: 10, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
-                        {s.icon}
+                      <div style={{ width: 38, height: 38, borderRadius: 10, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0, color: s.color }}>
+                        <i className={`ti ${s.icon}`}/>
                       </div>
 
                       {/* Main info */}
@@ -762,7 +821,7 @@ function BgvAdminView({ token, flash }: { token: string; flash: (m: string) => v
                           </span>
                           {needsCheck && (
                             <span style={{ fontSize: 10, fontWeight: 600, color: "var(--warn)", padding: "2px 8px", borderRadius: 99, background: "rgba(234,179,8,.08)", border: "1px solid rgba(234,179,8,.2)" }}>
-                              ⚡ Checks not run
+                              <i className="ti ti-bolt" style={{marginRight:3}}/>Checks not run
                             </span>
                           )}
                         </div>
@@ -783,7 +842,7 @@ function BgvAdminView({ token, flash }: { token: string; flash: (m: string) => v
                               background: c.done ? "rgba(34,197,94,.1)" : "var(--surface2)",
                               color: c.done ? "var(--success)" : "var(--text3)",
                               border: `1px solid ${c.done ? "rgba(34,197,94,.2)" : "var(--border)"}`,
-                            }}>{c.label} {c.done ? "✓" : "—"}</span>
+                            }}>{c.label} {c.done ? <i className="ti ti-check" style={{marginLeft:2}}/> : "—"}</span>
                           ))}
                           {acr && (
                             <span style={{
@@ -832,9 +891,9 @@ function BgvAdminView({ token, flash }: { token: string; flash: (m: string) => v
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
                   <div style={{ fontSize: 17, fontWeight: 800 }}>{selected.full_name}</div>
-                  <div style={{ fontSize: 12, color: s.color, marginTop: 3, fontWeight: 600 }}>{s.icon} {s.label}</div>
+                  <div style={{ fontSize: 12, color: s.color, marginTop: 3, fontWeight: 600 }}><><i className={`ti ${s.icon}`} style={{marginRight:3}}/>{s.label}</></div>
                 </div>
-                <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 20, padding: 4 }}>✕</button>
+                <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 20, padding: 4 }}><i className="ti ti-x"/></button>
               </div>
 
               {/* Identity summary */}
@@ -855,19 +914,19 @@ function BgvAdminView({ token, flash }: { token: string; flash: (m: string) => v
               {/* Auto-check results */}
               <div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700 }}>⚡ Automated Check Results</div>
+                  <div style={{ fontSize: 13, fontWeight: 700 }}><i className="ti ti-bolt" style={{marginRight:4}}/>Automated Check Results</div>
                   <button
                     onClick={() => runAutoCheck(selected.id)}
                     disabled={running}
                     style={{ ...btn(), fontSize: 12, padding: "5px 12px" }}
                   >
-                    {running ? "Running…" : acr ? "↻ Re-run Checks" : "▶ Run Checks"}
+                    {running ? "Running…" : acr ? <><i className="ti ti-refresh" style={{marginRight:4}}/>Re-run Checks</> : <><i className="ti ti-player-play" style={{marginRight:4}}/>Run Checks</>}
                   </button>
                 </div>
 
                 {!acr && (
                   <div style={{ padding: "14px", borderRadius: 10, background: "rgba(234,179,8,.06)", border: "1px solid rgba(234,179,8,.2)", fontSize: 13, color: "var(--warn)", textAlign: "center" }}>
-                    Auto-checks haven&apos;t been run yet. Click <strong>▶ Run Checks</strong> to start.
+                    Auto-checks haven&apos;t been run yet. Click <strong><i className="ti ti-player-play" style={{marginRight:2}}/>Run Checks</strong> to start.
                   </div>
                 )}
 
@@ -893,7 +952,7 @@ function BgvAdminView({ token, flash }: { token: string; flash: (m: string) => v
                     {/* Items needing manual review */}
                     {acr.requiresManualReview.length > 0 && (
                       <div style={{ background: "rgba(234,179,8,.06)", border: "1px solid rgba(234,179,8,.2)", borderRadius: 10, padding: "12px 14px" }}>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--warn)", marginBottom: 8 }}>⚠ Needs Manual Review</div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--warn)", marginBottom: 8 }}><i className="ti ti-alert-triangle" style={{marginRight:4}}/>Needs Manual Review</div>
                         {acr.requiresManualReview.map((item, i) => (
                           <div key={i} style={{ fontSize: 12, color: "var(--text2)", marginBottom: 4 }}>• {item}</div>
                         ))}
@@ -904,15 +963,16 @@ function BgvAdminView({ token, flash }: { token: string; flash: (m: string) => v
                     {(["identity", "education", "employment", "completeness"] as const).map(cat => {
                       const catChecks = grouped[cat];
                       if (!catChecks?.length) return null;
-                      const catLabel = { identity: "🪪 Identity", education: "🎓 Education", employment: "💼 Employment", completeness: "📋 Completeness" }[cat];
+                      const catLabelText = { identity: "Identity", education: "Education", employment: "Employment", completeness: "Completeness" }[cat];
+      const catLabelIcon = { identity: "ti-id-badge", education: "ti-school", employment: "ti-briefcase", completeness: "ti-list" }[cat];
                       return (
                         <div key={cat} style={{ background: "var(--surface2)", borderRadius: 10, overflow: "hidden" }}>
                           <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text3)", padding: "8px 14px", borderBottom: "1px solid var(--border)", textTransform: "uppercase", letterSpacing: ".04em" }}>
-                            {catLabel}
+                            <><i className={`ti ${catLabelIcon}`} style={{marginRight:4}}/>{catLabelText}</>
                           </div>
                           {catChecks.map((c, i) => (
                             <div key={i} style={{ display: "flex", gap: 10, padding: "8px 14px", borderBottom: i < catChecks.length - 1 ? "1px solid var(--border)" : "none", alignItems: "flex-start" }}>
-                              <span style={{ fontSize: 13, flexShrink: 0, marginTop: 1 }}>{CHECK_ICON[c.status]}</span>
+                              <span style={{ fontSize: 13, flexShrink: 0, marginTop: 1 }}><i className={`ti ${CHECK_ICON[c.status]}`}/></span>
                               <div style={{ flex: 1 }}>
                                 <div style={{ fontSize: 12, fontWeight: 600, color: CHECK_COLOR[c.status] }}>{c.check}</div>
                                 <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>{c.detail}</div>
@@ -929,7 +989,7 @@ function BgvAdminView({ token, flash }: { token: string; flash: (m: string) => v
               {/* Education entries */}
               {edu.length > 0 && (
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>🎓 Education ({edu.length})</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}><i className="ti ti-school" style={{marginRight:4}}/>Education ({edu.length})</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {edu.map((e, i) => (
                       <div key={i} style={{ background: "var(--surface2)", borderRadius: 10, padding: "10px 14px", fontSize: 13 }}>
@@ -945,7 +1005,7 @@ function BgvAdminView({ token, flash }: { token: string; flash: (m: string) => v
               {/* Employment entries */}
               {emp.length > 0 && (
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>💼 Employment ({emp.length})</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}><i className="ti ti-briefcase" style={{marginRight:4}}/>Employment ({emp.length})</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {emp.map((e, i) => (
                       <div key={i} style={{ background: "var(--surface2)", borderRadius: 10, padding: "10px 14px", fontSize: 13 }}>
@@ -953,7 +1013,7 @@ function BgvAdminView({ token, flash }: { token: string; flash: (m: string) => v
                         <div style={{ color: "var(--text3)", fontSize: 11, marginTop: 2 }}>{e.from_date} → {e.to_date || "Present"}</div>
                         {e.manager_email && (
                           <div style={{ marginTop: 6, padding: "6px 10px", background: "rgba(99,102,241,.06)", borderRadius: 7, fontSize: 11, color: "var(--text2)" }}>
-                            📧 Reference: {e.manager_name || "—"} · <a href={`mailto:${e.manager_email}`} style={{ color: "var(--accent)" }}>{e.manager_email}</a>
+                            <i className="ti ti-mail" style={{marginRight:4}}/>Reference: {e.manager_name || "—"} · <a href={`mailto:${e.manager_email}`} style={{ color: "var(--accent)" }}>{e.manager_email}</a>
                           </div>
                         )}
                       </div>
@@ -964,23 +1024,23 @@ function BgvAdminView({ token, flash }: { token: string; flash: (m: string) => v
 
               {/* ── Final approval section ── */}
               <div style={{ background: "var(--bg)", borderRadius: 12, padding: "18px", border: "1px solid var(--border)" }}>
-                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14 }}>✍ Admin Decision</div>
+                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14 }}><i className="ti ti-pencil" style={{marginRight:4}}/>Admin Decision</div>
 
                 {/* Manual check overrides */}
                 <div style={{ marginBottom: 14 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", marginBottom: 8 }}>Verification Checks</div>
                   <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                     {[
-                      { key: "id",  label: "🪪 Identity" },
-                      { key: "edu", label: "🎓 Education" },
-                      { key: "emp", label: "💼 Employment" },
-                    ].map(({ key, label }) => (
+                      { key: "id",  label: "Identity", icon: "ti-id-badge" },
+                      { key: "edu", label: "Education", icon: "ti-school" },
+                      { key: "emp", label: "Employment", icon: "ti-briefcase" },
+                    ].map(({ key, label, icon }) => (
                       <label key={key} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer", padding: "6px 12px", borderRadius: 8, border: `1px solid ${checks[key as keyof typeof checks] ? "var(--accborder)" : "var(--border)"}`, background: checks[key as keyof typeof checks] ? "var(--accdim)" : "none" }}>
                         <input type="checkbox"
                           checked={checks[key as keyof typeof checks]}
                           onChange={e => setChecks(p => ({ ...p, [key]: e.target.checked }))}
                           style={{ width: 14, height: 14 }} />
-                        {label}
+                        <i className={`ti ${icon}`} style={{ fontSize: 13 }}/>{label}
                       </label>
                     ))}
                   </div>
@@ -1017,18 +1077,18 @@ function BgvAdminView({ token, flash }: { token: string; flash: (m: string) => v
                   <button disabled={saving} onClick={() => approveBgv("verified")} style={{
                     ...btn(true), background: "var(--success)", flex: 1,
                   }}>
-                    ✅ Approve & Verify
+                    <i className="ti ti-circle-check" style={{marginRight:4}}/>Approve & Verify
                   </button>
                   <button disabled={saving} onClick={() => approveBgv("partial")} style={{ ...btn(), flex: 1 }}>
-                    ⚠ Partial
+                    <i className="ti ti-alert-triangle" style={{marginRight:4}}/>Partial
                   </button>
                   <button disabled={saving} onClick={() => approveBgv("in_progress")} style={{ ...btn(), flex: 1 }}>
-                    🔍 Keep In Progress
+                    <i className="ti ti-search" style={{marginRight:4}}/>Keep In Progress
                   </button>
                   <button disabled={saving} onClick={() => approveBgv("failed")} style={{
                     ...btn(), background: "rgba(239,68,68,.1)", color: "var(--danger)", border: "1px solid rgba(239,68,68,.2)", flex: 1,
                   }}>
-                    ✗ Reject
+                    <i className="ti ti-x" style={{marginRight:4}}/>Reject
                   </button>
                 </div>
               </div>
@@ -1090,8 +1150,8 @@ function CompanyVerifyAdminView({ token, flash }: { token: string; flash: (m: st
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-        <h2 style={{ fontSize: 16, fontWeight: 700 }}>🏅 Company Verifications ({rows.length})</h2>
-        <button onClick={load} style={btn()}>↻ Refresh</button>
+        <h2 style={{ fontSize: 16, fontWeight: 700 }}><i className="ti ti-building-store" style={{marginRight:6}}/>Company Verifications ({rows.length})</h2>
+        <button onClick={load} style={btn()}><i className="ti ti-refresh" style={{marginRight:4}} />Refresh</button>
       </div>
 
       {loading ? <div style={{ color: "var(--text3)", fontSize: 13 }}>Loading…</div> : (
@@ -1106,10 +1166,10 @@ function CompanyVerifyAdminView({ token, flash }: { token: string; flash: (m: st
                 </div>
                 <div style={{ fontSize: 11, marginTop: 4, display: "flex", gap: 8 }}>
                   <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 600, background: r.is_gst_verified ? "rgba(34,197,94,.1)" : "var(--surface2)", color: r.is_gst_verified ? "var(--success)" : "var(--text3)" }}>
-                    GST {r.is_gst_verified ? "✓" : "⏳"}
+                    GST {r.is_gst_verified ? <i className="ti ti-circle-check" style={{color:"var(--success)"}}/> : <i className="ti ti-clock" style={{color:"var(--warn)"}}/>}
                   </span>
                   <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 600, background: r.is_mca_verified ? "rgba(34,197,94,.1)" : "var(--surface2)", color: r.is_mca_verified ? "var(--success)" : "var(--text3)" }}>
-                    MCA {r.is_mca_verified ? "✓" : "⏳"}
+                    MCA {r.is_mca_verified ? <i className="ti ti-circle-check" style={{color:"var(--success)"}}/> : <i className="ti ti-clock" style={{color:"var(--warn)"}}/>}
                   </span>
                   {r.gst_trade_name && <span style={{ fontSize: 10, color: "var(--text3)" }}>{r.gst_trade_name}</span>}
                 </div>
@@ -1137,12 +1197,12 @@ function CompanyVerifyAdminView({ token, flash }: { token: string; flash: (m: st
           <div style={{ ...card, width: "100%", maxWidth: 500 }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
               <div style={{ fontSize: 15, fontWeight: 700 }}>Review: {selected.company_name}</div>
-              <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18 }}>✕</button>
+              <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18 }}><i className="ti ti-x"/></button>
             </div>
 
             <div style={{ fontSize: 13, color: "var(--text2)", marginBottom: 14 }}>
               <div>CIN: {selected.cin || "—"}</div>
-              <div style={{ marginTop: 4 }}>GSTIN: {selected.gstin || "—"} {selected.is_gst_verified ? "✅" : "⏳"}</div>
+              <div style={{ marginTop: 4 }}>GSTIN: {selected.gstin || "—"} {selected.is_gst_verified ? <i className="ti ti-circle-check" style={{color:"var(--success)"}}/> : <i className="ti ti-clock" style={{color:"var(--warn)"}}/>}</div>
               {selected.gst_trade_name && <div style={{ marginTop: 4, color: "var(--success)" }}>GST Trade Name: {selected.gst_trade_name}</div>}
             </div>
 
@@ -1168,10 +1228,10 @@ function CompanyVerifyAdminView({ token, flash }: { token: string; flash: (m: st
 
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {[
-                { status: "verified",           label: "✓ Fully Verified",     accent: true  },
-                { status: "partially_verified",  label: "⚠ Partially Verified", accent: false },
-                { status: "in_progress",         label: "🔍 In Progress",       accent: false },
-                { status: "failed",              label: "✗ Failed",             accent: false },
+                { status: "verified",           label: "Fully Verified",     accent: true,  icon: "ti-circle-check"  },
+                { status: "partially_verified",  label: "Partially Verified", accent: false, icon: "ti-alert-triangle" },
+                { status: "in_progress",         label: "In Progress",       accent: false, icon: "ti-search" },
+                { status: "failed",              label: "Failed",             accent: false, icon: "ti-x" },
               ].map(a => (
                 <button key={a.status} disabled={saving} onClick={() => {
                   const score = parseInt((document.getElementById("co_score") as HTMLInputElement)?.value ?? "0");
@@ -1182,7 +1242,7 @@ function CompanyVerifyAdminView({ token, flash }: { token: string; flash: (m: st
                     verified_at: a.status === "verified" ? new Date().toISOString() : null,
                     updated_at: new Date().toISOString(),
                   });
-                }} style={btn(a.accent)}>{a.label}</button>
+                }} style={btn(a.accent)}>{a.icon && <i className={`ti ${a.icon}`} style={{marginRight:4}}/>}{a.label}</button>
               ))}
             </div>
           </div>
@@ -1259,7 +1319,7 @@ function UsersAdminView({ token, flash }: { token: string; flash: (m: string) =>
           <option value="all">All plans</option>
           {PLANS.map(p => <option key={p} value={p}>{p}</option>)}
         </select>
-        <button style={btn()} onClick={load}>↻ Refresh</button>
+        <button style={btn()} onClick={load}><i className="ti ti-refresh" style={{marginRight:4}} />Refresh</button>
         <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--text3)" }}>{filtered.length} / {users.length} users</span>
       </div>
 
@@ -1318,7 +1378,7 @@ function UsersAdminView({ token, flash }: { token: string; flash: (m: string) =>
                 <div style={{ fontSize: 15, fontWeight: 800 }}>{selected.email}</div>
                 <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 2 }}>{selected.full_name || "No name"} · Joined {new Date(selected.created_at).toLocaleDateString()}</div>
               </div>
-              <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18 }}>✕</button>
+              <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18 }}><i className="ti ti-x"/></button>
             </div>
 
             <div>
@@ -1340,12 +1400,12 @@ function UsersAdminView({ token, flash }: { token: string; flash: (m: string) =>
                 </button>
                 <button onClick={() => updateUser(selected.id, { is_suspended: !selected.is_suspended })} disabled={saving}
                   style={{ ...btn(), color: selected.is_suspended ? "var(--success)" : "var(--danger)" }}>
-                  {selected.is_suspended ? "↩ Unsuspend" : "⛔ Suspend"}
+                  {selected.is_suspended ? <><i className="ti ti-arrow-back-up" style={{marginRight:4}}/>Unsuspend</> : <><i className="ti ti-ban" style={{marginRight:4}}/>Suspend</>}
                 </button>
                 {!selected.is_admin && (
                   <button onClick={() => { if (confirm(`Grant admin to ${selected.email}?`)) updateUser(selected.id, { is_admin: true }); }} disabled={saving}
                     style={{ ...btn(), color: "var(--warn)" }}>
-                    ⭐ Make Admin
+                    <i className="ti ti-star" style={{marginRight:4}}/>Make Admin
                   </button>
                 )}
               </div>
@@ -1356,7 +1416,7 @@ function UsersAdminView({ token, flash }: { token: string; flash: (m: string) =>
                 ["Current role",  selected.current_job_role || "—"],
                 ["Target role",   selected.target_role  || "—"],
                 ["Location",      selected.location     || "—"],
-                ["Onboarding",    selected.onboarding_completed ? "✓ Complete" : "⏳ In progress"],
+                ["Onboarding",    selected.onboarding_completed ? "Complete" : "In progress"],
               ].map(([k, v]) => (
                 <div key={k}>
                   <div style={{ fontSize: 10, color: "var(--text3)", fontWeight: 700, textTransform: "uppercase" }}>{k}</div>
@@ -1409,22 +1469,22 @@ function FeatureFlagsView({ token, flash }: { token: string; flash: (m: string) 
   }
 
   const FLAG_ICONS: Record<string, string> = {
-    bgv_live: "🛡", ai_cover_letter: "✉️", salary_predict: "💰",
-    python_ats: "🐍", enterprise_sso: "🔑", stripe_payments: "💳",
+    bgv_live: "ti-shield-check", ai_cover_letter: "ti-mail", salary_predict: "ti-coin",
+    python_ats: "ti-code", enterprise_sso: "ti-key", stripe_payments: "ti-credit-card",
   };
 
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <div style={{ fontSize: 14, fontWeight: 700 }}>🚩 Feature Flags</div>
-        <button onClick={load} style={btn()}>↻ Refresh</button>
+        <div style={{ fontSize: 14, fontWeight: 700 }}><i className="ti ti-flag" style={{marginRight:6}}/>Feature Flags</div>
+        <button onClick={load} style={btn()}><i className="ti ti-refresh" style={{marginRight:4}} />Refresh</button>
       </div>
 
       {loading ? <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>Loading…</div> : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 10 }}>
           {flags.map(f => (
             <div key={f.id} style={{ ...card, display: "flex", alignItems: "center", gap: 14 }}>
-              <div style={{ fontSize: 24 }}>{FLAG_ICONS[f.key] ?? "🏳"}</div>
+              <div style={{ fontSize: 22, color: "var(--accent)" }}><i className={`ti ${FLAG_ICONS[f.key] ?? "ti-flag"}`}/></div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)" }}>{f.key}</div>
                 {f.description && <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>{f.description}</div>}
@@ -1509,7 +1569,7 @@ function AuditLogView({ token }: { token: string }) {
     <div>
       <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 16, flexWrap: "wrap" }}>
         <input style={{ ...input, maxWidth: 280 }} value={search} onChange={e => { setSearch(e.target.value); setPage(0); }} placeholder="Filter by action, resource, user ID…" />
-        <button style={btn()} onClick={load}>↻ Refresh</button>
+        <button style={btn()} onClick={load}><i className="ti ti-refresh" style={{marginRight:4}} />Refresh</button>
         <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--text3)" }}>{filtered.length} events</span>
       </div>
 
@@ -1613,7 +1673,7 @@ function MetricsView({ token }: { token: string }) {
 
   return (
     <div>
-      <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}>📊 Platform Metrics</div>
+      <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}><i className="ti ti-chart-bar" style={{marginRight:6}}/>Platform Metrics</div>
 
       {loading ? <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>Loading…</div> : (
         <>

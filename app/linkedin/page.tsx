@@ -55,8 +55,8 @@ const STATUS_COLOR: Record<string, string> = {
   Missing:"var(--danger)", Weak:"var(--warn)", Good:"var(--success)", Strong:"var(--accent)",
 };
 const SECTION_EMOJI: Record<string, string> = {
-  Photo:"📷", Banner:"🖼️", Headline:"✏️", About:"📝", Featured:"⭐",
-  Experience:"💼", Skills:"🛠️", Recommendations:"🤝", "Custom URL":"🔗", "Open to Work":"🟢",
+  Photo:"ti-camera", Banner:"ti-photo", Headline:"ti-pencil", About:"ti-note", Featured:"ti-star",
+  Experience:"ti-briefcase", Skills:"ti-tools", Recommendations:"ti-handshake", "Custom URL":"ti-link", "Open to Work":"ti-circle",
 };
 const CAT_COLOR: Record<string, string> = {
   Algorithm:"var(--accent)", Network:"var(--success)", Content:"var(--warn)", Engagement:"#a855f7",
@@ -203,7 +203,7 @@ export default function LinkedInPage() {
         {/* Header */}
         <div style={{ marginBottom:28 }}>
           <div style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"4px 12px", borderRadius:99, background:"var(--accdim)", border:"1px solid var(--accborder)", fontSize:11, fontWeight:700, color:"var(--accent)", marginBottom:12 }}>
-            💼 AI-Powered · Role-Targeted · LinkedIn Connected
+            <i className="ti ti-briefcase"/> AI-Powered · Role-Targeted · LinkedIn Connected
           </div>
           <h1 style={{ fontSize:26, fontWeight:800, marginBottom:8, letterSpacing:"-.02em" }}>LinkedIn Profile Optimizer</h1>
           <p style={{ fontSize:14, color:"var(--text3)", lineHeight:1.6, maxWidth:580 }}>
@@ -245,7 +245,7 @@ export default function LinkedInPage() {
           {/* Tips form */}
           <div style={{ padding:"20px 24px" }}>
             <div style={{ fontSize:13, fontWeight:700, color:"var(--text1)", marginBottom:14 }}>
-              {isLinkedInConnected ? "🎯 Generate your personalised LinkedIn tips" : "📋 Get LinkedIn tips (no LinkedIn account required)"}
+              {isLinkedInConnected ? "Generate your personalised LinkedIn tips" : "Get LinkedIn tips (no LinkedIn account required)"}
             </div>
 
             <div style={{ display:"grid", gridTemplateColumns:mobile?"1fr":"1fr 1fr", gap:12, marginBottom:14 }}>
@@ -304,7 +304,7 @@ export default function LinkedInPage() {
             )}
 
             <button onClick={handleGenerateTips} disabled={tipsLoading || !role.trim()} style={{ padding:"11px 24px", borderRadius:10, background:"var(--accent)", color:"#fff", border:"none", fontSize:13, fontWeight:700, cursor:tipsLoading?"not-allowed":"pointer", fontFamily:"inherit", opacity:tipsLoading?0.7:1, display:"inline-flex", alignItems:"center", gap:8 }}>
-              {tipsLoading ? <><Spinner/> Generating tips…</> : "✨ Generate my LinkedIn tips"}
+              {tipsLoading ? <><Spinner/> Generating tips…</> : "Generate my LinkedIn tips"}
             </button>
           </div>
 
@@ -317,7 +317,7 @@ export default function LinkedInPage() {
                 <ScoreRing score={tips.healthScore} size={88}/>
                 <div style={{ flex:1, minWidth:200 }}>
                   <div style={{ fontSize:18, fontWeight:800, marginBottom:4 }}>
-                    Profile Health: {tips.healthScore>=80?"🟢 Strong":tips.healthScore>=60?"🟡 Moderate":"🔴 Needs work"}
+                    Profile Health: {tips.healthScore>=80?"Strong":tips.healthScore>=60?"Moderate":"Needs work"}
                   </div>
                   <div style={{ fontSize:13, color:"var(--text3)", lineHeight:1.6, marginBottom:10 }}>
                     Based on your profile data for <strong>{role}</strong> roles.
@@ -332,7 +332,7 @@ export default function LinkedInPage() {
 
               {/* Tab bar */}
               <div style={{ display:"flex", gap:0, borderBottom:"1px solid var(--border)", padding:"0 24px", overflowX:"auto" }}>
-                {([{key:"wins",label:"⚡ Quick Wins"},{key:"sections",label:"📋 Section Guide"},{key:"growth",label:"📈 Growth Playbook"},{key:"plan",label:"📅 30-Day Plan"}] as const).map(t=>(
+                {([{key:"wins",label:"Quick Wins"},{key:"sections",label:"Section Guide"},{key:"growth",label:"Growth Playbook"},{key:"plan",label:"30-Day Plan"}] as const).map(t=>(
                   <button key={t.key} onClick={()=>setTipsTab(t.key)} style={{ padding:"11px 18px", fontSize:13, fontWeight:700, background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", whiteSpace:"nowrap", color:tipsTab===t.key?"var(--accent)":"var(--text3)", borderBottom:tipsTab===t.key?"2px solid var(--accent)":"2px solid transparent" }}>
                     {t.label}
                   </button>
@@ -382,7 +382,7 @@ export default function LinkedInPage() {
                       <div key={s.section} style={{ ...card, padding:"14px 16px" }}>
                         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
                           <div style={{ display:"flex", alignItems:"center", gap:7 }}>
-                            <span style={{ fontSize:16 }}>{SECTION_EMOJI[s.section]??"📌"}</span>
+                            <span style={{ fontSize:16 }}>{SECTION_EMOJI[s.section]??"ti-pin"}</span>
                             <span style={{ fontSize:13, fontWeight:700 }}>{s.section}</span>
                           </div>
                           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
@@ -431,7 +431,7 @@ export default function LinkedInPage() {
                         </div>
                         {(week.tasks??[]).map((task,i)=>(
                           <div key={i} style={{ display:"flex", gap:8, fontSize:12, color:"var(--text2)", marginBottom:6 }}>
-                            <span style={{ color:"var(--accent)", fontWeight:700, flexShrink:0 }}>→</span>
+                            <span style={{ color:"var(--accent)", fontWeight:700, flexShrink:0 }}><i className="ti ti-arrow-right"/></span>
                             <span style={{ lineHeight:1.5 }}>{task}</span>
                           </div>
                         ))}
@@ -446,7 +446,7 @@ export default function LinkedInPage() {
               {(tips.roleKeywords?.length??0)>0 && (
                 <div style={{ padding:"0 24px 20px" }}>
                   <div style={{ ...card, padding:"14px 18px" }}>
-                    <div style={{ fontSize:12, fontWeight:700, color:"var(--text2)", marginBottom:10 }}>🔑 Top recruiter keywords for <strong>{role}</strong> — add to your Skills &amp; About</div>
+                    <div style={{ fontSize:12, fontWeight:700, color:"var(--text2)", marginBottom:10 }}><i className="ti ti-key"/> Top recruiter keywords for <strong>{role}</strong> — add to your Skills &amp; About</div>
                     <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
                       {tips.roleKeywords.map(kw=>(
                         <span key={kw} style={{ display:"inline-flex", alignItems:"center", gap:4, padding:"4px 12px", borderRadius:99, fontSize:12, fontWeight:600, background:"var(--surface2)", border:"1px solid var(--border)", color:"var(--text2)" }}>{kw}</span>
@@ -467,15 +467,15 @@ export default function LinkedInPage() {
             style={{ width:"100%", padding:"14px 20px", borderRadius:12, border:"1px solid var(--border)", background:"var(--surface)", textAlign:"left", cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"space-between" }}
           >
             <div>
-              <div style={{ fontSize:14, fontWeight:700, color:"var(--text1)" }}>📥 Import from LinkedIn</div>
-              <div style={{ fontSize:12, color:"var(--text3)", marginTop:2 }}>Paste your LinkedIn profile text → auto-fill the resume builder</div>
+              <div style={{ fontSize:14, fontWeight:700, color:"var(--text1)" }}><i className="ti ti-download"/> Import from LinkedIn</div>
+              <div style={{ fontSize:12, color:"var(--text3)", marginTop:2 }}>Paste your LinkedIn profile text <i className="ti ti-arrow-right"/> auto-fill the resume builder</div>
             </div>
             <span style={{ fontSize:16, color:"var(--text3)" }}>{showImport ? "▲" : "▼"}</span>
           </button>
           {showImport && (
             <div style={{ marginTop:8, padding:"20px", background:"var(--surface)", borderRadius:12, border:"1px solid var(--border)" }}>
               <p style={{ margin:"0 0 12px", fontSize:13, color:"var(--text2)" }}>
-                On LinkedIn, go to your profile → select all text (Ctrl+A) → paste it below. No API key needed — our AI extracts everything.
+                On LinkedIn, go to your profile <i className="ti ti-arrow-right"/> select all text (Ctrl+A) <i className="ti ti-arrow-right"/> paste it below. No API key needed — our AI extracts everything.
               </p>
               <textarea
                 value={importText}
@@ -487,14 +487,14 @@ export default function LinkedInPage() {
               {importError && <div style={{ color:"var(--danger)", fontSize:12, marginTop:6 }}>{importError}</div>}
               {importResult && (
                 <div style={{ marginTop:10, padding:"12px 16px", background:"rgba(34,197,94,.06)", border:"1px solid rgba(34,197,94,.2)", borderRadius:8 }}>
-                  <div style={{ fontSize:13, fontWeight:700, color:"var(--success)", marginBottom:4 }}>✅ Profile parsed!</div>
+                  <div style={{ fontSize:13, fontWeight:700, color:"var(--success)", marginBottom:4 }}><i className="ti ti-circle-check"/> Profile parsed!</div>
                   <div style={{ fontSize:12, color:"var(--text2)", marginBottom:10 }}>
                     Found: <strong>{(importResult as { name?: string }).name}</strong> ·{" "}
                     {Array.isArray((importResult as { work?: unknown[] }).work) ? (importResult as { work: unknown[] }).work.length : 0} jobs ·{" "}
                     {Array.isArray((importResult as { edu?: unknown[] }).edu) ? (importResult as { edu: unknown[] }).edu.length : 0} education entries
                   </div>
                   <a href="/builder?from=linkedin" style={{ fontSize:13, fontWeight:600, color:"var(--accent)", textDecoration:"none" }}>
-                    Open Builder with imported data →
+                    Open Builder with imported data <i className="ti ti-arrow-right"/>
                   </a>
                 </div>
               )}
@@ -549,7 +549,7 @@ export default function LinkedInPage() {
             </div>
             {error && <div style={{ padding:"10px 16px", borderRadius:9, background:"rgba(239,68,68,.08)", border:"1px solid rgba(239,68,68,.2)", fontSize:13, color:"var(--danger)" }}>{error}</div>}
             <button onClick={handleAnalyze} disabled={loading||!analyRole.trim()} style={{ padding:"13px 28px", borderRadius:10, background:"var(--accent)", color:"#fff", border:"none", fontSize:14, fontWeight:700, cursor:loading?"not-allowed":"pointer", fontFamily:"inherit", opacity:loading?0.7:1, display:"flex", alignItems:"center", gap:8 }}>
-              {loading ? <><Spinner/> Analysing…</> : "💼 Analyse & rewrite"}
+              {loading ? <><Spinner/> Analysing…</> : "Analyse & rewrite"}
             </button>
           </div>
 
@@ -589,13 +589,13 @@ export default function LinkedInPage() {
 
                 <div style={{ ...card, padding:"18px 20px" }}>
                   <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
-                    <div style={{ fontSize:13, fontWeight:700, textTransform:"capitalize" }}>✨ AI-rewritten {activeTab}</div>
+                    <div style={{ fontSize:13, fontWeight:700, textTransform:"capitalize" }}><i className="ti ti-sparkles"/> AI-rewritten {activeTab}</div>
                     <CopyBtn text={result.rewrites[activeTab]}/>
                   </div>
                   <div style={{ padding:"14px 16px", background:"var(--surface2)", borderRadius:10, border:"1px solid var(--border)", fontSize:13, color:"var(--text1)", lineHeight:1.7, whiteSpace:"pre-wrap" }}>
                     {result.rewrites[activeTab]}
                   </div>
-                  <div style={{ marginTop:10, fontSize:11, color:"var(--text3)" }}>Click Copy → paste into LinkedIn → Edit profile → {activeTab.charAt(0).toUpperCase()+activeTab.slice(1)}</div>
+                  <div style={{ marginTop:10, fontSize:11, color:"var(--text3)" }}>Click Copy <i className="ti ti-arrow-right"/> paste into LinkedIn <i className="ti ti-arrow-right"/> Edit profile <i className="ti ti-arrow-right"/> {activeTab.charAt(0).toUpperCase()+activeTab.slice(1)}</div>
                 </div>
 
                 {result.missingKeywords.length>0 && (
@@ -610,8 +610,8 @@ export default function LinkedInPage() {
                 )}
 
                 <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
-                  <Link href="/builder" style={{ padding:"9px 18px", borderRadius:9, background:"var(--accdim)", border:"1px solid var(--accborder)", color:"var(--accent)", fontSize:13, fontWeight:700, textDecoration:"none" }}>Update resume to match →</Link>
-                  <Link href="/career-gps" style={{ padding:"9px 18px", borderRadius:9, background:"var(--surface2)", border:"1px solid var(--border)", color:"var(--text1)", fontSize:13, fontWeight:600, textDecoration:"none" }}>Close skill gaps →</Link>
+                  <Link href="/builder" style={{ padding:"9px 18px", borderRadius:9, background:"var(--accdim)", border:"1px solid var(--accborder)", color:"var(--accent)", fontSize:13, fontWeight:700, textDecoration:"none" }}>Update resume to match <i className="ti ti-arrow-right"/></Link>
+                  <Link href="/career-gps" style={{ padding:"9px 18px", borderRadius:9, background:"var(--surface2)", border:"1px solid var(--border)", color:"var(--text1)", fontSize:13, fontWeight:600, textDecoration:"none" }}>Close skill gaps <i className="ti ti-arrow-right"/></Link>
                 </div>
               </div>
             )}

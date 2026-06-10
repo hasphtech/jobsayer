@@ -25,19 +25,19 @@ function useWidth() {
 }
 
 const NAV_LINKS = [
-  { href: "/dashboard",      label: "Dashboard",      icon: "📊" },
+  { href: "/dashboard",      label: "Dashboard",      icon: "ti-layout-dashboard" },
   { href: "/builder",        label: "Builder",        icon: "✏️" },
   { href: "/cover-letter",   label: "Cover Letter",   icon: "✉️" },
-  { href: "/score",          label: "Score",          icon: "🎯" },
-  { href: "/jobs",           label: "Jobs",           icon: "💼" },
-  { href: "/applications",   label: "Tracker",        icon: "📋" },
-  { href: "/interview",      label: "Interview",      icon: "🎤" },
+  { href: "/score",          label: "Score",          icon: "ti-target" },
+  { href: "/jobs",           label: "Jobs",           icon: "ti-briefcase" },
+  { href: "/applications",   label: "Tracker",        icon: "ti-layout-list" },
+  { href: "/interview",      label: "Interview",      icon: "ti-microphone" },
   { href: "/tailor",         label: "JD Tailor",      icon: "✂️" },
-  { href: "/linkedin",       label: "LinkedIn",       icon: "💼" },
-  { href: "/career-gps",     label: "Career GPS",     icon: "🧭" },
-  { href: "/career-health",  label: "Health",         icon: "🏥" },
-  { href: "/bgv",            label: "BGV",            icon: "🛡" },
-  { href: "/salary",         label: "Salaries",       icon: "💰" },
+  { href: "/linkedin",       label: "LinkedIn",       icon: "ti-briefcase" },
+  { href: "/career-gps",     label: "Career GPS",     icon: "ti-compass" },
+  { href: "/career-health",  label: "Health",         icon: "ti-stethoscope" },
+  { href: "/bgv",            label: "BGV",            icon: "ti-shield-check" },
+  { href: "/salary",         label: "Salaries",       icon: "ti-coin" },
   { href: "/employer-trust", label: "Trust",          icon: "⭐" },
 ];
 
@@ -112,7 +112,7 @@ export default function AppNav({ actions }: { actions?: React.ReactNode }) {
           {!mobile && (
             <button onClick={toggleTheme} title={dark ? "Switch to light mode" : "Switch to dark mode"}
               style={{ width: 30, height: 30, borderRadius: 7, border: "1px solid var(--border)", background: "var(--surface2)", color: "var(--text2)", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              {dark ? "☀" : "🌙"}
+              <i className={dark ? "ti ti-sun" : "ti ti-moon"}/>
             </button>
           )}
 
@@ -166,7 +166,7 @@ export default function AppNav({ actions }: { actions?: React.ReactNode }) {
                 border: `1px solid ${active ? "var(--accborder)" : "var(--border)"}`,
                 display: "flex", alignItems: "center", gap: 10,
               }}>
-                <span>{l.icon}</span> {l.label}
+                <i className={`ti ${l.icon}`} style={{fontSize:15, flexShrink:0}}/> {l.label}
               </Link>
             );
           })}
@@ -182,7 +182,7 @@ export default function AppNav({ actions }: { actions?: React.ReactNode }) {
               background: "var(--surface2)", border: "1px solid var(--border)",
               display: "flex", alignItems: "center", gap: 10,
             }}>
-              👤 My Account
+              <i className="ti ti-user" style={{marginRight:4}}/>My Account
             </Link>
           )}
         </div>
