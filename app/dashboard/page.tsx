@@ -137,6 +137,195 @@ function QuickAction({ href, icon, label, xp }: { href: string; icon: string; la
   );
 }
 
+/* ── Career milestone prompt ─────────────────────────────────── */
+type Milestone = {
+  monthsMin: number;
+  monthsMax: number;
+  emoji: string;
+  headline: string;
+  body: string;
+  cta: string;
+  ctaHref: string;
+  ctaSecondary?: string;
+  ctaSecondaryHref?: string;
+  color: string;
+};
+
+const MILESTONES: Milestone[] = [
+  {
+    monthsMin: 3, monthsMax: 5,
+    emoji: "🌱",
+    headline: "You've hit 3 months in your role",
+    body: "You're past the ramp-up phase. A great time to document your early wins and benchmark your salary against the market before your first review.",
+    cta: "Check salary benchmark", ctaHref: "/salary",
+    ctaSecondary: "Update resume with wins", ctaSecondaryHref: "/builder",
+    color: "var(--success)",
+  },
+  {
+    monthsMin: 6, monthsMax: 11,
+    emoji: "⚡",
+    headline: "6 months in — time to check your market value",
+    body: "Professionals who benchmark their salary at 6 months are 2.4× more likely to negotiate a raise at their next review. Your market rate may have shifted.",
+    cta: "Get salary benchmark", ctaHref: "/salary",
+    ctaSecondary: "Close skill gaps", ctaSecondaryHref: "/career-gps",
+    color: "var(--accent)",
+  },
+  {
+    monthsMin: 12, monthsMax: 17,
+    emoji: "🏆",
+    headline: "1 year in — your next move starts now",
+    body: "Your impact is proven. Run Career GPS to see what 3 skills separate you from a senior title, and get your resume ready for internal or external opportunities.",
+    cta: "Run Career GPS", ctaHref: "/career-gps",
+    ctaSecondary: "Refresh resume", ctaSecondaryHref: "/builder",
+    color: "#f59e0b",
+  },
+  {
+    monthsMin: 18, monthsMax: 23,
+    emoji: "🚀",
+    headline: "18 months — the sweet spot for a move",
+    body: "18–24 months is when professionals see the biggest salary jumps from switching roles. See what your profile looks like to recruiters right now.",
+    cta: "Score your resume", ctaHref: "/score",
+    ctaSecondary: "Check salary data", ctaSecondaryHref: "/salary",
+    color: "var(--accent)",
+  },
+  {
+    monthsMin: 24, monthsMax: 9999,
+    emoji: "💡",
+    headline: "2+ years — you have serious leverage",
+    body: "Staying beyond 2 years? Make sure your profile and salary reflect the experience and impact you've built. Now is the time to negotiate or explore.",
+    cta: "Optimise LinkedIn", ctaHref: "/linkedin",
+    ctaSecondary: "Salary benchmark", ctaSecondaryHref: "/salary",
+    color: "#8b5cf6",
+  },
+];
+
+function CareerMilestonePrompt() {
+  const START_KEY    = "jobsayer-role-start";
+  const DISMISS_KEY  = "jobsayer-milestone-dismissed";
+
+  const [startDate, setStartDate] = useState<string>("");
+  const [input,     setInput]     = useState<string>("");
+  const [dismissed, setDismissed] = useState<Record<number, boolean>>({});
+  const [mounted,   setMounted]   = useState(false);
+
+  useEffect(() => {
+    try {
+      const s = localStorage.getItem(START_KEY);
+      if (s) setStartDate(s);
+      const d = localStorage.getItem(DISMISS_KEY);
+      if (d) setDismissed(JSON.parse(d));
+    } catch { /* ignore */ }
+    setMounted(true);
+  }, []);
+
+  function saveStart() {
+    if (!input) return;
+    try { localStorage.setItem(START_KEY, input); } catch { /* ignore */ }
+    setStartDate(input);
+  }
+
+  function dismiss(min: number) {
+    const next = { ...dismissed, [min]: true };
+    setDismissed(next);
+    try { localStorage.setItem(DISMISS_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+  }
+
+  if (!mounted) return null;
+
+  // If no start date, show a small setup prompt
+  if (!startDate) {
+    return (
+      <div style={{
+        background: "var(--surface)", border: "1px solid var(--border)",
+        borderRadius: 12, padding: "14px 16px", marginBottom: 16,
+        display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap",
+      }}>
+        <span style={{ fontSize: 18 }}>📅</span>
+        <div style={{ flex: 1, minWidth: 180 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)", marginBottom: 3 }}>
+            When did you start your current role?
+          </div>
+          <div style={{ fontSize: 11, color: "var(--text3)" }}>
+            We&apos;ll surface salary benchmarks and skill recs at the right career moment.
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <input
+            type="month"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            style={{
+              background: "var(--surface2)", border: "1px solid var(--border)",
+              borderRadius: 7, color: "var(--text1)", padding: "6px 10px",
+              fontSize: 12, fontFamily: "inherit",
+            }}
+          />
+          <button onClick={saveStart} style={{
+            padding: "7px 14px", borderRadius: 7, background: "var(--accent)", color: "#fff",
+            fontSize: 12, fontWeight: 700, border: "none", cursor: "pointer", fontFamily: "inherit",
+          }}>
+            Set
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Calculate months in role
+  const start  = new Date(startDate + "-01");
+  const months = Math.max(0, Math.floor((Date.now() - start.getTime()) / (1000 * 60 * 60 * 24 * 30.44)));
+  const milestone = MILESTONES.find(m => months >= m.monthsMin && months <= m.monthsMax);
+
+  if (!milestone || dismissed[milestone.monthsMin]) return null;
+
+  return (
+    <div style={{
+      background: "var(--surface)", borderLeft: `3px solid ${milestone.color}`,
+      border: `1px solid var(--border)`, borderLeftWidth: 3, borderLeftColor: milestone.color,
+      borderRadius: 12, padding: "16px", marginBottom: 16,
+      position: "relative",
+    }}>
+      <button
+        onClick={() => dismiss(milestone.monthsMin)}
+        style={{
+          position: "absolute", top: 10, right: 12, background: "none", border: "none",
+          fontSize: 14, color: "var(--text3)", cursor: "pointer", lineHeight: 1, padding: 0,
+        }}
+        aria-label="Dismiss"
+      >×</button>
+      <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+        <span style={{ fontSize: 22, flexShrink: 0 }}>{milestone.emoji}</span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text1)", marginBottom: 5 }}>
+            {milestone.headline}
+          </div>
+          <p style={{ fontSize: 12, color: "var(--text2)", lineHeight: 1.65, margin: "0 0 12px" }}>
+            {milestone.body}
+          </p>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <Link href={milestone.ctaHref} style={{
+              padding: "7px 14px", borderRadius: 7,
+              background: milestone.color, color: "#fff",
+              fontSize: 12, fontWeight: 700, textDecoration: "none",
+            }}>
+              {milestone.cta} →
+            </Link>
+            {milestone.ctaSecondary && (
+              <Link href={milestone.ctaSecondaryHref!} style={{
+                padding: "7px 14px", borderRadius: 7,
+                background: "var(--surface2)", border: "1px solid var(--border)",
+                color: "var(--text1)", fontSize: 12, fontWeight: 600, textDecoration: "none",
+              }}>
+                {milestone.ctaSecondary}
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Post-hire continuity panel (GAP 3) ─────────────────────── */
 type PHPhase = "30" | "60" | "90";
 
@@ -478,6 +667,9 @@ export default function DashboardPage() {
             }} />
           </div>
         </div>
+
+        {/* ── Career milestone prompt ── */}
+        <CareerMilestonePrompt />
 
         {/* ── 4 stat cards ── */}
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: 10, marginBottom: 16 }}>

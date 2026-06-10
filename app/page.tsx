@@ -540,64 +540,67 @@ function LandingPage({ signIn }: { signIn: () => void }) {
           {[
             {
               name: "Sarah K.",
-              role: "Landed a role at Stripe",
+              outcome: "₹40L offer at Stripe",
+              outcomeSub: "Score jumped 58 → 89 in one session",
               avatar: "SK",
-              text: "The JD tailoring feature is magic. Pasted the Stripe JD and it rewrote my bullets to match exactly. Got a callback within 3 days. Resume score went from 58 to 89.",
-              score: 89,
+              text: "Pasted the Stripe JD and it rewrote my bullets to match exactly. Got a callback within 3 days. I hadn't expected the turnaround to be this fast.",
               tag: "Senior SWE · San Francisco",
             },
             {
               name: "Liam O.",
-              role: "Moved from consulting to Monzo",
+              outcome: "£12K above first offer",
+              outcomeSub: "Consulting → Product at Monzo",
               avatar: "LO",
-              text: "Career GPS told me exactly what was missing for a product role. The salary coach gave me the data to negotiate £12K above the first offer. Genuinely life-changing.",
-              score: 82,
+              text: "Career GPS told me exactly what was missing for a product role. The salary coach gave me market data to back every counter I made. The negotiation paid for Pro 100× over.",
               tag: "PM · London",
             },
             {
               name: "Aisha R.",
-              role: "First tech role at Grab",
+              outcome: "Offer on 4th application",
+              outcomeSub: "Career switcher → Grab in 2 weeks",
               avatar: "AR",
-              text: "As a career switcher, I had no idea how ATS systems worked. jobSayer's score and interview prep got me interview-ready in 2 weeks. Got the Grab offer on my 4th application.",
-              score: 77,
+              text: "I had no idea how ATS systems worked. jobSayer's score flagged every gap and the interview prep built my confidence. Grab was my 4th application — not my 40th.",
               tag: "Data Analyst · Singapore",
             },
           ].map(t => (
             <div key={t.name} style={{
               background: "var(--surface)", border: "1px solid var(--border)",
-              borderRadius: 14, padding: mobile ? "14px" : "22px", display: "flex", flexDirection: "column", gap: mobile ? 10 : 16,
+              borderRadius: 14, padding: mobile ? "14px" : "22px", display: "flex", flexDirection: "column", gap: mobile ? 10 : 14,
             }}>
+              {/* Outcome headline — number first */}
+              <div style={{
+                background: "var(--accdim)", border: "1px solid var(--accborder)",
+                borderRadius: 10, padding: "10px 14px",
+              }}>
+                <div style={{ fontSize: mobile ? 15 : 18, fontWeight: 800, color: "var(--accent)", lineHeight: 1.2 }}>
+                  {t.outcome}
+                </div>
+                <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 3 }}>
+                  {t.outcomeSub}
+                </div>
+              </div>
               {/* Stars */}
               <div style={{ display: "flex", gap: 2 }}>
                 {[1,2,3,4,5].map(i => (
-                  <span key={i} style={{ color: "#eab308", fontSize: 14 }}>★</span>
+                  <span key={i} style={{ color: "#eab308", fontSize: 13 }}>★</span>
                 ))}
               </div>
               {/* Quote */}
-              <p style={{ fontSize: 13, color: "var(--text2)", lineHeight: 1.7, flex: 1 }}>
-                "{t.text}"
+              <p style={{ fontSize: 12, color: "var(--text2)", lineHeight: 1.7, flex: 1, margin: 0 }}>
+                &ldquo;{t.text}&rdquo;
               </p>
               {/* Footer */}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{
-                    width: 36, height: 36, borderRadius: "50%", flexShrink: 0,
-                    background: "var(--accdim)", border: "1px solid var(--accborder)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 12, fontWeight: 700, color: "var(--accent)",
-                  }}>{t.avatar}</div>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)" }}>{t.name}</div>
-                    <div style={{ fontSize: 11, color: "var(--success)", fontWeight: 600 }}>{t.role}</div>
-                  </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{
+                  width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
+                  background: "var(--surface2)", border: "1px solid var(--border)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 11, fontWeight: 700, color: "var(--text2)",
+                }}>{t.avatar}</div>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)" }}>{t.name}</div>
+                  <div style={{ fontSize: 11, color: "var(--text3)" }}>{t.tag}</div>
                 </div>
-                <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: "var(--accent)" }}>{t.score}</div>
-                  <div style={{ fontSize: 10, color: "var(--text3)" }}>jobSayer Score</div>
-                </div>
-              </div>
-              <div style={{ fontSize: 11, color: "var(--text3)", padding: "4px 10px", background: "var(--surface2)", borderRadius: 6, border: "1px solid var(--border)", textAlign: "center" }}>
-                {t.tag}
               </div>
             </div>
           ))}

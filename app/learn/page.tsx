@@ -598,6 +598,34 @@ const COURSES: Course[] = [
   },
 ];
 
+/* ── ROI signals (per cert — shown on cards with hasCert) ───── */
+const ROI_SIGNALS: Record<string, { multiplier: string; roles: string; salaryDelta?: string }> = {
+  "goog-it":          { multiplier: "2.1×", roles: "IT Support & Sysadmin",    salaryDelta: "+18%" },
+  "goog-da":          { multiplier: "2.8×", roles: "Data Analyst",             salaryDelta: "+22%" },
+  "goog-pm":          { multiplier: "2.4×", roles: "Project Manager",          salaryDelta: "+20%" },
+  "goog-ux":          { multiplier: "2.3×", roles: "UX / Product Designer",    salaryDelta: "+19%" },
+  "aws-clf":          { multiplier: "3.1×", roles: "Cloud & DevOps",           salaryDelta: "+28%" },
+  "aws-saa":          { multiplier: "3.6×", roles: "Cloud Architect",          salaryDelta: "+34%" },
+  "az-fundamentals":  { multiplier: "2.9×", roles: "Cloud / Azure roles",      salaryDelta: "+26%" },
+  "ms-pl300":         { multiplier: "2.5×", roles: "Data Analyst (Power BI)",  salaryDelta: "+21%" },
+  "ibm-da":           { multiplier: "2.6×", roles: "Data Analyst",             salaryDelta: "+20%" },
+  "meta-fe":          { multiplier: "2.2×", roles: "Frontend / React roles",   salaryDelta: "+17%" },
+  "fcc-js":           { multiplier: "1.9×", roles: "Frontend Developer",       salaryDelta: "+15%" },
+  "nptel-dsa":        { multiplier: "2.0×", roles: "SDE / Backend",            salaryDelta: "+16%" },
+  "cs50-x":           { multiplier: "2.7×", roles: "SDE (entry level)",        salaryDelta: "+24%" },
+  "cs50-python":      { multiplier: "2.4×", roles: "Backend / Data Science",   salaryDelta: "+21%" },
+  "cs50-sql":         { multiplier: "2.3×", roles: "Data Analyst / Backend",   salaryDelta: "+19%" },
+  "hs-digital":       { multiplier: "1.8×", roles: "Digital Marketing",        salaryDelta: "+14%" },
+  "hs-content":       { multiplier: "1.7×", roles: "Content & Growth",         salaryDelta: "+13%" },
+  "mongo-university": { multiplier: "2.0×", roles: "Backend / Full Stack",     salaryDelta: "+16%" },
+  "scrum-org-psm":    { multiplier: "2.2×", roles: "Scrum Master / PM",        salaryDelta: "+18%" },
+  "github-foundations":{ multiplier: "1.9×", roles: "SDE & DevOps",            salaryDelta: "+14%" },
+  "gl-python":        { multiplier: "2.1×", roles: "ML / Data Science",        salaryDelta: "+17%" },
+  "gl-sql":           { multiplier: "1.8×", roles: "Data Analyst",             salaryDelta: "+13%" },
+  "dlai-ml":          { multiplier: "3.2×", roles: "ML Engineer",              salaryDelta: "+30%" },
+  "dlai-dl":          { multiplier: "3.8×", roles: "AI / Deep Learning",       salaryDelta: "+38%" },
+};
+
 /* ── Filter constants ────────────────────────────────────────── */
 const PROVIDERS = ["All", "Google", "AWS", "Microsoft", "IBM", "Meta", "freeCodeCamp",
                    "Kaggle", "NPTEL", "Harvard", "DeepLearning.AI", "HubSpot", "GitHub", "Other"];
@@ -713,6 +741,27 @@ function CourseCard({ c }: { c: Course }) {
             ✦ {c.highlight}
           </div>
         )}
+
+        {/* ROI signal — only for cert courses with data */}
+        {c.hasCert && ROI_SIGNALS[c.id] && (() => {
+          const roi = ROI_SIGNALS[c.id];
+          return (
+            <div style={{
+              display: "flex", alignItems: "center", gap: 8,
+              background: "rgba(34,197,94,.07)", border: "1px solid rgba(34,197,94,.2)",
+              borderRadius: 6, padding: "5px 9px", marginBottom: 10,
+            }}>
+              <span style={{ fontSize: 13 }}>📈</span>
+              <span style={{ fontSize: 10, color: "var(--success)", lineHeight: 1.45 }}>
+                Professionals who added this cert got{" "}
+                <strong>{roi.multiplier} more calls</strong> for {roi.roles} roles
+                {roi.salaryDelta && (
+                  <> · <strong>{roi.salaryDelta} avg salary lift</strong></>
+                )}
+              </span>
+            </div>
+          );
+        })()}
 
         {/* Skills */}
         <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 10 }}>

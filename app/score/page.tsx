@@ -403,6 +403,52 @@ export default function ScorePage() {
           </div>
         )}
 
+        {/* ── Score-triggered upgrade CTA ── */}
+        {result.total < 70 && (
+          <div style={{
+            ...card, marginBottom: 20,
+            background: "var(--accdim)", border: "1px solid var(--accborder)",
+            display: "flex", gap: 20, alignItems: "center",
+            flexWrap: "wrap",
+          }}>
+            {/* Before/after visual */}
+            <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontSize: 28, fontWeight: 800, color: "var(--danger)", lineHeight: 1 }}>{result.total}</div>
+                <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 2 }}>Now</div>
+              </div>
+              <div style={{ fontSize: 18, color: "var(--text3)" }}>→</div>
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontSize: 28, fontWeight: 800, color: "var(--success)", lineHeight: 1 }}>
+                  {Math.min(result.total + result.improvements.reduce((s, i) => s + i.points, 0), 100)}
+                </div>
+                <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 2 }}>With fixes</div>
+              </div>
+            </div>
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", marginBottom: 5 }}>
+                Your score has room to grow
+              </div>
+              <p style={{ fontSize: 12, color: "var(--text2)", lineHeight: 1.65, marginBottom: 12 }}>
+                Upgrade to Pro and let AI rewrite your resume bullets, optimise keywords for your target role, and apply directly — all in one flow.
+              </p>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                <a href="/upgrade" style={{
+                  padding: "9px 20px", borderRadius: 9,
+                  background: "var(--accent)", color: "#fff",
+                  fontSize: 13, fontWeight: 700, textDecoration: "none",
+                  display: "inline-flex", alignItems: "center", gap: 6,
+                }}>⚡ Upgrade to Pro →</a>
+                <a href="/builder" style={{
+                  padding: "9px 18px", borderRadius: 9, border: "1px solid var(--border)",
+                  background: "var(--surface)", color: "var(--text1)",
+                  fontSize: 13, fontWeight: 600, textDecoration: "none",
+                }}>Fix manually in Builder</a>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ── JD Match ── */}
         <div style={{ marginBottom: 20 }}>
           <JdMatchPanel resumeText={resumeText} />

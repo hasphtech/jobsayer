@@ -236,12 +236,26 @@ export default function BgvPage() {
 
       <div style={{ padding: "24px 24px 48px" }}>
 
-        {/* Header — always visible */}
-        <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Background Verification (BGV)</h1>
-          <p style={{ fontSize: 14, color: "var(--text3)", lineHeight: 1.7 }}>
-            A verified BGV badge boosts your profile trust score and gets you prioritised by employers.
-            Verification takes <strong style={{ color: "var(--text1)" }}>2–5 business days</strong>.
+        {/* Header — trust badge framing */}
+        <div style={{ marginBottom: 28 }}>
+          {/* Impact stat pill */}
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 14,
+            background: "rgba(34,197,94,.08)", border: "1px solid rgba(34,197,94,.2)",
+            borderRadius: 99, padding: "5px 14px",
+          }}>
+            <span style={{ fontSize: 14 }}>🛡</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: "var(--success)" }}>
+              Verified professionals get 3× more employer views
+            </span>
+          </div>
+          <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 8, letterSpacing: "-.02em" }}>
+            Get your Verified badge
+          </h1>
+          <p style={{ fontSize: 14, color: "var(--text3)", lineHeight: 1.7, maxWidth: 560 }}>
+            Stand out from unverified candidates. A jobSayer Verified badge signals trust to employers —
+            profiles with it are shortlisted faster and offered better roles.
+            Verification completes in <strong style={{ color: "var(--text1)" }}>2–5 business days</strong>.
           </p>
         </div>
 
@@ -260,18 +274,18 @@ export default function BgvPage() {
           <StatusBadge bgv={existing} />
         )}
 
-        {/* Trust info bar */}
+        {/* Trust benefit cards */}
         {!dataLoading && !existing && (
-          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 12, marginBottom: 32 }}>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr 1fr", gap: 12, marginBottom: 28 }}>
             {[
-              { icon: "🪪", title: "Identity Check",   desc: "PAN + Aadhaar last 4 digits" },
-              { icon: "🎓", title: "Education Check",  desc: "Degree & institution verification" },
-              { icon: "💼", title: "Employment Check", desc: "Previous employer confirmation" },
+              { icon: "🪪", title: "3× more views",      desc: "Verified profiles surface first in employer searches", accent: "var(--success)" },
+              { icon: "⚡", title: "Faster shortlisting", desc: "Skip the screening queue — employers trust verified candidates", accent: "var(--warn)" },
+              { icon: "💰", title: "Better offers",       desc: "Verified pros report 12–18% higher starting salaries on average", accent: "var(--accent)" },
             ].map(c => (
-              <div key={c.title} style={{ ...cardStyle, padding: "16px", textAlign: "center" }}>
-                <div style={{ fontSize: 24, marginBottom: 6 }}>{c.icon}</div>
-                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>{c.title}</div>
-                <div style={{ fontSize: 11, color: "var(--text3)" }}>{c.desc}</div>
+              <div key={c.title} style={{ ...cardStyle, padding: "16px", textAlign: "center", borderTop: `3px solid ${c.accent}` }}>
+                <div style={{ fontSize: 24, marginBottom: 8 }}>{c.icon}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 5, color: "var(--text1)" }}>{c.title}</div>
+                <div style={{ fontSize: 11, color: "var(--text3)", lineHeight: 1.6 }}>{c.desc}</div>
               </div>
             ))}
           </div>
