@@ -602,6 +602,30 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
             <div style={{ flex: 1 }} />
           </div>
 
+          {/* Admin shortcut */}
+          <div style={{ padding: "0 10px 8px" }}>
+            <a href="/admin" style={{
+              display: "flex", alignItems: "center", gap: 8,
+              padding: "6px 10px", borderRadius: 7,
+              background: "transparent", border: "1px solid transparent",
+              textDecoration: "none", fontSize: 11.5, fontWeight: 600,
+              color: "var(--text3)",
+              transition: "color .12s, background .12s",
+            }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLAnchorElement).style.background = "var(--surface2)";
+                (e.currentTarget as HTMLAnchorElement).style.color = "var(--text1)";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
+                (e.currentTarget as HTMLAnchorElement).style.color = "var(--text3)";
+              }}
+            >
+              <i className="ti ti-shield-lock" style={{ fontSize: 13 }} />
+              Admin Panel
+            </a>
+          </div>
+
           {/* User pill + sign out */}
           <div style={{ padding: "10px", borderTop: "1px solid var(--border)", display: "flex", flexDirection: "column", gap: 4 }}>
             <Link href="/profile" style={{
