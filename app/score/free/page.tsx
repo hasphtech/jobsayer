@@ -49,7 +49,7 @@ function parseResumeText(text: string): ResumeData {
     for (let i = expIdx + 1; i < Math.min(expIdx + 30, lines.length); i++) {
       const l = lines[i];
       if (l.length > 8 && l.length < 80 && !/^\d/.test(l)) {
-        work.push({ company: l, role: lines[i + 1] ?? "", desc: lines.slice(i + 2, i + 6).join("\n") });
+        work.push({ id: crypto.randomUUID(), company: l, role: lines[i + 1] ?? "", desc: lines.slice(i + 2, i + 6).join("\n"), from: "", to: "", current: false });
         i += 3;
         if (work.length >= 3) break;
       }
@@ -57,14 +57,14 @@ function parseResumeText(text: string): ResumeData {
   }
   // If no structured work found, create a synthetic entry from text
   if (work.length === 0 && text.length > 200) {
-    work.push({ company: "—", role: "—", desc: text.slice(0, 800) });
+    work.push({ id: crypto.randomUUID(), company: "—", role: "—", desc: text.slice(0, 800), from: "", to: "", current: false });
   }
 
   // Education
   const eduIdx = lines.findIndex(l => /education|university|college|degree/i.test(l));
   const edu: ResumeData["edu"] = [];
   if (eduIdx !== -1) {
-    edu.push({ school: lines[eduIdx + 1] ?? lines[eduIdx], degree: lines[eduIdx + 2] ?? "", year: "" });
+    edu.push({ id: crypto.randomUUID(), school: lines[eduIdx + 1] ?? lines[eduIdx], degree: lines[eduIdx + 2] ?? "", year: "", gpa: "" });
   }
 
   return { name: nameLine, email, phone, summary, skills, work, edu } as ResumeData;
