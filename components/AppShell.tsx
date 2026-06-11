@@ -66,147 +66,6 @@ const ALL_LINKS = [
   ...RECRUITER_TOOL_LINKS, ...RECRUITER_INSIGHT_LINKS,
 ].filter((l, i, arr) => arr.findIndex(x => x.href === l.href) === i);
 
-/* ── Command Palette ─────────────────────────────────────────── */
-function CommandPalette({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const [query, setQuery] = useState("");
-  const [cursor, setCursor] = useState(0);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
-
-  const results = query.trim()
-    ? ALL_LINKS.filter(l =>
-        l.label.toLowerCase().includes(query.toLowerCase()) ||
-        l.href.toLowerCase().includes(query.toLowerCase())
-      )
-    : ALL_LINKS;
-
-  // Reset cursor when results change
-  useEffect(() => { setCursor(0); }, [query]);
-
-  // Focus input when opened
-  useEffect(() => {
-    if (open) { setQuery(""); setCursor(0); setTimeout(() => inputRef.current?.focus(), 30); }
-  }, [open]);
-
-  // Keyboard navigation
-  useEffect(() => {
-    if (!open) return;
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") { onClose(); return; }
-      if (e.key === "ArrowDown") { e.preventDefault(); setCursor(c => Math.min(c + 1, results.length - 1)); }
-      if (e.key === "ArrowUp")   { e.preventDefault(); setCursor(c => Math.max(c - 1, 0)); }
-      if (e.key === "Enter" && results[cursor]) {
-        router.push(results[cursor].href);
-        onClose();
-      }
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, cursor, results, onClose, router]);
-
-  if (!open) return null;
-
-  return (
-    <div
-      onClick={onClose}
-      style={{
-        position: "fixed", inset: 0, zIndex: 1000,
-        background: "rgba(0,0,0,.55)", backdropFilter: "blur(4px)",
-        display: "flex", alignItems: "flex-start", justifyContent: "center",
-        paddingTop: 120,
-      }}
-    >
-      <div
-        onClick={e => e.stopPropagation()}
-        style={{
-          width: "100%", maxWidth: 520,
-          background: "var(--surface)", border: "1px solid var(--border)",
-          borderRadius: 14, boxShadow: "0 24px 80px rgba(0,0,0,.5)",
-          overflow: "hidden",
-        }}
-      >
-        {/* Search input */}
-        <div style={{
-          display: "flex", alignItems: "center", gap: 10,
-          padding: "12px 16px", borderBottom: "1px solid var(--border)",
-        }}>
-          <i className="ti ti-search" style={{ fontSize: 16, color: "var(--text3)", flexShrink: 0 }} />
-          <input
-            ref={inputRef}
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            placeholder="Search tools, pages, features..."
-            style={{
-              flex: 1, background: "none", border: "none", outline: "none",
-              fontSize: 14, color: "var(--text1)", fontFamily: "inherit",
-            }}
-          />
-          {query && (
-            <button onClick={() => setQuery("")} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 16, padding: 0, lineHeight: 1 }}>✕</button>
-          )}
-          <kbd style={{ fontSize: 10, color: "var(--text3)", background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 4, padding: "2px 6px" }}>Esc</kbd>
-        </div>
-
-        {/* Results */}
-        <div style={{ maxHeight: 360, overflowY: "auto", padding: "6px" }}>
-          {results.length === 0 ? (
-            <div style={{ padding: "20px", textAlign: "center", color: "var(--text3)", fontSize: 13 }}>
-              No results for &quot;{query}&quot;
-            </div>
-          ) : (
-            results.map((item, i) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={onClose}
-                style={{
-                  display: "flex", alignItems: "center", gap: 12,
-                  padding: "10px 12px", borderRadius: 8, textDecoration: "none",
-                  background: i === cursor ? "var(--accdim)" : "transparent",
-                  border: `1px solid ${i === cursor ? "var(--accborder)" : "transparent"}`,
-                  transition: "background .1s",
-                }}
-                onMouseEnter={() => setCursor(i)}
-              >
-                <span style={{
-                  width: 30, height: 30, borderRadius: 7, flexShrink: 0,
-                  background: i === cursor ? "var(--accent)" : "var(--surface2)",
-                  border: "1px solid var(--border)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <i className={`ti ${item.icon}`} style={{ fontSize: 14, color: i === cursor ? "#fff" : "var(--text2)" }} />
-                </span>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: i === cursor ? "var(--accent)" : "var(--text1)" }}>
-                    {item.label}
-                  </div>
-                  <div style={{ fontSize: 11, color: "var(--text3)" }}>jobsayer.com{item.href}</div>
-                </div>
-                {i === cursor && (
-                  <kbd style={{ marginLeft: "auto", fontSize: 10, color: "var(--text3)", background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 4, padding: "2px 6px", flexShrink: 0 }}>↵</kbd>
-                )}
-              </Link>
-            ))
-          )}
-        </div>
-
-        {/* Footer hint */}
-        <div style={{
-          borderTop: "1px solid var(--border)", padding: "8px 16px",
-          display: "flex", gap: 16, alignItems: "center",
-        }}>
-          {[["↑↓", "navigate"], ["↵", "go"], ["Esc", "close"]].map(([key, hint]) => (
-            <span key={key} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "var(--text3)" }}>
-              <kbd style={{ background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 4, padding: "1px 5px", fontSize: 10 }}>{key}</kbd>
-              {hint}
-            </span>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /* ── Role switcher pill ──────────────────────────────────────── */
 function RoleSwitcher({ role, setRole }: { role: AppRole; setRole: (r: AppRole) => void }) {
   const router = useRouter();
@@ -350,7 +209,6 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
   const { role, setRole } = useRole();
   const pathname = usePathname();
   const w = useWidth();
-  const [cmdOpen, setCmdOpen] = useState(false);
   // Client-side search params (avoids Suspense requirement)
   const [search, setSearch] = useState("");
 
@@ -358,17 +216,44 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
     setSearch(window.location.search);
   }, [pathname]);
 
-  // ⌘K / Ctrl+K global hotkey
+  // Inline search state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [searchCursor, setSearchCursor] = useState(0);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  const searchResults = searchQuery.trim()
+    ? ALL_LINKS.filter(l =>
+        l.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        l.href.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : ALL_LINKS.slice(0, 8);
+
+  useEffect(() => { setSearchCursor(0); }, [searchQuery]);
+
+  // Close dropdown on outside click
   useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setCmdOpen(o => !o);
+    function onClick(e: MouseEvent) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setSearchFocused(false);
       }
     }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
   }, []);
+
+  // Keyboard nav in inline search
+  function onSearchKey(e: React.KeyboardEvent) {
+    if (e.key === "ArrowDown") { e.preventDefault(); setSearchCursor(c => Math.min(c + 1, searchResults.length - 1)); }
+    if (e.key === "ArrowUp")   { e.preventDefault(); setSearchCursor(c => Math.max(c - 1, 0)); }
+    if (e.key === "Enter" && searchResults[searchCursor]) {
+      router.push(searchResults[searchCursor].href);
+      setSearchQuery(""); setSearchFocused(false);
+    }
+    if (e.key === "Escape") { setSearchFocused(false); setSearchQuery(""); }
+  }
   const mobile = w < 768;
   const wideEnough = w >= 1200;
   const showAiPanel = aiPanel && wideEnough;
@@ -442,10 +327,10 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
         {/* Mobile drawer */}
         {drawerOpen && (
           <div style={{
-            position: "sticky", top: 52, zIndex: 99,
-            background: "var(--surface)", borderBottom: "1px solid var(--border)",
+            position: "fixed", top: 52, left: 0, right: 0, bottom: 0, zIndex: 99,
+            background: "var(--surface)",
             padding: "12px 14px", display: "flex", flexDirection: "column", gap: 4,
-            maxHeight: "calc(100dvh - 52px)", overflowY: "auto",
+            overflowY: "auto",
           }}>
             {/* Role switcher + theme toggle */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
@@ -551,7 +436,6 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
         {/* Page content */}
         <main style={{ flex: 1 }}>{children}</main>
       </div>
-      <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} />
       </>
     );
   }
@@ -582,27 +466,84 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
           </Link>
         </div>
 
-        {/* Command bar — hidden on pages with their own toolbar */}
+        {/* Inline search bar */}
         {!noSearch && (
-          <div style={{ flex: 1, maxWidth: 440 }}>
-            <button
-              onClick={() => setCmdOpen(true)}
-              style={{
-                width: "100%", background: "var(--surface2)", border: "1px solid var(--border)",
-                borderRadius: 8, padding: "6px 14px", cursor: "text",
-                display: "flex", alignItems: "center", gap: 8, fontFamily: "inherit",
-              }}
-            >
+          <div ref={searchContainerRef} style={{ flex: 1, maxWidth: 440, position: "relative" }}>
+            <div style={{
+              display: "flex", alignItems: "center", gap: 8,
+              background: "var(--surface2)", border: `1px solid ${searchFocused ? "var(--accent)" : "var(--border)"}`,
+              borderRadius: 8, padding: "6px 14px", transition: "border-color .15s",
+            }}>
               <i className="ti ti-search" style={{ fontSize: 13, color: "var(--text3)", flexShrink: 0 }} />
-              <span style={{ fontSize: 12.5, color: "var(--text3)", flex: 1, textAlign: "left" }}>
-                Search tools, jobs, skills...
-              </span>
-              <kbd style={{
-                fontSize: 10, color: "var(--text3)",
-                background: "var(--border)", padding: "2px 6px", borderRadius: 4,
-                border: "1px solid var(--border2)", fontFamily: "inherit",
-              }}>⌘K</kbd>
-            </button>
+              <input
+                ref={searchRef}
+                value={searchQuery}
+                onChange={e => { setSearchQuery(e.target.value); setSearchFocused(true); setSearchCursor(0); }}
+                onFocus={() => setSearchFocused(true)}
+                onKeyDown={onSearchKey}
+                placeholder="Search tools, pages, features..."
+                style={{
+                  flex: 1, background: "none", border: "none", outline: "none",
+                  fontSize: 12.5, color: "var(--text1)", fontFamily: "inherit",
+                }}
+              />
+              {searchQuery && (
+                <button onClick={() => { setSearchQuery(""); searchRef.current?.focus(); }}
+                  style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", padding: 0, fontSize: 14, lineHeight: 1 }}>✕</button>
+              )}
+            </div>
+
+            {/* Dropdown results */}
+            {searchFocused && (
+              <div style={{
+                position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, zIndex: 200,
+                background: "var(--surface)", border: "1px solid var(--border)",
+                borderRadius: 10, boxShadow: "0 8px 32px rgba(0,0,0,.18)",
+                overflow: "hidden", maxHeight: 360, overflowY: "auto",
+              }}>
+                {searchResults.length === 0 ? (
+                  <div style={{ padding: "16px", textAlign: "center", color: "var(--text3)", fontSize: 13 }}>
+                    No results for &quot;{searchQuery}&quot;
+                  </div>
+                ) : (
+                  <>
+                    {!searchQuery && (
+                      <div style={{ padding: "8px 12px 4px", fontSize: 10, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".06em" }}>
+                        Quick links
+                      </div>
+                    )}
+                    {searchResults.map((item, i) => (
+                      <Link key={item.href} href={item.href}
+                        onClick={() => { setSearchQuery(""); setSearchFocused(false); }}
+                        onMouseEnter={() => setSearchCursor(i)}
+                        style={{
+                          display: "flex", alignItems: "center", gap: 10,
+                          padding: "9px 12px", textDecoration: "none",
+                          background: i === searchCursor ? "var(--accdim)" : "transparent",
+                          borderLeft: `3px solid ${i === searchCursor ? "var(--accent)" : "transparent"}`,
+                          transition: "background .08s",
+                        }}>
+                        <span style={{
+                          width: 28, height: 28, borderRadius: 7, flexShrink: 0,
+                          background: i === searchCursor ? "var(--accent)" : "var(--surface2)",
+                          border: "1px solid var(--border)",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                        }}>
+                          <i className={`ti ${item.icon}`} style={{ fontSize: 13, color: i === searchCursor ? "#fff" : "var(--text2)" }} />
+                        </span>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: i === searchCursor ? "var(--accent)" : "var(--text1)" }}>{item.label}</div>
+                          <div style={{ fontSize: 11, color: "var(--text3)" }}>jobsayer.com{item.href}</div>
+                        </div>
+                        {i === searchCursor && (
+                          <kbd style={{ marginLeft: "auto", fontSize: 10, color: "var(--text3)", background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 4, padding: "2px 5px", flexShrink: 0 }}>↵</kbd>
+                        )}
+                      </Link>
+                    ))}
+                  </>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -762,7 +703,6 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
         {showAiPanel && <AiCoachPanel />}
       </div>
     </div>
-    <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} />
     </>
   );
 }
