@@ -11,7 +11,8 @@ interface Course {
   id: string;
   title: string;
   provider: string;
-  providerLogo: string;        // emoji
+  providerLogo: string;        // tabler icon class e.g. "ti-brand-google"
+  providerColor?: string;      // icon accent colour
   url: string;
   cost: Cost;
   level: Level;
@@ -32,7 +33,7 @@ const COURSES: Course[] = [
   {
     id: "goog-it",
     title: "Google IT Support Professional Certificate",
-    provider: "Google / Coursera", providerLogo: "ti-search",
+    provider: "Google / Coursera", providerLogo: "ti-brand-google", providerColor: "#4285f4",
     url: "https://grow.google/certificates/it-support/",
     cost: "freemium", level: "Beginner", durationHrs: 120,
     skills: ["networking", "linux", "cloud computing", "cybersecurity", "troubleshooting"],
@@ -44,7 +45,7 @@ const COURSES: Course[] = [
   {
     id: "goog-da",
     title: "Google Data Analytics Professional Certificate",
-    provider: "Google / Coursera", providerLogo: "ti-search",
+    provider: "Google / Coursera", providerLogo: "ti-brand-google", providerColor: "#4285f4",
     url: "https://grow.google/certificates/data-analytics/",
     cost: "freemium", level: "Beginner", durationHrs: 180,
     skills: ["sql", "r", "tableau", "spreadsheets", "data visualisation", "analytics"],
@@ -56,7 +57,7 @@ const COURSES: Course[] = [
   {
     id: "goog-pm",
     title: "Google Project Management Professional Certificate",
-    provider: "Google / Coursera", providerLogo: "ti-search",
+    provider: "Google / Coursera", providerLogo: "ti-brand-google", providerColor: "#4285f4",
     url: "https://grow.google/certificates/project-management/",
     cost: "freemium", level: "Beginner", durationHrs: 180,
     skills: ["project management", "agile", "scrum", "risk management"],
@@ -68,7 +69,7 @@ const COURSES: Course[] = [
   {
     id: "goog-ux",
     title: "Google UX Design Professional Certificate",
-    provider: "Google / Coursera", providerLogo: "ti-search",
+    provider: "Google / Coursera", providerLogo: "ti-brand-google", providerColor: "#4285f4",
     url: "https://grow.google/certificates/ux-design/",
     cost: "freemium", level: "Beginner", durationHrs: 200,
     skills: ["figma", "user research", "wireframing", "prototyping", "usability testing"],
@@ -80,7 +81,7 @@ const COURSES: Course[] = [
   {
     id: "goog-cyber",
     title: "Google Cybersecurity Professional Certificate",
-    provider: "Google / Coursera", providerLogo: "ti-search",
+    provider: "Google / Coursera", providerLogo: "ti-brand-google", providerColor: "#4285f4",
     url: "https://grow.google/certificates/cybersecurity/",
     cost: "freemium", level: "Beginner", durationHrs: 170,
     skills: ["cybersecurity", "linux", "python", "siem", "networking", "sql"],
@@ -92,7 +93,7 @@ const COURSES: Course[] = [
   {
     id: "goog-ml",
     title: "Machine Learning Crash Course",
-    provider: "Google / ML Education", providerLogo: "ti-search",
+    provider: "Google / ML Education", providerLogo: "ti-brand-google", providerColor: "#4285f4",
     url: "https://developers.google.com/machine-learning/crash-course",
     cost: "free", level: "Intermediate", durationHrs: 15,
     skills: ["machine learning", "tensorflow", "python", "neural networks"],
@@ -105,7 +106,7 @@ const COURSES: Course[] = [
   {
     id: "aws-ccp-train",
     title: "AWS Cloud Practitioner Essentials",
-    provider: "AWS Training", providerLogo: "☁️",
+    provider: "AWS Training", providerLogo: "ti-cloud", providerColor: "#ff9900",
     url: "https://aws.amazon.com/training/learn-about/cloud-practitioner/",
     cost: "free", level: "Beginner", durationHrs: 6,
     skills: ["aws", "cloud computing", "s3", "ec2", "iam", "billing"],
@@ -116,7 +117,7 @@ const COURSES: Course[] = [
   {
     id: "aws-quest",
     title: "AWS Cloud Quest: Cloud Practitioner",
-    provider: "AWS Skill Builder", providerLogo: "☁️",
+    provider: "AWS Skill Builder", providerLogo: "ti-cloud", providerColor: "#ff9900",
     url: "https://aws.amazon.com/training/digital/aws-cloud-quest/",
     cost: "free", level: "Beginner", durationHrs: 12,
     skills: ["aws", "ec2", "s3", "vpc", "rds", "lambda"],
@@ -128,7 +129,7 @@ const COURSES: Course[] = [
   {
     id: "aws-saa",
     title: "AWS Solutions Architect – Associate (SAA-C03) Study Path",
-    provider: "AWS Skill Builder", providerLogo: "☁️",
+    provider: "AWS Skill Builder", providerLogo: "ti-cloud", providerColor: "#ff9900",
     url: "https://skillbuilder.aws/exam-prep/solutions-architect-associate",
     cost: "freemium", level: "Intermediate", durationHrs: 40,
     skills: ["aws", "ec2", "s3", "rds", "vpc", "iam", "load balancers", "system design"],
@@ -141,7 +142,7 @@ const COURSES: Course[] = [
   {
     id: "msft-az900",
     title: "Microsoft Azure Fundamentals (AZ-900)",
-    provider: "Microsoft Learn", providerLogo: "🪟",
+    provider: "Microsoft Learn", providerLogo: "ti-brand-windows", providerColor: "#0078d4",
     url: "https://learn.microsoft.com/en-us/certifications/azure-fundamentals/",
     cost: "free", level: "Beginner", durationHrs: 10,
     skills: ["azure", "cloud computing", "cloud services", "networking"],
@@ -153,7 +154,7 @@ const COURSES: Course[] = [
   {
     id: "msft-ai900",
     title: "Azure AI Fundamentals (AI-900)",
-    provider: "Microsoft Learn", providerLogo: "🪟",
+    provider: "Microsoft Learn", providerLogo: "ti-brand-windows", providerColor: "#0078d4",
     url: "https://learn.microsoft.com/en-us/certifications/azure-ai-fundamentals/",
     cost: "free", level: "Beginner", durationHrs: 8,
     skills: ["azure", "machine learning", "cognitive services", "ai", "nlp"],
@@ -165,7 +166,7 @@ const COURSES: Course[] = [
   {
     id: "msft-pl900",
     title: "Power Platform Fundamentals (PL-900)",
-    provider: "Microsoft Learn", providerLogo: "🪟",
+    provider: "Microsoft Learn", providerLogo: "ti-brand-windows", providerColor: "#0078d4",
     url: "https://learn.microsoft.com/en-us/certifications/power-platform-fundamentals/",
     cost: "free", level: "Beginner", durationHrs: 8,
     skills: ["power bi", "power automate", "power apps", "analytics"],
@@ -179,7 +180,7 @@ const COURSES: Course[] = [
   {
     id: "ibm-ds",
     title: "IBM Data Science Professional Certificate",
-    provider: "IBM / Coursera", providerLogo: "ti-circle",
+    provider: "IBM / Coursera", providerLogo: "ti-brand-ibm", providerColor: "#1192e8",
     url: "https://www.coursera.org/professional-certificates/ibm-data-science",
     cost: "freemium", level: "Beginner", durationHrs: 200,
     skills: ["python", "sql", "machine learning", "data visualisation", "jupyter", "pandas", "scikit-learn"],
@@ -191,7 +192,7 @@ const COURSES: Course[] = [
   {
     id: "ibm-fullstack",
     title: "IBM Full Stack Software Developer Certificate",
-    provider: "IBM / Coursera", providerLogo: "ti-circle",
+    provider: "IBM / Coursera", providerLogo: "ti-brand-ibm", providerColor: "#1192e8",
     url: "https://www.coursera.org/professional-certificates/ibm-full-stack-cloud-developer",
     cost: "freemium", level: "Beginner", durationHrs: 240,
     skills: ["html", "css", "javascript", "react", "node.js", "docker", "kubernetes", "cloud"],
@@ -203,7 +204,7 @@ const COURSES: Course[] = [
   {
     id: "ibm-ai",
     title: "IBM AI Engineering Professional Certificate",
-    provider: "IBM / Coursera", providerLogo: "ti-circle",
+    provider: "IBM / Coursera", providerLogo: "ti-brand-ibm", providerColor: "#1192e8",
     url: "https://www.coursera.org/professional-certificates/ai-engineer",
     cost: "freemium", level: "Intermediate", durationHrs: 180,
     skills: ["machine learning", "deep learning", "pytorch", "tensorflow", "keras", "python"],
@@ -217,7 +218,7 @@ const COURSES: Course[] = [
   {
     id: "meta-fe",
     title: "Meta Front-End Developer Professional Certificate",
-    provider: "Meta / Coursera", providerLogo: "ti-diamond",
+    provider: "Meta / Coursera", providerLogo: "ti-brand-meta", providerColor: "#1877f2",
     url: "https://www.coursera.org/professional-certificates/meta-front-end-developer",
     cost: "freemium", level: "Beginner", durationHrs: 240,
     skills: ["html", "css", "javascript", "react", "ux", "testing"],
@@ -229,7 +230,7 @@ const COURSES: Course[] = [
   {
     id: "meta-be",
     title: "Meta Back-End Developer Professional Certificate",
-    provider: "Meta / Coursera", providerLogo: "ti-diamond",
+    provider: "Meta / Coursera", providerLogo: "ti-brand-meta", providerColor: "#1877f2",
     url: "https://www.coursera.org/professional-certificates/meta-back-end-developer",
     cost: "freemium", level: "Beginner", durationHrs: 240,
     skills: ["python", "django", "rest api", "sql", "linux", "version control"],
@@ -241,7 +242,7 @@ const COURSES: Course[] = [
   {
     id: "meta-ds",
     title: "Meta Data Analyst Professional Certificate",
-    provider: "Meta / Coursera", providerLogo: "ti-diamond",
+    provider: "Meta / Coursera", providerLogo: "ti-brand-meta", providerColor: "#1877f2",
     url: "https://www.coursera.org/professional-certificates/facebook-data-analyst",
     cost: "freemium", level: "Beginner", durationHrs: 150,
     skills: ["sql", "python", "statistics", "analytics", "excel", "tableau"],
@@ -255,7 +256,7 @@ const COURSES: Course[] = [
   {
     id: "fcc-webdev",
     title: "Responsive Web Design Certification",
-    provider: "freeCodeCamp", providerLogo: "ti-flame",
+    provider: "freeCodeCamp", providerLogo: "ti-flame", providerColor: "#0a0a23",
     url: "https://www.freecodecamp.org/learn/2022/responsive-web-design/",
     cost: "free", level: "Beginner", durationHrs: 300,
     skills: ["html", "css", "responsive design", "accessibility", "flexbox", "grid"],
@@ -267,7 +268,7 @@ const COURSES: Course[] = [
   {
     id: "fcc-js",
     title: "JavaScript Algorithms and Data Structures",
-    provider: "freeCodeCamp", providerLogo: "ti-flame",
+    provider: "freeCodeCamp", providerLogo: "ti-flame", providerColor: "#0a0a23",
     url: "https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures/",
     cost: "free", level: "Beginner", durationHrs: 300,
     skills: ["javascript", "algorithms", "data structures", "oop", "functional programming"],
@@ -279,7 +280,7 @@ const COURSES: Course[] = [
   {
     id: "fcc-ds",
     title: "Data Analysis with Python Certification",
-    provider: "freeCodeCamp", providerLogo: "ti-flame",
+    provider: "freeCodeCamp", providerLogo: "ti-flame", providerColor: "#0a0a23",
     url: "https://www.freecodecamp.org/learn/data-analysis-with-python/",
     cost: "free", level: "Beginner", durationHrs: 300,
     skills: ["python", "pandas", "numpy", "matplotlib", "data analysis"],
@@ -293,7 +294,7 @@ const COURSES: Course[] = [
   {
     id: "kaggle-python",
     title: "Python for Data Science",
-    provider: "Kaggle", providerLogo: "ti-brand-python",
+    provider: "Kaggle", providerLogo: "ti-brand-python", providerColor: "#20beff",
     url: "https://www.kaggle.com/learn/python",
     cost: "free", level: "Beginner", durationHrs: 5,
     skills: ["python", "pandas", "data science"],
@@ -305,7 +306,7 @@ const COURSES: Course[] = [
   {
     id: "kaggle-ml",
     title: "Intro to Machine Learning",
-    provider: "Kaggle", providerLogo: "ti-brand-python",
+    provider: "Kaggle", providerLogo: "ti-brand-python", providerColor: "#20beff",
     url: "https://www.kaggle.com/learn/intro-to-machine-learning",
     cost: "free", level: "Beginner", durationHrs: 4,
     skills: ["machine learning", "python", "scikit-learn", "decision trees", "random forest"],
@@ -317,7 +318,7 @@ const COURSES: Course[] = [
   {
     id: "kaggle-sql",
     title: "Intro to SQL + Advanced SQL",
-    provider: "Kaggle", providerLogo: "ti-brand-python",
+    provider: "Kaggle", providerLogo: "ti-brand-python", providerColor: "#20beff",
     url: "https://www.kaggle.com/learn/intro-to-sql",
     cost: "free", level: "Beginner", durationHrs: 6,
     skills: ["sql", "bigquery", "data analysis"],
@@ -331,7 +332,7 @@ const COURSES: Course[] = [
   {
     id: "nptel-ds",
     title: "Programming, Data Structures and Algorithms using Python",
-    provider: "NPTEL / IIT Madras", providerLogo: "ti-school",
+    provider: "NPTEL / IIT Madras", providerLogo: "ti-school", providerColor: "#e63946",
     url: "https://nptel.ac.in/courses/106106145",
     cost: "free", level: "Beginner", durationHrs: 120,
     skills: ["python", "data structures", "algorithms", "programming"],
@@ -343,7 +344,7 @@ const COURSES: Course[] = [
   {
     id: "nptel-ml",
     title: "Introduction to Machine Learning",
-    provider: "NPTEL / IIT Kharagpur", providerLogo: "ti-school",
+    provider: "NPTEL / IIT Kharagpur", providerLogo: "ti-school", providerColor: "#e63946",
     url: "https://nptel.ac.in/courses/106105152",
     cost: "free", level: "Intermediate", durationHrs: 120,
     skills: ["machine learning", "probability", "statistics", "python"],
@@ -355,7 +356,7 @@ const COURSES: Course[] = [
   {
     id: "nptel-dbms",
     title: "Database Management Systems",
-    provider: "NPTEL / IIT Madras", providerLogo: "ti-school",
+    provider: "NPTEL / IIT Madras", providerLogo: "ti-school", providerColor: "#e63946",
     url: "https://nptel.ac.in/courses/106106093",
     cost: "free", level: "Intermediate", durationHrs: 80,
     skills: ["sql", "dbms", "postgresql", "indexing", "transactions"],
@@ -367,7 +368,7 @@ const COURSES: Course[] = [
   {
     id: "nptel-os",
     title: "Operating Systems and System Programming",
-    provider: "NPTEL / IIT Bombay", providerLogo: "ti-school",
+    provider: "NPTEL / IIT Bombay", providerLogo: "ti-school", providerColor: "#e63946",
     url: "https://nptel.ac.in/courses/106101183",
     cost: "free", level: "Intermediate", durationHrs: 80,
     skills: ["linux", "os concepts", "c", "concurrency", "memory management"],
@@ -381,7 +382,7 @@ const COURSES: Course[] = [
   {
     id: "odin-fullstack",
     title: "Full Stack JavaScript Path",
-    provider: "The Odin Project", providerLogo: "⚔️",
+    provider: "The Odin Project", providerLogo: "ti-sword", providerColor: "#d35f1e",
     url: "https://www.theodinproject.com/paths/full-stack-javascript",
     cost: "free", level: "Beginner", durationHrs: 1000,
     skills: ["html", "css", "javascript", "react", "node.js", "express", "postgresql", "git"],
@@ -394,7 +395,7 @@ const COURSES: Course[] = [
   {
     id: "cs50-main",
     title: "CS50: Introduction to Computer Science",
-    provider: "Harvard / edX", providerLogo: "ti-building",
+    provider: "Harvard / edX", providerLogo: "ti-building-castle", providerColor: "#a51c30",
     url: "https://cs50.harvard.edu/x/",
     cost: "free", level: "Beginner", durationHrs: 100,
     skills: ["c", "python", "sql", "html", "css", "javascript", "algorithms"],
@@ -406,7 +407,7 @@ const COURSES: Course[] = [
   {
     id: "cs50-python",
     title: "CS50's Introduction to Python",
-    provider: "Harvard / edX", providerLogo: "ti-building",
+    provider: "Harvard / edX", providerLogo: "ti-building-castle", providerColor: "#a51c30",
     url: "https://cs50.harvard.edu/python/",
     cost: "free", level: "Beginner", durationHrs: 40,
     skills: ["python", "oop", "testing", "regular expressions", "libraries"],
@@ -418,7 +419,7 @@ const COURSES: Course[] = [
   {
     id: "cs50-sql",
     title: "CS50's Introduction to Databases with SQL",
-    provider: "Harvard / edX", providerLogo: "ti-building",
+    provider: "Harvard / edX", providerLogo: "ti-building-castle", providerColor: "#a51c30",
     url: "https://cs50.harvard.edu/sql/",
     cost: "free", level: "Beginner", durationHrs: 30,
     skills: ["sql", "sqlite", "postgresql", "database design", "indexing"],
@@ -432,7 +433,7 @@ const COURSES: Course[] = [
   {
     id: "cncf-k8s",
     title: "Introduction to Kubernetes (LFS158)",
-    provider: "Linux Foundation / edX", providerLogo: "ti-brand-debian",
+    provider: "Linux Foundation / edX", providerLogo: "ti-brand-debian", providerColor: "#f47920",
     url: "https://www.edx.org/learn/kubernetes/the-linux-foundation-introduction-to-kubernetes",
     cost: "free", level: "Intermediate", durationHrs: 20,
     skills: ["kubernetes", "docker", "containers", "microservices", "devops"],
@@ -443,7 +444,7 @@ const COURSES: Course[] = [
   {
     id: "docker-official",
     title: "Docker Get Started + Docker Deep Dive",
-    provider: "Docker / Play with Docker", providerLogo: "ti-brand-docker",
+    provider: "Docker / Play with Docker", providerLogo: "ti-brand-docker", providerColor: "#2496ed",
     url: "https://docs.docker.com/get-started/",
     cost: "free", level: "Beginner", durationHrs: 10,
     skills: ["docker", "containers", "microservices", "devops"],
@@ -456,7 +457,7 @@ const COURSES: Course[] = [
   {
     id: "hs-digital",
     title: "Digital Marketing Certification",
-    provider: "HubSpot Academy", providerLogo: "ti-circle",
+    provider: "HubSpot Academy", providerLogo: "ti-brand-hubspot", providerColor: "#ff7a59",
     url: "https://academy.hubspot.com/courses/digital-marketing",
     cost: "free", level: "Beginner", durationHrs: 5,
     skills: ["digital marketing", "seo", "content marketing", "social media", "email marketing"],
@@ -468,7 +469,7 @@ const COURSES: Course[] = [
   {
     id: "hs-content",
     title: "Content Marketing Certification",
-    provider: "HubSpot Academy", providerLogo: "ti-circle",
+    provider: "HubSpot Academy", providerLogo: "ti-brand-hubspot", providerColor: "#ff7a59",
     url: "https://academy.hubspot.com/courses/content-marketing",
     cost: "free", level: "Beginner", durationHrs: 7,
     skills: ["content marketing", "storytelling", "seo", "content strategy"],
@@ -482,7 +483,7 @@ const COURSES: Course[] = [
   {
     id: "mongo-university",
     title: "MongoDB for Developers (M101)",
-    provider: "MongoDB University", providerLogo: "ti-leaf",
+    provider: "MongoDB University", providerLogo: "ti-leaf", providerColor: "#00ed64",
     url: "https://learn.mongodb.com/learning-paths/introduction-to-mongodb",
     cost: "free", level: "Beginner", durationHrs: 10,
     skills: ["mongodb", "nosql", "aggregation", "indexing", "node.js"],
@@ -496,7 +497,7 @@ const COURSES: Course[] = [
   {
     id: "hashi-terraform",
     title: "Terraform Fundamentals",
-    provider: "HashiCorp / Developer Portal", providerLogo: "ti-diamond",
+    provider: "HashiCorp / Developer Portal", providerLogo: "ti-diamond", providerColor: "#7b42bc",
     url: "https://developer.hashicorp.com/terraform/tutorials",
     cost: "free", level: "Intermediate", durationHrs: 12,
     skills: ["terraform", "aws", "infrastructure as code", "devops", "cloud"],
@@ -509,7 +510,7 @@ const COURSES: Course[] = [
   {
     id: "sf-trailhead",
     title: "Salesforce Admin + Developer Trailhead",
-    provider: "Salesforce Trailhead", providerLogo: "☁️",
+    provider: "Salesforce Trailhead", providerLogo: "ti-cloud", providerColor: "#ff9900",
     url: "https://trailhead.salesforce.com/content/learn/trails/force_com_dev_beginner",
     cost: "free", level: "Beginner", durationHrs: 40,
     skills: ["salesforce", "crm", "apex", "soql", "lightning"],
@@ -522,7 +523,7 @@ const COURSES: Course[] = [
   {
     id: "scrum-org-psm",
     title: "Professional Scrum Master I (PSM I) Prep",
-    provider: "Scrum.org", providerLogo: "ti-refresh",
+    provider: "Scrum.org", providerLogo: "ti-refresh", providerColor: "#009dc4",
     url: "https://www.scrum.org/pathway/scrum-master",
     cost: "free", level: "Beginner", durationHrs: 16,
     skills: ["scrum", "agile", "sprint planning", "product backlog", "retrospectives"],
@@ -535,7 +536,7 @@ const COURSES: Course[] = [
   {
     id: "github-foundations",
     title: "GitHub Foundations Certification",
-    provider: "GitHub", providerLogo: "ti-brand-github",
+    provider: "GitHub", providerLogo: "ti-brand-github", providerColor: "#24292f",
     url: "https://resources.github.com/learn/certifications/",
     cost: "free", level: "Beginner", durationHrs: 8,
     skills: ["git", "github", "version control", "pull requests", "github actions"],
@@ -549,7 +550,7 @@ const COURSES: Course[] = [
   {
     id: "gl-python",
     title: "Python for Machine Learning",
-    provider: "Great Learning", providerLogo: "ti-book",
+    provider: "Great Learning", providerLogo: "ti-book", providerColor: "#0063e0",
     url: "https://www.mygreatlearning.com/academy/learn-for-free/courses/python-for-machine-learning",
     cost: "free", level: "Beginner", durationHrs: 6,
     skills: ["python", "machine learning", "pandas", "scikit-learn"],
@@ -561,7 +562,7 @@ const COURSES: Course[] = [
   {
     id: "gl-sql",
     title: "SQL for Data Science",
-    provider: "Great Learning", providerLogo: "ti-book",
+    provider: "Great Learning", providerLogo: "ti-book", providerColor: "#0063e0",
     url: "https://www.mygreatlearning.com/academy/learn-for-free/courses/sql-for-data-science1",
     cost: "free", level: "Beginner", durationHrs: 4,
     skills: ["sql", "data science", "queries", "joins", "aggregations"],
@@ -575,7 +576,7 @@ const COURSES: Course[] = [
   {
     id: "dlai-ml",
     title: "Machine Learning Specialization",
-    provider: "DeepLearning.AI / Coursera", providerLogo: "ti-brain",
+    provider: "DeepLearning.AI / Coursera", providerLogo: "ti-brain", providerColor: "#ef4444",
     url: "https://www.coursera.org/specializations/machine-learning-introduction",
     cost: "freemium", level: "Intermediate", durationHrs: 90,
     skills: ["machine learning", "python", "tensorflow", "neural networks", "supervised learning"],
@@ -587,7 +588,7 @@ const COURSES: Course[] = [
   {
     id: "dlai-dl",
     title: "Deep Learning Specialization",
-    provider: "DeepLearning.AI / Coursera", providerLogo: "ti-brain",
+    provider: "DeepLearning.AI / Coursera", providerLogo: "ti-brain", providerColor: "#ef4444",
     url: "https://www.coursera.org/specializations/deep-learning",
     cost: "freemium", level: "Advanced", durationHrs: 120,
     skills: ["deep learning", "cnn", "rnn", "nlp", "pytorch", "tensorflow"],
@@ -690,19 +691,17 @@ function stars(n: number) {
 /* ── Card ────────────────────────────────────────────────────── */
 function CourseCard({ c }: { c: Course }) {
   const cc = costColor(c.cost);
+  const iconColor = c.providerColor ?? "var(--accent)";
   return (
-    <a
-      href={c.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{ textDecoration: "none", display: "block" }}
-    >
+    <a href={c.url} target="_blank" rel="noopener noreferrer"
+      style={{ textDecoration: "none", display: "flex" }}>
       <div
         style={{
           background: "var(--surface)", border: "1px solid var(--border)",
           borderRadius: 12, padding: "16px 18px",
           transition: "border-color .15s, box-shadow .15s",
-          cursor: "pointer",
+          cursor: "pointer", width: "100%",
+          display: "flex", flexDirection: "column",
         }}
         onMouseEnter={e => {
           (e.currentTarget as HTMLDivElement).style.borderColor = "var(--accent)";
@@ -714,18 +713,25 @@ function CourseCard({ c }: { c: Course }) {
         }}
       >
         {/* Header row */}
-        <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 10 }}>
-          <span style={{ fontSize: 24, flexShrink: 0, lineHeight: 1 }}>{c.providerLogo}</span>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 12 }}>
+          {/* Provider icon box */}
+          <div style={{
+            width: 36, height: 36, borderRadius: 8, flexShrink: 0,
+            background: `${iconColor}18`, border: `1px solid ${iconColor}28`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <i className={`ti ${c.providerLogo}`} style={{ fontSize: 17, color: iconColor }} />
+          </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)", marginBottom: 2, lineHeight: 1.35 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)", lineHeight: 1.4, marginBottom: 2 }}>
               {c.title}
             </div>
-            <div style={{ fontSize: 11, color: "var(--text3)" }}>{c.provider}</div>
+            <div style={{ fontSize: 10, color: "var(--text3)" }}>{c.provider}</div>
           </div>
-          {/* Cost badge */}
           <span style={{
             fontSize: 9, fontWeight: 800, padding: "3px 8px", borderRadius: 10, flexShrink: 0,
-            background: cc.bg, color: cc.color, border: `1px solid ${cc.border}`,
+            background: cc.bg, color: cc.color, border: `1px solid ${cc.border}`, whiteSpace: "nowrap",
+            alignSelf: "flex-start",
           }}>
             {costLabel(c.cost)}
           </span>
@@ -736,40 +742,37 @@ function CourseCard({ c }: { c: Course }) {
           <div style={{
             fontSize: 11, color: "var(--accent)", background: "var(--accdim)",
             border: "1px solid var(--accborder)", borderRadius: 6,
-            padding: "5px 9px", marginBottom: 10, lineHeight: 1.4,
+            padding: "5px 9px", marginBottom: 8, lineHeight: 1.4,
           }}>
-            ✦ {c.highlight}
+            <i className="ti ti-sparkles" style={{ marginRight: 4, fontSize: 11 }}/>{c.highlight}
           </div>
         )}
 
-        {/* ROI signal — only for cert courses with data */}
+        {/* ROI signal */}
         {c.hasCert && ROI_SIGNALS[c.id] && (() => {
           const roi = ROI_SIGNALS[c.id];
           return (
             <div style={{
-              display: "flex", alignItems: "center", gap: 8,
-              background: "rgba(34,197,94,.07)", border: "1px solid rgba(34,197,94,.2)",
-              borderRadius: 6, padding: "5px 9px", marginBottom: 10,
+              display: "flex", alignItems: "flex-start", gap: 6,
+              background: "rgba(34,197,94,.07)", border: "1px solid rgba(34,197,94,.18)",
+              borderRadius: 6, padding: "5px 8px", marginBottom: 8,
             }}>
-              <span style={{ fontSize: 13 }}><i className="ti ti-trending-up"/></span>
-              <span style={{ fontSize: 10, color: "var(--success)", lineHeight: 1.45 }}>
-                Professionals who added this cert got{" "}
-                <strong>{roi.multiplier} more calls</strong> for {roi.roles} roles
-                {roi.salaryDelta && (
-                  <> · <strong>{roi.salaryDelta} avg salary lift</strong></>
-                )}
+              <i className="ti ti-trending-up" style={{ fontSize: 11, color: "var(--success)", marginTop: 1, flexShrink: 0 }}/>
+              <span style={{ fontSize: 10, color: "var(--success)", lineHeight: 1.5 }}>
+                <strong>{roi.multiplier} more calls</strong> · {roi.roles}
+                {roi.salaryDelta && <> · <strong>{roi.salaryDelta}</strong></>}
               </span>
             </div>
           );
         })()}
 
         {/* Skills */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 10 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 12, flex: 1 }}>
           {c.skills.slice(0, 5).map(s => (
             <span key={s} style={{
               fontSize: 10, padding: "2px 7px", borderRadius: 6,
               background: "var(--surface2)", border: "1px solid var(--border)",
-              color: "var(--text3)",
+              color: "var(--text3)", whiteSpace: "nowrap",
             }}>{s}</span>
           ))}
           {c.skills.length > 5 && (
@@ -777,24 +780,27 @@ function CourseCard({ c }: { c: Course }) {
           )}
         </div>
 
-        {/* Footer row */}
-        <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 11, color: "var(--text3)" }}>
-          <span style={{ color: "#f59e0b", letterSpacing: 1 }}>{stars(c.rating)}</span>
-          <span>{c.rating}</span>
+        {/* Footer */}
+        <div style={{
+          display: "flex", alignItems: "center", flexWrap: "wrap", columnGap: 8, rowGap: 3,
+          fontSize: 11, color: "var(--text3)", paddingTop: 10,
+          borderTop: "1px solid var(--border)", marginTop: "auto",
+        }}>
+          <span style={{ color: "#f59e0b", fontSize: 10 }}>{stars(c.rating)}</span>
+          <span style={{ fontWeight: 600, color: "var(--text2)" }}>{c.rating}</span>
           <span>·</span>
-          <span>{c.enrolled} enrolled</span>
+          <span>{c.enrolled}</span>
           <span>·</span>
           <span>~{c.durationHrs}h</span>
           <span>·</span>
-          <span style={{ color: levelColor(c.level) }}>{c.level}</span>
+          <span style={{ color: levelColor(c.level), fontWeight: 600 }}>{c.level}</span>
           {c.hasCert && (
-            <>
-              <span>·</span>
-              <span style={{ color: "var(--success)" }}><i className="ti ti-award"/> Cert</span>
-            </>
+            <span style={{ color: "var(--success)", fontWeight: 600 }}>
+              · <i className="ti ti-award" style={{ marginRight: 2 }}/>Cert
+            </span>
           )}
-          <span style={{ marginLeft: "auto", color: "var(--accent)", fontWeight: 700 }}>
-            Open ↗
+          <span style={{ marginLeft: "auto", color: "var(--accent)", fontWeight: 700, fontSize: 11 }}>
+            Open <i className="ti ti-arrow-up-right" style={{ fontSize: 10 }}/>
           </span>
         </div>
       </div>
