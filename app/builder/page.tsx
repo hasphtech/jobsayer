@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useResumePlan } from "@/lib/resumePlan";
 import { useAuth } from "@/lib/auth";
+import { useTheme } from "@/lib/useTheme";
 import { exportDocx } from "@/lib/docxExport";
 import {
   saveDraft, loadDraft, createShare,
@@ -1131,7 +1132,7 @@ export default function BuilderPage() {
   const [previewScale,  setPreviewScale] = useState(1);
   const [isMobile,      setIsMobile]     = useState(false);
   const [showPreview,   setShowPreview]  = useState(false); // mobile preview overlay
-  const [dark,          setDark]         = useState(true);
+  const { dark, toggle: toggleTheme }  = useTheme();
   const [previewTemplate, setPreviewTemplate] = useState<string | null>(null); // premium preview modal
   const [customOrder,   setCustomOrder]  = useState<number[] | null>(null);    // user-defined section order
   const [photoShape,    setPhotoShape]   = useState<"round" | "square">("round");
@@ -1223,23 +1224,6 @@ export default function BuilderPage() {
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
-
-  /* theme — persist to localStorage */
-  useEffect(() => {
-    const saved = localStorage.getItem("resume-theme");
-    if (saved === "light") { setDark(false); document.body.classList.add("light"); }
-    else { document.body.classList.remove("light"); }
-  }, []);
-
-  useEffect(() => {
-    if (dark) {
-      document.body.classList.remove("light");
-      localStorage.setItem("resume-theme", "dark");
-    } else {
-      document.body.classList.add("light");
-      localStorage.setItem("resume-theme", "light");
-    }
-  }, [dark]);
 
   /* load draft on mount */
   useEffect(() => {
@@ -1861,7 +1845,7 @@ export default function BuilderPage() {
                 <FolderOpen size={13} />
               </button>
             )}
-            <button onClick={() => setDark(d => !d)}
+            <button onClick={toggleTheme}
               style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, borderRadius: 7, borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", background: "var(--surface2)", color: "var(--text2)", cursor: "pointer" }}>
               {dark ? <Sun size={13} /> : <Moon size={13} />}
             </button>
@@ -3650,11 +3634,6 @@ export default function BuilderPage() {
         {!plan.hasDocxExport && <Lock size={10} />} DOCX
       </button>
 
-      {/* Dark/light toggle */}
-      <button onClick={() => setDark(d => !d)} title={dark ? "Switch to light mode" : "Switch to dark mode"}
-        style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, borderRadius: 8, borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", background: "var(--surface2)", color: "var(--text2)", cursor: "pointer", flexShrink: 0 }}>
-        {dark ? <Sun size={13} /> : <Moon size={13} />}
-      </button>
     </div>
   );
 
