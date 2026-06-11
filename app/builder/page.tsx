@@ -3522,6 +3522,40 @@ export default function BuilderPage() {
 
   const builderActions = (
     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+
+      {/* ── Completeness bar ── */}
+      <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 2, width: 120 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span style={{ fontSize: 9, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".05em" }}>Profile</span>
+          <span style={{ fontSize: 9, fontWeight: 800, color: progressPct >= 80 ? "var(--success)" : progressPct >= 50 ? "var(--warn)" : "var(--text3)" }}>{progressPct}%</span>
+        </div>
+        <div style={{ height: 4, background: "var(--surface2)", borderRadius: 99, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${progressPct}%`, borderRadius: 99, transition: "width .4s",
+            background: progressPct >= 80 ? "var(--success)" : progressPct >= 50 ? "var(--warn)" : "var(--accent)" }} />
+        </div>
+      </div>
+
+      {/* ── ATS circle ── */}
+      <button onClick={() => { setLeftTab("edit"); setStep(STEP_ATS); }} title="View ATS breakdown"
+        style={{ flexShrink: 0, background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", alignItems: "center", gap: 4 }}>
+        <svg width={32} height={32} viewBox="0 0 44 44">
+          <circle cx={22} cy={22} r={18} fill="none" stroke="var(--surface2)" strokeWidth={4} />
+          <circle cx={22} cy={22} r={18} fill="none"
+            stroke={ats.score >= 75 ? "#22c55e" : ats.score >= 50 ? "#eab308" : "#ef4444"}
+            strokeWidth={4} strokeLinecap="round"
+            strokeDasharray={`${(ats.score / 100) * 113.1} 113.1`}
+            transform="rotate(-90 22 22)"
+            style={{ transition: "stroke-dasharray .5s ease" }} />
+          <text x={22} y={23} textAnchor="middle" dominantBaseline="middle"
+            fontSize={11} fontWeight={800}
+            fill={ats.score >= 75 ? "#22c55e" : ats.score >= 50 ? "#eab308" : "#ef4444"}>
+            {ats.score}
+          </text>
+        </svg>
+        <span style={{ fontSize: 9, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".04em" }}>ATS</span>
+      </button>
+
+      <div style={{ width: 1, height: 20, background: "var(--border)", flexShrink: 0 }} />
       {/* Editable resume name */}
       {nameEditing ? (
         <input
@@ -3688,50 +3722,6 @@ export default function BuilderPage() {
 
           {/* ── Content panel (flex: 1 = 416px) ──────────────── */}
           <div style={{ flex: 1, display: "flex", flexDirection: "column" as const, overflow: "hidden" }}>
-
-          {/* ── Sticky stats strip ─────────────────────────────── */}
-          <div style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 10, padding: "8px 14px", borderBottom: "1px solid var(--border)", background: "var(--surface)" }}>
-            {/* Progress */}
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
-                <span style={{ fontSize: 10, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase" as const, letterSpacing: ".05em" }}>Completeness</span>
-                <span style={{ fontSize: 10, fontWeight: 800, color: progressPct >= 80 ? "var(--success)" : progressPct >= 50 ? "var(--warn)" : "var(--text3)" }}>
-                  {completedCount}/{TOTAL_MAIN} · {progressPct}%
-                </span>
-              </div>
-              <div style={{ height: 5, background: "var(--surface2)", borderRadius: 99, overflow: "hidden" }}>
-                <div style={{ height: "100%", width: `${progressPct}%`, borderRadius: 99, transition: "width .4s",
-                  background: progressPct >= 80 ? "var(--success)" : progressPct >= 50 ? "var(--warn)" : "var(--accent)" }} />
-              </div>
-            </div>
-
-            {/* ATS circle */}
-            <button onClick={() => { setLeftTab("edit"); setStep(STEP_ATS); }} title="View ATS breakdown"
-              style={{ flexShrink: 0, background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", flexDirection: "column" as const, alignItems: "center", gap: 1 }}>
-              {/* SVG ring */}
-              <svg width={44} height={44} viewBox="0 0 44 44" style={{ display: "block" }}>
-                {/* Track */}
-                <circle cx={22} cy={22} r={18} fill="none" stroke="var(--surface2)" strokeWidth={4} />
-                {/* Progress arc */}
-                <circle cx={22} cy={22} r={18} fill="none"
-                  stroke={ats.score >= 75 ? "#22c55e" : ats.score >= 50 ? "#eab308" : "#ef4444"}
-                  strokeWidth={4}
-                  strokeLinecap="round"
-                  strokeDasharray={`${(ats.score / 100) * 113.1} 113.1`}
-                  strokeDashoffset={0}
-                  transform="rotate(-90 22 22)"
-                  style={{ transition: "stroke-dasharray .5s ease" }}
-                />
-                {/* Score label */}
-                <text x={22} y={23} textAnchor="middle" dominantBaseline="middle"
-                  fontSize={11} fontWeight={800}
-                  fill={ats.score >= 75 ? "#22c55e" : ats.score >= 50 ? "#eab308" : "#ef4444"}>
-                  {ats.score}
-                </text>
-              </svg>
-              <span style={{ fontSize: 9, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase" as const, letterSpacing: ".04em" }}>ATS</span>
-            </button>
-          </div>
 
           {/* ── EDIT TAB ──────────────────────────────────────── */}
           {leftTab === "edit" && (
