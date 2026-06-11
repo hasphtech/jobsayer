@@ -11,10 +11,11 @@
  * }
  * Returns: { success: true }
  */
-import { NextRequest, NextResponse } from "next/server";
-import { createHmac }                from "crypto";
-import { createServerClient }        from "@supabase/ssr";
-import { cookies }                   from "next/headers";
+import { NextRequest, NextResponse }    from "next/server";
+import { createHmac }                  from "crypto";
+import { createServerClient }          from "@supabase/ssr";
+import { cookies }                     from "next/headers";
+import { invalidateSubscriptionCache } from "@/lib/aiAuth";
 
 export async function POST(req: NextRequest) {
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
@@ -104,5 +105,6 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  invalidateSubscriptionCache(user.id);
   return NextResponse.json({ success: true, plan, expiresAt });
 }

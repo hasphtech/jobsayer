@@ -36,7 +36,7 @@ function buildSuggestions(xp: XPState): Suggestion[] {
       title: "Score your resume",
       body: "Check your ATS pass rate before applying anywhere.",
       href: "/score",
-      cta: "Score now <i className="ti ti-arrow-right"/>",
+      cta: "Score now →",
     });
   } else if (latestScore < 75) {
     suggestions.push({
@@ -44,7 +44,7 @@ function buildSuggestions(xp: XPState): Suggestion[] {
       title: `ATS score: ${latestScore} — improve it`,
       body: "Most ATS filters reject scores below 75. Tailor your resume.",
       href: "/tailor",
-      cta: "Tailor now <i className="ti ti-arrow-right"/>",
+      cta: "Tailor now →",
     });
   } else {
     suggestions.push({
@@ -52,7 +52,7 @@ function buildSuggestions(xp: XPState): Suggestion[] {
       title: `ATS score: ${latestScore} — strong`,
       body: "Good score. Tailor for specific JDs to push past 90.",
       href: "/tailor",
-      cta: "Tailor for a JD <i className="ti ti-arrow-right"/>",
+      cta: "Tailor for a JD →",
     });
   }
 
@@ -62,7 +62,7 @@ function buildSuggestions(xp: XPState): Suggestion[] {
       title: "Practice interviews",
       body: "Candidates who practice 3+ times get 2× more offers.",
       href: "/interview",
-      cta: "Start session <i className="ti ti-arrow-right"/>",
+      cta: "Start session →",
     });
   } else {
     suggestions.push({
@@ -70,7 +70,7 @@ function buildSuggestions(xp: XPState): Suggestion[] {
       title: "Are you underpaid?",
       body: "Check global salary benchmarks for your role and market.",
       href: "/salary",
-      cta: "Check salary <i className="ti ti-arrow-right"/>",
+      cta: "Check salary →",
     });
   }
 
@@ -80,7 +80,7 @@ function buildSuggestions(xp: XPState): Suggestion[] {
       title: "Map your career path",
       body: "Career GPS shows the fastest route to your target role.",
       href: "/career-gps",
-      cta: "Open GPS <i className="ti ti-arrow-right"/>",
+      cta: "Open GPS →",
     });
   } else {
     suggestions.push({
@@ -88,7 +88,7 @@ function buildSuggestions(xp: XPState): Suggestion[] {
       title: "Optimise LinkedIn",
       body: "Recruiters filter by headline keywords — update yours.",
       href: "/linkedin",
-      cta: "Optimise <i className="ti ti-arrow-right"/>",
+      cta: "Optimise →",
     });
   }
 

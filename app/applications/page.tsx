@@ -43,7 +43,7 @@ const STAGES: { key: Stage; label: string; icon: string; color: string; bg: stri
   { key: "applied",     label: "Applied",    icon: "ti-upload", color: "var(--accent)",   bg: "rgba(99,102,241,.08)"  },
   { key: "screening",   label: "Screening",  icon: "ti-phone", color: "var(--warn)",     bg: "rgba(234,179,8,.08)"   },
   { key: "interview",   label: "Interview",  icon: "ti-microphone", color: "#a78bfa",         bg: "rgba(167,139,250,.08)" },
-  { key: "offer",       label: "Offer <i className="ti ti-confetti"/>",   icon: "ti-circle-check", color: "var(--success)",  bg: "rgba(34,197,94,.08)"   },
+  { key: "offer",       label: "Offer 🎉",   icon: "ti-circle-check", color: "var(--success)",  bg: "rgba(34,197,94,.08)"   },
   { key: "rejected",    label: "Rejected",   icon: "✗",  color: "var(--danger)",   bg: "rgba(239,68,68,.08)"   },
 ];
 

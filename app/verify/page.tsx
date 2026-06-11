@@ -296,7 +296,7 @@ export default function VerifyPage() {
                 background: "var(--accent)", color: "#fff", fontSize: 14, fontWeight: 700,
                 cursor: "pointer", fontFamily: "inherit",
               }}>
-                {submitting ? "Verifying…" : "Submit for Verification <i className="ti ti-arrow-right"/>"}
+                {submitting ? "Verifying…" : "Submit for Verification →"}
               </button>
 
               <div style={{ fontSize: 11, color: "var(--text3)", textAlign: "center", lineHeight: 1.6 }}>

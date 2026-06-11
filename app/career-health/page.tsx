@@ -99,7 +99,7 @@ function computeDimensions(resume: ResumeData | null, lastUpdatedDays: number): 
         ? "Your profile is thorough — recruiters see everything they need."
         : `Missing: ${missingFields.slice(0, 3).join(", ")}. Incomplete profiles get 60% fewer recruiter views.`,
       actions: profScore < 90
-        ? [{ label: "Complete your profile <i className="ti ti-arrow-right"/>", href: "/builder" }]
+        ? [{ label: "Complete your profile →", href: "/builder" }]
         : [],
     },
     {
@@ -112,8 +112,8 @@ function computeDimensions(resume: ResumeData | null, lastUpdatedDays: number): 
         ? `Trending skills not in your profile: ${trendingMissing.join(", ")}. The market moves fast.`
         : "Your skill set is current and well-aligned with 2026 market demand.",
       actions: [
-        { label: "Check skill gaps <i className="ti ti-arrow-right"/>", href: "/career-gps" },
-        ...(trendingMissing.length > 0 ? [{ label: "Update resume skills <i className="ti ti-arrow-right"/>", href: "/builder" }] : []),
+        { label: "Check skill gaps →", href: "/career-gps" },
+        ...(trendingMissing.length > 0 ? [{ label: "Update resume skills →", href: "/builder" }] : []),
       ],
     },
     {
@@ -128,7 +128,7 @@ function computeDimensions(resume: ResumeData | null, lastUpdatedDays: number): 
           ? `Last updated ${Math.round(lastUpdatedDays / 30)} months ago. Stale resumes miss recent achievements and keywords.`
           : `Updated ${lastUpdatedDays} days ago. Aim for a monthly refresh.`,
       actions: recencyScore < 80
-        ? [{ label: "Refresh your resume <i className="ti ti-arrow-right"/>", href: "/builder" }]
+        ? [{ label: "Refresh your resume →", href: "/builder" }]
         : [],
     },
     {
@@ -142,8 +142,8 @@ function computeDimensions(resume: ResumeData | null, lastUpdatedDays: number): 
         : `Add ${projectCount === 0 ? "projects, " : ""}${certCount === 0 ? "certifications, " : ""}more work detail to strengthen your profile.`,
       actions: depthScore < 70
         ? [
-            { label: "Add projects/certs <i className="ti ti-arrow-right"/>", href: "/builder" },
-            { label: "Get certified <i className="ti ti-arrow-right"/>", href: "/career-gps" },
+            { label: "Add projects/certs →", href: "/builder" },
+            { label: "Get certified →", href: "/career-gps" },
           ]
         : [],
     },
@@ -157,9 +157,9 @@ function computeDimensions(resume: ResumeData | null, lastUpdatedDays: number): 
         ? "Strong online presence — recruiters can find and vet you easily."
         : `${!hasLinkedIn ? "LinkedIn URL missing — 87% of recruiters check it. " : ""}${!hasGitHub ? "GitHub not linked — key for tech roles." : ""}`,
       actions: [
-        ...(!hasLinkedIn  ? [{ label: "Add LinkedIn <i className="ti ti-arrow-right"/>",  href: "/builder" }] : []),
-        ...(!hasGitHub    ? [{ label: "Add GitHub <i className="ti ti-arrow-right"/>",    href: "/builder" }] : []),
-        ...(!hasPortfolio ? [{ label: "Add portfolio <i className="ti ti-arrow-right"/>", href: "/builder" }] : []),
+        ...(!hasLinkedIn  ? [{ label: "Add LinkedIn →",  href: "/builder" }] : []),
+        ...(!hasGitHub    ? [{ label: "Add GitHub →",    href: "/builder" }] : []),
+        ...(!hasPortfolio ? [{ label: "Add portfolio →", href: "/builder" }] : []),
       ],
     },
   ];

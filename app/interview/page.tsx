@@ -504,7 +504,7 @@ export default function InterviewPage() {
                         color: done ? "var(--text3)" : "#fff",
                         fontSize: 12, fontWeight: 700, whiteSpace: "nowrap", flexShrink: 0,
                       }}>
-                      {done ? "Re-practice" : "Practice <i className="ti ti-arrow-right"/>"}
+                      {done ? "Re-practice" : "Practice →"}
                     </button>
                   </div>
                 </div>

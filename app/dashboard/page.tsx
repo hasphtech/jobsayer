@@ -664,7 +664,7 @@ export default function DashboardPage() {
             <span style={{ fontSize: 11, color: "var(--text3)" }}>
               {levelInfo.level < 7
                 ? `${levelInfo.xpToNext.toLocaleString()} XP to Level ${levelInfo.level + 1} · ${LEVELS[levelInfo.level]?.title ?? ""}`
-                : "Max level reached <i className="ti ti-trophy"/>"}
+                : "Max level reached 🏆"}
             </span>
           </div>
           <div style={{ height: 5, background: "var(--border)", borderRadius: 3, overflow: "hidden" }}>

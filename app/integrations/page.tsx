@@ -103,7 +103,7 @@ const PLATFORMS: {
 const BOT_DEMOS: Record<Platform, { messages: { from: "user" | "bot"; text: string }[] }> = {
   slack: { messages: [
     { from: "user", text: "/jobsayer search backend bangalore 7-day notice" },
-    { from: "bot", text: "**7 matches found.** Top match: **Asha Patel · 94%** — Backend Engineer, 6 yrs, BGV cleared, 7-day notice. React to shortlist <i className="ti ti-arrow-right"/>" },
+    { from: "bot", text: "**7 matches found.** Top match: **Asha Patel · 94%** — Backend Engineer, 6 yrs, BGV cleared, 7-day notice. React to shortlist →" },
     { from: "user", text: "/jobsayer schedule asha.patel@email.com Mon 3pm" },
     { from: "bot", text: "Interview scheduled — Mon 9 Jun 3:00 PM. Calendar invite sent to Asha and the panel." },
   ]},
@@ -114,9 +114,9 @@ const BOT_DEMOS: Record<Platform, { messages: { from: "user" | "bot"; text: stri
     { from: "bot", text: "Offer letter sent to Vikram Suri (vikram@email.com). He has 48 hours to accept." },
   ]},
   whatsapp: { messages: [
-    { from: "bot", text: "Hi Asha <i className="ti ti-hand-stop"/> You've been shortlisted for Senior Backend Engineer at Razorpay. Interview: Tue 10 Jun, 2 PM. Confirm?" },
+    { from: "bot", text: "Hi Asha ✋ You've been shortlisted for Senior Backend Engineer at Razorpay. Interview: Tue 10 Jun, 2 PM. Confirm?" },
     { from: "user", text: "Yes, confirmed!" },
-    { from: "bot", text: "Great! <i className="ti ti-circle-check"/> Calendar invite sent. Details: Razorpay HQ, Koramangala. Your interviewer: Kavitha S. Prep tip: system design round first." },
+    { from: "bot", text: "Great! ✓ Calendar invite sent. Details: Razorpay HQ, Koramangala. Your interviewer: Kavitha S. Prep tip: system design round first." },
   ]},
   telegram: { messages: [
     { from: "user", text: "/search react bangalore 15-day" },

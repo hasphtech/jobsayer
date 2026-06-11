@@ -36,6 +36,7 @@ const EMPTY_FORM: Omit<AdminJob, "id" | "posted_at" | "is_active" | "is_approved
   skills: [], openings: 1, logo: "",
   description: "", jd_text: "", apply_url: "",
   source: "manual", source_url: "",
+  expires_at: null,
 };
 
 // ── Styles ────────────────────────────────────────────────────────────────────

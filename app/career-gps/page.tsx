@@ -392,7 +392,7 @@ const ROLE_BLUEPRINTS: RoleBlueprint[] = [
 
   /* ── Transition ────────────────────────────────────────────── */
   {
-    title: "IT Services <i className="ti ti-arrow-right"/> Product / Tech",
+    title: "IT Services → Product / Tech",
     category: "Transition",
     icon: "ti-arrows-shuffle",
     salaryRange: "$120K–$280K (2–4× current TC)",

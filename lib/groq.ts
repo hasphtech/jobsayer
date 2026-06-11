@@ -80,7 +80,6 @@ async function callWithRetry(
           max_tokens:  opts.maxTokens,
           temperature: opts.temperature,
         },
-        // @ts-expect-error Groq SDK accepts signal via RequestOptions
         { signal: controller.signal },
       );
 

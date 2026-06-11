@@ -19,10 +19,11 @@
  *   Events: checkout.session.completed, customer.subscription.*,
  *           invoice.payment_failed, invoice.payment_succeeded
  */
-import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
-import { createServerClient } from "@supabase/ssr";
-import { logAuditEvent } from "@/lib/auditLog";
+import { NextRequest, NextResponse }          from "next/server";
+import Stripe                                  from "stripe";
+import { createServerClient }                  from "@supabase/ssr";
+import { logAuditEvent }                       from "@/lib/auditLog";
+import { invalidateSubscriptionCache }         from "@/lib/aiAuth";
 
 export const dynamic = "force-dynamic";
 
@@ -103,6 +104,7 @@ export async function POST(req: NextRequest) {
       userId, action: "plan.upgrade", resource: `plan:${PLAN_DISPLAY[plan] ?? plan}`,
       meta: { provider: "stripe", plan, interval, currency, stripe_session_id: session.id },
     });
+    invalidateSubscriptionCache(userId);
     console.log(`[stripe-webhook] activated: user=${userId} plan=${plan} sub=${subId}`);
   }
 
@@ -130,6 +132,7 @@ export async function POST(req: NextRequest) {
     }
 
     await sb.from("profiles").update(updates).eq("id", userId);
+    invalidateSubscriptionCache(userId);
     console.log(`[stripe-webhook] subscription updated: user=${userId} status=${status}`);
   }
 
@@ -150,6 +153,7 @@ export async function POST(req: NextRequest) {
       userId, action: "plan.cancelled", resource: "plan:free",
       meta: { provider: "stripe", stripe_subscription_id: sub.id },
     });
+    invalidateSubscriptionCache(userId);
     console.log(`[stripe-webhook] subscription canceled: user=${userId}`);
   }
 

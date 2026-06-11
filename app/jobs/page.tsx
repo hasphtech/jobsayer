@@ -462,7 +462,7 @@ function JobCard({ job, selected, onClick }: { job: ScoredJob; selected: boolean
               opacity: job.applyUrl ? 1 : 0.5, display: "inline-flex", alignItems: "center",
             }}
           >
-            {job.ghost ? "View ›" : "Apply <i className="ti ti-arrow-right"/>"}
+            {job.ghost ? "View ›" : "Apply →"}
           </a>
         </div>
       </div>
@@ -557,7 +557,7 @@ function DetailPanel({ job, resumeText }: { job: ScoredJob; resumeText: string }
           boxSizing: "border-box" as const,
         }}
       >
-        {job.applyUrl ? "Apply Now <i className="ti ti-arrow-right"/>" : "No Apply Link"}
+        {job.applyUrl ? "Apply Now →" : "No Apply Link"}
       </a>
 
       <Link href="/builder" style={{

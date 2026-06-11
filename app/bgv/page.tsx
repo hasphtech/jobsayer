@@ -507,7 +507,7 @@ export default function BgvPage() {
                     <div key={i} style={{ marginBottom: i < employment.length - 1 ? 10 : 0, paddingBottom: i < employment.length - 1 ? 10 : 0, borderBottom: i < employment.length - 1 ? "1px solid var(--border)" : "none" }}>
                       <Row label="Company"  value={em.company || "—"} />
                       <Row label="Role"     value={em.role || "—"} />
-                      <Row label="Period"   value={`${em.from_date || "?"} <i className="ti ti-arrow-right"/> ${em.to_date || "Present"}`} />
+                      <Row label="Period"   value={`${em.from_date || "?"} → ${em.to_date || "Present"}`} />
                     </div>
                   ))}
                 </Section>
@@ -534,7 +534,7 @@ export default function BgvPage() {
                   background: "var(--accent)", color: "#fff", fontSize: 14, fontWeight: 700,
                   cursor: "pointer", fontFamily: "inherit",
                 }}>
-                  {submitting ? "Submitting…" : "Submit BGV <i className="ti ti-arrow-right"/>"}
+                  {submitting ? "Submitting…" : "Submit BGV →"}
                 </button>
               ) : (
                 <button onClick={nextStep} style={{

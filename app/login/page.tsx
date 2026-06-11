@@ -184,7 +184,7 @@ export default function LoginPage() {
                   style={inp}
                 />
                 <button type="submit" disabled={busy} style={{ padding: "13px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
-                  {busy ? "Sending…" : "Send Magic Link <i className="ti ti-arrow-right"/>"}
+                  {busy ? "Sending…" : "Send Magic Link →"}
                 </button>
               </form>
             ) : (
@@ -198,7 +198,7 @@ export default function LoginPage() {
                   style={{ ...inp, textAlign: "center", fontSize: 28, letterSpacing: 8, fontWeight: 700 }}
                 />
                 <button type="submit" disabled={busy || otp.length < 6} style={{ padding: "13px", borderRadius: 12, border: "none", background: otp.length >= 6 ? "var(--accent)" : "var(--surface2)", color: otp.length >= 6 ? "#fff" : "var(--text3)", fontSize: 15, fontWeight: 700, cursor: otp.length >= 6 ? "pointer" : "not-allowed" }}>
-                  {busy ? "Verifying…" : "Sign In <i className="ti ti-arrow-right"/>"}
+                  {busy ? "Verifying…" : "Sign In →"}
                 </button>
                 <button type="button" onClick={() => handleSendOtp({ preventDefault: () => {} } as React.FormEvent)} style={{ padding: "8px", fontSize: 13, color: "var(--text3)", background: "none", border: "none", cursor: "pointer" }}>
                   Resend code
@@ -229,7 +229,7 @@ export default function LoginPage() {
                 style={inp}
               />
               <button type="submit" disabled={busy} style={{ padding: "13px", borderRadius: 12, border: "none", background: "var(--accent)", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
-                {busy ? "Looking up…" : "Continue with SSO <i className="ti ti-arrow-right"/>"}
+                {busy ? "Looking up…" : "Continue with SSO →"}
               </button>
             </form>
 

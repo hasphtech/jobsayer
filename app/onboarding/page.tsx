@@ -31,7 +31,7 @@ const TARGET_ROLES = [
 const LOCATIONS = [
   "Bangalore 🇮🇳", "Mumbai 🇮🇳", "Delhi / NCR 🇮🇳", "Hyderabad 🇮🇳", "Pune 🇮🇳",
   "Remote India 🇮🇳", "San Francisco 🇺🇸", "New York 🇺🇸", "London 🇬🇧",
-  "Singapore 🇸🇬", "Dubai 🇦🇪", "Berlin 🇩🇪", "Remote / Worldwide <i className="ti ti-world"/>", "Other",
+  "Singapore 🇸🇬", "Dubai 🇦🇪", "Berlin 🇩🇪", "Remote / Worldwide 🌐", "Other",
 ];
 
 const STEP_LABELS = ["Your role", "Target role", "Location", "Resume", "Done"];
@@ -236,7 +236,7 @@ export default function OnboardingPage() {
               ))}
             </div>
             <button onClick={saveAndFinish} disabled={saving} style={{ width: "100%", padding: 16, borderRadius: 12, border: "none", background: "var(--accent)", color: "#fff", fontWeight: 800, fontSize: 16, cursor: saving ? "wait" : "pointer" }}>
-              {saving ? "Saving…" : resumeChoice === "build" ? "Go to Resume Builder <i className="ti ti-arrow-right"/>" : "Go to Dashboard <i className="ti ti-arrow-right"/>"}
+              {saving ? "Saving…" : resumeChoice === "build" ? "Go to Resume Builder →" : "Go to Dashboard →"}
             </button>
           </div>
         )}

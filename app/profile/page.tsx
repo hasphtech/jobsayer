@@ -415,7 +415,7 @@ export default function ProfilePage() {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: bgv ? 14 : 0 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)" }}><i className="ti ti-shield-check"/> Background Verification</div>
             <Link href="/bgv" style={{ padding: "7px 16px", background: bgv?.status === "verified" ? "rgba(34,197,94,.1)" : "var(--accdim)", border: `1px solid ${bgv?.status === "verified" ? "rgba(34,197,94,.3)" : "var(--accborder)"}`, borderRadius: 8, color: bgv?.status === "verified" ? "var(--success)" : "var(--accent)", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
-              {bgv ? "View / Update <i className="ti ti-arrow-right"/>" : "Start BGV <i className="ti ti-arrow-right"/>"}
+              {bgv ? "View / Update →" : "Start BGV →"}
             </Link>
           </div>
           {bgv ? (
@@ -626,7 +626,7 @@ export default function ProfilePage() {
                 cursor: "pointer", fontFamily: "inherit",
               }}
             >
-              {billingLoading ? "Opening…" : "Manage Billing <i className="ti ti-arrow-right"/>"}
+              {billingLoading ? "Opening…" : "Manage Billing →"}
             </button>
           </div>
         )}

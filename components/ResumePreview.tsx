@@ -1069,7 +1069,7 @@ function TemplateTech({ data, accent, thumbnail = false }: { data: ResumeData; a
                 <strong style={{ fontSize: 13, color: "#111827" }}>{w.role || "Role"}</strong>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ fontSize: 11, color: accent, fontFamily: "monospace" }}>{w.company}</span>
-                  <span style={{ fontSize: 10, color: "#9ca3af", fontFamily: "monospace" }}>{[w.from, w.current ? "Present" : w.to].filter(Boolean).join(" <i className="ti ti-arrow-right"/> ")}</span>
+                  <span style={{ fontSize: 10, color: "#9ca3af", fontFamily: "monospace" }}>{[w.from, w.current ? "Present" : w.to].filter(Boolean).join(" → ")}</span>
                 </div>
                 {w.desc && <p style={{ color: "#4b5563", fontSize: 11, lineHeight: 1.5, marginTop: 3 }}>{w.desc}</p>}
               </div>
