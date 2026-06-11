@@ -339,10 +339,12 @@ interface AppShellProps {
   aiPanel?: boolean;
   /** When true, content area is overflow:hidden + flex so children can fill it (e.g. builder). */
   contentFill?: boolean;
+  /** When true, hide the ⌘K search bar — use when the page has its own toolbar (e.g. builder). */
+  noSearch?: boolean;
 }
 
 /* ── AppShell ────────────────────────────────────────────────── */
-export default function AppShell({ children, actions, aiPanel = true, contentFill = false }: AppShellProps) {
+export default function AppShell({ children, actions, aiPanel = true, contentFill = false, noSearch = false }: AppShellProps) {
   const { user, signOut } = useAuth();
   const { dark, toggle: toggleTheme } = useTheme();
   const { role, setRole } = useRole();
@@ -516,27 +518,29 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
           </Link>
         </div>
 
-        {/* Command bar */}
-        <div style={{ flex: 1, maxWidth: 440 }}>
-          <button
-            onClick={() => setCmdOpen(true)}
-            style={{
-              width: "100%", background: "var(--surface2)", border: "1px solid var(--border)",
-              borderRadius: 8, padding: "6px 14px", cursor: "text",
-              display: "flex", alignItems: "center", gap: 8, fontFamily: "inherit",
-            }}
-          >
-            <i className="ti ti-search" style={{ fontSize: 13, color: "var(--text3)", flexShrink: 0 }} />
-            <span style={{ fontSize: 12.5, color: "var(--text3)", flex: 1, textAlign: "left" }}>
-              Search tools, jobs, skills...
-            </span>
-            <kbd style={{
-              fontSize: 10, color: "var(--text3)",
-              background: "var(--border)", padding: "2px 6px", borderRadius: 4,
-              border: "1px solid var(--border2)", fontFamily: "inherit",
-            }}>⌘K</kbd>
-          </button>
-        </div>
+        {/* Command bar — hidden on pages with their own toolbar */}
+        {!noSearch && (
+          <div style={{ flex: 1, maxWidth: 440 }}>
+            <button
+              onClick={() => setCmdOpen(true)}
+              style={{
+                width: "100%", background: "var(--surface2)", border: "1px solid var(--border)",
+                borderRadius: 8, padding: "6px 14px", cursor: "text",
+                display: "flex", alignItems: "center", gap: 8, fontFamily: "inherit",
+              }}
+            >
+              <i className="ti ti-search" style={{ fontSize: 13, color: "var(--text3)", flexShrink: 0 }} />
+              <span style={{ fontSize: 12.5, color: "var(--text3)", flex: 1, textAlign: "left" }}>
+                Search tools, jobs, skills...
+              </span>
+              <kbd style={{
+                fontSize: 10, color: "var(--text3)",
+                background: "var(--border)", padding: "2px 6px", borderRadius: 4,
+                border: "1px solid var(--border2)", fontFamily: "inherit",
+              }}>⌘K</kbd>
+            </button>
+          </div>
+        )}
 
         {/* Right: page actions + role switcher + streak + theme + upgrade */}
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>

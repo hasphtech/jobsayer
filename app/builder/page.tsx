@@ -3578,42 +3578,6 @@ export default function BuilderPage() {
         </div>
       )}
 
-      <div style={{ width: 1, height: 20, background: "var(--border)" }} />
-
-      {/* Progress + ATS */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)" }}>Progress</span>
-        <div style={{ width: 100, height: 5, background: "var(--surface2)", borderRadius: 99, overflow: "hidden" }}>
-          <div style={{ height: "100%", width: `${progressPct}%`, background: "var(--text1)", borderRadius: 99, transition: "width .4s" }} />
-        </div>
-        <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text1)" }}>{completedCount}/{TOTAL_MAIN}</span>
-        <div style={{ width: 1, height: 14, background: "var(--border)" }} />
-        <button onClick={() => { setLeftTab("edit"); setStep(STEP_ATS); }} title="View ATS breakdown"
-          style={{ display: "flex", alignItems: "center", gap: 5, background: "none", border: "none", cursor: "pointer", padding: "2px 6px", borderRadius: 6 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)" }}>ATS</span>
-          <div style={{ position: "relative", width: 70, height: 5, background: "var(--surface2)", borderRadius: 99, overflow: "hidden" }}>
-            <div style={{
-              height: "100%", width: `${ats.score}%`, borderRadius: 99,
-              background: `linear-gradient(90deg, ${ats.score < 50 ? "#ef4444, #f97316" : ats.score < 75 ? "#f97316, #eab308" : "#22c55e, #16a34a"})`,
-              transition: "width .5s ease",
-            }} />
-          </div>
-          <span style={{ fontSize: 11, fontWeight: 800, color: ats.scoreColor, minWidth: 20 }}>{ats.score}</span>
-        </button>
-      </div>
-
-      <div style={{ width: 1, height: 20, background: "var(--border)" }} />
-
-      {/* Autosave indicator */}
-      <span style={{
-        fontSize: 10, fontWeight: 600, color: "var(--text3)",
-        display: "flex", alignItems: "center", gap: 3,
-        opacity: autoSaved ? 1 : 0, transition: "opacity .3s ease",
-        pointerEvents: "none", minWidth: 62,
-      }}>
-        <Check size={10} style={{ color: "var(--accent)" }} /> Autosaved
-      </span>
-
       {/* Share */}
       <button onClick={handleShare} disabled={shareStatus === "loading"}
         style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: shareStatus === "copied" ? "var(--accent)" : "var(--text2)", background: shareStatus === "copied" ? "var(--accdim)" : "var(--surface2)", borderWidth: 1, borderStyle: "solid", borderColor: shareStatus === "copied" ? "var(--accborder)" : "var(--border)", borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontFamily: "inherit" }}>
@@ -3638,7 +3602,7 @@ export default function BuilderPage() {
   );
 
   return (
-    <AppShell actions={builderActions} contentFill aiPanel={false}>
+    <AppShell actions={builderActions} contentFill aiPanel={false} noSearch>
       {/* ── Score CTA Toast ── */}
       {showScoreCta && (
         <div style={{
@@ -3725,37 +3689,53 @@ export default function BuilderPage() {
           {/* ── Content panel (flex: 1 = 416px) ──────────────── */}
           <div style={{ flex: 1, display: "flex", flexDirection: "column" as const, overflow: "hidden" }}>
 
+          {/* ── Sticky stats strip ─────────────────────────────── */}
+          <div style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 10, padding: "8px 14px", borderBottom: "1px solid var(--border)", background: "var(--surface)" }}>
+            {/* Progress */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+                <span style={{ fontSize: 10, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase" as const, letterSpacing: ".05em" }}>Completeness</span>
+                <span style={{ fontSize: 10, fontWeight: 800, color: progressPct >= 80 ? "var(--success)" : progressPct >= 50 ? "var(--warn)" : "var(--text3)" }}>
+                  {completedCount}/{TOTAL_MAIN} · {progressPct}%
+                </span>
+              </div>
+              <div style={{ height: 5, background: "var(--surface2)", borderRadius: 99, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${progressPct}%`, borderRadius: 99, transition: "width .4s",
+                  background: progressPct >= 80 ? "var(--success)" : progressPct >= 50 ? "var(--warn)" : "var(--accent)" }} />
+              </div>
+            </div>
+
+            {/* ATS circle */}
+            <button onClick={() => { setLeftTab("edit"); setStep(STEP_ATS); }} title="View ATS breakdown"
+              style={{ flexShrink: 0, background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", flexDirection: "column" as const, alignItems: "center", gap: 1 }}>
+              {/* SVG ring */}
+              <svg width={44} height={44} viewBox="0 0 44 44" style={{ display: "block" }}>
+                {/* Track */}
+                <circle cx={22} cy={22} r={18} fill="none" stroke="var(--surface2)" strokeWidth={4} />
+                {/* Progress arc */}
+                <circle cx={22} cy={22} r={18} fill="none"
+                  stroke={ats.score >= 75 ? "#22c55e" : ats.score >= 50 ? "#eab308" : "#ef4444"}
+                  strokeWidth={4}
+                  strokeLinecap="round"
+                  strokeDasharray={`${(ats.score / 100) * 113.1} 113.1`}
+                  strokeDashoffset={0}
+                  transform="rotate(-90 22 22)"
+                  style={{ transition: "stroke-dasharray .5s ease" }}
+                />
+                {/* Score label */}
+                <text x={22} y={23} textAnchor="middle" dominantBaseline="middle"
+                  fontSize={11} fontWeight={800}
+                  fill={ats.score >= 75 ? "#22c55e" : ats.score >= 50 ? "#eab308" : "#ef4444"}>
+                  {ats.score}
+                </text>
+              </svg>
+              <span style={{ fontSize: 9, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase" as const, letterSpacing: ".04em" }}>ATS</span>
+            </button>
+          </div>
+
           {/* ── EDIT TAB ──────────────────────────────────────── */}
           {leftTab === "edit" && (
             <div style={{ flex: 1, overflowY: "auto", paddingTop: 0, display: "flex", flexDirection: "column" as const }}>
-
-              {/* ── Completeness meter ─────────────────────────── */}
-              <div style={{ flexShrink: 0, padding: "8px 12px 6px", borderBottom: "1px solid var(--border)", background: "var(--surface)" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 5 }}>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase" as const, letterSpacing: ".05em" }}>
-                    Resume completeness
-                  </span>
-                  <span style={{ fontSize: 11, fontWeight: 800, color: progressPct >= 80 ? "var(--success)" : progressPct >= 50 ? "var(--warn)" : "var(--text3)" }}>
-                    {completedCount}/{TOTAL_MAIN} · {progressPct}%
-                  </span>
-                </div>
-                <div style={{ height: 4, background: "var(--surface2)", borderRadius: 99, overflow: "hidden" }}>
-                  <div style={{
-                    height: "100%", borderRadius: 99, transition: "width .4s ease",
-                    width: `${progressPct}%`,
-                    background: progressPct >= 80 ? "var(--success)" : progressPct >= 50 ? "var(--warn)" : "var(--accent)",
-                  }} />
-                </div>
-                {progressPct < 100 && (
-                  <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 4 }}>
-                    {progressPct >= 80
-                      ? "Almost there — fill the remaining sections"
-                      : progressPct >= 50
-                      ? "Good start — keep adding sections for a stronger resume"
-                      : "Fill key sections to boost your ATS score"}
-                  </div>
-                )}
-              </div>
 
               <div style={{ flex: 1, overflowY: "auto" as const, paddingTop: 10 }}>
 
