@@ -51,6 +51,7 @@ const RECRUITER_TOOL_LINKS = [
   { href: "/employer-dashboard?tab=pipeline",  label: "Pipeline",    icon: "ti-filter" },
   { href: "/employer-dashboard?tab=candidates",label: "Candidates",  icon: "ti-users" },
   { href: "/employer-dashboard?tab=bgv",       label: "BGV",         icon: "ti-shield-check" },
+  { href: "/employer-dashboard?tab=team",      label: "Team",        icon: "ti-users-group" },
   { href: "/jobs/post",                         label: "Post a Job",  icon: "ti-circle-plus" },
 ];
 
