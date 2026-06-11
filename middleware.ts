@@ -165,15 +165,14 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    /* 4 ─ Admin guard */
+    /* 4 ─ Admin guard — check ADMIN_EMAILS env var */
     if (pathname.startsWith("/admin")) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("is_admin")
-        .eq("id", session.user.id)
-        .single();
-
-      if (!profile?.is_admin) {
+      const adminEmails = (process.env.ADMIN_EMAILS ?? "")
+        .split(",")
+        .map(e => e.trim().toLowerCase())
+        .filter(Boolean);
+      const userEmail = (session.user.email ?? "").toLowerCase();
+      if (!userEmail || !adminEmails.includes(userEmail)) {
         return NextResponse.redirect(new URL("/dashboard", req.url));
       }
     }

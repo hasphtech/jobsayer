@@ -111,6 +111,17 @@ export default function AdminPage() {
       <div style={{ fontSize: 13, color: "var(--text3)" }}>
         {token ? "Your account is not in the admin list." : "Please sign in first."}
       </div>
+      {token && (
+        <button
+          onClick={async () => {
+            const res = await fetch("/api/admin/debug", { headers: { Authorization: `Bearer ${token}` } });
+            const j = await res.json();
+            alert(JSON.stringify(j, null, 2));
+          }}
+          style={{ fontSize: 11, color: "var(--text3)", background: "none", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 10px", cursor: "pointer" }}>
+          Debug info
+        </button>
+      )}
       <a href="/" style={{ color: "var(--accent)", fontSize: 13, textDecoration: "none" }}>← Back to home</a>
     </div>
   );
