@@ -445,8 +445,9 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
             position: "sticky", top: 52, zIndex: 99,
             background: "var(--surface)", borderBottom: "1px solid var(--border)",
             padding: "12px 14px", display: "flex", flexDirection: "column", gap: 4,
+            maxHeight: "calc(100dvh - 52px)", overflowY: "auto",
           }}>
-            {/* Role switcher + theme toggle in mobile drawer */}
+            {/* Role switcher + theme toggle */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
               <RoleSwitcher role={role} setRole={setRole} />
               <button
@@ -460,9 +461,11 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
                   cursor: "pointer", fontFamily: "inherit",
                 }}
               >
-                <><i className={dark ? "ti ti-sun" : "ti ti-moon"}/> {dark ? "Light" : "Dark"}</>
+                <i className={dark ? "ti ti-sun" : "ti ti-moon"}/> {dark ? "Light" : "Dark"}
               </button>
             </div>
+
+            {/* Nav links */}
             {[...toolLinks, ...insightLinks].map(l => {
               const a = isActive(l.href);
               return (
@@ -481,6 +484,67 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
                 </Link>
               );
             })}
+
+            {/* Divider */}
+            <div style={{ height: 1, background: "var(--border)", margin: "6px 0" }} />
+
+            {/* Upgrade */}
+            {role === "candidate" && (
+              <Link href="/upgrade" onClick={closeDrawer} style={{
+                display: "flex", alignItems: "center", gap: 10,
+                padding: "10px 14px", borderRadius: 9, fontSize: 13, fontWeight: 600,
+                color: "var(--accent)", textDecoration: "none",
+                background: "var(--accdim)", border: "1px solid var(--accborder)",
+              }}>
+                <i className="ti ti-star" style={{ fontSize: 15 }} />
+                Upgrade Plan
+              </Link>
+            )}
+
+            {/* Profile */}
+            <Link href="/profile" onClick={closeDrawer} style={{
+              display: "flex", alignItems: "center", gap: 10,
+              padding: "10px 14px", borderRadius: 9, fontSize: 13, fontWeight: 500,
+              color: "var(--text1)", textDecoration: "none",
+              background: "var(--surface2)", border: "1px solid var(--border)",
+            }}>
+              <i className="ti ti-user-circle" style={{ fontSize: 15 }} />
+              <span style={{ flex: 1 }}>My Profile</span>
+              {user?.email && <span style={{ fontSize: 11, color: "var(--text3)", maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.email}</span>}
+            </Link>
+
+            {/* Admin — only for admins */}
+            {(() => {
+              const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "")
+                .split(",").map(e => e.trim().toLowerCase()).filter(Boolean);
+              if (!user?.email || !adminEmails.includes(user.email.toLowerCase())) return null;
+              return (
+                <Link href="/admin" onClick={closeDrawer} style={{
+                  display: "flex", alignItems: "center", gap: 10,
+                  padding: "10px 14px", borderRadius: 9, fontSize: 13, fontWeight: 500,
+                  color: "var(--text3)", textDecoration: "none",
+                  background: "var(--surface2)", border: "1px solid var(--border)",
+                }}>
+                  <i className="ti ti-shield-lock" style={{ fontSize: 15 }} />
+                  Admin Panel
+                </Link>
+              );
+            })()}
+
+            {/* Sign out */}
+            <button
+              onClick={() => { signOut(); closeDrawer(); }}
+              style={{
+                display: "flex", alignItems: "center", gap: 10,
+                padding: "10px 14px", borderRadius: 9, fontSize: 13, fontWeight: 600,
+                color: "var(--danger)", background: "rgba(239,68,68,.07)",
+                border: "1px solid rgba(239,68,68,.2)",
+                cursor: "pointer", fontFamily: "inherit", textAlign: "left",
+              }}
+            >
+              <i className="ti ti-logout" style={{ fontSize: 15 }} />
+              Sign Out
+            </button>
           </div>
         )}
 
@@ -606,29 +670,37 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
             <div style={{ flex: 1 }} />
           </div>
 
-          {/* Admin shortcut */}
-          <div style={{ padding: "0 10px 8px" }}>
-            <a href="/admin" style={{
-              display: "flex", alignItems: "center", gap: 8,
-              padding: "6px 10px", borderRadius: 7,
-              background: "transparent", border: "1px solid transparent",
-              textDecoration: "none", fontSize: 11.5, fontWeight: 600,
-              color: "var(--text3)",
-              transition: "color .12s, background .12s",
-            }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLAnchorElement).style.background = "var(--surface2)";
-                (e.currentTarget as HTMLAnchorElement).style.color = "var(--text1)";
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
-                (e.currentTarget as HTMLAnchorElement).style.color = "var(--text3)";
-              }}
-            >
-              <i className="ti ti-shield-lock" style={{ fontSize: 13 }} />
-              Admin Panel
-            </a>
-          </div>
+          {/* Admin shortcut — only visible to admin emails */}
+          {(() => {
+            const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "")
+              .split(",").map(e => e.trim().toLowerCase()).filter(Boolean);
+            const isAdmin = !!user?.email && adminEmails.includes(user.email.toLowerCase());
+            if (!isAdmin) return null;
+            return (
+              <div style={{ padding: "0 10px 8px" }}>
+                <a href="/admin" style={{
+                  display: "flex", alignItems: "center", gap: 8,
+                  padding: "6px 10px", borderRadius: 7,
+                  background: "transparent", border: "1px solid transparent",
+                  textDecoration: "none", fontSize: 11.5, fontWeight: 600,
+                  color: "var(--text3)",
+                  transition: "color .12s, background .12s",
+                }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLAnchorElement).style.background = "var(--surface2)";
+                    (e.currentTarget as HTMLAnchorElement).style.color = "var(--text1)";
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
+                    (e.currentTarget as HTMLAnchorElement).style.color = "var(--text3)";
+                  }}
+                >
+                  <i className="ti ti-shield-lock" style={{ fontSize: 13 }} />
+                  Admin Panel
+                </a>
+              </div>
+            );
+          })()}
 
           {/* User pill + sign out */}
           <div style={{ padding: "10px", borderTop: "1px solid var(--border)", display: "flex", flexDirection: "column", gap: 4 }}>
