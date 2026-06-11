@@ -78,6 +78,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* impact.com / Udemy affiliate verification */}
+        {/* eslint-disable-next-line @next/next/no-head-element */}
+        <meta name="impact-site-verification" content="2e2d81c2-759c-4ea9-a35e-a9df5a139d8e" />
         <link rel="preconnect" href="https://supabase.co" />
         {/* Tabler icons webfont — used by AppShell sidebar */}
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" />

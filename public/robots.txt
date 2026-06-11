@@ -9,6 +9,8 @@ Disallow: /verify
 Disallow: /dashboard
 Disallow: /profile
 Disallow: /applications
+Disallow: /employer-dashboard
+Disallow: /vault
 Disallow: /r/
 
 # AI crawlers — opt out of training data collection
@@ -25,6 +27,12 @@ User-agent: anthropic-ai
 Disallow: /
 
 User-agent: Claude-Web
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+User-agent: Bytespider
 Disallow: /
 
 Sitemap: https://jobsayer.com/sitemap.xml
