@@ -767,18 +767,21 @@ function CourseCard({ c }: { c: Course }) {
         })()}
 
         {/* Skills */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 12, flex: 1 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 10 }}>
           {c.skills.slice(0, 5).map(s => (
             <span key={s} style={{
               fontSize: 10, padding: "2px 7px", borderRadius: 6,
               background: "var(--surface2)", border: "1px solid var(--border)",
-              color: "var(--text3)", whiteSpace: "nowrap",
+              color: "var(--text2)", whiteSpace: "nowrap",
             }}>{s}</span>
           ))}
           {c.skills.length > 5 && (
             <span style={{ fontSize: 10, color: "var(--text3)", padding: "2px 4px" }}>+{c.skills.length - 5}</span>
           )}
         </div>
+
+        {/* Spacer — pushes footer to card bottom */}
+        <div style={{ flex: 1 }} />
 
         {/* Footer */}
         <div style={{
