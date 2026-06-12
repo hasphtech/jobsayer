@@ -850,6 +850,7 @@ function CourseCard({ c }: { c: Course }) {
   );
 }
 
+
 /* ── Page ────────────────────────────────────────────────────── */
 export default function LearnPage() {
   const [search,      setSearch]      = useState("");
