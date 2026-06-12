@@ -1,7 +1,32 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import AppShell from "@/components/AppShell";
+
+/* ── Affiliate link helper ───────────────────────────────────────
+ * For Udemy + Coursera: fetches a tracked URL from impact.com.
+ * Falls back to direct URL if campaign not yet approved or on error.
+ * ──────────────────────────────────────────────────────────────── */
+function isAffiliateCourse(provider: string): "udemy" | "coursera" | null {
+  if (provider.toLowerCase().includes("udemy"))    return "udemy";
+  if (provider.toLowerCase().includes("coursera")) return "coursera";
+  return null;
+}
+
+async function getAffiliateUrl(url: string, brand: "udemy" | "coursera", courseId: string): Promise<string> {
+  try {
+    const res = await fetch("/api/affiliate/tracking-link", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url, brand, subId: courseId }),
+    });
+    if (!res.ok) return url;
+    const data = await res.json() as { trackingUrl?: string };
+    return data.trackingUrl ?? url;
+  } catch {
+    return url;
+  }
+}
 
 /* ── Types ───────────────────────────────────────────────────── */
 type Cost    = "free" | "freemium" | "paid";
@@ -692,9 +717,23 @@ function stars(n: number) {
 function CourseCard({ c }: { c: Course }) {
   const cc = costColor(c.cost);
   const iconColor = c.providerColor ?? "var(--accent)";
+  const brand = isAffiliateCourse(c.provider);
+
+  const handleOpen = useCallback(async (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!brand) return; // non-affiliate — let href open normally
+    e.preventDefault();
+    const finalUrl = await getAffiliateUrl(c.url, brand, c.id);
+    window.open(finalUrl, "_blank", "noopener,noreferrer");
+  }, [brand, c.url, c.id]);
+
   return (
-    <a href={c.url} target="_blank" rel="noopener noreferrer"
-      style={{ textDecoration: "none", display: "flex" }}>
+    <a
+      href={c.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={brand ? handleOpen : undefined}
+      style={{ textDecoration: "none", display: "flex" }}
+    >
       <div
         style={{
           background: "var(--surface)", border: "1px solid var(--border)",
