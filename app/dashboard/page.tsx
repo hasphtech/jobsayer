@@ -587,6 +587,103 @@ function PostHirePanel() {
   );
 }
 
+/* ── Onboarding banner (new users — 0 XP) ──────────────────── */
+function OnboardingBanner() {
+  const DISMISS_KEY = "jobsayer-onboarding-dismissed";
+  const [dismissed, setDismissed] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(DISMISS_KEY) === "1") setDismissed(true);
+    } catch { /* ignore */ }
+    setMounted(true);
+  }, []);
+
+  function dismiss() {
+    try { localStorage.setItem(DISMISS_KEY, "1"); } catch { /* ignore */ }
+    setDismissed(true);
+  }
+
+  if (!mounted || dismissed) return null;
+
+  const steps = [
+    { icon: "ti-file-text",  label: "Build your resume",           href: "/builder",   cta: "Open Builder" },
+    { icon: "ti-target",     label: "Score it against ATS",        href: "/score",     cta: "Score Now" },
+    { icon: "ti-compass",    label: "Find your skill gaps",        href: "/career-gps", cta: "Run GPS" },
+    { icon: "ti-microphone", label: "Practice an interview",       href: "/interview", cta: "Practice" },
+  ];
+
+  return (
+    <div style={{
+      background: "var(--accdim)", border: "1px solid var(--accborder)",
+      borderRadius: 14, padding: "20px 22px", marginBottom: 20, position: "relative",
+    }}>
+      <button
+        onClick={dismiss}
+        aria-label="Dismiss"
+        style={{
+          position: "absolute", top: 12, right: 14,
+          background: "none", border: "none", fontSize: 15,
+          color: "var(--text3)", cursor: "pointer", lineHeight: 1, padding: 0,
+        }}
+      >×</button>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+        <div style={{
+          width: 34, height: 34, borderRadius: 9, background: "var(--accent)",
+          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+        }}>
+          <i className="ti ti-rocket" style={{ fontSize: 18, color: "#fff" }} />
+        </div>
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text1)", letterSpacing: "-.02em" }}>
+            Welcome to jobSayer — let&apos;s set up your career profile
+          </div>
+          <div style={{ fontSize: 12, color: "var(--text2)", marginTop: 2 }}>
+            Complete these 4 steps to unlock your Career Health Score and personalised recommendations.
+          </div>
+        </div>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 8 }}>
+        {steps.map((step, i) => (
+          <Link key={i} href={step.href} style={{
+            display: "flex", flexDirection: "column", gap: 6,
+            padding: "12px 14px", borderRadius: 10, textDecoration: "none",
+            background: "var(--surface)", border: "1px solid var(--accborder)",
+            transition: "box-shadow .15s, border-color .15s",
+          }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 4px 16px rgba(99,102,241,.2)";
+              (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--accent)";
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLAnchorElement).style.boxShadow = "none";
+              (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--accborder)";
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{
+                width: 22, height: 22, borderRadius: 6,
+                background: "var(--accdim)", display: "flex",
+                alignItems: "center", justifyContent: "center", flexShrink: 0,
+              }}>
+                <i className={`ti ${step.icon}`} style={{ fontSize: 12, color: "var(--accent)" }} />
+              </span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)" }}>
+                Step {i + 1}
+              </span>
+            </div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text1)" }}>{step.label}</div>
+            <div style={{ fontSize: 11, color: "var(--accent)", fontWeight: 600, display: "flex", alignItems: "center", gap: 3 }}>
+              {step.cta} <i className="ti ti-arrow-right" style={{ fontSize: 10 }} />
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ── Page ────────────────────────────────────────────────────── */
 export default function DashboardPage() {
   const w = useWindowWidth();
@@ -677,8 +774,11 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* ── Onboarding banner (new users) ── */}
+        {state.totalXP === 0 && <OnboardingBanner />}
+
         {/* ── Career milestone prompt ── */}
-        <CareerMilestonePrompt />
+        {state.totalXP > 0 && <CareerMilestonePrompt />}
 
         {/* ── 4 stat cards ── */}
         <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: 10, marginBottom: 16 }}>
@@ -706,6 +806,23 @@ export default function DashboardPage() {
             accent
             href="/career-health"
           />
+        </div>
+
+        {/* ── Quick actions ── */}
+        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px", marginBottom: 14 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>
+            Quick actions
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 8 }}>
+            <QuickAction href="/builder"       icon="ti-pencil"       label="Update Resume"       xp="+20 XP" />
+            <QuickAction href="/score"         icon="ti-target"       label="Score Resume"         xp="+30 XP" />
+            <QuickAction href="/interview"     icon="ti-microphone"   label="Practice Interview"   xp="+45 XP" />
+            <QuickAction href="/jobs"          icon="ti-briefcase"    label="Apply to Jobs"         xp="+25 XP" />
+            <QuickAction href="/career-gps"    icon="ti-compass"      label="Career GPS"            xp="+15 XP" />
+            <QuickAction href="/career-health" icon="ti-stethoscope"  label="Health Checkup"        xp="+40 XP" />
+            <QuickAction href="/salary"        icon="ti-coin"         label="Salary Intel"          xp="+10 XP" />
+            <QuickAction href="/profile"       icon="ti-bolt"         label="Add Skill Proof"       xp="+35 XP" />
+          </div>
         </div>
 
         {/* ── 2-col: focus tasks + recent activity ── */}
@@ -816,23 +933,6 @@ export default function DashboardPage() {
                 );
               })}
             </div>
-          </div>
-        </div>
-
-        {/* ── Quick actions ── */}
-        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px", marginBottom: 14 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>
-            Quick actions
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 8 }}>
-            <QuickAction href="/builder"       icon="ti-pencil"       label="Update Resume"       xp="+20 XP" />
-            <QuickAction href="/score"         icon="ti-target"       label="Score Resume"         xp="+30 XP" />
-            <QuickAction href="/interview"     icon="ti-microphone"   label="Practice Interview"   xp="+45 XP" />
-            <QuickAction href="/jobs"          icon="ti-briefcase"    label="Apply to Jobs"         xp="+25 XP" />
-            <QuickAction href="/career-gps"    icon="ti-compass"      label="Career GPS"            xp="+15 XP" />
-            <QuickAction href="/career-health" icon="ti-stethoscope"  label="Health Checkup"        xp="+40 XP" />
-            <QuickAction href="/salary"        icon="ti-coin"         label="Salary Intel"          xp="+10 XP" />
-            <QuickAction href="/profile"       icon="ti-bolt"         label="Add Skill Proof"       xp="+35 XP" />
           </div>
         </div>
 

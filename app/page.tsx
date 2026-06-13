@@ -439,25 +439,70 @@ function LandingPage({ signIn }: { signIn: () => void }) {
         </p>
 
         {/* CTAs */}
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center", marginBottom: 18 }}>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center", marginBottom: 16 }}>
           <Link href="/career-gps" style={{
-            padding: mobile ? "13px 26px" : "14px 30px",
+            padding: mobile ? "13px 26px" : "15px 32px",
             background: "var(--accent)", borderRadius: 12, color: "#fff",
-            fontSize: mobile ? 14 : 15, fontWeight: 700, textDecoration: "none",
+            fontSize: mobile ? 14 : 16, fontWeight: 700, textDecoration: "none",
             display: "inline-flex", alignItems: "center", gap: 7, letterSpacing: "-.01em",
-          }}>🚀 Start growing — free</Link>
+            boxShadow: "0 8px 28px rgba(99,102,241,.35)",
+            transition: "box-shadow .2s, transform .15s",
+          }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 12px 36px rgba(99,102,241,.5)";
+              (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-1px)";
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 8px 28px rgba(99,102,241,.35)";
+              (e.currentTarget as HTMLAnchorElement).style.transform = "none";
+            }}
+          ><i className="ti ti-rocket" style={{ fontSize: 15 }} /> Start growing — free</Link>
           <button onClick={signIn} style={{
-            padding: mobile ? "13px 22px" : "14px 26px",
-            background: "var(--surface2)", border: "1px solid var(--border)",
+            padding: mobile ? "13px 22px" : "15px 26px",
+            background: "var(--surface)", border: "1px solid var(--border)",
             borderRadius: 12, color: "var(--text1)",
             fontSize: mobile ? 14 : 15, fontWeight: 500,
             cursor: "pointer", fontFamily: "inherit", letterSpacing: "-.01em",
-          }}>Sign in →</button>
+            transition: "border-color .15s, background .15s",
+          }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--text3)";
+              (e.currentTarget as HTMLButtonElement).style.background = "var(--surface2)";
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)";
+              (e.currentTarget as HTMLButtonElement).style.background = "var(--surface)";
+            }}
+          >Sign in →</button>
         </div>
+
+        {/* Social proof row */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14, marginBottom: 14, flexWrap: "wrap" }}>
+          {/* Stacked avatars */}
+          <div style={{ display: "flex", alignItems: "center" }}>
+            {["#6366f1","#f59e0b","#22c55e","#ef4444","#a78bfa"].map((col, i) => (
+              <div key={i} style={{
+                width: 26, height: 26, borderRadius: "50%", background: col,
+                border: "2px solid var(--bg)", marginLeft: i === 0 ? 0 : -8, flexShrink: 0,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 9, fontWeight: 700, color: "#fff",
+              }}>
+                {["S","L","A","R","D"][i]}
+              </div>
+            ))}
+          </div>
+          <span style={{ fontSize: 12, color: "var(--text2)", fontWeight: 500 }}>
+            <strong style={{ color: "var(--text1)" }}>50K+ professionals</strong> already growing their careers
+          </span>
+          <span style={{ fontSize: 12, color: "var(--warn)", fontWeight: 600, display: "flex", alignItems: "center", gap: 3 }}>
+            ★★★★★ <span style={{ color: "var(--text3)", fontWeight: 400 }}>4.8</span>
+          </span>
+        </div>
+
         <div style={{ display: "flex", gap: 18, justifyContent: "center", flexWrap: "wrap" }}>
           {["No credit card", "Free forever tier", "2 min setup"].map(t => (
             <span key={t} style={{ fontSize: 12, color: "var(--text3)", display: "flex", alignItems: "center", gap: 5 }}>
-              <span style={{ color: "var(--accent)", fontSize: 10 }}>✦</span> {t}
+              <span style={{ color: "var(--success)", fontSize: 10 }}>✓</span> {t}
             </span>
           ))}
         </div>
@@ -494,23 +539,30 @@ function LandingPage({ signIn }: { signIn: () => void }) {
       {/* ── Stats bar ────────────────────────────────────────── */}
       <section style={{
         borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)",
-        padding: mobile ? "20px 16px" : "28px 20px", background: "var(--surface)",
-        display: mobile ? "grid" : "flex",
-        gridTemplateColumns: mobile ? "1fr 1fr" : undefined,
-        justifyContent: "center",
-        gap: mobile ? 12 : 72, flexWrap: "wrap",
+        padding: mobile ? "20px 16px" : "32px 24px", background: "var(--surface)",
       }}>
-        {[
-          { val: "50K+",    label: "Professionals growing", col: "var(--accent)"  },
-          { val: "4.8 ★",   label: "Average rating",        col: "var(--warn)"    },
-          { val: "91%",     label: "ATS pass rate",          col: "var(--success)" },
-          { val: "50+",     label: "Countries",              col: "var(--text1)"   },
-        ].map(s => (
-          <div key={s.label} style={{ textAlign: "center" }}>
-            <div style={{ fontSize: mobile ? 22 : 28, fontWeight: 800, color: s.col, letterSpacing: "-.03em" }}>{s.val}</div>
-            <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 4 }}>{s.label}</div>
-          </div>
-        ))}
+        <div style={{
+          maxWidth: 860, margin: "0 auto",
+          display: mobile ? "grid" : "flex",
+          gridTemplateColumns: mobile ? "1fr 1fr" : undefined,
+          justifyContent: "space-around",
+          gap: mobile ? 12 : 0, flexWrap: "wrap",
+        }}>
+          {[
+            { val: "50K+",    label: "Professionals growing", col: "var(--accent)", icon: "ti-users"     },
+            { val: "4.8 ★",   label: "Average rating",        col: "var(--warn)",   icon: "ti-star"      },
+            { val: "91%",     label: "ATS pass rate",          col: "var(--success)", icon: "ti-check"    },
+            { val: "50+",     label: "Countries",              col: "var(--text2)",   icon: "ti-world"    },
+          ].map((s, i) => (
+            <div key={s.label} style={{
+              textAlign: "center", padding: mobile ? "8px" : "0 24px",
+              borderRight: !mobile && i < 3 ? "1px solid var(--border)" : "none",
+            }}>
+              <div style={{ fontSize: mobile ? 24 : 32, fontWeight: 800, color: s.col, letterSpacing: "-.04em", lineHeight: 1 }}>{s.val}</div>
+              <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 6, fontWeight: 500 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* ── Social proof — company logos ─────────────────────── */}
