@@ -17,6 +17,26 @@ const CAMPAIGN_IDS: Record<string, string | undefined> = {
   coursera: process.env.IMPACT_COURSERA_CAMPAIGN_ID,
 };
 
+// Deep-link base URLs for known brands — used as fallback when API
+// isn't available but campaign ID is known. Format:
+//   udemy:    https://trk.udemy.com/c/{mediaPropertyId}/{campaignId}/{adId}?u={encodedUrl}
+//   coursera: (no known direct deep-link format — falls back to direct URL)
+const MEDIA_PROPERTY_ID_FALLBACK = process.env.IMPACT_MEDIA_PROPERTY_ID ?? "";
+
+function buildFallbackTrackingUrl(
+  brand: "udemy" | "coursera",
+  destinationUrl: string,
+): string | null {
+  const campaignId = CAMPAIGN_IDS[brand];
+  if (!campaignId || !MEDIA_PROPERTY_ID_FALLBACK) return null;
+
+  if (brand === "udemy") {
+    // Standard Udemy/impact.com deep-link: ?u= points to the course page
+    return `https://trk.udemy.com/c/${MEDIA_PROPERTY_ID_FALLBACK}/${campaignId}/39854?u=${encodeURIComponent(destinationUrl)}`;
+  }
+  return null;
+}
+
 function authHeader(): string {
   return "Basic " + Buffer.from(`${SID}:${TOKEN}`).toString("base64");
 }
@@ -78,7 +98,9 @@ export async function generateTrackingLink(
     const url = data.TrackingLink ?? data.Uri ?? destinationUrl;
     return { trackingUrl: url, tracked: true };
   } catch {
-    // On API error still return usable URL
+    // API error — try deep-link fallback before returning bare URL
+    const fallback = buildFallbackTrackingUrl(brand, destinationUrl);
+    if (fallback) return { trackingUrl: fallback, tracked: true };
     return { trackingUrl: destinationUrl, tracked: false };
   }
 }
