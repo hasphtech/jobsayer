@@ -78,45 +78,52 @@ const ALL_LINKS = [
 /* ── Role switcher pill ──────────────────────────────────────── */
 function RoleSwitcher({ role, setRole }: { role: AppRole; setRole: (r: AppRole) => void }) {
   const router = useRouter();
-  const [hov, setHov] = useState<AppRole | null>(null);
 
   function handleSwitch(r: AppRole) {
+    if (r === role) return; // already active — no nav, no state churn
     setRole(r);
-    if (r === "recruiter") router.push("/employer-dashboard");
-    else router.push("/dashboard");
+    router.push(r === "recruiter" ? "/employer-dashboard" : "/dashboard");
   }
 
-  const pill = (r: AppRole, label: string) => {
-    const active = role === r;
-    const hovered = hov === r;
-    return (
-      <button
-        key={r}
-        onClick={() => handleSwitch(r)}
-        onMouseEnter={() => setHov(r)}
-        onMouseLeave={() => setHov(null)}
-        style={{
-          padding: "4px 11px", border: "none", cursor: "pointer",
-          background: active ? "var(--accent)" : hovered ? "var(--surface)" : "transparent",
-          color: active ? "#fff" : hovered ? "var(--text1)" : "var(--text3)",
-          fontFamily: "inherit", fontSize: 11, fontWeight: 700,
-          transition: "background .12s, color .12s",
-          borderRadius: 6,
-        }}
-      >
-        {label}
-      </button>
-    );
-  };
+  const isCandidate = role === "candidate";
 
   return (
     <div style={{
       display: "flex", alignItems: "center",
       background: "var(--surface2)", border: "1px solid var(--border)",
-      borderRadius: 8, padding: 2, gap: 1,
+      borderRadius: 8, padding: 2, gap: 0,
+      position: "relative",
     }}>
-      {pill("candidate", "Candidate")}
-      {pill("recruiter", "Recruiter")}
+      {/* Sliding active indicator */}
+      <div aria-hidden style={{
+        position: "absolute",
+        left: isCandidate ? 2 : "calc(50%)",
+        top: 2, bottom: 2,
+        width: "calc(50% - 2px)",
+        background: "var(--accent)",
+        borderRadius: 6,
+        transition: "left .22s cubic-bezier(.4,0,.2,1)",
+        pointerEvents: "none",
+      }} />
+
+      {(["candidate", "recruiter"] as AppRole[]).map(r => (
+        <button
+          key={r}
+          onClick={() => handleSwitch(r)}
+          style={{
+            position: "relative", zIndex: 1,
+            flex: 1, padding: "4px 12px", border: "none", cursor: role === r ? "default" : "pointer",
+            background: "transparent",
+            color: role === r ? "#fff" : "var(--text3)",
+            fontFamily: "inherit", fontSize: 11, fontWeight: 700,
+            borderRadius: 6,
+            transition: "color .22s",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {r === "candidate" ? "Candidate" : "Recruiter"}
+        </button>
+      ))}
     </div>
   );
 }
@@ -278,6 +285,24 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
       setMoreOpen(true);
     }
   }, [pathname]);
+
+  // Sync role from URL — employer-dashboard → recruiter; all other pages → candidate
+  useEffect(() => {
+    const onEmployerPage = pathname.startsWith("/employer-dashboard");
+    if (onEmployerPage && role !== "recruiter") setRole("recruiter");
+    if (!onEmployerPage && role !== "candidate") setRole("candidate");
+  }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Sidebar fade-in on role change
+  const [navVisible, setNavVisible] = useState(true);
+  const prevRole = useRef(role);
+  useEffect(() => {
+    if (prevRole.current !== role) {
+      setNavVisible(false);
+      const t = setTimeout(() => { setNavVisible(true); prevRole.current = role; }, 120);
+      return () => clearTimeout(t);
+    }
+  }, [role]);
 
   // Inline search state
   const [searchQuery, setSearchQuery] = useState("");
@@ -658,7 +683,11 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
           display: "flex", flexDirection: "column",
           overflowY: "auto", overflowX: "hidden",
         }}>
-          <div style={{ padding: "12px 10px", flex: 1, display: "flex", flexDirection: "column" }}>
+          <div style={{
+            padding: "12px 10px", flex: 1, display: "flex", flexDirection: "column",
+            opacity: navVisible ? 1 : 0,
+            transition: "opacity .12s ease",
+          }}>
             <SectionLabel>{toolLabel}</SectionLabel>
             {toolLinks.map(l => (
               <NavLink key={l.href} {...l} active={isActive(l.href)} />

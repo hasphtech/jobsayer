@@ -3445,7 +3445,7 @@ export default function BuilderPage() {
                   style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 12, borderWidth: 1.5, borderStyle: "solid", borderColor: "var(--border)", background: "var(--bg)", cursor: "pointer", fontFamily: "inherit", textAlign: "left" as const, transition: "border-color .12s, background .12s" }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--accent)"; (e.currentTarget as HTMLElement).style.background = "var(--accdim)"; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLElement).style.background = "var(--bg)"; }}>
-                  <span style={{ fontSize: 24, lineHeight: 1, flexShrink: 0 }}>{s.emoji}</span>
+                  <i className={`ti ${s.emoji}`} style={{ fontSize: 24, lineHeight: 1, flexShrink: 0, color: "var(--accent)" }} />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)" }}>{s.label}</div>
                     <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 1 }}>{s.role}</div>
@@ -3876,7 +3876,7 @@ export default function BuilderPage() {
                       onClick={() => { if (open) { setActiveSection(null); } else { setActiveSection(s.key); setStep(idx); } }}
                       style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 12px", cursor: "pointer", background: open ? "var(--accdim)" : "var(--surface)", userSelect: "none" as const, transition: "background .1s" }}>
                       <div style={{ width: 26, height: 26, borderRadius: 7, background: done ? "var(--text1)" : "var(--surface2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: done ? 11 : 14, fontWeight: 700, flexShrink: 0, color: done ? "var(--bg)" : undefined }}>
-                        {done ? "✓" : (ICONS[s.key] ?? "ti-file-text")}
+                        {done ? "✓" : <i className={`ti ${ICONS[s.key] ?? "ti-file-text"}`} style={{ fontSize: 14, color: "var(--text2)" }} />}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)" }}>{modeLabel(idx)}</div>
@@ -4505,7 +4505,7 @@ export default function BuilderPage() {
                         transition: "background .12s, border-color .12s, opacity .15s",
                         cursor: "grab" }}>
                       <GripVertical size={13} style={{ color: "var(--text3)", flexShrink: 0, cursor: "grab" }} />
-                      <span style={{ fontSize: 14, flexShrink: 0 }}>{ICONS[s.key] ?? "ti-file-text"}</span>
+                      <i className={`ti ${ICONS[s.key] ?? "ti-file-text"}`} style={{ fontSize: 14, flexShrink: 0, color: "var(--text2)" }} />
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)" }}>{s.label}</div>
                         <div style={{ fontSize: 10, color: "var(--text3)" }}>{hidden ? "Hidden from resume" : s.subtitle}</div>

@@ -227,7 +227,8 @@ function JdScannerTab({ resumeText }: { resumeText: string }) {
                     background: "var(--surface2)",
                   }}>
                     <div style={{ fontSize: 13, fontWeight: 600, color: c, marginBottom: 3 }}>
-                      {sig.severity === "red" ? "ti-circle" : sig.severity === "amber" ? "ti-circle" : "ti-circle"} {sig.label}
+                      <i className={`ti ${sig.severity === "red" ? "ti-circle-filled" : sig.severity === "amber" ? "ti-alert-triangle" : "ti-circle-check"}`} style={{ marginRight: 5 }} />
+                      {sig.label}
                     </div>
                     <div style={{ fontSize: 12, color: "var(--text3)", lineHeight: 1.5 }}>{sig.detail}</div>
                   </div>
