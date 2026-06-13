@@ -382,30 +382,155 @@ function AppCard({ app, onEdit, onDelete, onStageChange }: {
   );
 }
 
+/* ── DB row → Application ────────────────────────────────────── */
+function fromRow(r: Record<string, unknown>): Application {
+  return {
+    id:           String(r.id),
+    company:      String(r.company ?? ""),
+    role:         String(r.role ?? ""),
+    location:     String(r.location ?? ""),
+    salary:       String(r.salary ?? ""),
+    url:          String(r.url ?? ""),
+    stage:        String(r.stage ?? "saved") as Stage,
+    notes:        String(r.notes ?? ""),
+    appliedDate:  String(r.applied_date ?? new Date().toISOString().split("T")[0]),
+    updatedAt:    String(r.updated_at ?? new Date().toISOString()),
+    noticePeriod: String(r.notice_period ?? "30 days"),
+    offerDate:    String(r.offer_date ?? ""),
+  };
+}
+
 /* ── Main Page ───────────────────────────────────────────────── */
 export default function ApplicationsPage() {
   const w = useWindowWidth();
   const mobile = w < 640;
   const { user } = useAuth();
-  const [apps, setApps]         = useState<Application[]>([]);
-  const [modal, setModal]       = useState<"add" | Application | null>(null);
+  const [apps, setApps]          = useState<Application[]>([]);
+  const [modal, setModal]        = useState<"add" | Application | null>(null);
   const [filterStage, setFilter] = useState<Stage | "all">("all");
-  const [search, setSearch]     = useState("");
+  const [search, setSearch]      = useState("");
+  const [loading, setLoading]    = useState(false);
+  const [synced, setSynced]      = useState(false);
+  const [toast, setToast]        = useState("");
 
-  useEffect(() => { setApps(load()); }, []);
+  function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(""), 3000); }
 
+  // ── Load data ─────────────────────────────────────────────────
+  const loadFromSupabase = useCallback(async (doLocalSync = false) => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/applications");
+      if (!res.ok) { setApps(load()); return; }
+      const data = await res.json() as { applications: Record<string, unknown>[] };
+      const remote = (data.applications ?? []).map(fromRow);
+
+      // One-time migration: push localStorage apps that exist only locally
+      if (doLocalSync) {
+        const local = load();
+        if (local.length > 0) {
+          await fetch("/api/applications", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ bulk: true, applications: local }),
+          });
+          // Reload after bulk push
+          const res2 = await fetch("/api/applications");
+          const data2 = await res2.json() as { applications: Record<string, unknown>[] };
+          setApps((data2.applications ?? []).map(fromRow));
+          if (local.length > 0) showToast(`${local.length} local application${local.length > 1 ? "s" : ""} synced to cloud`);
+          return;
+        }
+      }
+
+      setApps(remote);
+    } catch { setApps(load()); }
+    finally { setLoading(false); setSynced(true); }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (user) {
+      loadFromSupabase(!synced); // first load: attempt local sync
+    } else {
+      setApps(load());
+    }
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // localStorage persist (guests only)
   const persist = useCallback((next: Application[]) => {
     setApps(next);
-    save(next);
-  }, []);
+    if (!user) save(next);
+  }, [user]);
 
-  function addApp(app: Application)    { persist([app, ...apps]); setModal(null); }
-  function editApp(app: Application)   { persist(apps.map(a => a.id === app.id ? app : a)); setModal(null); }
-  function deleteApp(id: string)       { persist(apps.filter(a => a.id !== id)); }
-  function moveStage(id: string, s: Stage) {
+  // ── Mutations (API when signed in, localStorage when guest) ───
+  async function addApp(app: Application) {
+    if (user) {
+      const res = await fetch("/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          company: app.company, role: app.role, location: app.location,
+          salary: app.salary, url: app.url, stage: app.stage, notes: app.notes,
+          appliedDate: app.appliedDate, offerDate: app.offerDate || undefined,
+          noticePeriod: app.noticePeriod,
+        }),
+      });
+      if (res.ok) {
+        const d = await res.json() as { application: Record<string, unknown> };
+        setApps(prev => [fromRow(d.application), ...prev]);
+      }
+    } else {
+      persist([app, ...apps]);
+    }
+    setModal(null);
+  }
+
+  async function editApp(app: Application) {
+    if (user) {
+      const res = await fetch(`/api/applications/${app.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          company: app.company, role: app.role, location: app.location,
+          salary: app.salary, url: app.url, stage: app.stage, notes: app.notes,
+          appliedDate: app.appliedDate, offerDate: app.offerDate || undefined,
+          noticePeriod: app.noticePeriod,
+        }),
+      });
+      if (res.ok) {
+        const d = await res.json() as { application: Record<string, unknown> };
+        setApps(prev => prev.map(a => a.id === app.id ? fromRow(d.application) : a));
+      }
+    } else {
+      persist(apps.map(a => a.id === app.id ? app : a));
+    }
+    setModal(null);
+  }
+
+  async function deleteApp(id: string) {
+    if (user) {
+      await fetch(`/api/applications/${id}`, { method: "DELETE" });
+      setApps(prev => prev.filter(a => a.id !== id));
+    } else {
+      persist(apps.filter(a => a.id !== id));
+    }
+  }
+
+  async function moveStage(id: string, s: Stage) {
     const prev = apps.find(a => a.id === id);
     if (prev && prev.stage !== "applied" && s === "applied") trackAction("job_applied");
-    persist(apps.map(a => a.id === id ? { ...a, stage: s, updatedAt: new Date().toISOString() } : a));
+    if (user) {
+      const res = await fetch(`/api/applications/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stage: s }),
+      });
+      if (res.ok) {
+        const d = await res.json() as { application: Record<string, unknown> };
+        setApps(prev2 => prev2.map(a => a.id === id ? fromRow(d.application) : a));
+      }
+    } else {
+      persist(apps.map(a => a.id === id ? { ...a, stage: s, updatedAt: new Date().toISOString() } : a));
+    }
   }
 
   const filtered = apps
@@ -428,8 +553,10 @@ export default function ApplicationsPage() {
           <div>
             <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>Application Tracker</h1>
             <p style={{ fontSize: 13, color: "var(--text3)" }}>
-              {apps.length === 0 ? "Start tracking your job applications" : `${apps.length} application${apps.length !== 1 ? "s" : ""} tracked`}
-              {!user && <span> · <span style={{ color: "var(--warn)" }}>Sign in to sync across devices</span></span>}
+              {loading ? "Loading…" : apps.length === 0 ? "Start tracking your job applications" : `${apps.length} application${apps.length !== 1 ? "s" : ""} tracked`}
+              {user
+                ? <span> · <span style={{ color: "var(--success)", fontWeight: 600 }}>Synced to cloud</span></span>
+                : <span> · <span style={{ color: "var(--warn)" }}>Sign in to sync across devices</span></span>}
             </p>
           </div>
         </div>
@@ -518,6 +645,13 @@ export default function ApplicationsPage() {
           </div>
         )}
       </div>
+
+      {/* Toast */}
+      {toast && (
+        <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", background: "var(--accent)", color: "#fff", padding: "10px 20px", borderRadius: 10, fontSize: 13, fontWeight: 600, zIndex: 9999, pointerEvents: "none", boxShadow: "0 4px 20px rgba(0,0,0,.18)" }}>
+          ✓ {toast}
+        </div>
+      )}
 
       {/* Modal */}
       {modal && (

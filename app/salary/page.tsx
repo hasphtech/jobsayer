@@ -8,6 +8,7 @@ import AppShell from "@/components/AppShell";
 import Link from "next/link";
 import { trackAction } from "@/lib/activityTracker";
 import { useWindowWidth } from "@/lib/useWindowWidth";
+import { useAuth } from "@/lib/useAuth";
 
 /* ── Currency config ─────────────────────────────────────────── */
 type Currency = "USD" | "EUR" | "GBP" | "SGD" | "AED" | "INR";
@@ -242,9 +243,18 @@ function underpaidVerdict(currentUSD: number, row: SalaryRow, cur: Currency) {
 }
 
 /* ── Page ────────────────────────────────────────────────────── */
+interface AiNegResult {
+  recommendedCounter: number;
+  rationale:  string;
+  scripts:    string[];
+  tactics:    string[];
+  redFlags:   string[];
+}
+
 export default function SalaryPage() {
   const w = useWindowWidth();
   const mobile = w < 640;
+  const { user } = useAuth();
   const [region,    setRegion]    = useState("All regions");
   const [category,  setCategory]  = useState("All");
   const [exp,       setExp]       = useState<"all"|"0-2"|"2-5"|"5-10"|"10+">("all");
@@ -264,11 +274,20 @@ export default function SalaryPage() {
   const [upVal,  setUpVal]      = useState("");
   const [upCur,  setUpCur]      = useState<Currency>("USD");
 
-  // Negotiation analyser
-  const [negCurrent, setNegCurrent] = useState("");
-  const [negOffer,   setNegOffer]   = useState("");
-  const [negRole,    setNegRole]    = useState("");
-  const [negCity,    setNegCity]    = useState("");
+  // Negotiation analyser — local fields
+  const [negCurrent,  setNegCurrent]  = useState("");
+  const [negOffer,    setNegOffer]    = useState("");
+  const [negRole,     setNegRole]     = useState("");
+  const [negCity,     setNegCity]     = useState("");
+  // Additional fields for AI coach
+  const [negExp,      setNegExp]      = useState<"0-2"|"2-5"|"5-10"|"10+">("2-5");
+  const [negIndustry, setNegIndustry] = useState("");
+  const [negContext,  setNegContext]  = useState("");
+  // AI result state
+  const [negLoading,  setNegLoading]  = useState(false);
+  const [negAiResult, setNegAiResult] = useState<AiNegResult | null>(null);
+  const [negAiError,  setNegAiError]  = useState("");
+  const [showAiScript, setShowAiScript] = useState<number | null>(null);
 
   const filtered = useMemo(() => DATA
     .filter(d => region   === "All regions" || d.region   === region)
@@ -302,6 +321,36 @@ export default function SalaryPage() {
     const vsMed   = market ? Math.round(((offUSD - market.median) / market.median) * 100) : null;
     return { curUSD, offUSD, hikePct, vsMed, market };
   }, [negCurrent, negOffer, negRole, negCity, currency]);
+
+  // AI coaching call
+  async function getAiCoaching() {
+    if (!negRole.trim() || !negOffer) return;
+    setNegLoading(true);
+    setNegAiResult(null);
+    setNegAiError("");
+    try {
+      const expYears: Record<string, number> = { "0-2": 1, "2-5": 3, "5-10": 7, "10+": 12 };
+      const res = await fetch("/api/salary/negotiate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          role:          negRole,
+          location:      negCity || undefined,
+          currentSalary: negCurrent ? Number(negCurrent) * CURRENCIES[currency].toUSD : undefined,
+          offerAmount:   Number(negOffer) * CURRENCIES[currency].toUSD,
+          yearsExp:      expYears[negExp],
+          industry:      negIndustry || undefined,
+          context:       negContext  || undefined,
+          currency:      "USD",
+        }),
+      });
+      const data = await res.json() as AiNegResult & { error?: string };
+      if (!res.ok || data.error) { setNegAiError(data.error ?? "AI coaching failed. Try again."); return; }
+      setNegAiResult(data);
+      trackAction("salary_checked");
+    } catch { setNegAiError("Network error. Please try again."); }
+    finally { setNegLoading(false); }
+  }
 
   const card: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12 };
   const chip = (active: boolean, col = "var(--accent)"): React.CSSProperties => ({
@@ -458,20 +507,111 @@ export default function SalaryPage() {
                 ))}
                 <div>
                   <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 6 }}>Role</label>
-                  <select value={negRole} onChange={e => setNegRole(e.target.value)} style={{ width: "100%", padding: "10px 12px", borderRadius: 9, background: "var(--surface2)", border: "1px solid var(--border)", color: "var(--text1)", fontSize: 13, fontFamily: "inherit" }}>
+                  <select value={negRole} onChange={e => { setNegRole(e.target.value); setNegAiResult(null); }} style={{ width: "100%", padding: "10px 12px", borderRadius: 9, background: "var(--surface2)", border: "1px solid var(--border)", color: "var(--text1)", fontSize: 13, fontFamily: "inherit" }}>
                     <option value="">Select role…</option>
                     {allRoles.map(r => <option key={r} value={r}>{r}</option>)}
                   </select>
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 6 }}>City</label>
-                  <select value={negCity} onChange={e => setNegCity(e.target.value)} style={{ width: "100%", padding: "10px 12px", borderRadius: 9, background: "var(--surface2)", border: "1px solid var(--border)", color: "var(--text1)", fontSize: 13, fontFamily: "inherit" }}>
+                  <select value={negCity} onChange={e => { setNegCity(e.target.value); setNegAiResult(null); }} style={{ width: "100%", padding: "10px 12px", borderRadius: 9, background: "var(--surface2)", border: "1px solid var(--border)", color: "var(--text1)", fontSize: 13, fontFamily: "inherit" }}>
                     <option value="">Select city…</option>
                     {allCities.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 6 }}>Experience</label>
+                  <select value={negExp} onChange={e => setNegExp(e.target.value as typeof negExp)} style={{ width: "100%", padding: "10px 12px", borderRadius: 9, background: "var(--surface2)", border: "1px solid var(--border)", color: "var(--text1)", fontSize: 13, fontFamily: "inherit" }}>
+                    <option value="0-2">0–2 years</option>
+                    <option value="2-5">2–5 years</option>
+                    <option value="5-10">5–10 years</option>
+                    <option value="10+">10+ years</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 6 }}>Industry (optional)</label>
+                  <input placeholder="e.g. Fintech, Healthcare, SaaS…" value={negIndustry} onChange={e => setNegIndustry(e.target.value)}
+                    style={{ padding: "10px 13px", borderRadius: 9, background: "var(--surface2)", border: "1px solid var(--border)", color: "var(--text1)", fontSize: 13, fontFamily: "inherit", width: "100%" }} />
+                </div>
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 6 }}>Extra context for AI (optional)</label>
+                <textarea placeholder="e.g. I have a competing offer from Google at $175K. The role is remote. They mentioned equity could be flexible…" value={negContext} onChange={e => setNegContext(e.target.value)} rows={2}
+                  style={{ padding: "10px 13px", borderRadius: 9, background: "var(--surface2)", border: "1px solid var(--border)", color: "var(--text1)", fontSize: 13, fontFamily: "inherit", width: "100%", resize: "vertical" }} />
               </div>
 
+              {/* AI coaching button */}
+              {user ? (
+                <button
+                  onClick={getAiCoaching}
+                  disabled={negLoading || !negRole.trim() || !negOffer}
+                  style={{ padding: "11px 22px", background: "var(--accent)", border: "none", borderRadius: 9, color: "#fff", fontSize: 13, fontWeight: 700, cursor: negLoading || !negRole.trim() || !negOffer ? "not-allowed" : "pointer", opacity: !negRole.trim() || !negOffer ? 0.5 : 1, fontFamily: "inherit", display: "flex", alignItems: "center", gap: 8 }}>
+                  {negLoading ? <><span style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,.3)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin 0.8s linear infinite" }}/> Analysing…</> : <><i className="ti ti-brain"/> Get AI coaching</>}
+                </button>
+              ) : (
+                <div style={{ padding: "12px 16px", background: "var(--accdim)", borderRadius: 9, border: "1px solid var(--accborder)", fontSize: 13, color: "var(--text2)" }}>
+                  <Link href="/sign-in" style={{ color: "var(--accent)", fontWeight: 700 }}>Sign in</Link> to get personalised AI counter-offer scripts and coaching.
+                </div>
+              )}
+              {negAiError && <div style={{ marginTop: 10, fontSize: 13, color: "var(--danger)" }}>{negAiError}</div>}
+
+              {/* AI result */}
+              {negAiResult && (
+                <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 14 }}>
+                  {/* Counter recommendation */}
+                  <div style={{ padding: 20, background: "var(--accdim)", borderRadius: 12, border: "1px solid var(--accborder)" }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "var(--accent)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".05em" }}>AI recommended counter</div>
+                    <div style={{ fontSize: 32, fontWeight: 900, color: "var(--accent)", letterSpacing: "-.03em" }}>
+                      {CURRENCIES[currency].symbol}{Math.round(negAiResult.recommendedCounter / CURRENCIES[currency].toUSD).toLocaleString()}
+                    </div>
+                    <p style={{ fontSize: 13, color: "var(--text2)", marginTop: 8, lineHeight: 1.7 }}>{negAiResult.rationale}</p>
+                  </div>
+
+                  {/* Red flags */}
+                  {negAiResult.redFlags.length > 0 && (
+                    <div style={{ padding: "14px 16px", background: "rgba(239,68,68,.08)", borderRadius: 10, border: "1px solid rgba(239,68,68,.2)" }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "var(--danger)", marginBottom: 8 }}><i className="ti ti-alert-triangle"/> Watch out</div>
+                      {negAiResult.redFlags.map((f, i) => (
+                        <div key={i} style={{ fontSize: 13, color: "var(--text2)", lineHeight: 1.6 }}>• {f}</div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Ready-to-send scripts */}
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: "var(--text1)" }}><i className="ti ti-message"/> Ready-to-send scripts</div>
+                    {negAiResult.scripts.map((script, i) => (
+                      <div key={i} style={{ ...card, overflow: "hidden", marginBottom: 6 }}>
+                        <button onClick={() => setShowAiScript(showAiScript === i ? null : i)} style={{ width: "100%", padding: "12px 16px", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", fontFamily: "inherit" }}>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)" }}>
+                            {i === 0 ? "📧 Formal email" : i === 1 ? "💬 Conversational" : "📞 Verbal / phone"}
+                          </span>
+                          <span style={{ color: "var(--text3)" }}>{showAiScript === i ? "▲" : "▼"}</span>
+                        </button>
+                        {showAiScript === i && (
+                          <div style={{ padding: "0 16px 14px", borderTop: "1px solid var(--border2)" }}>
+                            <div style={{ marginTop: 12, padding: "12px 14px", background: "var(--surface2)", borderRadius: 9, fontSize: 13, color: "var(--text2)", lineHeight: 1.8, borderLeft: "3px solid var(--accent)", fontStyle: "italic", whiteSpace: "pre-wrap" }}>{script}</div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Tactics */}
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: "var(--text1)" }}><i className="ti ti-target"/> Tactics for your situation</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                      {negAiResult.tactics.map((t, i) => (
+                        <div key={i} style={{ padding: "10px 14px", background: "var(--surface)", borderRadius: 9, border: "1px solid var(--border)", fontSize: 13, color: "var(--text2)", lineHeight: 1.6 }}>
+                          <span style={{ color: "var(--accent)", fontWeight: 700 }}>{i + 1}. </span>{t}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Quick local analysis (static) */}
               {negResult && (() => {
                 const { hikePct, vsMed, market } = negResult;
                 const shouldCounter = market ? negResult.offUSD < market.p75 : hikePct < 20;

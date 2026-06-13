@@ -13,6 +13,8 @@ import CourseCard from "@/components/CourseCard";
 import { getCoursesForSkill } from "@/lib/courseRecommendations";
 import type { ResumeData } from "@/lib/types";
 import { trackAction } from "@/lib/activityTracker";
+import { useAuth } from "@/lib/useAuth";
+import { listResumes, loadResumeSave } from "@/lib/resumeDb";
 
 /* ── Role blueprints ─────────────────────────────────────────── */
 interface RoleBlueprint {
@@ -469,22 +471,46 @@ function ResourceBadge({ type }: { type: ResourceType }) {
 export default function CareerGpsPage() {
   const w = useWindowWidth();
   const mobile = w < 640;
+  const { user } = useAuth();
   const [selectedRole, setSelectedRole] = useState<RoleBlueprint | null>(null);
   const [userSkills,   setUserSkills]   = useState<Set<string>>(new Set());
   const [resumeLoaded, setResumeLoaded] = useState(false);
+  const [resumeSource, setResumeSource] = useState<"cloud" | "local" | null>(null);
   const [filter,       setFilter]       = useState<"all" | "gaps" | "done">("all");
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem("jobsayer-resume-draft");
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        const data: ResumeData = parsed.data ?? parsed;
-        setUserSkills(extractUserSkills(data));
-        setResumeLoaded(true);
+    async function loadSkills() {
+      // 1. Try Supabase first when signed in
+      if (user) {
+        try {
+          const saves = await listResumes(user.id);
+          if (saves.length > 0) {
+            const latest = await loadResumeSave(saves[0].id, user.id);
+            if (latest?.data) {
+              setUserSkills(extractUserSkills(latest.data));
+              setResumeLoaded(true);
+              setResumeSource("cloud");
+              return;
+            }
+          }
+        } catch { /* fall through to localStorage */ }
       }
-    } catch { /* ignore */ }
-  }, []);
+
+      // 2. Fall back to localStorage draft
+      try {
+        const raw = localStorage.getItem("jobsayer-resume-draft");
+        if (raw) {
+          const parsed = JSON.parse(raw) as { data?: ResumeData } | ResumeData;
+          const data: ResumeData = (parsed as { data?: ResumeData }).data ?? (parsed as ResumeData);
+          setUserSkills(extractUserSkills(data));
+          setResumeLoaded(true);
+          setResumeSource("local");
+        }
+      } catch { /* ignore */ }
+    }
+
+    void loadSkills();
+  }, [user]);
 
   const card: React.CSSProperties = {
     background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "20px",
@@ -513,6 +539,18 @@ export default function CareerGpsPage() {
             <p style={{ fontSize: 14, color: "var(--text3)", lineHeight: 1.6, maxWidth: 520 }}>
               Pick your target role — we'll analyse your skill gaps and give you a personalised learning roadmap.
             </p>
+            {resumeLoaded && resumeSource === "cloud" && (
+              <div style={{ marginTop: 12, padding: "8px 14px", borderRadius: 8, background: "rgba(34,197,94,.08)", border: "1px solid rgba(34,197,94,.2)", fontSize: 12, color: "var(--success)", display: "flex", alignItems: "center", gap: 8, width: "fit-content" }}>
+                <CheckCircle2 size={13} />
+                Skills auto-loaded from your saved resume
+              </div>
+            )}
+            {resumeLoaded && resumeSource === "local" && (
+              <div style={{ marginTop: 12, padding: "8px 14px", borderRadius: 8, background: "var(--surface2)", border: "1px solid var(--border)", fontSize: 12, color: "var(--text3)", display: "flex", alignItems: "center", gap: 8, width: "fit-content" }}>
+                <CheckCircle2 size={13} />
+                Skills loaded from local draft · <Link href="/sign-in" style={{ color: "var(--accent)" }}>Sign in</Link> to sync across devices
+              </div>
+            )}
             {!resumeLoaded && (
               <div style={{ marginTop: 12, padding: "10px 16px", borderRadius: 8, background: "rgba(234,179,8,.08)", border: "1px solid rgba(234,179,8,.2)", fontSize: 12, color: "var(--warn)", display: "flex", alignItems: "center", gap: 8 }}>
                 <AlertCircle size={13} />
