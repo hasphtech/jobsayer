@@ -1,27 +1,28 @@
 /**
- * GET /api/vault/cloud/files?provider=google_drive|dropbox|onedrive&folder=...
+ * GET /api/vault/cloud/files?provider=google_drive|dropbox|onedrive&pageToken=...
  *
- * Lists files from the connected cloud provider that look like career docs
- * (PDFs and images). Filters by name patterns common for offer letters,
- * salary slips, certificates, etc. so the picker isn't overwhelming.
+ * Lists PDFs/images from the connected cloud provider.
+ * Uses per-user OAuth app credentials from vault_provider_configs (BYOA).
+ * Auto-refreshes expired access tokens using stored refresh tokens.
  *
  * Returns: { files: CloudFile[], nextPageToken?: string }
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { createServerSupabase } from "@/lib/supabase";
-import { getServiceSupabase } from "@/lib/supabase";
+import { createServerSupabase, getServiceSupabase } from "@/lib/supabase";
+import { getUserCreds } from "@/lib/vaultCloudCreds";
+import type { ProviderCreds } from "@/lib/vaultCloudCreds";
 import { cookies } from "next/headers";
 
 export interface CloudFile {
-  id:           string;
-  name:         string;
-  mimeType:     string;
-  size?:        number;
-  modifiedAt?:  string;
-  thumbnailUrl?:string;
-  webViewUrl?:  string;
-  provider:     "google_drive" | "dropbox" | "onedrive";
+  id:            string;
+  name:          string;
+  mimeType:      string;
+  size?:         number;
+  modifiedAt?:   string;
+  thumbnailUrl?: string;
+  webViewUrl?:   string;
+  provider:      "google_drive" | "dropbox" | "onedrive";
 }
 
 type Provider = "google_drive" | "dropbox" | "onedrive";
@@ -35,14 +36,14 @@ const ALLOWED_MIME = new Set([
 
 // ── Token refresh helpers ─────────────────────────────────────────
 
-async function refreshGoogleToken(refreshToken: string): Promise<string> {
+async function refreshGoogleToken(refreshToken: string, creds: ProviderCreds): Promise<string> {
   const res = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
+    method:  "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       refresh_token: refreshToken,
-      client_id:     process.env.GOOGLE_DRIVE_CLIENT_ID ?? "",
-      client_secret: process.env.GOOGLE_DRIVE_CLIENT_SECRET ?? "",
+      client_id:     creds.clientId,
+      client_secret: creds.clientSecret,
       grant_type:    "refresh_token",
     }),
   });
@@ -51,14 +52,14 @@ async function refreshGoogleToken(refreshToken: string): Promise<string> {
   return d.access_token;
 }
 
-async function refreshDropboxToken(refreshToken: string): Promise<string> {
+async function refreshDropboxToken(refreshToken: string, creds: ProviderCreds): Promise<string> {
   const res = await fetch("https://api.dropboxapi.com/oauth2/token", {
-    method: "POST",
+    method:  "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       refresh_token: refreshToken,
-      client_id:     process.env.DROPBOX_CLIENT_ID ?? "",
-      client_secret: process.env.DROPBOX_CLIENT_SECRET ?? "",
+      client_id:     creds.clientId,
+      client_secret: creds.clientSecret,
       grant_type:    "refresh_token",
     }),
   });
@@ -67,14 +68,14 @@ async function refreshDropboxToken(refreshToken: string): Promise<string> {
   return d.access_token;
 }
 
-async function refreshOnedriveToken(refreshToken: string): Promise<string> {
+async function refreshOnedriveToken(refreshToken: string, creds: ProviderCreds): Promise<string> {
   const res = await fetch("https://login.microsoftonline.com/common/oauth2/v2.0/token", {
-    method: "POST",
+    method:  "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       refresh_token: refreshToken,
-      client_id:     process.env.ONEDRIVE_CLIENT_ID ?? "",
-      client_secret: process.env.ONEDRIVE_CLIENT_SECRET ?? "",
+      client_id:     creds.clientId,
+      client_secret: creds.clientSecret,
       grant_type:    "refresh_token",
       scope:         "files.read offline_access",
     }),
@@ -86,7 +87,10 @@ async function refreshOnedriveToken(refreshToken: string): Promise<string> {
 
 // ── File listing helpers ──────────────────────────────────────────
 
-async function listGoogleDriveFiles(accessToken: string, pageToken?: string): Promise<{ files: CloudFile[]; nextPageToken?: string }> {
+async function listGoogleDriveFiles(
+  accessToken: string,
+  pageToken?: string,
+): Promise<{ files: CloudFile[]; nextPageToken?: string }> {
   const params = new URLSearchParams({
     q:        "mimeType='application/pdf' or mimeType='image/jpeg' or mimeType='image/png'",
     fields:   "nextPageToken,files(id,name,mimeType,size,modifiedTime,thumbnailLink,webViewLink)",
@@ -99,7 +103,10 @@ async function listGoogleDriveFiles(accessToken: string, pageToken?: string): Pr
     headers: { Authorization: `Bearer ${accessToken}` },
   });
   const data = await res.json() as {
-    files?: Array<{ id: string; name: string; mimeType: string; size?: string; modifiedTime?: string; thumbnailLink?: string; webViewLink?: string }>;
+    files?: Array<{
+      id: string; name: string; mimeType: string; size?: string;
+      modifiedTime?: string; thumbnailLink?: string; webViewLink?: string;
+    }>;
     nextPageToken?: string;
   };
 
@@ -121,12 +128,15 @@ async function listGoogleDriveFiles(accessToken: string, pageToken?: string): Pr
 
 async function listDropboxFiles(accessToken: string): Promise<{ files: CloudFile[] }> {
   const res = await fetch("https://api.dropboxapi.com/2/files/list_folder", {
-    method: "POST",
+    method:  "POST",
     headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ path: "", recursive: true, limit: 100 }),
+    body:    JSON.stringify({ path: "", recursive: true, limit: 100 }),
   });
   const data = await res.json() as {
-    entries?: Array<{ ".tag": string; id: string; name: string; size?: number; server_modified?: string; path_display?: string }>;
+    entries?: Array<{
+      ".tag": string; id: string; name: string;
+      size?: number; server_modified?: string; path_display?: string;
+    }>;
   };
 
   const files: CloudFile[] = (data.entries ?? [])
@@ -135,13 +145,12 @@ async function listDropboxFiles(accessToken: string): Promise<{ files: CloudFile
       e.name.endsWith(".jpeg") || e.name.endsWith(".png")
     ))
     .map(e => ({
-      id:          e.id,
-      name:        e.name,
-      mimeType:    e.name.endsWith(".pdf") ? "application/pdf" : "image/jpeg",
-      size:        e.size,
-      modifiedAt:  e.server_modified,
-      webViewUrl:  undefined,
-      provider:    "dropbox",
+      id:         e.id,
+      name:       e.name,
+      mimeType:   e.name.endsWith(".pdf") ? "application/pdf" : "image/jpeg",
+      size:       e.size,
+      modifiedAt: e.server_modified,
+      provider:   "dropbox",
     }));
 
   return { files };
@@ -153,22 +162,22 @@ async function listOnedriveFiles(accessToken: string): Promise<{ files: CloudFil
     { headers: { Authorization: `Bearer ${accessToken}` } }
   );
   const data = await res.json() as {
-    value?: Array<{ id: string; name: string; size?: number; lastModifiedDateTime?: string; file?: { mimeType?: string }; webUrl?: string }>;
+    value?: Array<{
+      id: string; name: string; size?: number;
+      lastModifiedDateTime?: string; file?: { mimeType?: string }; webUrl?: string;
+    }>;
   };
 
   const files: CloudFile[] = (data.value ?? [])
-    .filter(f => {
-      const mime = f.file?.mimeType ?? "";
-      return ALLOWED_MIME.has(mime);
-    })
+    .filter(f => ALLOWED_MIME.has(f.file?.mimeType ?? ""))
     .map(f => ({
-      id:          f.id,
-      name:        f.name,
-      mimeType:    f.file?.mimeType ?? "application/pdf",
-      size:        f.size,
-      modifiedAt:  f.lastModifiedDateTime,
-      webViewUrl:  f.webUrl,
-      provider:    "onedrive",
+      id:         f.id,
+      name:       f.name,
+      mimeType:   f.file?.mimeType ?? "application/pdf",
+      size:       f.size,
+      modifiedAt: f.lastModifiedDateTime,
+      webViewUrl: f.webUrl,
+      provider:   "onedrive",
     }));
 
   return { files };
@@ -179,7 +188,7 @@ async function listOnedriveFiles(accessToken: string): Promise<{ files: CloudFil
 export async function GET(req: NextRequest) {
   try {
     const cookieStore = await cookies();
-    const sb = createServerSupabase(cookieStore);
+    const sb          = createServerSupabase(cookieStore);
 
     const { data: { user }, error: authErr } = await sb.auth.getUser();
     if (authErr || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -189,7 +198,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Invalid provider" }, { status: 400 });
     }
 
-    // Fetch stored tokens
+    // ── Load user's OAuth app credentials (BYOA) ──────────────────
+    const creds = await getUserCreds(sb, user.id, provider);
+    if (!creds) {
+      return NextResponse.json(
+        { error: "Provider credentials not configured", code: "not_configured" },
+        { status: 412 }
+      );
+    }
+
+    // Fetch stored connection tokens
     const { data: conn } = await sb
       .from("vault_cloud_connections")
       .select("access_token,refresh_token,token_expiry,status")
@@ -198,26 +216,35 @@ export async function GET(req: NextRequest) {
       .single();
 
     if (!conn) return NextResponse.json({ error: "Provider not connected" }, { status: 404 });
-    if (conn.status === "revoked") return NextResponse.json({ error: "Connection revoked. Please reconnect." }, { status: 401 });
+    if (conn.status === "revoked") {
+      return NextResponse.json({ error: "Connection revoked. Please reconnect." }, { status: 401 });
+    }
 
-    // Refresh token if expired
-    let accessToken = conn.access_token;
-    const isExpired = conn.token_expiry && new Date(conn.token_expiry) < new Date(Date.now() + 60_000);
+    // ── Refresh token if expired (uses user's own creds) ──────────
+    let accessToken = conn.access_token as string;
+    const isExpired = conn.token_expiry && new Date(conn.token_expiry as string) < new Date(Date.now() + 60_000);
 
     if (isExpired && conn.refresh_token) {
       try {
-        if (provider === "google_drive") accessToken = await refreshGoogleToken(conn.refresh_token);
-        else if (provider === "dropbox") accessToken = await refreshDropboxToken(conn.refresh_token);
-        else                             accessToken = await refreshOnedriveToken(conn.refresh_token);
+        if      (provider === "google_drive") accessToken = await refreshGoogleToken(conn.refresh_token as string, creds);
+        else if (provider === "dropbox")      accessToken = await refreshDropboxToken(conn.refresh_token as string, creds);
+        else                                  accessToken = await refreshOnedriveToken(conn.refresh_token as string, creds);
 
-        // Persist fresh token
+        // Persist refreshed token via service role (bypasses RLS)
         await getServiceSupabase()
           .from("vault_cloud_connections")
-          .update({ access_token: accessToken, token_expiry: new Date(Date.now() + 3600_000).toISOString() })
+          .update({
+            access_token: accessToken,
+            token_expiry: new Date(Date.now() + 3600_000).toISOString(),
+            updated_at:   new Date().toISOString(),
+          })
           .eq("user_id", user.id)
           .eq("provider", provider);
       } catch {
-        return NextResponse.json({ error: "Session expired. Please reconnect.", code: "token_expired" }, { status: 401 });
+        return NextResponse.json(
+          { error: "Session expired. Please reconnect.", code: "token_expired" },
+          { status: 401 }
+        );
       }
     }
 

@@ -19,6 +19,8 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase, getServiceSupabase } from "@/lib/supabase";
+import { getUserCreds } from "@/lib/vaultCloudCreds";
+import type { ProviderCreds } from "@/lib/vaultCloudCreds";
 import { cookies } from "next/headers";
 
 type Provider = "google_drive" | "dropbox" | "onedrive";
@@ -49,6 +51,37 @@ async function downloadDropboxFile(fileId: string, accessToken: string): Promise
   });
   if (!res.ok) throw new Error(`Dropbox download failed: ${res.status}`);
   return res.arrayBuffer();
+}
+
+// ── Token refresh helper ──────────────────────────────────────────
+async function refreshToken(
+  provider: Provider,
+  refreshToken: string,
+  creds: ProviderCreds,
+): Promise<string> {
+  const urls: Record<Provider, string> = {
+    google_drive: "https://oauth2.googleapis.com/token",
+    dropbox:      "https://api.dropboxapi.com/oauth2/token",
+    onedrive:     "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+  };
+  const extraParams: Partial<Record<Provider, Record<string, string>>> = {
+    onedrive: { scope: "files.read offline_access" },
+  };
+  const body = new URLSearchParams({
+    refresh_token: refreshToken,
+    client_id:     creds.clientId,
+    client_secret: creds.clientSecret,
+    grant_type:    "refresh_token",
+    ...(extraParams[provider] ?? {}),
+  });
+  const res = await fetch(urls[provider], {
+    method:  "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body,
+  });
+  const d = await res.json() as { access_token?: string };
+  if (!d.access_token) throw new Error(`${provider} token refresh failed`);
+  return d.access_token;
 }
 
 async function downloadOnedriveFile(fileId: string, accessToken: string): Promise<ArrayBuffer> {
@@ -91,16 +124,50 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid document type" }, { status: 400 });
     }
 
+    // Load user's OAuth app credentials (BYOA — needed for token refresh)
+    const creds = await getUserCreds(sb, user.id, provider);
+    if (!creds) {
+      return NextResponse.json(
+        { error: "Provider credentials not configured", code: "not_configured" },
+        { status: 412 }
+      );
+    }
+
     // Check provider is connected & get access token
     const { data: conn } = await sb
       .from("vault_cloud_connections")
-      .select("access_token,status")
+      .select("access_token,refresh_token,token_expiry,status")
       .eq("user_id", user.id)
       .eq("provider", provider)
       .single();
 
     if (!conn || conn.status !== "connected") {
       return NextResponse.json({ error: `${provider} not connected` }, { status: 401 });
+    }
+
+    // Refresh access token if expired before downloading
+    let accessToken = conn.access_token as string;
+    const isExpired = conn.token_expiry &&
+      new Date(conn.token_expiry as string) < new Date(Date.now() + 60_000);
+
+    if (isExpired && conn.refresh_token) {
+      try {
+        accessToken = await refreshToken(provider, conn.refresh_token as string, creds);
+        await getServiceSupabase()
+          .from("vault_cloud_connections")
+          .update({
+            access_token: accessToken,
+            token_expiry: new Date(Date.now() + 3600_000).toISOString(),
+            updated_at:   new Date().toISOString(),
+          })
+          .eq("user_id", user.id)
+          .eq("provider", provider);
+      } catch {
+        return NextResponse.json(
+          { error: "Session expired. Please reconnect.", code: "token_expired" },
+          { status: 401 }
+        );
+      }
     }
 
     // Check for duplicate import (same cloud file already in vault)
@@ -115,12 +182,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "This file is already in your Vault", existingId: existing.id }, { status: 409 });
     }
 
-    // Download file from provider
+    // Download file from provider using (possibly refreshed) access token
     let fileBuffer: ArrayBuffer;
     try {
-      if (provider === "google_drive") fileBuffer = await downloadGoogleFile(fileId, conn.access_token);
-      else if (provider === "dropbox") fileBuffer = await downloadDropboxFile(fileId, conn.access_token);
-      else                             fileBuffer = await downloadOnedriveFile(fileId, conn.access_token);
+      if (provider === "google_drive") fileBuffer = await downloadGoogleFile(fileId, accessToken);
+      else if (provider === "dropbox") fileBuffer = await downloadDropboxFile(fileId, accessToken);
+      else                             fileBuffer = await downloadOnedriveFile(fileId, accessToken);
     } catch (err) {
       console.error("Cloud download error:", err);
       return NextResponse.json({ error: "Failed to download file from cloud provider" }, { status: 502 });
@@ -175,12 +242,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Failed to save document" }, { status: 500 });
     }
 
-    // Update import counter (service role to bypass RLS on update)
-    await getServiceSupabase()
+    // Update import counter via service role (bypasses RLS)
+    const svc = getServiceSupabase();
+    const { data: connCount } = await svc
+      .from("vault_cloud_connections")
+      .select("files_imported")
+      .eq("user_id", user.id)
+      .eq("provider", provider)
+      .single();
+
+    await svc
       .from("vault_cloud_connections")
       .update({
-        files_imported: (conn as unknown as { files_imported?: number }).files_imported ?? 0 + 1,
-        last_synced: new Date().toISOString(),
+        files_imported: ((connCount?.files_imported as number | null) ?? 0) + 1,
+        last_synced:    new Date().toISOString(),
+        updated_at:     new Date().toISOString(),
       })
       .eq("user_id", user.id)
       .eq("provider", provider);

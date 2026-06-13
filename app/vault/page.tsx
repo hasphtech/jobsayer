@@ -50,6 +50,13 @@ interface CloudFile {
   provider: CloudProvider;
 }
 
+interface ProviderConfig {
+  provider: CloudProvider;
+  client_id: string;
+  app_name?: string;
+  validated: boolean;
+}
+
 /* ── Config ─────────────────────────────────────────────────── */
 const DOC_TYPES: { key: DocType; label: string; icon: string; color: string }[] = [
   { key: "offer_letter",       label: "Offer Letters",       icon: "ti-file-dollar",   color: "#6366f1" },
@@ -101,13 +108,15 @@ function SourceBadge({ source }: { source: VaultDoc["source"] }) {
 
 /* ── Cloud Provider Card ─────────────────────────────────────── */
 function CloudProviderCard({
-  provider, connection, onConnect, onDisconnect, onBrowse,
+  provider, connection, configured, onConnect, onDisconnect, onBrowse, onConfigure,
 }: {
   provider: typeof CLOUD_PROVIDERS[0];
   connection?: CloudConnection;
-  onConnect: (p: CloudProvider) => void;
+  configured: boolean;
+  onConnect:    (p: CloudProvider) => void;
   onDisconnect: (p: CloudProvider) => void;
-  onBrowse: (p: CloudProvider) => void;
+  onBrowse:     (p: CloudProvider) => void;
+  onConfigure:  (p: CloudProvider) => void;
 }) {
   const isConnected = connection?.status === "connected";
   const isExpired   = connection?.status === "expired";
@@ -127,8 +136,16 @@ function CloudProviderCard({
             <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 1 }}>{connection.account_email}</div>
           )}
           {isExpired && <div style={{ fontSize: 11, color: "var(--warn)", marginTop: 1 }}>Session expired — reconnect</div>}
+          {!configured && !isConnected && (
+            <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 1 }}>Requires your OAuth app</div>
+          )}
         </div>
         {isConnected && <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--success)", flexShrink: 0 }} title="Connected" />}
+        {configured && !isConnected && (
+          <button onClick={() => onConfigure(provider.key)} title="Edit credentials" style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 14, padding: 2 }}>
+            <i className="ti ti-settings" />
+          </button>
+        )}
       </div>
 
       {isConnected && connection?.files_imported != null && (
@@ -156,14 +173,22 @@ function CloudProviderCard({
               Disconnect
             </button>
           </>
-        ) : (
+        ) : configured ? (
           <button onClick={() => onConnect(provider.key)} style={{
+            flex: 1, padding: "8px 0", borderRadius: 8, fontSize: 12, fontWeight: 700,
+            background: provider.bg, border: "1px solid " + provider.color + "30",
+            color: provider.color, cursor: "pointer", fontFamily: "inherit",
+          }}>
+            <i className="ti ti-plug" style={{ marginRight: 5 }} />
+            {isExpired ? "Reconnect" : "Connect"}
+          </button>
+        ) : (
+          <button onClick={() => onConfigure(provider.key)} style={{
             flex: 1, padding: "8px 0", borderRadius: 8, fontSize: 12, fontWeight: 700,
             background: "var(--surface2)", border: "1px solid var(--border)",
             color: "var(--text2)", cursor: "pointer", fontFamily: "inherit",
           }}>
-            <i className="ti ti-plug" style={{ marginRight: 5 }} />
-            {isExpired ? "Reconnect" : "Connect"}
+            <i className="ti ti-settings" style={{ marginRight: 5 }} />Set up app
           </button>
         )}
       </div>
@@ -325,6 +350,181 @@ function CloudPickerModal({ provider, onClose, onImport }: {
                 )}
               </div>
             )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Configure OAuth App Modal ───────────────────────────────── */
+const PROVIDER_DEV_LINKS: Record<CloudProvider, { url: string; label: string; steps: string[] }> = {
+  google_drive: {
+    url:   "https://console.cloud.google.com/apis/credentials",
+    label: "Google Cloud Console",
+    steps: ["Create a project → Enable Drive API", "OAuth consent screen → External", "Create OAuth 2.0 Client ID (Web app)", "Add authorised redirect URI → your domain + /api/vault/cloud/callback?provider=google_drive"],
+  },
+  dropbox: {
+    url:   "https://www.dropbox.com/developers/apps",
+    label: "Dropbox App Console",
+    steps: ["Create app → Scoped access → Full Dropbox", "Permissions tab → Enable files.metadata.read + files.content.read", "Settings tab → copy App key + App secret", "Add redirect URI → your domain + /api/vault/cloud/callback?provider=dropbox"],
+  },
+  onedrive: {
+    url:   "https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade",
+    label: "Azure App Registrations",
+    steps: ["Register app → Supported account types: Multitenant", "Authentication → Add platform → Web → redirect URI + /api/vault/cloud/callback?provider=onedrive", "API permissions → Microsoft Graph → Files.Read", "Certificates & Secrets → New client secret → copy value"],
+  },
+};
+
+function ConfigureModal({ provider, existing, onClose, onSaved }: {
+  provider: CloudProvider;
+  existing?: ProviderConfig;
+  onClose:  () => void;
+  onSaved:  (cfg: ProviderConfig, connectNow: boolean) => void;
+}) {
+  const cfg = providerConfig(provider);
+  const dev = PROVIDER_DEV_LINKS[provider];
+
+  const [clientId,     setClientId]     = useState(existing?.client_id ?? "");
+  const [clientSecret, setClientSecret] = useState("");
+  const [appName,      setAppName]      = useState(existing?.app_name  ?? "");
+  const [showSecret,   setShowSecret]   = useState(false);
+  const [saving,       setSaving]       = useState(false);
+  const [error,        setError]        = useState("");
+  const [showGuide,    setShowGuide]    = useState(!existing);
+
+  async function handleSave(connectNow: boolean) {
+    if (!clientId.trim()) { setError("Client ID is required"); return; }
+    if (!clientSecret.trim() && !existing) { setError("Client Secret is required"); return; }
+    setError(""); setSaving(true);
+    try {
+      const body: Record<string, string> = { provider, client_id: clientId.trim() };
+      if (clientSecret.trim()) body.client_secret = clientSecret.trim();
+      if (appName.trim())      body.app_name      = appName.trim();
+
+      const res  = await fetch("/api/vault/cloud/config", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json() as { ok?: boolean; error?: string };
+      if (!res.ok || !data.ok) { setError(data.error ?? "Failed to save"); setSaving(false); return; }
+      onSaved({ provider, client_id: clientId.trim(), app_name: appName.trim() || undefined, validated: false }, connectNow);
+    } catch { setError("Network error"); }
+    finally { setSaving(false); }
+  }
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--border)",
+    background: "var(--surface2)", color: "var(--text1)", fontSize: 13, fontFamily: "inherit", boxSizing: "border-box",
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.65)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 300, padding: 16 }}>
+      <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, width: "100%", maxWidth: 500, maxHeight: "90vh", overflowY: "auto" }}>
+
+        {/* Header */}
+        <div style={{ padding: "18px 20px 14px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ width: 34, height: 34, borderRadius: 8, background: cfg.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <i className={"ti " + cfg.icon} style={{ fontSize: 17, color: cfg.color }} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text1)" }}>
+              {existing ? "Update" : "Set up"} {cfg.name}
+            </div>
+            <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>Your own OAuth app — jobSayer never holds platform keys</div>
+          </div>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18, padding: 4 }}>✕</button>
+        </div>
+
+        <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 16 }}>
+
+          {/* Setup guide */}
+          <div style={{ background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 10, overflow: "hidden" }}>
+            <button
+              onClick={() => setShowGuide(g => !g)}
+              style={{ width: "100%", padding: "11px 14px", display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+              <i className="ti ti-info-circle" style={{ color: cfg.color, fontSize: 14 }} />
+              <span style={{ flex: 1, fontSize: 12, fontWeight: 700, color: "var(--text2)", textAlign: "left" }}>
+                How to get your {cfg.name} credentials
+              </span>
+              <i className={"ti " + (showGuide ? "ti-chevron-up" : "ti-chevron-down")} style={{ fontSize: 12, color: "var(--text3)" }} />
+            </button>
+            {showGuide && (
+              <div style={{ padding: "0 14px 14px", borderTop: "1px solid var(--border)" }}>
+                <ol style={{ margin: "10px 0 0", paddingLeft: 18, display: "flex", flexDirection: "column", gap: 6 }}>
+                  {dev.steps.map((s, i) => (
+                    <li key={i} style={{ fontSize: 12, color: "var(--text2)", lineHeight: 1.5 }}>{s}</li>
+                  ))}
+                </ol>
+                <a href={dev.url} target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 12, fontSize: 12, color: cfg.color, fontWeight: 600, textDecoration: "none" }}>
+                  <i className="ti ti-external-link" />Open {dev.label}
+                </a>
+              </div>
+            )}
+          </div>
+
+          {/* Form */}
+          {error && (
+            <div style={{ padding: "10px 12px", background: "rgba(239,68,68,.08)", borderRadius: 8, fontSize: 12, color: "var(--danger)", border: "1px solid rgba(239,68,68,.2)" }}>
+              {error}
+            </div>
+          )}
+
+          <div>
+            <label style={{ fontSize: 10, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".06em", display: "block", marginBottom: 5 }}>
+              App Name <span style={{ fontWeight: 400, opacity: 0.7 }}>(optional, for your reference)</span>
+            </label>
+            <input value={appName} onChange={e => setAppName(e.target.value)}
+              placeholder={"e.g. My " + cfg.name + " App"}
+              style={inputStyle} />
+          </div>
+
+          <div>
+            <label style={{ fontSize: 10, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".06em", display: "block", marginBottom: 5 }}>
+              Client ID *
+            </label>
+            <input value={clientId} onChange={e => setClientId(e.target.value)}
+              placeholder={provider === "google_drive" ? "xxxx.apps.googleusercontent.com" : provider === "dropbox" ? "your_app_key" : "Application (client) ID"}
+              style={inputStyle} />
+          </div>
+
+          <div>
+            <label style={{ fontSize: 10, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".06em", display: "block", marginBottom: 5 }}>
+              Client Secret {existing ? <span style={{ fontWeight: 400, opacity: 0.7 }}>(leave blank to keep existing)</span> : "*"}
+            </label>
+            <div style={{ position: "relative" }}>
+              <input
+                type={showSecret ? "text" : "password"}
+                value={clientSecret}
+                onChange={e => setClientSecret(e.target.value)}
+                placeholder={existing ? "••••••••••••••••" : "Paste your client secret"}
+                style={{ ...inputStyle, paddingRight: 40 }} />
+              <button
+                type="button"
+                onClick={() => setShowSecret(s => !s)}
+                style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 14 }}>
+                <i className={"ti " + (showSecret ? "ti-eye-off" : "ti-eye")} />
+              </button>
+            </div>
+          </div>
+
+          {/* Security note */}
+          <div style={{ padding: "10px 12px", background: "var(--accdim)", border: "1px solid var(--accborder)", borderRadius: 8, fontSize: 11, color: "var(--text2)", lineHeight: 1.5 }}>
+            <i className="ti ti-lock" style={{ marginRight: 6, color: "var(--accent)" }} />
+            Your credentials are <strong>AES-256 encrypted</strong> before storage. Only you can initiate OAuth flows with them. jobSayer never uses them for anything else.
+          </div>
+
+          {/* Actions */}
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={onClose} style={{ padding: "10px 16px", borderRadius: 9, border: "1px solid var(--border)", background: "none", color: "var(--text2)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+              Cancel
+            </button>
+            <button onClick={() => handleSave(false)} disabled={saving} style={{ flex: 1, padding: "10px 0", borderRadius: 9, border: "1px solid var(--border)", background: "var(--surface2)", color: "var(--text2)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+              {saving ? "Saving…" : "Save only"}
+            </button>
+            <button onClick={() => handleSave(true)} disabled={saving} style={{ flex: 1, padding: "10px 0", borderRadius: 9, border: "none", background: cfg.color, color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+              {saving ? "Saving…" : "Save & Connect"}
+            </button>
           </div>
         </div>
       </div>
@@ -603,6 +803,7 @@ export default function VaultPage() {
 
   const [docs,        setDocs]        = useState<VaultDoc[]>([]);
   const [connections, setConnections] = useState<CloudConnection[]>([]);
+  const [configs,     setConfigs]     = useState<ProviderConfig[]>([]);
   const [loading,     setLoading]     = useState(true);
   const [activeType,  setActiveType]  = useState<DocType | "all">("all");
   const [search,      setSearch]      = useState("");
@@ -611,16 +812,25 @@ export default function VaultPage() {
   const [showBgvModal,    setShowBgvModal]    = useState(false);
   const [showCloudPanel,  setShowCloudPanel]  = useState(false);
   const [cloudPicker,     setCloudPicker]     = useState<CloudProvider | null>(null);
+  const [configureFor,    setConfigureFor]    = useState<CloudProvider | null>(null);
   const [toast,           setToast]           = useState("");
 
   const loadDocs = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/vault/docs");
-      if (!res.ok) return;
-      const data = await res.json() as { docs: VaultDoc[]; connections: CloudConnection[] };
-      setDocs(data.docs ?? []);
-      setConnections(data.connections ?? []);
+      const [docsRes, cfgRes] = await Promise.all([
+        fetch("/api/vault/docs"),
+        fetch("/api/vault/cloud/config"),
+      ]);
+      if (docsRes.ok) {
+        const data = await docsRes.json() as { docs: VaultDoc[]; connections: CloudConnection[] };
+        setDocs(data.docs ?? []);
+        setConnections(data.connections ?? []);
+      }
+      if (cfgRes.ok) {
+        const cfgData = await cfgRes.json() as { configs?: ProviderConfig[] };
+        setConfigs(cfgData.configs ?? []);
+      }
     } catch { /* empty state */ }
     finally { setLoading(false); }
   }, []);
@@ -637,15 +847,32 @@ export default function VaultPage() {
       router.replace("/vault", { scroll: false });
     }
     if (error) {
-      const msgs: Record<string, string> = { access_denied: "Access denied.", state_mismatch: "Security check failed.", token_exchange_failed: "Connection failed." };
-      showToast(msgs[error] ?? "Connection failed. Please try again.");
-      router.replace("/vault", { scroll: false });
+      if (error === "not_configured") {
+        const p = searchParams.get("provider") as CloudProvider | null;
+        if (p) { setConfigureFor(p); setShowCloudPanel(true); }
+        router.replace("/vault", { scroll: false });
+      } else {
+        const msgs: Record<string, string> = { access_denied: "Access denied.", state_mismatch: "Security check failed.", token_exchange_failed: "Connection failed." };
+        showToast(msgs[error] ?? "Connection failed. Please try again.");
+        router.replace("/vault", { scroll: false });
+      }
     }
   }, [searchParams, loadDocs, router]);
 
   function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(""), 3500); }
 
   function handleConnect(provider: CloudProvider) { window.location.href = "/api/vault/cloud/connect?provider=" + provider; }
+  function handleConfigure(provider: CloudProvider) { setConfigureFor(provider); }
+
+  function handleConfigSaved(cfg: ProviderConfig, connectNow: boolean) {
+    setConfigs(prev => {
+      const next = prev.filter(c => c.provider !== cfg.provider);
+      return [...next, cfg];
+    });
+    setConfigureFor(null);
+    if (connectNow) handleConnect(cfg.provider);
+    else showToast("Credentials saved for " + providerConfig(cfg.provider).name);
+  }
 
   async function handleDisconnect(provider: CloudProvider) {
     const { getSupabaseAsync } = await import("@/lib/supabase");
@@ -710,6 +937,14 @@ export default function VaultPage() {
       )}
       {selected && <DetailPanel doc={selected} onClose={() => setSelected(null)} onDelete={handleDelete} onDownload={handleDownload} />}
       {cloudPicker && <CloudPickerModal provider={cloudPicker} onClose={() => setCloudPicker(null)} onImport={handleCloudImport} />}
+      {configureFor && (
+        <ConfigureModal
+          provider={configureFor}
+          existing={configs.find(c => c.provider === configureFor)}
+          onClose={() => setConfigureFor(null)}
+          onSaved={handleConfigSaved}
+        />
+      )}
 
       <div style={{ padding: "24px 24px 64px", maxWidth: selected && !mobile ? "calc(100% - 370px)" : "100%" }}>
 
@@ -748,7 +983,9 @@ export default function VaultPage() {
               {CLOUD_PROVIDERS.map(provider => (
                 <CloudProviderCard key={provider.key} provider={provider}
                   connection={connections.find(c => c.provider === provider.key)}
-                  onConnect={handleConnect} onDisconnect={handleDisconnect} onBrowse={p => setCloudPicker(p)} />
+                  configured={configs.some(c => c.provider === provider.key)}
+                  onConnect={handleConnect} onDisconnect={handleDisconnect}
+                  onBrowse={p => setCloudPicker(p)} onConfigure={handleConfigure} />
               ))}
             </div>
             <div style={{ marginTop: 14, padding: "10px 13px", background: "var(--surface2)", borderRadius: 8, fontSize: 11, color: "var(--text3)", border: "1px solid var(--border)" }}>
