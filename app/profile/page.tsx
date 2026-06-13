@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/auth";
 import { useResumePlan } from "@/lib/resumePlan";
 import { getSupabaseAsync } from "@/lib/auth";
 import AppShell from "@/components/AppShell";
+import UpgradePlans from "@/components/UpgradePlans";
 import type { SkillProof } from "@/lib/types";
 import { useWindowWidth } from "@/lib/useWindowWidth";
 
@@ -394,12 +395,12 @@ export default function ProfilePage() {
               </div>
             </div>
             {plan.tier !== "pro" && (
-              <Link href="/upgrade" style={{
+              <a href="#upgrade" style={{
                 padding: "10px 20px", background: "var(--accent)", borderRadius: 9,
                 color: "#fff", fontSize: 13, fontWeight: 700, textDecoration: "none",
               }}>
                 Upgrade <i className="ti ti-arrow-right"/>
-              </Link>
+              </a>
             )}
           </div>
           <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
@@ -409,6 +410,13 @@ export default function ProfilePage() {
             <PlanStat label="All Templates" value={plan.allTemplates ? "✓ Enabled" : "✗ Starter+"} />
           </div>
         </div>
+
+        {/* Upgrade plans — shown inline when not Pro */}
+        {plan.tier !== "pro" && (
+          <div style={{ ...card, marginBottom: 20 }}>
+            <UpgradePlans />
+          </div>
+        )}
 
         {/* BGV status */}
         <div style={{ ...card, marginBottom: 20 }}>
