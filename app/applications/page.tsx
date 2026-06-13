@@ -378,6 +378,113 @@ function AppCard({ app, onEdit, onDelete, onStageChange }: {
           )}
         </>
       )}
+
+      {/* Rate this employer (show for any stage past saved) */}
+      {app.stage !== "saved" && (
+        <RateEmployerInline company={app.company} role={app.role} stage={app.stage} />
+      )}
+    </div>
+  );
+}
+
+/* ── Inline employer rating widget ───────────────────────────── */
+function StarRow({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      <span style={{ fontSize: 11, color: "var(--text3)", width: 130, flexShrink: 0 }}>{label}</span>
+      <div style={{ display: "flex", gap: 3 }}>
+        {[1,2,3,4,5].map(n => (
+          <button key={n} onClick={() => onChange(n)}
+            style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, padding: 0, color: n <= value ? "#f59e0b" : "var(--border)", lineHeight: 1 }}>
+            ★
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function RateEmployerInline({ company, role, stage }: { company: string; role: string; stage: Stage }) {
+  const [open,     setOpen]     = useState(false);
+  const [offer,    setOffer]    = useState(0);
+  const [interview,setInterview]= useState(0);
+  const [culture,  setCulture]  = useState(0);
+  const [response, setResponse] = useState(0);
+  const [review,   setReview]   = useState("");
+  const [saving,   setSaving]   = useState(false);
+  const [saved,    setSaved]    = useState(false);
+
+  async function submit() {
+    if (!offer && !interview && !culture && !response) return;
+    setSaving(true);
+    try {
+      await fetch("/api/employer-ratings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          employerName: company, jobTitle: role, stage,
+          offerReliability: offer || undefined,
+          interviewExperience: interview || undefined,
+          cultureTransparency: culture || undefined,
+          responseTime: response || undefined,
+          review: review || undefined,
+        }),
+      });
+      setSaved(true);
+      setOpen(false);
+    } catch { /* ignore */ } finally { setSaving(false); }
+  }
+
+  if (saved) return (
+    <div style={{ marginTop: 8, fontSize: 11, color: "var(--success)", display: "flex", alignItems: "center", gap: 4 }}>
+      <i className="ti ti-shield-check"/> Employer rated — thank you!
+    </div>
+  );
+
+  return (
+    <div style={{ marginTop: 8 }}>
+      <button onClick={() => setOpen(o => !o)} style={{
+        display: "flex", alignItems: "center", gap: 5,
+        background: "none", border: "none", cursor: "pointer",
+        color: "var(--text3)", fontSize: 11, fontFamily: "inherit", padding: 0,
+      }}>
+        <i className="ti ti-star"/> {open ? "Close rating" : "Rate this employer"}
+      </button>
+      {open && (
+        <div style={{
+          marginTop: 8, padding: "12px 14px", background: "var(--surface2)",
+          border: "1px solid var(--border)", borderRadius: 10,
+        }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text2)", marginBottom: 10 }}>
+            Rate {company} — help future candidates
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 10 }}>
+            <StarRow label="Offer reliability"      value={offer}     onChange={setOffer} />
+            <StarRow label="Interview experience"   value={interview} onChange={setInterview} />
+            <StarRow label="Culture transparency"   value={culture}   onChange={setCulture} />
+            <StarRow label="Response time"          value={response}  onChange={setResponse} />
+          </div>
+          <textarea
+            value={review}
+            onChange={e => setReview(e.target.value)}
+            placeholder="Optional: describe your experience (500 chars max)"
+            maxLength={500}
+            style={{
+              width: "100%", padding: "8px 10px", borderRadius: 8, fontSize: 12,
+              background: "var(--surface)", border: "1px solid var(--border)",
+              color: "var(--text1)", resize: "vertical", minHeight: 60, fontFamily: "inherit",
+              boxSizing: "border-box", marginBottom: 8,
+            }}
+          />
+          <button onClick={() => void submit()} disabled={saving || (!offer && !interview && !culture && !response)} style={{
+            padding: "7px 16px", borderRadius: 8, border: "none", cursor: saving ? "wait" : "pointer",
+            background: "var(--accent)", color: "#fff", fontSize: 12, fontWeight: 700,
+            opacity: (!offer && !interview && !culture && !response) ? 0.5 : 1,
+          }}>
+            {saving ? "Saving…" : "Submit rating"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import AppShell from "@/components/AppShell";
+import { useAuth } from "@/lib/useAuth";
 
 /* ── Affiliate link helper ───────────────────────────────────────
  * For Udemy + Coursera: fetches a tracked URL from impact.com.
@@ -851,8 +852,343 @@ function CourseCard({ c }: { c: Course }) {
 }
 
 
+/* ── Suggested course shape from API ─────────────────────────── */
+interface CourseSuggestion {
+  courseId:      string;
+  title:         string;
+  provider:      string;
+  reason:        string;
+  skillsCovered: string[];
+  priority:      1 | 2 | 3;
+  isFree:        boolean;
+}
+
+/* ── Learning log entry ──────────────────────────────────────── */
+interface LearningLog {
+  id:           string;
+  course_id:    string;
+  course_title: string;
+  provider:     string;
+  status:       "started" | "completed" | "dropped";
+  started_at:   string;
+  completed_at?: string | null;
+  skill_tag?:   string | null;
+}
+
+/* ── Suggested tab ───────────────────────────────────────────── */
+function SuggestedTab({ logs }: { logs: LearningLog[] }) {
+  const [suggestions, setSuggestions] = useState<CourseSuggestion[]>([]);
+  const [summary, setSummary]         = useState("");
+  const [loading, setLoading]         = useState(false);
+  const [error, setError]             = useState("");
+  const [fetched, setFetched]         = useState(false);
+
+  const completedIds = logs.filter(l => l.status === "completed").map(l => l.course_id);
+  const startedIds   = logs.filter(l => l.status === "started").map(l => l.course_id);
+
+  async function fetchSuggestions() {
+    setLoading(true); setError("");
+    try {
+      // Get skills from localStorage resume
+      let currentSkills: string[] = [];
+      let targetRole = "";
+      try {
+        const raw = localStorage.getItem("jobsayer-resume-draft");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const data = parsed.data ?? parsed;
+          if (data.skills) currentSkills = data.skills.split(/[,;]/).map((s: string) => s.trim()).filter(Boolean);
+          if (data.title) targetRole = data.title;
+        }
+      } catch { /* ignore */ }
+
+      const res = await fetch("/api/learn/suggestions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentSkills, targetRole, completedIds, preferFree: false }),
+      });
+      if (!res.ok) { setError("Could not load suggestions. Try again."); return; }
+      const data = await res.json() as { suggestions: CourseSuggestion[]; summary: string };
+      setSuggestions(data.suggestions ?? []);
+      setSummary(data.summary ?? "");
+      setFetched(true);
+    } catch {
+      setError("Network error. Please try again.");
+    } finally { setLoading(false); }
+  }
+
+  useEffect(() => { void fetchSuggestions(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function trackStart(s: CourseSuggestion) {
+    // Find matching course in COURSES array
+    const course = COURSES.find(c => c.id === s.courseId);
+    const url = course?.url ?? "#";
+    // Log as started
+    try {
+      await fetch("/api/learn/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          courseId: s.courseId, courseTitle: s.title,
+          provider: s.provider, skillTag: s.skillsCovered[0] ?? null,
+          affiliateUrl: url, status: "started",
+        }),
+      });
+    } catch { /* non-blocking */ }
+    // Get affiliate URL if needed
+    const brand = isAffiliateCourse(s.provider);
+    const finalUrl = brand ? await getAffiliateUrl(url, brand, s.courseId) : url;
+    window.open(finalUrl, "_blank", "noopener,noreferrer");
+  }
+
+  const priorityLabel: Record<number, { label: string; color: string; bg: string }> = {
+    1: { label: "Critical gap", color: "var(--danger)",  bg: "rgba(239,68,68,.08)"   },
+    2: { label: "High value",   color: "var(--accent)",  bg: "var(--accdim)"          },
+    3: { label: "Nice to have", color: "var(--text3)",   bg: "var(--surface2)"        },
+  };
+
+  if (loading) return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 16 }}>
+      {[0,1,2,3,4,5].map(i => <div key={i} className="skeleton" style={{ height: 110, borderRadius: 12 }} />)}
+    </div>
+  );
+
+  if (error) return (
+    <div style={{ padding: "32px 0", textAlign: "center" }}>
+      <div style={{ color: "var(--danger)", marginBottom: 12 }}>{error}</div>
+      <button onClick={() => void fetchSuggestions()} style={{
+        padding: "8px 18px", borderRadius: 8, background: "var(--accent)", color: "#fff",
+        border: "none", cursor: "pointer", fontSize: 13, fontWeight: 700,
+      }}>Retry</button>
+    </div>
+  );
+
+  return (
+    <div>
+      {summary && (
+        <div style={{
+          background: "var(--accdim)", border: "1px solid var(--accborder)",
+          borderRadius: 10, padding: "12px 16px", marginBottom: 20,
+          fontSize: 13, color: "var(--text2)", lineHeight: 1.6,
+        }}>
+          <i className="ti ti-sparkles" style={{ color: "var(--accent)", marginRight: 6 }}/>
+          {summary}
+        </div>
+      )}
+
+      {suggestions.length === 0 && fetched && (
+        <div style={{ padding: "40px 0", textAlign: "center", color: "var(--text3)", fontSize: 13 }}>
+          No suggestions yet — add skills to your resume and try again.
+        </div>
+      )}
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {suggestions.map(s => {
+          const pl     = priorityLabel[s.priority] ?? priorityLabel[3];
+          const isStarted   = startedIds.includes(s.courseId);
+          const isCompleted = completedIds.includes(s.courseId);
+          const course = COURSES.find(c => c.id === s.courseId);
+          const iconColor = course?.providerColor ?? "var(--accent)";
+
+          return (
+            <div key={s.courseId} style={{
+              background: "var(--surface)", border: "1px solid var(--border)",
+              borderRadius: 12, padding: "16px 18px",
+              display: "flex", gap: 14, alignItems: "flex-start",
+            }}>
+              {/* Provider icon */}
+              <div style={{
+                width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+                background: `${iconColor}18`, border: `1px solid ${iconColor}28`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <i className={`ti ${course?.providerLogo ?? "ti-school"}`} style={{ fontSize: 18, color: iconColor }} />
+              </div>
+
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center", marginBottom: 4 }}>
+                  <span style={{
+                    fontSize: 9, fontWeight: 800, padding: "2px 8px", borderRadius: 10,
+                    background: pl.bg, color: pl.color, border: `1px solid ${pl.color}30`,
+                  }}>{pl.label}</span>
+                  {s.isFree && <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 10, background: "rgba(34,197,94,.08)", color: "var(--success)", border: "1px solid rgba(34,197,94,.2)" }}>Free</span>}
+                  {isCompleted && <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 10, background: "rgba(34,197,94,.08)", color: "var(--success)" }}>✓ Completed</span>}
+                  {isStarted && !isCompleted && <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 10, background: "var(--accdim)", color: "var(--accent)" }}>In progress</span>}
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)", marginBottom: 4 }}>{s.title}</div>
+                <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 6 }}>{s.provider}</div>
+
+                {/* AI reason */}
+                <div style={{
+                  fontSize: 12, color: "var(--text2)", lineHeight: 1.5,
+                  background: "var(--surface2)", borderRadius: 7, padding: "6px 10px", marginBottom: 10,
+                }}>
+                  <i className="ti ti-robot" style={{ color: "var(--accent)", marginRight: 5, fontSize: 11 }}/>
+                  {s.reason}
+                </div>
+
+                {/* Skills covered */}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                  {s.skillsCovered.slice(0, 4).map(sk => (
+                    <span key={sk} style={{
+                      fontSize: 10, padding: "2px 7px", borderRadius: 6,
+                      background: "var(--surface2)", border: "1px solid var(--border)",
+                      color: "var(--text2)",
+                    }}>{sk}</span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Action button */}
+              <button
+                onClick={() => void trackStart(s)}
+                disabled={isCompleted}
+                style={{
+                  padding: "8px 14px", borderRadius: 8, fontSize: 12, fontWeight: 700,
+                  border: "none", cursor: isCompleted ? "default" : "pointer",
+                  background: isCompleted ? "var(--surface2)" : "var(--accent)",
+                  color: isCompleted ? "var(--text3)" : "#fff",
+                  flexShrink: 0, whiteSpace: "nowrap",
+                }}
+              >
+                {isCompleted ? "Done ✓" : isStarted ? "Resume →" : "Start →"}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      {fetched && (
+        <div style={{ marginTop: 16, textAlign: "center" }}>
+          <button onClick={() => { setFetched(false); void fetchSuggestions(); }} style={{
+            padding: "7px 16px", borderRadius: 8, border: "1px solid var(--border)",
+            background: "transparent", color: "var(--text3)", fontSize: 12, cursor: "pointer",
+          }}>
+            <i className="ti ti-refresh"/> Refresh suggestions
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Progress tab (In Progress + Completed) ──────────────────── */
+function ProgressTab({ logs, onRefresh }: { logs: LearningLog[]; onRefresh: () => void }) {
+  const inProgress = logs.filter(l => l.status === "started");
+  const completed  = logs.filter(l => l.status === "completed");
+
+  async function markComplete(log: LearningLog) {
+    try {
+      await fetch("/api/learn/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          courseId: log.course_id, courseTitle: log.course_title,
+          provider: log.provider, skillTag: log.skill_tag ?? null, status: "completed",
+        }),
+      });
+      onRefresh();
+    } catch { /* ignore */ }
+  }
+
+  if (logs.length === 0) return (
+    <div style={{ padding: "48px 0", textAlign: "center", color: "var(--text3)" }}>
+      <div style={{ fontSize: 36, marginBottom: 12 }}>📚</div>
+      <div style={{ fontSize: 14, marginBottom: 6 }}>No courses tracked yet</div>
+      <div style={{ fontSize: 12 }}>Click &quot;Start&quot; on a suggestion or Browse tab to begin tracking</div>
+    </div>
+  );
+
+  return (
+    <div>
+      {inProgress.length > 0 && (
+        <div style={{ marginBottom: 28 }}>
+          <h3 style={{ fontSize: 13, fontWeight: 700, color: "var(--text3)", marginBottom: 12, textTransform: "uppercase", letterSpacing: ".05em" }}>
+            In Progress ({inProgress.length})
+          </h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {inProgress.map(l => (
+              <div key={l.id} style={{
+                background: "var(--surface)", border: "1px solid var(--border)",
+                borderRadius: 10, padding: "14px 16px",
+                display: "flex", alignItems: "center", gap: 14,
+              }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)" }}>{l.course_title}</div>
+                  <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>
+                    {l.provider} · Started {new Date(l.started_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                  </div>
+                </div>
+                <button onClick={() => void markComplete(l)} style={{
+                  padding: "7px 14px", borderRadius: 8, border: "none", cursor: "pointer",
+                  background: "rgba(34,197,94,.1)", color: "var(--success)", fontSize: 12, fontWeight: 700,
+                }}>
+                  Mark done ✓
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {completed.length > 0 && (
+        <div>
+          <h3 style={{ fontSize: 13, fontWeight: 700, color: "var(--text3)", marginBottom: 12, textTransform: "uppercase", letterSpacing: ".05em" }}>
+            Completed ({completed.length})
+          </h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {completed.map(l => (
+              <div key={l.id} style={{
+                background: "rgba(34,197,94,.04)", border: "1px solid rgba(34,197,94,.15)",
+                borderRadius: 10, padding: "12px 16px",
+                display: "flex", alignItems: "center", gap: 12,
+              }}>
+                <i className="ti ti-circle-check" style={{ fontSize: 18, color: "var(--success)", flexShrink: 0 }}/>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)" }}>{l.course_title}</div>
+                  <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>
+                    {l.provider}
+                    {l.completed_at && <> · Completed {new Date(l.completed_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</>}
+                    {l.skill_tag && <> · <strong style={{ color: "var(--success)" }}>+{l.skill_tag}</strong></>}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── Page ────────────────────────────────────────────────────── */
 export default function LearnPage() {
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState<"suggested" | "progress" | "browse">(user ? "suggested" : "browse");
+  const [logs, setLogs]           = useState<LearningLog[]>([]);
+  const [logsLoaded, setLogsLoaded] = useState(false);
+
+  // Load learning logs when signed in
+  useEffect(() => {
+    if (!user) { setLogsLoaded(true); return; }
+    fetch("/api/learn/log")
+      .then(r => r.json())
+      .then((d: { logs?: LearningLog[] }) => setLogs(d.logs ?? []))
+      .catch(() => {})
+      .finally(() => setLogsLoaded(true));
+  }, [user]);
+
+  function refreshLogs() {
+    if (!user) return;
+    fetch("/api/learn/log")
+      .then(r => r.json())
+      .then((d: { logs?: LearningLog[] }) => setLogs(d.logs ?? []))
+      .catch(() => {});
+  }
+
+  const inProgressCount = logs.filter(l => l.status === "started").length;
+  const completedCount  = logs.filter(l => l.status === "completed").length;
+
   const [search,      setSearch]      = useState("");
   const [provider,    setProvider]    = useState("All");
   const [roleFilter,  setRoleFilter]  = useState("All Roles");
@@ -919,7 +1255,7 @@ export default function LearnPage() {
       <div style={{ padding: "24px 28px", maxWidth: 1000 }}>
 
         {/* Header */}
-        <div style={{ marginBottom: 24 }}>
+        <div style={{ marginBottom: 20 }}>
           <h1 style={{ fontSize: 20, fontWeight: 900, color: "var(--text1)", margin: 0 }}>
             Courses & Certifications
           </h1>
@@ -928,6 +1264,43 @@ export default function LearnPage() {
             {" "}sourced from Google, AWS, Microsoft, IBM, Meta, NPTEL, Harvard &amp; more
           </p>
         </div>
+
+        {/* Tab nav */}
+        <div style={{ display: "flex", gap: 4, borderBottom: "2px solid var(--border)", marginBottom: 24 }}>
+          {([
+            { key: "suggested", label: "✦ Suggested", show: !!user },
+            { key: "progress",  label: `My Progress${inProgressCount + completedCount > 0 ? ` (${inProgressCount + completedCount})` : ""}`, show: !!user },
+            { key: "browse",    label: "Browse All",  show: true },
+          ] as { key: string; label: string; show: boolean }[]).filter(t => t.show).map(t => (
+            <button
+              key={t.key}
+              onClick={() => setActiveTab(t.key as "suggested" | "progress" | "browse")}
+              style={{
+                padding: "9px 16px", fontSize: 13, fontWeight: 700, border: "none",
+                cursor: "pointer", fontFamily: "inherit", borderRadius: "8px 8px 0 0",
+                background: activeTab === t.key ? "var(--accent)" : "transparent",
+                color:      activeTab === t.key ? "#fff"         : "var(--text3)",
+                borderBottom: activeTab === t.key ? "2px solid var(--accent)" : "2px solid transparent",
+                marginBottom: -2,
+              }}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Suggested tab */}
+        {activeTab === "suggested" && user && logsLoaded && (
+          <SuggestedTab logs={logs} />
+        )}
+
+        {/* Progress tab */}
+        {activeTab === "progress" && user && logsLoaded && (
+          <ProgressTab logs={logs} onRefresh={refreshLogs} />
+        )}
+
+        {/* Browse tab wrapper */}
+        {activeTab === "browse" && (<>
 
         {/* Stats row */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 10, marginBottom: 24 }}>
@@ -1083,6 +1456,7 @@ export default function LearnPage() {
           Many employers value the skill over the cert — audit freely, pay only if you need the badge for your resume.
           NPTEL courses are 100% free and exams cost ~₹1,000 — highest ROI for Indian tech professionals.
         </div>
+        </>)}
       </div>
     </AppShell>
   );

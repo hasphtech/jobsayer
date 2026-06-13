@@ -105,11 +105,17 @@ export async function GET(req: NextRequest) {
       // Availability filter (stored in separate localStorage key on client — use profile metadata)
       // For server-side, we rely on what's stored in resume data or user_metadata
 
+      // Compute match percentage: matched / total required skills
+      const matchPct = skills.length > 0
+        ? Math.round((matchedSkills.length / skills.length) * 100)
+        : null;
+
       const summary: Record<string, unknown> = {
         id:               row.user_id,
         title:            (d.title as string | undefined) ?? "",
         skills:           resumeSkills.slice(0, 15),
         matched_skills:   matchedSkills,
+        match_pct:        matchPct,           // % of required skills the candidate has
         experience_years: expYears,
         location:         candidateLocation,
         github:           (d.github as string | undefined) ?? null,

@@ -73,6 +73,107 @@ function StageBadge({ stage }: { stage: Candidate["stage"] }) {
   );
 }
 
+/* ── Candidate list with skill-match + AI summary ───────────── */
+function MatchBar({ pct }: { pct: number }) {
+  const color = pct >= 80 ? "var(--success)" : pct >= 60 ? "var(--accent)" : "var(--warn)";
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+      <div style={{ width: 48, height: 5, background: "var(--surface2)", borderRadius: 3, overflow: "hidden" }}>
+        <div style={{ height: "100%", width: `${pct}%`, background: color, borderRadius: 3 }} />
+      </div>
+      <span style={{ fontSize: 11, fontWeight: 800, color }}>{pct}%</span>
+    </div>
+  );
+}
+
+function CandidateCard({ c, stages, advanceStage }: { c: Candidate; stages: Record<string, Candidate["stage"]>; advanceStage: (id: string) => void }) {
+  const [showSummary, setShowSummary] = useState(false);
+  const [summary,     setSummary]     = useState("");
+  const [aiLoading,   setAiLoading]   = useState(false);
+
+  async function generateSummary() {
+    if (summary) { setShowSummary(s => !s); return; }
+    setAiLoading(true); setShowSummary(true);
+    try {
+      const res = await fetch("/api/employer/candidates/ai-summary-preview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: c.name, role: c.role, match: c.match }),
+      });
+      if (!res.ok) throw new Error();
+      const d = await res.json() as { summary: string };
+      setSummary(d.summary ?? "");
+    } catch {
+      setSummary("Could not generate summary. Please try again.");
+    } finally { setAiLoading(false); }
+  }
+
+  return (
+    <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, padding: "14px 16px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <div style={{ width: 38, height: 38, borderRadius: "50%", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: "#fff", flexShrink: 0 }}>
+          {c.initials}
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)" }}>{c.name}</div>
+          <div style={{ fontSize: 11, color: "var(--text3)" }}>{c.role} · {c.notice}d notice · {c.salary}</div>
+          <div style={{ marginTop: 4 }}>
+            <MatchBar pct={c.match} />
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6, flexShrink: 0 }}>
+          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+            <div style={{ fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 10, background: c.bgv === "cleared" ? "rgba(34,197,94,.1)" : "rgba(251,191,36,.1)", color: c.bgv === "cleared" ? "var(--success)" : "var(--warn)" }}>
+              {c.bgv === "cleared" ? "✓ BGV" : "⟳ BGV"}
+            </div>
+            <StageBadge stage={stages[c.id] ?? c.stage} />
+          </div>
+          <div style={{ display: "flex", gap: 6 }}>
+            <button onClick={() => void generateSummary()} style={{
+              padding: "5px 10px", borderRadius: 7, border: "1px solid var(--accborder)",
+              background: "var(--accdim)", color: "var(--accent)", fontSize: 11, fontWeight: 600,
+              cursor: "pointer", fontFamily: "inherit",
+            }}>
+              <i className="ti ti-robot"/> AI fit
+            </button>
+            <button onClick={() => advanceStage(c.id)} style={{
+              padding: "5px 10px", borderRadius: 7, background: "var(--accent)", border: "none",
+              color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+            }}>
+              Advance <i className="ti ti-arrow-right"/>
+            </button>
+          </div>
+        </div>
+      </div>
+      {showSummary && (
+        <div style={{
+          marginTop: 10, padding: "10px 12px", background: "var(--accdim)",
+          border: "1px solid var(--accborder)", borderRadius: 8, fontSize: 12, color: "var(--text2)", lineHeight: 1.6,
+        }}>
+          {aiLoading
+            ? <span style={{ color: "var(--text3)" }}><i className="ti ti-loader-2"/> Generating AI fit summary…</span>
+            : <><i className="ti ti-sparkles" style={{ color: "var(--accent)", marginRight: 4 }}/>{summary}</>
+          }
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CandidateList({ candidates, stages, advanceStage }: {
+  candidates: Candidate[];
+  stages: Record<string, Candidate["stage"]>;
+  advanceStage: (id: string) => void;
+}) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {candidates.map(c => (
+        <CandidateCard key={c.id} c={c} stages={stages} advanceStage={advanceStage} />
+      ))}
+    </div>
+  );
+}
+
 /* ── Team Tab ────────────────────────────────────────────────── */
 interface TeamMember {
   id: string; email: string; name: string | null;
@@ -597,28 +698,7 @@ function EmployerDashboardContent() {
 
         {/* ── CANDIDATES ── */}
         {tab === "candidates" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {CANDIDATES.map(c => (
-              <div key={c.id} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14 }}>
-                <div style={{ width: 38, height: 38, borderRadius: "50%", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: "#fff", flexShrink: 0 }}>
-                  {c.initials}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)" }}>{c.name}</div>
-                  <div style={{ fontSize: 11, color: "var(--text3)" }}>{c.role} · {c.notice}d notice · {c.salary}</div>
-                </div>
-                <div style={{ fontSize: 13, fontWeight: 800, color: "var(--accent)" }}>{c.match}%</div>
-                <div style={{ fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 10, background: c.bgv === "cleared" ? "rgba(34,197,94,.1)" : "rgba(251,191,36,.1)", color: c.bgv === "cleared" ? "var(--success)" : "var(--warn)" }}>
-                  {c.bgv === "cleared" ? "✓ BGV" : "⟳ BGV"}
-                </div>
-                <StageBadge stage={stages[c.id] ?? c.stage} />
-                <button onClick={() => advanceStage(c.id)}
-                  style={{ padding: "7px 12px", borderRadius: 7, background: "var(--accent)", border: "none", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
-                  Advance <i className="ti ti-arrow-right"/>
-                </button>
-              </div>
-            ))}
-          </div>
+          <CandidateList candidates={CANDIDATES} stages={stages} advanceStage={advanceStage} />
         )}
 
         {/* ── BGV ── */}
@@ -650,14 +730,14 @@ function EmployerDashboardContent() {
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {["Aadhaar", "PAN", "Address", "Education", "Employment", "Criminal"].map((check, i) => (
+                  {["PAN / Aadhaar", "Education", "Employment"].map((check) => (
                     <span key={check} style={{
                       fontSize: 10, padding: "2px 8px", borderRadius: 6,
-                      background: (c.bgv === "cleared" || i < 4) ? "rgba(34,197,94,.1)" : "rgba(251,191,36,.1)",
-                      color: (c.bgv === "cleared" || i < 4) ? "var(--success)" : "var(--warn)",
-                      border: "1px solid " + ((c.bgv === "cleared" || i < 4) ? "rgba(34,197,94,.2)" : "rgba(251,191,36,.2)"),
+                      background: c.bgv === "cleared" ? "rgba(34,197,94,.1)" : "rgba(251,191,36,.1)",
+                      color: c.bgv === "cleared" ? "var(--success)" : "var(--warn)",
+                      border: "1px solid " + (c.bgv === "cleared" ? "rgba(34,197,94,.2)" : "rgba(251,191,36,.2)"),
                     }}>
-                      {c.bgv === "cleared" || i < 4 ? "✓" : "⟳"} {check}
+                      {c.bgv === "cleared" ? "✓" : "⟳"} {check}
                     </span>
                   ))}
                 </div>
