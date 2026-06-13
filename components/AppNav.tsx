@@ -27,6 +27,7 @@ function useWidth() {
 const NAV_LINKS = [
   { href: "/dashboard",      label: "Dashboard",      icon: "ti-layout-dashboard" },
   { href: "/builder",        label: "Builder",        icon: "✏️" },
+  { href: "/editor",         label: "My Resume",      icon: "ti-edit" },
   { href: "/cover-letter",   label: "Cover Letter",   icon: "✉️" },
   { href: "/score",          label: "Score",          icon: "ti-target" },
   { href: "/jobs",           label: "Jobs",           icon: "ti-briefcase" },

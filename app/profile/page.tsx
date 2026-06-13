@@ -11,6 +11,7 @@ import { useResumePlan } from "@/lib/resumePlan";
 import { getSupabaseAsync } from "@/lib/auth";
 import AppShell from "@/components/AppShell";
 import UpgradePlans from "@/components/UpgradePlans";
+import JobPreferences from "@/components/JobPreferences";
 import type { SkillProof } from "@/lib/types";
 import { useWindowWidth } from "@/lib/useWindowWidth";
 
@@ -417,6 +418,11 @@ export default function ProfilePage() {
             <UpgradePlans />
           </div>
         )}
+
+        {/* Job Preferences */}
+        <div style={{ ...card, marginBottom: 20 }}>
+          <JobPreferences />
+        </div>
 
         {/* BGV status */}
         <div style={{ ...card, marginBottom: 20 }}>
