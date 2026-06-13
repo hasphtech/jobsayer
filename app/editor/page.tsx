@@ -293,14 +293,14 @@ export default function EditorPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (user) {
-      const ok = await canUpload(user.id);
+      const ok = canUpload("resume", 5);
       if (!ok) { setUploadMsg("Monthly upload limit reached. Upgrade to upload more."); return; }
     }
     setUploadMsg("Parsing resume…");
     try {
       const parsed = await parseResumeFile(file);
       setData(d => ({ ...d, ...parsed }));
-      if (user) await recordUpload(user.id);
+      if (user) recordUpload("resume");
       setUploadMsg("Resume imported successfully!");
       setTimeout(() => setUploadMsg(""), 3000);
     } catch {
@@ -312,11 +312,12 @@ export default function EditorPage() {
 
   /* ── Load saved resume ── */
   async function handleLoad(rec: ResumeRecord) {
-    const full = await loadResumeSave(rec.id);
+    if (!user) return;
+    const full = await loadResumeSave(rec.id, user.id);
     if (!full) return;
     setData(full.data);
     setResumeName(full.name);
-    setSaveId(full.id);
+    setSaveId(rec.id);
     setShowLoadMenu(false);
   }
 
@@ -325,7 +326,7 @@ export default function EditorPage() {
     if (!user) { alert("Sign in to save."); return; }
     setSaving(true);
     try {
-      const id = await saveNamedResume(user.id, resumeName, data, "Classic", saveId ?? undefined);
+      const id = await saveNamedResume(resumeName, data, "Classic", {}, user.id, saveId ?? undefined);
       setSaveId(id);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
@@ -341,7 +342,7 @@ export default function EditorPage() {
   async function handleDocx() {
     setExporting(true);
     try {
-      await exportDocx(data, "Classic");
+      exportDocx(data);
     } finally {
       setExporting(false);
     }
@@ -421,7 +422,7 @@ export default function EditorPage() {
                     >
                       <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)" }}>{s.name}</div>
                       <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>
-                        {new Date(s.updated_at).toLocaleDateString()}
+                        {new Date(s.updatedAt).toLocaleDateString()}
                       </div>
                     </button>
                   ))
@@ -672,10 +673,9 @@ export default function EditorPage() {
               <ResumePreview
                 data={data}
                 template="Classic"
-                styleFont="Inter"
-                styleColor="#6366f1"
+                font="Inter"
+                color="#6366f1"
                 photoShape="round"
-                hiddenSections={[]}
               />
             </div>
           </div>
@@ -691,10 +691,9 @@ export default function EditorPage() {
               <ResumePreview
                 data={data}
                 template="Classic"
-                styleFont="Inter"
-                styleColor="#6366f1"
+                font="Inter"
+                color="#6366f1"
                 photoShape="round"
-                hiddenSections={[]}
               />
             </div>
           </div>
