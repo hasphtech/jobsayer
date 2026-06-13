@@ -14,7 +14,7 @@ import AppShell from "@/components/AppShell";
 /* ── Types ─────────────────────────────────────────────────── */
 interface EduEntry  { degree: string; institution: string; year: string; result: string }
 interface EmpEntry  { company: string; role: string; from_date: string; to_date: string; manager_name: string; manager_email: string }
-interface BgvRecord { status: string; verification_score: number | null; id_verified: boolean; edu_verified: boolean; emp_verified: boolean; address_verified: boolean; submitted_at: string; admin_notes: string | null; rejection_reason: string | null; auto_check_results?: { autoScore: number } | null }
+interface BgvRecord { status: string; verification_score: number | null; id_verified: boolean; edu_verified: boolean; emp_verified: boolean; submitted_at: string; admin_notes: string | null; rejection_reason: string | null; auto_check_results?: { autoScore: number } | null }
 
 type Step = "identity" | "education" | "employment" | "review" | "submitted";
 
@@ -57,15 +57,16 @@ function StatusBadge({ bgv }: { bgv: BgvRecord }) {
   };
   const s = cfg[bgv.status] ?? cfg.pending;
   const checks = [
-    { label: "Identity",   done: bgv.id_verified   },
-    { label: "Education",  done: bgv.edu_verified  },
-    { label: "Employment", done: bgv.emp_verified  },
-    { label: "Address",    done: bgv.address_verified },
+    { label: "Identity",   done: bgv.id_verified,  icon: "ti-id-badge"  },
+    { label: "Education",  done: bgv.edu_verified,  icon: "ti-school"    },
+    { label: "Employment", done: bgv.emp_verified,  icon: "ti-briefcase" },
   ];
   return (
     <div style={{ ...cardStyle, marginBottom: 24 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
-        <div style={{ width: 52, height: 52, borderRadius: 14, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>{s.icon}</div>
+        <div style={{ width: 52, height: 52, borderRadius: 14, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>
+          <i className={`ti ${s.icon}`} />
+        </div>
         <div>
           <div style={{ fontSize: 16, fontWeight: 700, color: s.color }}>{s.label}</div>
           <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 3 }}>
@@ -74,15 +75,21 @@ function StatusBadge({ bgv }: { bgv: BgvRecord }) {
           </div>
         </div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(4,1fr)", gap: 10 }}>
+      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3,1fr)", gap: 10 }}>
         {checks.map(c => (
           <div key={c.label} style={{
-            padding: "10px 12px", borderRadius: 9, textAlign: "center",
+            padding: "14px 12px", borderRadius: 9, textAlign: "center",
             background: c.done ? "rgba(34,197,94,.08)" : "var(--surface2)",
             border: `1px solid ${c.done ? "rgba(34,197,94,.2)" : "var(--border)"}`,
           }}>
-            <div style={{ fontSize: 18, marginBottom: 4 }}>{c.done ? "ti-circle-check" : "⭕"}</div>
+            <div style={{ fontSize: 20, marginBottom: 6 }}>
+              {c.done
+                ? <i className="ti ti-circle-check" style={{ color: "var(--success)" }} />
+                : <i className={`ti ${c.icon}`} style={{ color: "var(--text3)" }} />
+              }
+            </div>
             <div style={{ fontSize: 11, color: c.done ? "var(--success)" : "var(--text3)", fontWeight: 600 }}>{c.label}</div>
+            <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 3 }}>{c.done ? "Verified" : "Pending"}</div>
           </div>
         ))}
       </div>
