@@ -708,146 +708,257 @@ function levelColor(level: Level) {
   return "var(--danger)";
 }
 
-function stars(n: number) {
-  const full  = Math.floor(n);
-  const half  = n - full >= 0.5;
-  return "★".repeat(full) + (half ? "½" : "") + "☆".repeat(5 - full - (half ? 1 : 0));
+/* ── Star rating (visual) ───────────────────────────────────── */
+function StarRating({ rating }: { rating: number }) {
+  return (
+    <span style={{ display: "inline-flex", gap: 1, alignItems: "center" }}>
+      {[1,2,3,4,5].map(i => {
+        const filled = rating >= i;
+        const half   = !filled && rating >= i - 0.5;
+        return (
+          <svg key={i} width="11" height="11" viewBox="0 0 24 24" fill={filled ? "#f59e0b" : half ? "url(#half)" : "none"} stroke="#f59e0b" strokeWidth="2">
+            {half && (
+              <defs>
+                <linearGradient id="half">
+                  <stop offset="50%" stopColor="#f59e0b"/>
+                  <stop offset="50%" stopColor="transparent"/>
+                </linearGradient>
+              </defs>
+            )}
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        );
+      })}
+    </span>
+  );
+}
+
+/* ── Duration bar ───────────────────────────────────────────── */
+function DurationBar({ hrs }: { hrs: number }) {
+  const maxHrs = 300;
+  const pct = Math.min(100, (hrs / maxHrs) * 100);
+  const label = hrs < 10 ? `${hrs}h` : hrs < 40 ? `~${hrs}h` : hrs < 100 ? `~${hrs}h` : `~${Math.round(hrs/40)}w`;
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+      <div style={{ flex: 1, height: 4, background: "var(--border)", borderRadius: 2, overflow: "hidden" }}>
+        <div style={{ width: `${pct}%`, height: "100%", background: "var(--accent)", borderRadius: 2, opacity: 0.7 }} />
+      </div>
+      <span style={{ fontSize: 10, color: "var(--text3)", whiteSpace: "nowrap", minWidth: 26 }}>{label}</span>
+    </div>
+  );
 }
 
 /* ── Card ────────────────────────────────────────────────────── */
 function CourseCard({ c }: { c: Course }) {
+  const [expanded, setExpanded] = useState(false);
   const cc = costColor(c.cost);
   const iconColor = c.providerColor ?? "var(--accent)";
   const brand = isAffiliateCourse(c.provider);
 
-  const handleOpen = useCallback(async (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (!brand) return; // non-affiliate — let href open normally
+  const handleOpen = useCallback(async (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
     e.preventDefault();
-    const finalUrl = await getAffiliateUrl(c.url, brand, c.id);
-    window.open(finalUrl, "_blank", "noopener,noreferrer");
+    if (brand) {
+      const finalUrl = await getAffiliateUrl(c.url, brand, c.id);
+      window.open(finalUrl, "_blank", "noopener,noreferrer");
+    } else {
+      window.open(c.url, "_blank", "noopener,noreferrer");
+    }
   }, [brand, c.url, c.id]);
 
   return (
-    <a
-      href={c.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={brand ? handleOpen : undefined}
-      style={{ textDecoration: "none", display: "flex" }}
+    <div style={{
+      background: "var(--surface)", border: `1px solid ${expanded ? "var(--accent)" : "var(--border)"}`,
+      borderRadius: 12, overflow: "hidden",
+      transition: "border-color .15s, box-shadow .15s",
+      boxShadow: expanded ? "0 4px 24px rgba(99,102,241,.1)" : "none",
+    }}
+      onMouseEnter={e => { if (!expanded) { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--accent)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 24px rgba(99,102,241,.08)"; } }}
+      onMouseLeave={e => { if (!expanded) { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "none"; } }}
     >
-      <div
-        style={{
-          background: "var(--surface)", border: "1px solid var(--border)",
-          borderRadius: 12, padding: "16px 18px",
-          transition: "border-color .15s, box-shadow .15s",
-          cursor: "pointer", width: "100%",
-          display: "flex", flexDirection: "column",
-        }}
-        onMouseEnter={e => {
-          (e.currentTarget as HTMLDivElement).style.borderColor = "var(--accent)";
-          (e.currentTarget as HTMLDivElement).style.boxShadow   = "0 4px 24px rgba(99,102,241,.12)";
-        }}
-        onMouseLeave={e => {
-          (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)";
-          (e.currentTarget as HTMLDivElement).style.boxShadow   = "none";
-        }}
-      >
+      {/* ── Collapsed view (always visible) ── */}
+      <div style={{ padding: "14px 16px", cursor: "pointer" }} onClick={() => setExpanded(x => !x)}>
         {/* Header row */}
-        <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 12 }}>
-          {/* Provider icon box */}
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 10 }}>
           <div style={{
-            width: 36, height: 36, borderRadius: 8, flexShrink: 0,
+            width: 38, height: 38, borderRadius: 9, flexShrink: 0,
             background: `${iconColor}18`, border: `1px solid ${iconColor}28`,
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>
-            <i className={`ti ${c.providerLogo}`} style={{ fontSize: 17, color: iconColor }} />
+            <i className={`ti ${c.providerLogo}`} style={{ fontSize: 18, color: iconColor }} />
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)", lineHeight: 1.4, marginBottom: 2 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)", lineHeight: 1.4, marginBottom: 2 }}>
               {c.title}
             </div>
-            <div style={{ fontSize: 10, color: "var(--text3)" }}>{c.provider}</div>
+            <div style={{ fontSize: 11, color: "var(--text3)" }}>{c.provider}</div>
           </div>
-          <span style={{
-            fontSize: 9, fontWeight: 800, padding: "3px 8px", borderRadius: 10, flexShrink: 0,
-            background: cc.bg, color: cc.color, border: `1px solid ${cc.border}`, whiteSpace: "nowrap",
-            alignSelf: "flex-start",
-          }}>
-            {costLabel(c.cost)}
-          </span>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, flexShrink: 0 }}>
+            <span style={{
+              fontSize: 9, fontWeight: 800, padding: "3px 8px", borderRadius: 10,
+              background: cc.bg, color: cc.color, border: `1px solid ${cc.border}`, whiteSpace: "nowrap",
+            }}>
+              {costLabel(c.cost)}
+            </span>
+            {c.hasCert && (
+              <span style={{ fontSize: 9, fontWeight: 700, color: "var(--success)", background: "rgba(34,197,94,.08)", border: "1px solid rgba(34,197,94,.2)", padding: "2px 7px", borderRadius: 10 }}>
+                <i className="ti ti-award" style={{ marginRight: 2 }}/>Cert
+              </span>
+            )}
+          </div>
         </div>
+
+        {/* Rating + meta row */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+          <StarRating rating={c.rating} />
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#f59e0b" }}>{c.rating}</span>
+          <span style={{ fontSize: 11, color: "var(--text3)" }}>({c.enrolled} enrolled)</span>
+          <span style={{ fontSize: 11, color: "var(--text3)" }}>·</span>
+          <span style={{ fontSize: 11, fontWeight: 600, color: levelColor(c.level), background: `${levelColor(c.level)}18`, padding: "1px 7px", borderRadius: 6 }}>{c.level}</span>
+        </div>
+
+        {/* Duration bar */}
+        <DurationBar hrs={c.durationHrs} />
 
         {/* Highlight */}
         {c.highlight && (
           <div style={{
             fontSize: 11, color: "var(--accent)", background: "var(--accdim)",
             border: "1px solid var(--accborder)", borderRadius: 6,
-            padding: "5px 9px", marginBottom: 8, lineHeight: 1.4,
+            padding: "5px 9px", marginTop: 8, lineHeight: 1.4,
           }}>
             <i className="ti ti-sparkles" style={{ marginRight: 4, fontSize: 11 }}/>{c.highlight}
           </div>
         )}
 
-        {/* ROI signal */}
-        {c.hasCert && ROI_SIGNALS[c.id] && (() => {
-          const roi = ROI_SIGNALS[c.id];
-          return (
-            <div style={{
-              display: "flex", alignItems: "flex-start", gap: 6,
-              background: "rgba(34,197,94,.07)", border: "1px solid rgba(34,197,94,.18)",
-              borderRadius: 6, padding: "5px 8px", marginBottom: 8,
-            }}>
-              <i className="ti ti-trending-up" style={{ fontSize: 11, color: "var(--success)", marginTop: 1, flexShrink: 0 }}/>
-              <span style={{ fontSize: 10, color: "var(--success)", lineHeight: 1.5 }}>
-                <strong>{roi.multiplier} more calls</strong> · {roi.roles}
-                {roi.salaryDelta && <> · <strong>{roi.salaryDelta}</strong></>}
-              </span>
-            </div>
-          );
-        })()}
-
-        {/* Skills */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 10 }}>
-          {c.skills.slice(0, 5).map(s => (
+        {/* Skills (first 4) */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 8 }}>
+          {c.skills.slice(0, 4).map(s => (
             <span key={s} style={{
               fontSize: 10, padding: "2px 7px", borderRadius: 6,
               background: "var(--surface2)", border: "1px solid var(--border)",
               color: "var(--text2)", whiteSpace: "nowrap",
             }}>{s}</span>
           ))}
-          {c.skills.length > 5 && (
-            <span style={{ fontSize: 10, color: "var(--text3)", padding: "2px 4px" }}>+{c.skills.length - 5}</span>
+          {c.skills.length > 4 && (
+            <span style={{ fontSize: 10, color: "var(--text3)", padding: "2px 4px" }}>+{c.skills.length - 4} more</span>
           )}
         </div>
 
-        {/* Spacer — pushes footer to card bottom */}
-        <div style={{ flex: 1 }} />
-
-        {/* Footer */}
-        <div style={{
-          display: "flex", alignItems: "center", flexWrap: "wrap", columnGap: 8, rowGap: 3,
-          fontSize: 11, color: "var(--text3)", paddingTop: 10,
-          borderTop: "1px solid var(--border)", marginTop: "auto",
-        }}>
-          <span style={{ color: "#f59e0b", fontSize: 10 }}>{stars(c.rating)}</span>
-          <span style={{ fontWeight: 600, color: "var(--text2)" }}>{c.rating}</span>
-          <span>·</span>
-          <span>{c.enrolled}</span>
-          <span>·</span>
-          <span>~{c.durationHrs}h</span>
-          <span>·</span>
-          <span style={{ color: levelColor(c.level), fontWeight: 600 }}>{c.level}</span>
-          {c.hasCert && (
-            <span style={{ color: "var(--success)", fontWeight: 600 }}>
-              · <i className="ti ti-award" style={{ marginRight: 2 }}/>Cert
-            </span>
-          )}
-          <span style={{ marginLeft: "auto", color: "var(--accent)", fontWeight: 700, fontSize: 11 }}>
-            Open <i className="ti ti-arrow-up-right" style={{ fontSize: 10 }}/>
+        {/* Expand toggle */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 10 }}>
+          <span style={{ fontSize: 11, color: "var(--accent)", fontWeight: 600 }}>
+            {expanded ? "▲ Less details" : "▼ See full details"}
           </span>
+          <span style={{ fontSize: 11, color: "var(--text3)" }}>~{c.durationHrs}h total</span>
         </div>
       </div>
-    </a>
+
+      {/* ── Expanded detail panel ── */}
+      {expanded && (
+        <div style={{ borderTop: "1px solid var(--border)", background: "var(--surface2)", padding: "14px 16px" }}>
+          {/* All skills */}
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 6 }}>
+              Skills covered
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+              {c.skills.map(s => (
+                <span key={s} style={{
+                  fontSize: 11, padding: "3px 9px", borderRadius: 6,
+                  background: "var(--accdim)", border: "1px solid var(--accborder)",
+                  color: "var(--accent)", fontWeight: 600,
+                }}>{s}</span>
+              ))}
+            </div>
+          </div>
+
+          {/* Target roles */}
+          {c.roles.length > 0 && (
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 6 }}>
+                Best for roles
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                {c.roles.map(r => (
+                  <span key={r} style={{
+                    fontSize: 11, padding: "3px 9px", borderRadius: 6,
+                    background: "var(--surface)", border: "1px solid var(--border)",
+                    color: "var(--text2)",
+                  }}>{r}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Cert info */}
+          {c.hasCert && c.certName && (
+            <div style={{
+              display: "flex", alignItems: "center", gap: 8,
+              background: "rgba(34,197,94,.07)", border: "1px solid rgba(34,197,94,.18)",
+              borderRadius: 8, padding: "8px 12px", marginBottom: 12,
+            }}>
+              <i className="ti ti-award" style={{ color: "var(--success)", fontSize: 16, flexShrink: 0 }}/>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "var(--success)" }}>Certificate: {c.certName}</div>
+                <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 1 }}>Issued on completion · Shareable on LinkedIn</div>
+              </div>
+            </div>
+          )}
+
+          {/* ROI signal */}
+          {c.hasCert && ROI_SIGNALS[c.id] && (() => {
+            const roi = ROI_SIGNALS[c.id];
+            return (
+              <div style={{
+                display: "flex", alignItems: "flex-start", gap: 8,
+                background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.18)",
+                borderRadius: 8, padding: "8px 12px", marginBottom: 12,
+              }}>
+                <i className="ti ti-trending-up" style={{ fontSize: 14, color: "var(--accent)", marginTop: 1, flexShrink: 0 }}/>
+                <span style={{ fontSize: 12, color: "var(--text2)", lineHeight: 1.5 }}>
+                  <strong style={{ color: "var(--accent)" }}>{roi.multiplier} more interview calls</strong> · {roi.roles}
+                  {roi.salaryDelta && <> · Avg salary lift: <strong>{roi.salaryDelta}</strong></>}
+                </span>
+              </div>
+            );
+          })()}
+
+          {/* Rating breakdown */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontSize: 28, fontWeight: 900, color: "#f59e0b", lineHeight: 1 }}>{c.rating}</div>
+              <StarRating rating={c.rating} />
+              <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 2 }}>{c.enrolled} learners</div>
+            </div>
+            <div style={{ flex: 1 }}>
+              {[5,4,3,2,1].map(star => {
+                const approxPct = star === 5 ? 72 : star === 4 ? 18 : star === 3 ? 6 : star === 2 ? 2 : 2;
+                return (
+                  <div key={star} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
+                    <span style={{ fontSize: 10, color: "var(--text3)", width: 8 }}>{star}</span>
+                    <div style={{ flex: 1, height: 5, background: "var(--border)", borderRadius: 3, overflow: "hidden" }}>
+                      <div style={{ width: `${approxPct}%`, height: "100%", background: "#f59e0b", borderRadius: 3 }} />
+                    </div>
+                    <span style={{ fontSize: 10, color: "var(--text3)", width: 26 }}>{approxPct}%</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* CTA */}
+          <button onClick={handleOpen} style={{
+            width: "100%", padding: "11px 0", borderRadius: 9, border: "none",
+            background: "var(--accent)", color: "#fff", fontSize: 13, fontWeight: 700,
+            cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center",
+            justifyContent: "center", gap: 6,
+          }}>
+            <i className="ti ti-external-link" style={{ fontSize: 13 }}/>
+            {c.cost === "free" ? "Start for free" : c.cost === "freemium" ? "Audit for free" : "Enroll now"} →
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -947,6 +1058,14 @@ function SuggestedTab({ logs }: { logs: LearningLog[] }) {
     3: { label: "Nice to have", color: "var(--text3)",   bg: "var(--surface2)"        },
   };
 
+  function scoreBoost(s: CourseSuggestion): number {
+    const c = COURSES.find(x => x.id === s.courseId);
+    let pts = s.priority === 1 ? 14 : s.priority === 2 ? 9 : 4;
+    if (c?.hasCert) pts += 5;
+    if ((c?.durationHrs ?? 0) > 100) pts += 3;
+    return pts;
+  }
+
   if (loading) return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 16 }}>
       {[0,1,2,3,4,5].map(i => <div key={i} className="skeleton" style={{ height: 110, borderRadius: 12 }} />)}
@@ -1011,6 +1130,14 @@ function SuggestedTab({ logs }: { logs: LearningLog[] }) {
                     fontSize: 9, fontWeight: 800, padding: "2px 8px", borderRadius: 10,
                     background: pl.bg, color: pl.color, border: `1px solid ${pl.color}30`,
                   }}>{pl.label}</span>
+                  {/* Score boost badge */}
+                  <span style={{
+                    fontSize: 9, fontWeight: 800, padding: "2px 8px", borderRadius: 10,
+                    background: "rgba(34,197,94,.1)", color: "var(--success)",
+                    border: "1px solid rgba(34,197,94,.25)", display: "inline-flex", alignItems: "center", gap: 2,
+                  }}>
+                    <i className="ti ti-trending-up" style={{ fontSize: 9 }}/>+{scoreBoost(s)} pts
+                  </span>
                   {s.isFree && <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 10, background: "rgba(34,197,94,.08)", color: "var(--success)", border: "1px solid rgba(34,197,94,.2)" }}>Free</span>}
                   {isCompleted && <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 10, background: "rgba(34,197,94,.08)", color: "var(--success)" }}>✓ Completed</span>}
                   {isStarted && !isCompleted && <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 10, background: "var(--accdim)", color: "var(--accent)" }}>In progress</span>}
