@@ -1414,7 +1414,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
    ROOT
 ══════════════════════════════════════════════════════════════ */
 export default function HomePage() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
   const [showSignIn, setShowSignIn]   = useState(false);
   const [authError,  setAuthError]    = useState<string | null>(null);
@@ -1457,9 +1457,13 @@ export default function HomePage() {
     }
   }, []);
 
+  // While auth is resolving OR user is signed in (redirect pending), render nothing.
+  // This prevents the landing page nav/content flashing for signed-in users.
+  if (loading || user) return null;
+
   return (
     <>
-      <Nav user={user} signIn={openSignIn} />
+      <Nav user={null} signIn={openSignIn} />
       {authError && (
         <div style={{
           position: "fixed", top: 64, left: "50%", transform: "translateX(-50%)",
@@ -1473,7 +1477,7 @@ export default function HomePage() {
           <button onClick={() => setAuthError(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--danger)", fontSize: 16, padding: 0 }}>✕</button>
         </div>
       )}
-      {!user && <LandingPage signIn={openSignIn} />}
+      <LandingPage signIn={openSignIn} />
       {showSignIn && <SignInModal onClose={closeSignIn} />}
     </>
   );
