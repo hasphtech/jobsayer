@@ -30,20 +30,28 @@ const TOOL_LINKS = [
   { href: "/interview",    label: "Interview",      icon: "ti-microphone" },
 ];
 
-const INSIGHT_LINKS = [
-  { href: "/jobs",             label: "Jobs",        icon: "ti-briefcase" },
-  { href: "/applications",     label: "Tracker",     icon: "ti-checklist" },
-  { href: "/career-gps",       label: "Career GPS",  icon: "ti-compass" },
-  { href: "/career-health",    label: "Health",      icon: "ti-activity" },
-  { href: "/salary",           label: "Salaries",    icon: "ti-coin" },
-  { href: "/learn",            label: "Courses",     icon: "ti-school" },
-  { href: "/vault",            label: "Doc Vault",   icon: "ti-lock" },
-  { href: "/company",          label: "Companies",   icon: "ti-building" },
-  { href: "/employer-trust",   label: "Trust",       icon: "ti-shield-check" },
-  { href: "/bgv",              label: "BGV",         icon: "ti-certificate" },
-  { href: "/linkedin",         label: "LinkedIn",    icon: "ti-brand-linkedin" },
-  { href: "/integrations",     label: "Bot Integ.",  icon: "ti-plug" },
+// Primary grow links — always visible
+const GROW_LINKS = [
+  { href: "/jobs",          label: "Jobs",        icon: "ti-briefcase" },
+  { href: "/applications",  label: "Tracker",     icon: "ti-checklist" },
+  { href: "/career-gps",    label: "Career GPS",  icon: "ti-compass" },
+  { href: "/career-health", label: "Health",      icon: "ti-activity" },
+  { href: "/salary",        label: "Salaries",    icon: "ti-coin" },
+  { href: "/learn",         label: "Courses",     icon: "ti-school" },
 ];
+
+// Secondary links — shown in collapsed "More" section
+const MORE_LINKS = [
+  { href: "/vault",          label: "Doc Vault",   icon: "ti-lock" },
+  { href: "/bgv",            label: "BGV Badge",   icon: "ti-certificate" },
+  { href: "/linkedin",       label: "LinkedIn",    icon: "ti-brand-linkedin" },
+  { href: "/employer-trust", label: "Trust Ratings", icon: "ti-shield-check" },
+  { href: "/company",        label: "Companies",   icon: "ti-building" },
+  { href: "/integrations",   label: "Bot Integ.",  icon: "ti-plug" },
+];
+
+// Legacy: keep INSIGHT_LINKS as the combined set for mobile drawer + search
+const INSIGHT_LINKS = [...GROW_LINKS, ...MORE_LINKS];
 
 /* ── Recruiter nav ───────────────────────────────────────────── */
 const RECRUITER_TOOL_LINKS = [
@@ -191,6 +199,52 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
+/* ── Collapsible More section ────────────────────────────────── */
+function MoreLinksSection({
+  links, isActive, moreOpen, setMoreOpen,
+}: {
+  links: typeof MORE_LINKS;
+  isActive: (href: string) => boolean;
+  moreOpen: boolean;
+  setMoreOpen: (v: boolean) => void;
+}) {
+  const anyActive = links.some(l => isActive(l.href));
+  return (
+    <>
+      <button
+        onClick={() => setMoreOpen(!moreOpen)}
+        style={{
+          display: "flex", alignItems: "center", gap: 8,
+          padding: "6px 10px", borderRadius: 7, width: "100%",
+          fontSize: 12, fontWeight: anyActive ? 700 : 500,
+          color: anyActive ? "var(--accent)" : "var(--shell-link-col)",
+          background: anyActive && !moreOpen ? "var(--shell-link-active-bg)" : "transparent",
+          border: "none", cursor: "pointer", fontFamily: "inherit",
+          transition: "color .12s, background .12s",
+        }}
+        onMouseEnter={e => {
+          if (!anyActive || moreOpen) (e.currentTarget as HTMLButtonElement).style.background = "var(--surface2)";
+        }}
+        onMouseLeave={e => {
+          (e.currentTarget as HTMLButtonElement).style.background =
+            anyActive && !moreOpen ? "var(--shell-link-active-bg)" : "transparent";
+        }}
+      >
+        <i className="ti ti-dots-circle-horizontal" style={{ fontSize: 15, width: 16, textAlign: "center" }} />
+        <span style={{ flex: 1, textAlign: "left" }}>More</span>
+        <i className={`ti ${moreOpen ? "ti-chevron-up" : "ti-chevron-down"}`} style={{ fontSize: 11, opacity: 0.6 }} />
+      </button>
+      {moreOpen && (
+        <div style={{ paddingLeft: 4 }}>
+          {links.map(l => (
+            <NavLink key={l.href} {...l} active={isActive(l.href)} />
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
 /* ── Props ───────────────────────────────────────────────────── */
 interface AppShellProps {
   children: React.ReactNode;
@@ -212,9 +266,17 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
   const w = useWidth();
   // Client-side search params (avoids Suspense requirement)
   const [search, setSearch] = useState("");
+  const [moreOpen, setMoreOpen] = useState(false);
 
   useEffect(() => {
     setSearch(window.location.search);
+  }, [pathname]);
+
+  // Auto-open More if the current page is in that section
+  useEffect(() => {
+    if (MORE_LINKS.some(l => pathname === l.href || pathname.startsWith(l.href + "/"))) {
+      setMoreOpen(true);
+    }
   }, [pathname]);
 
   // Inline search state
@@ -605,9 +667,23 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
             <div style={{ height: 1, background: "var(--border)", margin: "8px 10px" }} />
 
             <SectionLabel>{insightLabel}</SectionLabel>
-            {insightLinks.map(l => (
-              <NavLink key={l.href} {...l} active={isActive(l.href)} />
-            ))}
+            {role === "candidate" ? (
+              <>
+                {GROW_LINKS.map(l => (
+                  <NavLink key={l.href} {...l} active={isActive(l.href)} />
+                ))}
+                <MoreLinksSection
+                  links={MORE_LINKS}
+                  isActive={isActive}
+                  moreOpen={moreOpen}
+                  setMoreOpen={setMoreOpen}
+                />
+              </>
+            ) : (
+              insightLinks.map(l => (
+                <NavLink key={l.href} {...l} active={isActive(l.href)} />
+              ))
+            )}
 
             <div style={{ flex: 1 }} />
           </div>
