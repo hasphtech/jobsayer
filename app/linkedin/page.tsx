@@ -54,7 +54,7 @@ const TARGET_ROLES = [
 const STATUS_COLOR: Record<string, string> = {
   Missing:"var(--danger)", Weak:"var(--warn)", Good:"var(--success)", Strong:"var(--accent)",
 };
-const SECTION_EMOJI: Record<string, string> = {
+const SECTION_ICON: Record<string, string> = {
   Photo:"ti-camera", Banner:"ti-photo", Headline:"ti-pencil", About:"ti-note", Featured:"ti-star",
   Experience:"ti-briefcase", Skills:"ti-tools", Recommendations:"ti-handshake", "Custom URL":"ti-link", "Open to Work":"ti-circle",
 };
@@ -382,7 +382,7 @@ export default function LinkedInPage() {
                       <div key={s.section} style={{ ...card, padding:"14px 16px" }}>
                         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
                           <div style={{ display:"flex", alignItems:"center", gap:7 }}>
-                            <span style={{ fontSize:16 }}>{SECTION_EMOJI[s.section]??"ti-pin"}</span>
+                            <i className={`ti ${SECTION_ICON[s.section] ?? "ti-pin"}`} style={{ fontSize:16, color:"var(--text2)" }} />
                             <span style={{ fontSize:13, fontWeight:700 }}>{s.section}</span>
                           </div>
                           <div style={{ display:"flex", alignItems:"center", gap:8 }}>

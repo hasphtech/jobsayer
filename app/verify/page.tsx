@@ -185,7 +185,11 @@ export default function VerifyPage() {
                       { label: "PAN",       done: !!existing.pan,           detail: existing.pan ? "Submitted" : "Not provided" },
                     ].map(c => (
                       <div key={c.label} style={{ padding: "10px 12px", borderRadius: 9, background: c.done ? "rgba(34,197,94,.06)" : "var(--surface2)", border: `1px solid ${c.done ? "rgba(34,197,94,.2)" : "var(--border)"}` }}>
-                        <div style={{ fontSize: 18, marginBottom: 4 }}>{c.done ? "ti-circle-check" : "⭕"}</div>
+                        <div style={{ fontSize: 18, marginBottom: 4 }}>
+                          {c.done
+                            ? <i className="ti ti-circle-check" style={{ color: "var(--success)" }} />
+                            : <i className="ti ti-circle" style={{ color: "var(--text3)" }} />}
+                        </div>
                         <div style={{ fontSize: 11, fontWeight: 700, color: c.done ? "var(--success)" : "var(--text2)", marginBottom: 2 }}>{c.label}</div>
                         <div style={{ fontSize: 10, color: "var(--text3)" }}>{c.detail}</div>
                       </div>

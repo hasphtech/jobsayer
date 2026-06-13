@@ -3357,7 +3357,7 @@ export default function BuilderPage() {
                       background:  active ? "var(--surface2)" : "var(--bg)",
                       fontFamily: "inherit", textAlign: "left" as const, transition: "all .15s",
                     }}>
-                    <span style={{ fontSize: 30, lineHeight: 1, flexShrink: 0 }}>{m === "fresher" ? "ti-school" : "ti-briefcase"}</span>
+                    <i className={`ti ${m === "fresher" ? "ti-school" : "ti-briefcase"}`} style={{ fontSize: 30, lineHeight: 1, flexShrink: 0, color: "var(--accent)" }} />
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 15, fontWeight: 800, color: "var(--text1)" }}>
                         {m === "fresher" ? "Student / Fresher" : "Experienced Professional"}

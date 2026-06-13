@@ -309,7 +309,7 @@ function AppCard({ app, onEdit, onDelete, onStageChange }: {
       {/* Joining countdown — shown only on offer stage */}
       {joiningInfo && (
         <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 8, background: `${joiningInfo.color}10`, border: `1px solid ${joiningInfo.color}35` }}>
-          <span style={{ fontSize: 14 }}>{joiningInfo.urgent ? "ti-alert-triangle" : "ti-calendar"}</span>
+          <i className={`ti ${joiningInfo.urgent ? "ti-alert-triangle" : "ti-calendar"}`} style={{ fontSize: 14, color: joiningInfo.color, flexShrink: 0 }} />
           <div>
             <div style={{ fontSize: 12, fontWeight: 700, color: joiningInfo.color }}>{joiningInfo.label}</div>
             {app.noticePeriod && app.noticePeriod !== "Immediate" && (
