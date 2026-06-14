@@ -1412,7 +1412,7 @@ function TemplateNordic({ data, accent, thumbnail = false }: { data: ResumeData;
             { icon: "⌥",  val: data.github   ? data.github.replace(/^https?:\/\/(www\.)?github\.com\//i, "")   : "" },
           ].filter(item => Boolean(item.val)).map((item, i) => (
             <div key={i} style={{ display: "flex", gap: 7, marginBottom: 6, alignItems: "flex-start" }}>
-              <span style={{ fontSize: 10, color: accent, flexShrink: 0 }}>{item.icon}</span>
+              {item.icon.startsWith("ti-") ? <i className={`ti ${item.icon}`} style={{ fontSize: 10, color: accent, flexShrink: 0 }} /> : <span style={{ fontSize: 10, color: accent, flexShrink: 0 }}>{item.icon}</span>}
               <span style={{ fontSize: 10, color: "#374151", lineHeight: 1.4, wordBreak: "break-all" as const }}>{item.val}</span>
             </div>
           ))}
@@ -1651,7 +1651,7 @@ function TemplateHorizon({ data, accent, thumbnail = false }: { data: ResumeData
             { icon: "⌥",  val: data.github   ? data.github.replace(/^https?:\/\/(www\.)?github\.com\//i, "")   : "" },
           ].filter(item => Boolean(item.val)).map((item, i) => (
             <div key={i} style={{ display: "flex", gap: 7, marginBottom: 6, alignItems: "flex-start" }}>
-              <span style={{ fontSize: 10, opacity: .7, flexShrink: 0 }}>{item.icon}</span>
+              {item.icon.startsWith("ti-") ? <i className={`ti ${item.icon}`} style={{ fontSize: 10, opacity: .7, flexShrink: 0 }} /> : <span style={{ fontSize: 10, opacity: .7, flexShrink: 0 }}>{item.icon}</span>}
               <span style={{ fontSize: 10, opacity: .88, lineHeight: 1.4, wordBreak: "break-all" as const }}>{item.val}</span>
             </div>
           ))}
@@ -1794,7 +1794,7 @@ function TemplateOrbit({ data, accent, thumbnail = false }: { data: ResumeData; 
             { icon: "⌥",  val: data.github   ? data.github.replace(/^https?:\/\/(www\.)?github\.com\//i, "")   : "" },
           ].filter(item => Boolean(item.val)).map((item, i) => (
             <div key={i} style={{ display: "flex", gap: 6, marginBottom: 6, alignItems: "flex-start" }}>
-              <span style={{ fontSize: 10, color: accent, flexShrink: 0 }}>{item.icon}</span>
+              {item.icon.startsWith("ti-") ? <i className={`ti ${item.icon}`} style={{ fontSize: 10, color: accent, flexShrink: 0 }} /> : <span style={{ fontSize: 10, color: accent, flexShrink: 0 }}>{item.icon}</span>}
               <span style={{ fontSize: 10, color: "#4b5563", lineHeight: 1.4, wordBreak: "break-all" as const }}>{item.val}</span>
             </div>
           ))}

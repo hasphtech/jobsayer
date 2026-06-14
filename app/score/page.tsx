@@ -469,7 +469,7 @@ export default function ScorePage() {
                 <div key={ats.name}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
                     <div>
-                      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)" }}>{ats.icon} {ats.name}</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)", display: "flex", alignItems: "center", gap: 5 }}><i className={`ti ${ats.icon}`} style={{ fontSize: 13, color: "var(--accent)" }} />{ats.name}</span>
                       <span style={{ fontSize: 11, color: "var(--text3)", marginLeft: 8 }}>Used by: {ats.usedBy}</span>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

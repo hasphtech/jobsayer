@@ -197,7 +197,7 @@ export default function OnboardingPage() {
                   ...(resumeChoice === opt.key ? cardActive : card),
                   display: "flex", alignItems: "center", gap: 14, textAlign: "left" as const,
                 }}>
-                  <span style={{ fontSize: 24 }}>{opt.icon}</span>
+                  {opt.icon.startsWith("ti-") ? <i className={`ti ${opt.icon}`} style={{ fontSize: 24, color: "var(--accent)" }} /> : <span style={{ fontSize: 24 }}>{opt.icon}</span>}
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: resumeChoice === opt.key ? "var(--accent)" : "var(--text1)" }}>{opt.title}</div>
                     <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 2 }}>{opt.desc}</div>

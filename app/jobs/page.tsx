@@ -514,7 +514,7 @@ function DetailPanel({ job, resumeText }: { job: ScoredJob; resumeText: string }
           { icon: "⏱",  text: `${daysAgo(job.postedDays)} · ${job.applicants || "—"} applicants` },
         ].map(row => (
           <div key={row.text} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text2)" }}>
-            <span style={{ fontSize: 14, flexShrink: 0 }}>{row.icon}</span>{row.text}
+            {row.icon.startsWith("ti-") ? <i className={`ti ${row.icon}`} style={{ fontSize: 14, flexShrink: 0 }} /> : <span style={{ fontSize: 14, flexShrink: 0 }}>{row.icon}</span>}{row.text}
           </div>
         ))}
         <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 2 }}>

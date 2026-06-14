@@ -668,7 +668,7 @@ export default function CareerGpsPage() {
             <ArrowLeft size={14} /> All Roles
           </button>
           <span style={{ color: "var(--border)", fontSize: 18 }}>›</span>
-          <span style={{ fontSize: 14, fontWeight: 600 }}>{selectedRole.icon} {selectedRole.title}</span>
+          <span style={{ fontSize: 14, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}><i className={`ti ${selectedRole.icon}`} style={{ fontSize: 16, color: "var(--accent)" }} />{selectedRole.title}</span>
         </div>
         <Link href="/jobs" style={{ padding: "7px 16px", background: "var(--accent)", borderRadius: 8, color: "#fff", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
           Find Jobs <i className="ti ti-arrow-right"/>
@@ -679,7 +679,7 @@ export default function CareerGpsPage() {
 
         {/* Overview card */}
         <div style={{ ...card, marginBottom: 20, display: "flex", gap: 24, flexWrap: "wrap", alignItems: "center" }}>
-          <div style={{ fontSize: 48 }}>{selectedRole.icon}</div>
+          <div style={{ fontSize: 48 }}><i className={`ti ${selectedRole.icon}`} style={{ fontSize: 48, color: "var(--accent)" }} /></div>
           <div style={{ flex: 1 }}>
             <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{selectedRole.title}</h1>
             <div style={{ display: "flex", gap: 16, fontSize: 13, color: "var(--text3)", flexWrap: "wrap" }}>
