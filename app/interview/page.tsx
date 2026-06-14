@@ -82,9 +82,9 @@ const TARGET_ROLES = [
   "Other (type below)",
 ];
 const COMPANIES = [
-  "Razorpay", "Flipkart", "Swiggy", "Zomato", "PhonePe", "CRED",
+  "Any top company", "Razorpay", "Flipkart", "Swiggy", "Zomato", "PhonePe", "CRED",
   "Meesho", "Zepto", "Groww", "Paytm", "Google India", "Microsoft India",
-  "Amazon India", "Atlassian", "Startup", "Any top company",
+  "Amazon India", "Atlassian", "Startup",
 ];
 const DIFFICULTIES: { key: Difficulty; label: string; desc: string }[] = [
   { key: "fresher", label: "Fresher",   desc: "0–2 yrs" },
@@ -111,7 +111,7 @@ export default function InterviewPage() {
   const [currentSkills,setCurrentSkills]= useState("");
   const [targetRole,   setTargetRole]   = useState(TARGET_ROLES[1]);
   const [customRole,   setCustomRole]   = useState("");
-  const [company,      setCompany]      = useState("Razorpay");
+  const [company,      setCompany]      = useState(COMPANIES[0]);
   const [difficulty,   setDifficulty]   = useState<Difficulty>("mid");
   const [progLang,     setProgLang]     = useState<ProgLanguageKey>("any");
   const [gaps,         setGaps]         = useState<GapAnalysis | null>(null);
