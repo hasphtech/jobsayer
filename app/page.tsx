@@ -432,15 +432,21 @@ function LandingPage({ signIn }: { signIn: () => void }) {
 
         <p style={{
           fontSize: mobile ? 15 : 17, color: "var(--text3)",
-          maxWidth: 520, lineHeight: 1.75, marginBottom: 40,
+          maxWidth: 520, lineHeight: 1.75, marginBottom: 24,
         }}>
-          Close skill gaps, craft a standout resume, ace every interview, and grow your
-          salary — one platform for your entire career journey, wherever you are.
+          AI resume builder, ATS scorer, interview prep, salary benchmarks, and skill gap analysis — everything you need to land a better role and grow your salary.
         </p>
+        <div style={{ display: "flex", gap: mobile ? 12 : 24, justifyContent: "center", marginBottom: 32, flexWrap: "wrap" }}>
+          {["Resume Builder", "ATS Scorer", "Interview AI", "Career GPS", "Salary Intel"].map(f => (
+            <span key={f} style={{ fontSize: 12, color: "var(--text3)", display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ color: "var(--accent)", fontSize: 10, fontWeight: 700 }}>✓</span> {f}
+            </span>
+          ))}
+        </div>
 
         {/* CTAs */}
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center", marginBottom: 16 }}>
-          <Link href="/career-gps" style={{
+          <Link href="/builder" style={{
             padding: mobile ? "13px 26px" : "15px 32px",
             background: "var(--accent)", borderRadius: 12, color: "#fff",
             fontSize: mobile ? 14 : 16, fontWeight: 700, textDecoration: "none",
@@ -456,7 +462,7 @@ function LandingPage({ signIn }: { signIn: () => void }) {
               (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 8px 28px rgba(99,102,241,.35)";
               (e.currentTarget as HTMLAnchorElement).style.transform = "none";
             }}
-          ><i className="ti ti-rocket" style={{ fontSize: 15 }} /> Start growing — free</Link>
+          ><i className="ti ti-file-text" style={{ fontSize: 15 }} /> Build your resume — free</Link>
           <button onClick={signIn} style={{
             padding: mobile ? "13px 22px" : "15px 26px",
             background: "var(--surface)", border: "1px solid var(--border)",
@@ -763,10 +769,10 @@ function LandingPage({ signIn }: { signIn: () => void }) {
             >
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: mobile ? 8 : 14 }}>
                 <div style={{ width: mobile ? 30 : 40, height: mobile ? 30 : 40, borderRadius: 10, background: f.iconBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: mobile ? 15 : 20 }}>{f.icon}</div>
-                {!mobile && <span style={{ fontSize: 10, fontWeight: 600, padding: "3px 9px", borderRadius: 99, background: `${f.tagC}18`, color: f.tagC, border: `1px solid ${f.tagC}30` }}>{f.tag}</span>}
+                <span style={{ fontSize: 10, fontWeight: 600, padding: "3px 9px", borderRadius: 99, background: `${f.tagC}18`, color: f.tagC, border: `1px solid ${f.tagC}30` }}>{f.tag}</span>
               </div>
               <div style={{ fontSize: mobile ? 12 : 14, fontWeight: 700, color: "var(--text1)", marginBottom: 4, letterSpacing: "-.01em" }}>{f.title}</div>
-              {!mobile && <div style={{ fontSize: 13, color: "var(--text3)", lineHeight: 1.65 }}>{f.desc}</div>}
+              <div style={{ fontSize: mobile ? 11 : 13, color: "var(--text3)", lineHeight: 1.6, marginTop: 2, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: mobile ? 2 : 4, WebkitBoxOrient: "vertical" as const }}>{f.desc}</div>
             </div>
           ))}
         </div>

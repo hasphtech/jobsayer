@@ -256,6 +256,7 @@ export default function InterviewPage() {
 
         <div style={{ textAlign: "center", marginBottom: 36 }}>
           <div style={{ fontSize: 44, marginBottom: 12 }}><i className="ti ti-compass"/></div>
+          <p style={{ fontSize: 13, color: "var(--text3)", marginBottom: 8 }}>Practice real interview questions with AI feedback. Build confidence before the real thing.</p>
           <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-.02em", marginBottom: 10 }}>
             Career Path Builder
           </h1>

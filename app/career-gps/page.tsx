@@ -535,7 +535,8 @@ export default function CareerGpsPage() {
             <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 99, background: "var(--accdim)", border: "1px solid var(--accborder)", fontSize: 11, fontWeight: 700, color: "var(--accent)", marginBottom: 12 }}>
               <i className="ti ti-world"/> Global · Any city, any market
             </div>
-            <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 8 }}><i className="ti ti-compass"/> Career GPS</h1>
+            <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 4 }}><i className="ti ti-compass"/> Career GPS</h1>
+            <p style={{ fontSize: 13, color: "var(--text3)", marginBottom: 8 }}>Find skill gaps between where you are and where you want to be — then close them.</p>
             <p style={{ fontSize: 14, color: "var(--text3)", lineHeight: 1.6, maxWidth: 520 }}>
               Pick your target role — we'll analyse your skill gaps and give you a personalised learning roadmap.
             </p>

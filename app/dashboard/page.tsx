@@ -694,6 +694,7 @@ export default function DashboardPage() {
     applicationsTotal: 0, applicationsActive: 0, offersCount: 0,
     interviewsTotal: 0, skillProofsCount: 0, resumeScore: null as number | null,
   });
+  const [showRoadmap, setShowRoadmap] = useState(false);
 
   useEffect(() => {
     setState(getXPState());
@@ -742,37 +743,16 @@ export default function DashboardPage() {
           <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-.03em", marginBottom: 3 }}>
             {greet()}, {firstName}
           </h1>
-          <p style={{ fontSize: 13, color: "var(--text3)", display: "flex", alignItems: "center", gap: 5 }}>
+          <p style={{ fontSize: 13, color: "var(--text3)", display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
             <i className={`ti ${levelInfo.icon}`} style={{ fontSize: 13, color: levelInfo.color }} />
             Level {levelInfo.level} · {levelInfo.title}
             {streak > 0 && <><i className="ti ti-flame" style={{ fontSize: 12, color: "var(--danger)", marginLeft: 6 }} />{streak} day streak</>}
+            <span style={{ marginLeft: 8, color: "var(--border)", fontSize: 11 }}>·</span>
+            <span style={{ fontSize: 12, color: "var(--text3)" }}>Career command center</span>
           </p>
         </div>
 
-        {/* ── Level progress bar ── */}
-        <div style={{
-          background: "var(--surface)", border: "1px solid var(--border)",
-          borderRadius: 10, padding: "12px 16px", marginBottom: 16,
-        }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 7 }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text1)" }}>
-              {state.totalXP.toLocaleString()} XP total
-            </span>
-            <span style={{ fontSize: 11, color: "var(--text3)" }}>
-              {levelInfo.level < 7
-                ? `${levelInfo.xpToNext.toLocaleString()} XP to Level ${levelInfo.level + 1} · ${LEVELS[levelInfo.level]?.title ?? ""}`
-                : "Max level reached 🏆"}
-            </span>
-          </div>
-          <div style={{ height: 5, background: "var(--border)", borderRadius: 3, overflow: "hidden" }}>
-            <div style={{
-              height: "100%", borderRadius: 3,
-              width: `${levelInfo.progressPct}%`,
-              background: levelInfo.color,
-              transition: "width 1s ease",
-            }} />
-          </div>
-        </div>
+
 
         {/* ── Onboarding banner (new users) ── */}
         {state.totalXP === 0 && <OnboardingBanner />}
@@ -808,20 +788,16 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* ── Quick actions ── */}
+        {/* ── Quick access ── */}
         <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px", marginBottom: 14 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>
-            Quick actions
+            Quick access
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 8 }}>
-            <QuickAction href="/builder"       icon="ti-pencil"       label="Update Resume"       xp="+20 XP" />
-            <QuickAction href="/score"         icon="ti-target"       label="Score Resume"         xp="+30 XP" />
-            <QuickAction href="/interview"     icon="ti-microphone"   label="Practice Interview"   xp="+45 XP" />
-            <QuickAction href="/jobs"          icon="ti-briefcase"    label="Apply to Jobs"         xp="+25 XP" />
-            <QuickAction href="/career-gps"    icon="ti-compass"      label="Career GPS"            xp="+15 XP" />
-            <QuickAction href="/career-health" icon="ti-stethoscope"  label="Health Checkup"        xp="+40 XP" />
-            <QuickAction href="/salary"        icon="ti-coin"         label="Salary Intel"          xp="+10 XP" />
-            <QuickAction href="/profile"       icon="ti-bolt"         label="Add Skill Proof"       xp="+35 XP" />
+            <QuickAction href="/builder"   icon="ti-pencil"     label="Resume Builder"   xp="+20 XP" />
+            <QuickAction href="/score"     icon="ti-target"     label="ATS Score"         xp="+30 XP" />
+            <QuickAction href="/jobs"      icon="ti-briefcase"  label="Browse Jobs"       xp="+25 XP" />
+            <QuickAction href="/interview" icon="ti-microphone" label="Interview Prep"    xp="+45 XP" />
           </div>
         </div>
 
@@ -831,7 +807,7 @@ export default function DashboardPage() {
           {/* Today's focus */}
           <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>
-              Today&apos;s focus
+              What to do next
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {focusTasks.map((t, i) => (
@@ -897,9 +873,10 @@ export default function DashboardPage() {
         </div>
 
         {/* ── Score trend + Badges ── */}
-        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12, marginBottom: 14 }}>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : ((state.scoreHistory ?? []).length >= 2 ? "1fr 1fr" : "1fr"), gap: 12, marginBottom: 14 }}>
 
-          {/* Score trend */}
+          {/* Score trend — only shown when there are ≥2 data points */}
+          {(state.scoreHistory ?? []).length >= 2 && (
           <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
@@ -911,6 +888,7 @@ export default function DashboardPage() {
             </div>
             <ScoreChart data={state.scoreHistory ?? []} />
           </div>
+          )}
 
           {/* Badges */}
           <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px" }}>
@@ -936,12 +914,17 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* ── Level roadmap ── */}
+        {/* ── Level roadmap (collapsible) ── */}
         <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px" }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>
-            Level roadmap
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: showRoadmap ? 12 : 0 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Level roadmap
+            </div>
+            <button onClick={() => setShowRoadmap(o => !o)} style={{ fontSize: 11, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+              {showRoadmap ? "Hide ↑" : "Show ↓"}
+            </button>
           </div>
-          <div style={{ display: "flex", gap: 0, overflowX: "auto" }}>
+          {showRoadmap && <div style={{ display: "flex", gap: 0, overflowX: "auto" }}>
             {LEVELS.map((lvl, i) => {
               const isActive = (state as unknown as { level?: number }).level === lvl.level
                 || levelInfo.level === lvl.level;
@@ -968,7 +951,7 @@ export default function DashboardPage() {
                 </div>
               );
             })}
-          </div>
+          </div>}
         </div>
 
         {/* ── POST-HIRE CONTINUITY (GAP 3) ── */}

@@ -301,7 +301,8 @@ export default function ScorePage() {
 
         {/* ── Header ── */}
         <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>jobSayer Score</h1>
+          <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>ATS Score</h1>
+          <p style={{ fontSize: 13, color: "var(--text3)", marginBottom: 12 }}>See how well your resume passes Applicant Tracking Systems before recruiters ever read it.</p>
           <p style={{ fontSize: 13, color: "var(--text3)" }}>{resumeName} · Analysed just now</p>
         </div>
 
