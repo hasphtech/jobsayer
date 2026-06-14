@@ -301,7 +301,8 @@ export default function ScorePage() {
 
         {/* ── Header ── */}
         <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>jobSayer Score</h1>
+          <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>ATS Score</h1>
+          <p style={{ fontSize: 13, color: "var(--text3)", marginBottom: 12 }}>See how well your resume passes Applicant Tracking Systems before recruiters ever read it.</p>
           <p style={{ fontSize: 13, color: "var(--text3)" }}>{resumeName} · Analysed just now</p>
         </div>
 
@@ -469,7 +470,7 @@ export default function ScorePage() {
                 <div key={ats.name}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
                     <div>
-                      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)" }}>{ats.icon} {ats.name}</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)", display: "flex", alignItems: "center", gap: 5 }}><i className={`ti ${ats.icon}`} style={{ fontSize: 13, color: "var(--accent)" }} />{ats.name}</span>
                       <span style={{ fontSize: 11, color: "var(--text3)", marginLeft: 8 }}>Used by: {ats.usedBy}</span>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

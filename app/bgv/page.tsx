@@ -65,7 +65,7 @@ function StatusBadge({ bgv }: { bgv: BgvRecord }) {
     <div style={{ ...cardStyle, marginBottom: 24 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
         <div style={{ width: 52, height: 52, borderRadius: 14, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>
-          <i className={`ti ${s.icon}`} />
+          {s.icon.startsWith("ti-") ? <i className={`ti ${s.icon}`} /> : <span>{s.icon}</span>}
         </div>
         <div>
           <div style={{ fontSize: 16, fontWeight: 700, color: s.color }}>{s.label}</div>
@@ -290,7 +290,7 @@ export default function BgvPage() {
               { icon: "ti-coin", title: "Better offers",       desc: "Verified pros report 12–18% higher starting salaries on average", accent: "var(--accent)" },
             ].map(c => (
               <div key={c.title} style={{ ...cardStyle, padding: "16px", textAlign: "center", borderTop: `3px solid ${c.accent}` }}>
-                <div style={{ fontSize: 24, marginBottom: 8 }}>{c.icon}</div>
+                <i className={`ti ${c.icon}`} style={{ fontSize: 26, marginBottom: 8, display: "block", color: c.accent }} />
                 <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 5, color: "var(--text1)" }}>{c.title}</div>
                 <div style={{ fontSize: 11, color: "var(--text3)", lineHeight: 1.6 }}>{c.desc}</div>
               </div>

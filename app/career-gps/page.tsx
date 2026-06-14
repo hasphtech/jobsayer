@@ -535,7 +535,8 @@ export default function CareerGpsPage() {
             <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 99, background: "var(--accdim)", border: "1px solid var(--accborder)", fontSize: 11, fontWeight: 700, color: "var(--accent)", marginBottom: 12 }}>
               <i className="ti ti-world"/> Global · Any city, any market
             </div>
-            <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 8 }}><i className="ti ti-compass"/> Career GPS</h1>
+            <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 4 }}><i className="ti ti-compass"/> Career GPS</h1>
+            <p style={{ fontSize: 13, color: "var(--text3)", marginBottom: 8 }}>Find skill gaps between where you are and where you want to be — then close them.</p>
             <p style={{ fontSize: 14, color: "var(--text3)", lineHeight: 1.6, maxWidth: 520 }}>
               Pick your target role — we'll analyse your skill gaps and give you a personalised learning roadmap.
             </p>
@@ -668,7 +669,7 @@ export default function CareerGpsPage() {
             <ArrowLeft size={14} /> All Roles
           </button>
           <span style={{ color: "var(--border)", fontSize: 18 }}>›</span>
-          <span style={{ fontSize: 14, fontWeight: 600 }}>{selectedRole.icon} {selectedRole.title}</span>
+          <span style={{ fontSize: 14, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}><i className={`ti ${selectedRole.icon}`} style={{ fontSize: 16, color: "var(--accent)" }} />{selectedRole.title}</span>
         </div>
         <Link href="/jobs" style={{ padding: "7px 16px", background: "var(--accent)", borderRadius: 8, color: "#fff", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
           Find Jobs <i className="ti ti-arrow-right"/>
@@ -679,7 +680,7 @@ export default function CareerGpsPage() {
 
         {/* Overview card */}
         <div style={{ ...card, marginBottom: 20, display: "flex", gap: 24, flexWrap: "wrap", alignItems: "center" }}>
-          <div style={{ fontSize: 48 }}>{selectedRole.icon}</div>
+          <div style={{ fontSize: 48 }}><i className={`ti ${selectedRole.icon}`} style={{ fontSize: 48, color: "var(--accent)" }} /></div>
           <div style={{ flex: 1 }}>
             <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{selectedRole.title}</h1>
             <div style={{ display: "flex", gap: 16, fontSize: 13, color: "var(--text3)", flexWrap: "wrap" }}>

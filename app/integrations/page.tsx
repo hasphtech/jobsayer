@@ -250,9 +250,7 @@ function PlatformCard({
 export default function IntegrationsPage() {
   const w = useWindowWidth();
   const mobile = w < 640;
-  const [integrations, setIntegrations] = useState<Integration[]>([
-    { platform: "slack", status: "connected", workspace: "acme-eng.slack.com", connectedAt: "2026-05-12" },
-  ]);
+  const [integrations, setIntegrations] = useState<Integration[]>([]);
 
   function getIntegration(platform: Platform) {
     return integrations.find(i => i.platform === platform);

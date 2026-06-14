@@ -22,22 +22,22 @@ import AiCoachPanel from "./AiCoachPanel";
 
 /* ── Candidate nav ───────────────────────────────────────────── */
 const TOOL_LINKS = [
-  { href: "/dashboard",    label: "Dashboard",      icon: "ti-layout-dashboard" },
-  { href: "/builder",      label: "Resume Builder", icon: "ti-file-text" },
-  { href: "/score",        label: "ATS Score",      icon: "ti-target" },
-  { href: "/tailor",       label: "JD Tailor",      icon: "ti-cut" },
-  { href: "/cover-letter", label: "Cover Letter",   icon: "ti-mail" },
-  { href: "/interview",    label: "Interview",      icon: "ti-microphone" },
+  { href: "/dashboard",    label: "Dashboard",      icon: "ti-layout-dashboard", desc: "Your career command center" },
+  { href: "/builder",      label: "Resume Builder", icon: "ti-file-text",        desc: "Build and edit your resume" },
+  { href: "/score",        label: "ATS Score",      icon: "ti-target",           desc: "Check ATS compatibility before applying" },
+  { href: "/tailor",       label: "JD Tailor",      icon: "ti-cut",              desc: "Customize your resume for a specific job" },
+  { href: "/cover-letter", label: "Cover Letter",   icon: "ti-mail",             desc: "Generate a tailored cover letter" },
+  { href: "/interview",    label: "Interview",      icon: "ti-microphone",       desc: "Practice with AI interview coaching" },
 ];
 
 // Primary grow links — always visible
 const GROW_LINKS = [
-  { href: "/jobs",          label: "Jobs",        icon: "ti-briefcase" },
-  { href: "/applications",  label: "Tracker",     icon: "ti-checklist" },
-  { href: "/career-gps",    label: "Career GPS",  icon: "ti-compass" },
-  { href: "/career-health", label: "Health",      icon: "ti-activity" },
-  { href: "/salary",        label: "Salaries",    icon: "ti-coin" },
-  { href: "/learn",         label: "Courses",     icon: "ti-school" },
+  { href: "/jobs",          label: "Jobs",        icon: "ti-briefcase",  desc: "Browse AI-matched job listings" },
+  { href: "/applications",  label: "Tracker",     icon: "ti-checklist",  desc: "Track your job applications" },
+  { href: "/career-gps",    label: "Career GPS",  icon: "ti-compass",    desc: "Find skill gaps to your next role" },
+  { href: "/career-health", label: "Health",      icon: "ti-activity",   desc: "Your overall career health score" },
+  { href: "/salary",        label: "Salaries",    icon: "ti-coin",       desc: "Benchmark your salary globally" },
+  { href: "/learn",         label: "Courses",     icon: "ti-school",     desc: "Curated courses to close skill gaps" },
 ];
 
 // Secondary links — shown in collapsed "More" section
@@ -142,15 +142,16 @@ function useWidth() {
 
 /* ── Sidebar nav link ────────────────────────────────────────── */
 function NavLink({
-  href, label, icon, active, onClick,
+  href, label, icon, active, onClick, desc,
 }: {
-  href: string; label: string; icon: string; active: boolean; onClick?: () => void;
+  href: string; label: string; icon: string; active: boolean; onClick?: () => void; desc?: string;
 }) {
   const [hovered, setHovered] = useState(false);
   return (
     <Link
       href={href}
       onClick={onClick}
+      title={desc}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
