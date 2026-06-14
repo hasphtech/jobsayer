@@ -123,7 +123,7 @@ function StepBar({ current }: { current: Step }) {
               fontSize: i < idx ? 14 : 16, color: i <= idx ? "#fff" : "var(--text3)",
               fontWeight: 700,
             }}>
-              {i < idx ? "✓" : s.icon}
+              {i < idx ? "✓" : <i className={`ti ${s.icon}`} style={{ fontSize: 15 }} />}
             </div>
             <div style={{ fontSize: 11, color: i === idx ? "var(--accent)" : "var(--text3)", marginTop: 5, fontWeight: i === idx ? 700 : 400 }}>{s.label}</div>
           </div>

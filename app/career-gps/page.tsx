@@ -602,7 +602,7 @@ export default function CareerGpsPage() {
                       onMouseLeave={e => (e.currentTarget.style.borderColor = role.category === "Transition" ? "var(--accborder)" : "var(--border)")}
                     >
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
-                        <span style={{ fontSize: 28 }}>{role.icon}</span>
+                        <i className={`ti ${role.icon}`} style={{ fontSize: 26, color: "var(--accent)" }} />
                         <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 10, background: "transparent", color: demandColor, border: `1px solid ${demandColor}` }}>
                           {role.demand} demand
                         </span>

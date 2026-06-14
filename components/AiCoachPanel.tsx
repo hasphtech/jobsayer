@@ -170,8 +170,9 @@ export default function AiCoachPanel() {
         borderRadius: 10, padding: "12px 12px", marginBottom: 12,
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)" }}>
-            {levelInfo.icon} {levelInfo.title}
+          <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)", display: "flex", alignItems: "center", gap: 5 }}>
+            <i className={`ti ${levelInfo.icon}`} style={{ fontSize: 13, color: levelInfo.color }} />
+            {levelInfo.title}
           </span>
           <span style={{
             fontSize: 11, color: "var(--accent)",
@@ -214,7 +215,7 @@ export default function AiCoachPanel() {
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 16, cursor: "default",
               }}>
-                {b.icon}
+                <i className={`ti ${b.icon}`} style={{ fontSize: 14, color: "var(--accent)" }} />
               </div>
             ))}
           </div>
