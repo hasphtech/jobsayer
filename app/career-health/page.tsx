@@ -361,7 +361,7 @@ export default function CareerHealthPage() {
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {dimensions.map(d => (
               <div key={d.id} style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                <i className={`ti ${d.icon}`} style={{ fontSize: 18, width: 24, textAlign: "center", flexShrink: 0, color: "var(--accent)" }} />
+                <span style={{ fontSize: 18, width: 24, textAlign: "center", flexShrink: 0 }}>{d.icon}</span>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
                     <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)" }}>{d.label}</span>
@@ -387,7 +387,7 @@ export default function CareerHealthPage() {
                   gap: 12, fontFamily: "inherit",
                 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 0 }}>
-                    <i className={`ti ${d.icon}`} style={{ fontSize: 22, flexShrink: 0, color: "var(--accent)" }} />
+                    <span style={{ fontSize: 22, flexShrink: 0 }}>{d.icon}</span>
                     <div style={{ textAlign: "left" }}>
                       <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)" }}>{d.label}</div>
                       <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 2 }}>{d.summary.slice(0, 80)}{d.summary.length > 80 ? "…" : ""}</div>

@@ -123,7 +123,7 @@ function StepBar({ current }: { current: Step }) {
               fontSize: i < idx ? 14 : 16, color: i <= idx ? "#fff" : "var(--text3)",
               fontWeight: 700,
             }}>
-              {i < idx ? "✓" : <i className={`ti ${s.icon}`} style={{ fontSize: 15 }} />}
+              {i < idx ? "✓" : s.icon}
             </div>
             <div style={{ fontSize: 11, color: i === idx ? "var(--accent)" : "var(--text3)", marginTop: 5, fontWeight: i === idx ? 700 : 400 }}>{s.label}</div>
           </div>
@@ -290,7 +290,7 @@ export default function BgvPage() {
               { icon: "ti-coin", title: "Better offers",       desc: "Verified pros report 12–18% higher starting salaries on average", accent: "var(--accent)" },
             ].map(c => (
               <div key={c.title} style={{ ...cardStyle, padding: "16px", textAlign: "center", borderTop: `3px solid ${c.accent}` }}>
-                <i className={`ti ${c.icon}`} style={{ fontSize: 26, marginBottom: 8, display: "block", color: c.accent }} />
+                <div style={{ fontSize: 24, marginBottom: 8 }}>{c.icon}</div>
                 <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 5, color: "var(--text1)" }}>{c.title}</div>
                 <div style={{ fontSize: 11, color: "var(--text3)", lineHeight: 1.6 }}>{c.desc}</div>
               </div>
