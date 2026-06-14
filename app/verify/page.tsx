@@ -152,7 +152,7 @@ export default function VerifyPage() {
             { icon: "ti-layout-list", title: "PAN",         desc: "Company PAN verification — matches legal entity name" },
           ].map(c => (
             <div key={c.title} style={{ ...card, padding: "16px", textAlign: "center" }}>
-              <div style={{ fontSize: 28, marginBottom: 8 }}>{c.icon}</div>
+              <i className={`ti ${c.icon}`} style={{ fontSize: 28, marginBottom: 8, display: "block", color: "var(--accent)" }} />
               <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>{c.title}</div>
               <div style={{ fontSize: 11, color: "var(--text3)", lineHeight: 1.5 }}>{c.desc}</div>
             </div>
@@ -167,7 +167,9 @@ export default function VerifyPage() {
               return (
                 <>
                   <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
-                    <div style={{ width: 52, height: 52, borderRadius: 14, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>{s.icon}</div>
+                    <div style={{ width: 52, height: 52, borderRadius: 14, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: s.color }}>
+                      {s.icon.startsWith("ti-") ? <i className={`ti ${s.icon}`} /> : s.icon}
+                    </div>
                     <div>
                       <div style={{ fontSize: 16, fontWeight: 700, color: s.color }}>{s.label}</div>
                       <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 3 }}>
