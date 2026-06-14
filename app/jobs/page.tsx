@@ -11,6 +11,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Target, Shield, AlertTriangle, Clock, Users, MapPin, Briefcase, RefreshCw, Search, ChevronRight } from "lucide-react";
 import AppShell from "@/components/AppShell";
+import { useWindowWidth } from "@/lib/useWindowWidth";
 
 /* ── JD Scanner ─────────────────────────────────────────────────── */
 
@@ -609,13 +610,16 @@ type Filter = "best" | "remote" | "fresh" | "foryou";
 type Tab = "jobs" | "scanner";
 
 export default function JobsPage() {
+  const w = useWindowWidth();
+  const mobile = w < 768;
   const [resumeText, setResumeText] = useState("");
   const [filter, setFilter] = useState<Filter>("best");
   const [jobs, setJobs] = useState<Job[]>(JOBS);
-  const [selectedId, setSelectedId] = useState<string>(JOBS[0].id);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>("jobs");
   const [prefs, setPrefs] = useState<JobPrefs | null>(null);
+  const [showDetail, setShowDetail] = useState(false); // mobile: show detail panel
 
   // Load resume from localStorage
   useEffect(() => {
@@ -722,7 +726,7 @@ export default function JobsPage() {
     return scored;
   }, [scored, filter, prefs]);
 
-  const selected = scored.find(j => j.id === selectedId) ?? scored[0];
+  const selected = scored.find(j => j.id === selectedId) ?? (scored.length > 0 ? scored[0] : null);
 
   if (loading) return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -756,9 +760,9 @@ export default function JobsPage() {
       }>
 
       {tab === "scanner" ? (
-        <div style={{ maxWidth: 960, margin: "0 auto", padding: "24px 20px" }}>
+        <div style={{ maxWidth: 960, margin: "0 auto", padding: mobile ? "16px 14px" : "24px 20px" }}>
           <div style={{ marginBottom: 20 }}>
-            <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}><i className="ti ti-search"/> Honest JD Scanner</h1>
+            <h1 style={{ fontSize: mobile ? 17 : 20, fontWeight: 700, marginBottom: 4 }}><i className="ti ti-search"/> Honest JD Scanner</h1>
             <p style={{ fontSize: 13, color: "var(--text3)" }}>
               Paste any job description — we&apos;ll score it for ghost-job signals, red flags, requirement inflation, and match it against your resume.
             </p>
@@ -818,16 +822,23 @@ export default function JobsPage() {
             )}
           </div>
 
-          {/* Split layout */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", minHeight: "100%" }}>
+          {/* Split layout — desktop side-by-side, mobile list + bottom sheet */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: mobile ? "1fr" : "1fr 300px",
+            minHeight: "100%",
+          }}>
             {/* Job list */}
-            <div style={{ borderRight: "1px solid var(--border)", overflowY: "auto" }}>
+            <div style={{ borderRight: mobile ? "none" : "1px solid var(--border)", overflowY: "auto" }}>
               {filtered.map(job => (
                 <JobCard
                   key={job.id}
                   job={job}
                   selected={selectedId === job.id}
-                  onClick={() => setSelectedId(job.id)}
+                  onClick={() => {
+                    setSelectedId(job.id);
+                    if (mobile) setShowDetail(true);
+                  }}
                 />
               ))}
               {filtered.length === 0 && (
@@ -837,11 +848,46 @@ export default function JobsPage() {
               )}
             </div>
 
-            {/* Detail panel */}
-            <div style={{ overflowY: "auto" }}>
-              {selected && <DetailPanel job={selected} resumeText={resumeText} />}
-            </div>
+            {/* Desktop: sidebar detail panel */}
+            {!mobile && (
+              <div style={{ overflowY: "auto" }}>
+                {selected && <DetailPanel job={selected} resumeText={resumeText} />}
+              </div>
+            )}
           </div>
+
+          {/* Mobile: full-screen bottom sheet for job detail */}
+          {mobile && showDetail && selected && (
+            <div style={{
+              position: "fixed", inset: 0, zIndex: 200,
+              background: "rgba(0,0,0,.5)",
+              display: "flex", flexDirection: "column", justifyContent: "flex-end",
+            }} onClick={() => setShowDetail(false)}>
+              <div
+                style={{
+                  background: "var(--surface)", borderRadius: "16px 16px 0 0",
+                  maxHeight: "88vh", overflowY: "auto",
+                  paddingBottom: 24,
+                }}
+                onClick={e => e.stopPropagation()}
+              >
+                {/* drag handle */}
+                <div style={{ display: "flex", justifyContent: "center", padding: "12px 0 4px" }}>
+                  <div style={{ width: 36, height: 4, borderRadius: 2, background: "var(--border)" }} />
+                </div>
+                <button
+                  onClick={() => setShowDetail(false)}
+                  style={{
+                    position: "absolute", top: 14, right: 16,
+                    background: "var(--surface2)", border: "none", borderRadius: "50%",
+                    width: 28, height: 28, cursor: "pointer", fontSize: 16,
+                    color: "var(--text2)", display: "flex", alignItems: "center", justifyContent: "center",
+                  }}
+                >×</button>
+                <DetailPanel job={selected} resumeText={resumeText} />
+              </div>
+            </div>
+          )}
         </div>
       )}
     </AppShell>
