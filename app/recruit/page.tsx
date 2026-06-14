@@ -602,17 +602,7 @@ function PostJobForm({ onSuccess }: { onSuccess: () => void }) {
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   MOCK CANDIDATES (for pool view)
-═══════════════════════════════════════════════════════════════ */
-const MOCK_CANDIDATES = [
-  { id: "c1", name: "Priya Sharma",  title: "Full Stack Engineer",       location: "Bangalore", exp: "4 yrs", skills: ["React","Node.js","TypeScript","AWS"],      score: 82, openTo: "remote",  avatar: "PS" },
-  { id: "c2", name: "Arjun Mehta",   title: "Backend Engineer",          location: "Pune",      exp: "3 yrs", skills: ["Go","PostgreSQL","Kubernetes","Docker"],    score: 76, openTo: "hybrid",  avatar: "AM" },
-  { id: "c3", name: "Sneha Reddy",   title: "Frontend Developer",        location: "Hyderabad", exp: "2 yrs", skills: ["React","TypeScript","Next.js","CSS"],       score: 71, openTo: "onsite",  avatar: "SR" },
-  { id: "c4", name: "Karthik Nair",  title: "DevOps Engineer",           location: "Bangalore", exp: "5 yrs", skills: ["Kubernetes","Terraform","AWS","CI/CD"],     score: 88, openTo: "remote",  avatar: "KN" },
-  { id: "c5", name: "Divya Patel",   title: "Python Backend Engineer",   location: "Mumbai",    exp: "3 yrs", skills: ["Python","Django","Redis","PostgreSQL"],     score: 74, openTo: "hybrid",  avatar: "DP" },
-  { id: "c6", name: "Rahul Verma",   title: "Full Stack Developer",      location: "Delhi",     exp: "2 yrs", skills: ["React","Node.js","MongoDB","Docker"],       score: 68, openTo: "remote",  avatar: "RV" },
-];
+
 
 /* ═══════════════════════════════════════════════════════════════
    RECRUITER DASHBOARD
@@ -795,9 +785,7 @@ export default function RecruitPage() {
     } finally { setPayLoading(null); }
   }, [user, interval, profile]);
 
-  const filteredCandidates = MOCK_CANDIDATES.filter(c =>
-    !searchQ || [c.name, c.title, ...c.skills].some(v => v.toLowerCase().includes(searchQ.toLowerCase()))
-  );
+
 
   const card: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "20px" };
 
@@ -853,41 +841,18 @@ export default function RecruitPage() {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
             <div>
               <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 2 }}>Candidate Pool</h1>
-              <p style={{ fontSize: 13, color: "var(--text3)" }}>Ranked by jobSayer score · {MOCK_CANDIDATES.length} active candidates</p>
-            </div>
-            <div style={{ position: "relative" }}>
-              <Search size={13} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "var(--text3)" }} />
-              <input value={searchQ} onChange={e => setSearchQ(e.target.value)} placeholder="Search skills, role…"
-                style={{ padding: "8px 12px 8px 30px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--surface2)", color: "var(--text1)", fontSize: 13, width: 200 }} />
+              <p style={{ fontSize: 13, color: "var(--text3)" }}>Candidates who apply to your jobs will appear here, ranked by jobSayer score.</p>
             </div>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 14 }}>
-            {filteredCandidates.map(c => {
-              const scoreColor = c.score >= 80 ? "var(--success)" : c.score >= 70 ? "var(--warn)" : "var(--danger)";
-              return (
-                <div key={c.id} style={{ ...card, borderRadius: 14 }}>
-                  <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: "50%", background: `${scoreColor}22`, border: `2px solid ${scoreColor}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: scoreColor, flexShrink: 0 }}>{c.avatar}</div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 14, fontWeight: 700 }}>{c.name}</div>
-                      <div style={{ fontSize: 13, color: "var(--text2)" }}>{c.title} · {c.location}</div>
-                      <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 2 }}>{c.exp} · Open to {c.openTo}</div>
-                    </div>
-                    <div style={{ textAlign: "center" }}>
-                      <div style={{ fontSize: 22, fontWeight: 800, color: scoreColor, lineHeight: 1 }}>{c.score}</div>
-                      <div style={{ fontSize: 10, color: "var(--text3)", textTransform: "uppercase" }}>score</div>
-                    </div>
-                  </div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 12 }}>
-                    {c.skills.map(s => <span key={s} style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6, fontWeight: 500, background: "rgba(99,102,241,.08)", color: "var(--accent)", border: "1px solid var(--accborder)" }}>{s}</span>)}
-                  </div>
-                  <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-                    <button style={{ padding: "6px 14px", border: "1px solid var(--border)", borderRadius: 7, fontSize: 12, fontWeight: 600, color: "var(--text2)", background: "var(--surface2)", cursor: "pointer" }}>View Profile</button>
-                    <button onClick={() => requireAuth(() => {})} style={{ padding: "6px 16px", border: "none", borderRadius: 7, fontSize: 12, fontWeight: 600, color: "#fff", background: "var(--accent)", cursor: "pointer" }}>Contact →</button>
-                  </div>
-                </div>
-              );
-            })}
+          <div style={{ ...card, textAlign: "center", padding: "60px 24px" }}>
+            <i className="ti ti-users" style={{ fontSize: 40, color: "var(--text3)", display: "block", marginBottom: 16 }} />
+            <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 8, color: "var(--text1)" }}>No candidates yet</div>
+            <p style={{ fontSize: 13, color: "var(--text3)", maxWidth: 360, margin: "0 auto 20px" }}>
+              Post a job to start receiving AI-matched, scored candidates. Each applicant is ranked by resume quality, skill match, and ATS score.
+            </p>
+            <button onClick={() => setView("post")} style={{ padding: "10px 24px", borderRadius: 9, border: "none", background: "var(--accent)", color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
+              Post your first job <i className="ti ti-arrow-right" style={{ marginLeft: 4 }} />
+            </button>
           </div>
         </div>
       </div>
