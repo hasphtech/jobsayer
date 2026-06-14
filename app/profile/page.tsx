@@ -7,6 +7,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
+import { useWindowWidth } from "@/lib/useWindowWidth";
 import { useResumePlan } from "@/lib/resumePlan";
 import { getSupabaseAsync } from "@/lib/auth";
 import AppShell from "@/components/AppShell";
@@ -72,6 +73,8 @@ export default function ProfilePage() {
   const router = useRouter();
   const { user, signOut, loading: authLoading } = useAuth();
   const plan = useResumePlan();
+  const w = useWindowWidth();
+  const mobile = w < 640;
 
   const [tab, setTab]                   = useState<TabId>("overview");
   const [saves, setSaves]               = useState<SaveMeta[]>([]);
@@ -211,7 +214,7 @@ export default function ProfilePage() {
 
   return (
     <AppShell>
-      <div style={{ maxWidth: 720, margin: "0 auto", padding: "32px 16px 80px" }}>
+      <div style={{ maxWidth: 720, margin: "0 auto", padding: mobile ? "16px 12px 80px" : "32px 16px 80px" }}>
 
         {/* ── Profile header ── */}
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 28, flexWrap: "wrap" }}>
@@ -265,7 +268,7 @@ export default function ProfilePage() {
               key={t.id}
               onClick={() => setTab(t.id)}
               style={{
-                flex: 1, minWidth: "fit-content", padding: "9px 14px", borderRadius: 9, border: "none",
+                flex: 1, minWidth: mobile ? "auto" : "fit-content", padding: mobile ? "8px 10px" : "9px 14px", borderRadius: 9, border: "none",
                 background: tab === t.id ? "var(--accent)" : "transparent",
                 color: tab === t.id ? "#fff" : "var(--text3)",
                 fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
@@ -285,7 +288,7 @@ export default function ProfilePage() {
         {tab === "overview" && (
           <div>
             {/* Quick stats row */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3, 1fr)", gap: 12, marginBottom: 14 }}>
               <StatCard icon="ti-file-text" label="Saved Resumes" value={savesLoading ? "…" : String(saves.length)} sub={`of ${plan.maxSaves} max`} />
               <StatCard icon="ti-sparkles" label="AI Features"   value={plan.hasAiFeatures ? "Active" : "Upgrade"}  accent={plan.hasAiFeatures} />
               <StatCard icon="ti-shield-check" label="BGV Status" value={bgv?.status === "verified" ? "Verified" : bgv ? "In Progress" : "Not started"} accent={bgv?.status === "verified"} />
@@ -475,7 +478,7 @@ export default function ProfilePage() {
 
               {proofForm && (
                 <div style={{ background: "var(--surface2)", borderRadius: 12, padding: 16, border: "1px solid var(--border)", marginBottom: 14, display: "flex", flexDirection: "column", gap: 10 }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 10 }}>
                     <div>
                       <Label>Skill name</Label>
                       <input value={newSkill} onChange={e => setNewSkill(e.target.value)} placeholder="e.g. React, System Design" style={inputStyle} />
@@ -547,7 +550,7 @@ export default function ProfilePage() {
                   </button>
                 )}
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 10 }}>
                 <PlanStat label="Resume Saves"  value={`${saves.length} / ${plan.maxSaves}`} />
                 <PlanStat label="AI Features"   value={plan.hasAiFeatures ? "✓ Enabled" : "✗ Upgrade needed"} />
                 <PlanStat label="DOCX Export"   value={plan.hasDocxExport ? "✓ Enabled" : "✗ Starter+"} />
