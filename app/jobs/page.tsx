@@ -576,8 +576,36 @@ function DetailPanel({ job, resumeText }: { job: ScoredJob; resumeText: string }
   );
 }
 
+/* ── Prefs matcher ─────────────────────────────────────────────── */
+interface JobPrefs {
+  job_titles: string[];
+  locations:  string[];
+  job_types:  string[];
+}
+
+function jobMatchesPrefs(job: Job, prefs: JobPrefs): boolean {
+  const title = job.title.toLowerCase();
+  const loc   = job.location.toLowerCase();
+  const modeMap: Record<string, string> = {
+    "full-time": "onsite", "remote": "remote",
+    "part-time": "remote", "contract": "contract", "internship": "onsite",
+  };
+
+  const titleMatch = prefs.job_titles.length === 0 ||
+    prefs.job_titles.some(t => title.includes(t.toLowerCase()) || t.toLowerCase().includes(title.split(" ")[0]));
+  const locMatch = prefs.locations.length === 0 ||
+    prefs.locations.some(l => loc.includes(l.toLowerCase()) || l.toLowerCase() === "anywhere" || job.mode === "remote");
+  const typeMatch = prefs.job_types.length === 0 ||
+    prefs.job_types.some(t => {
+      const mapped = modeMap[t.toLowerCase()];
+      return mapped ? job.mode === mapped : true;
+    });
+
+  return titleMatch && locMatch && typeMatch;
+}
+
 /* ── Page ──────────────────────────────────────────────────────── */
-type Filter = "best" | "remote" | "fresh";
+type Filter = "best" | "remote" | "fresh" | "foryou";
 type Tab = "jobs" | "scanner";
 
 export default function JobsPage() {
@@ -587,6 +615,7 @@ export default function JobsPage() {
   const [selectedId, setSelectedId] = useState<string>(JOBS[0].id);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>("jobs");
+  const [prefs, setPrefs] = useState<JobPrefs | null>(null);
 
   // Load resume from localStorage
   useEffect(() => {
@@ -601,6 +630,39 @@ export default function JobsPage() {
       }
     } catch { /* ignore */ }
     setLoading(false);
+  }, []);
+
+  // Load job preferences
+  useEffect(() => {
+    async function loadPrefs() {
+      try {
+        // Try cached prefs from localStorage first (instant)
+        const cached = localStorage.getItem("jobsayer-job-prefs");
+        if (cached) setPrefs(JSON.parse(cached));
+
+        // Fetch fresh from API
+        const { getSupabaseAsync } = await import("@/lib/auth");
+        const sb = await getSupabaseAsync();
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) return;
+
+        const res = await fetch("/api/preferences", {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+        });
+        if (!res.ok) return;
+        const { preferences } = await res.json();
+        if (preferences) {
+          const p: JobPrefs = {
+            job_titles: preferences.job_titles ?? [],
+            locations:  preferences.locations  ?? [],
+            job_types:  preferences.job_types  ?? [],
+          };
+          setPrefs(p);
+          localStorage.setItem("jobsayer-job-prefs", JSON.stringify(p));
+        }
+      } catch { /* graceful fallback */ }
+    }
+    loadPrefs();
   }, []);
 
   // Fetch live jobs: Supabase first <i className="ti ti-arrow-right"/> Remotive auto-seed <i className="ti ti-arrow-right"/> static pool fallback
@@ -648,11 +710,17 @@ export default function JobsPage() {
     }).sort((a, b) => b.matchPct - a.matchPct);
   }, [resumeText, jobs]);
 
+  const prefMatchCount = useMemo(() => {
+    if (!prefs || (prefs.job_titles.length + prefs.locations.length + prefs.job_types.length) === 0) return 0;
+    return scored.filter(j => jobMatchesPrefs(j, prefs)).length;
+  }, [scored, prefs]);
+
   const filtered = useMemo(() => {
     if (filter === "remote") return scored.filter(j => j.mode === "remote");
     if (filter === "fresh")  return scored.filter(j => j.postedDays <= 2);
+    if (filter === "foryou" && prefs) return scored.filter(j => jobMatchesPrefs(j, prefs));
     return scored;
-  }, [scored, filter]);
+  }, [scored, filter, prefs]);
 
   const selected = scored.find(j => j.id === selectedId) ?? scored[0];
 
@@ -699,15 +767,55 @@ export default function JobsPage() {
         </div>
       ) : (
         <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0" }}>
+          {/* Preferences banner */}
+          {prefMatchCount > 0 && filter !== "foryou" && (
+            <div style={{
+              padding: "10px 20px",
+              background: "rgba(99,102,241,.06)",
+              borderBottom: "1px solid rgba(99,102,241,.15)",
+              display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+            }}>
+              <div style={{ fontSize: 13, color: "var(--text1)" }}>
+                <i className="ti ti-sparkles" style={{ color: "var(--accent)", marginRight: 6 }}/>
+                <strong style={{ color: "var(--accent)" }}>{prefMatchCount} jobs</strong> match your saved preferences
+              </div>
+              <button
+                onClick={() => setFilter("foryou")}
+                style={{
+                  padding: "5px 14px", background: "var(--accent)", border: "none", borderRadius: 7,
+                  color: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap",
+                  fontFamily: "inherit",
+                }}
+              >Show matches →</button>
+            </div>
+          )}
+
           {/* Pill filters strip */}
           <div style={{ padding: "10px 20px", borderBottom: "1px solid var(--border)", display: "flex", gap: 6, alignItems: "center", overflowX: "auto", scrollbarWidth: "none" as const }}>
             <button onClick={() => setFilter("best")}   style={chip("best")}>All jobs</button>
+            {prefMatchCount > 0 && (
+              <button onClick={() => setFilter("foryou")} style={chip("foryou")}>
+                <i className="ti ti-sparkles"/> For you
+                <span style={{
+                  marginLeft: 5, fontSize: 10, fontWeight: 700,
+                  background: filter === "foryou" ? "var(--accent)" : "rgba(99,102,241,.15)",
+                  color: filter === "foryou" ? "#fff" : "var(--accent)",
+                  padding: "1px 6px", borderRadius: 99,
+                }}>{prefMatchCount}</span>
+              </button>
+            )}
             <button onClick={() => setFilter("remote")} style={chip("remote")}><i className="ti ti-world"/> Remote</button>
             <button onClick={() => setFilter("fresh")}  style={chip("fresh")}><i className="ti ti-bolt"/> Today</button>
             <div style={{ height: 16, width: 1, background: "var(--border)", flexShrink: 0, margin: "0 6px" }} />
             <span style={{ fontSize: 12, color: "var(--text3)", whiteSpace: "nowrap" as const }}>
               <span style={{ fontWeight: 700, color: "var(--text1)" }}>{filtered.filter(j => !j.ghost).length}</span> roles · ranked by match
             </span>
+            {filter === "foryou" && (
+              <span style={{ fontSize: 11, color: "var(--accent)", whiteSpace: "nowrap" }}>
+                · filtered by your preferences
+                <button onClick={() => window.location.href = "/profile"} style={{ marginLeft: 6, background: "none", border: "none", color: "var(--text3)", fontSize: 11, cursor: "pointer", padding: 0, textDecoration: "underline" }}>edit</button>
+              </span>
+            )}
           </div>
 
           {/* Split layout */}

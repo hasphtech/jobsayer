@@ -20,38 +20,47 @@ import { useTheme } from "@/lib/useTheme";
 import { useRole, AppRole } from "@/lib/useRole";
 import AiCoachPanel from "./AiCoachPanel";
 
-/* ── Candidate nav ───────────────────────────────────────────── */
-const TOOL_LINKS = [
-  { href: "/dashboard",    label: "Dashboard",      icon: "ti-layout-dashboard", desc: "Your career command center" },
-  { href: "/builder",      label: "Resume Builder", icon: "ti-file-text",        desc: "Build and edit your resume" },
-  { href: "/score",        label: "ATS Score",      icon: "ti-target",           desc: "Check ATS compatibility before applying" },
-  { href: "/tailor",       label: "JD Tailor",      icon: "ti-cut",              desc: "Customize your resume for a specific job" },
-  { href: "/cover-letter", label: "Cover Letter",   icon: "ti-mail",             desc: "Generate a tailored cover letter" },
-  { href: "/interview",    label: "Interview",      icon: "ti-microphone",       desc: "Practice with AI interview coaching" },
+/* ── Candidate nav — 4 categories ───────────────────────────── */
+
+// Always shown first, no section label
+const HOME_LINKS = [
+  { href: "/dashboard", label: "Dashboard", icon: "ti-layout-dashboard", desc: "Your career command center" },
 ];
 
-// Primary grow links — always visible
+// Resume category — building and scoring docs
+const RESUME_LINKS = [
+  { href: "/builder",      label: "Resume Builder", icon: "ti-file-text",  desc: "Build and edit your resume" },
+  { href: "/score",        label: "ATS Score",      icon: "ti-target",     desc: "Check ATS compatibility before applying" },
+  { href: "/tailor",       label: "JD Tailor",      icon: "ti-cut",        desc: "Customize your resume for a specific job" },
+  { href: "/cover-letter", label: "Cover Letter",   icon: "ti-mail",       desc: "Generate a tailored cover letter" },
+];
+
+// Job Search category
+const JOB_LINKS = [
+  { href: "/jobs",         label: "Browse Jobs",   icon: "ti-briefcase",  desc: "Browse AI-matched job listings" },
+  { href: "/applications", label: "Applications",  icon: "ti-checklist",  desc: "Track your job applications" },
+];
+
+// Grow category — skill and career development
 const GROW_LINKS = [
-  { href: "/jobs",          label: "Jobs",        icon: "ti-briefcase",  desc: "Browse AI-matched job listings" },
-  { href: "/applications",  label: "Tracker",     icon: "ti-checklist",  desc: "Track your job applications" },
-  { href: "/career-gps",    label: "Career GPS",  icon: "ti-compass",    desc: "Find skill gaps to your next role" },
-  { href: "/career-health", label: "Health",      icon: "ti-activity",   desc: "Your overall career health score" },
-  { href: "/salary",        label: "Salaries",    icon: "ti-coin",       desc: "Benchmark your salary globally" },
-  { href: "/learn",         label: "Courses",     icon: "ti-school",     desc: "Curated courses to close skill gaps" },
+  { href: "/career-gps",  label: "Career GPS",     icon: "ti-compass",    desc: "Find skill gaps to your next role" },
+  { href: "/interview",   label: "Interview Prep", icon: "ti-microphone", desc: "Practice with AI interview coaching" },
+  { href: "/salary",      label: "Salary Intel",   icon: "ti-coin",       desc: "Benchmark your salary globally" },
 ];
 
-// Secondary links — shown in collapsed "More" section
+// Collapsed secondary links — rarely needed upfront
 const MORE_LINKS = [
-  { href: "/vault",          label: "Doc Vault",   icon: "ti-lock" },
-  { href: "/bgv",            label: "BGV Badge",   icon: "ti-certificate" },
-  { href: "/linkedin",       label: "LinkedIn",    icon: "ti-brand-linkedin" },
-  { href: "/employer-trust", label: "Trust Ratings", icon: "ti-shield-check" },
-  { href: "/company",        label: "Companies",   icon: "ti-building" },
-  { href: "/integrations",   label: "Bot Integ.",  icon: "ti-plug" },
+  { href: "/learn",          label: "Courses",        icon: "ti-school",          desc: "Curated courses to close skill gaps" },
+  { href: "/career-health",  label: "Career Health",  icon: "ti-activity",        desc: "Your overall career health score" },
+  { href: "/bgv",            label: "BGV Badge",      icon: "ti-certificate",     desc: "Get credentials verified upfront" },
+  { href: "/linkedin",       label: "LinkedIn",       icon: "ti-brand-linkedin",  desc: "Optimise your LinkedIn profile" },
+  { href: "/vault",          label: "Doc Vault",      icon: "ti-lock",            desc: "Store and share your documents" },
+  { href: "/integrations",   label: "Integrations",   icon: "ti-plug",            desc: "Connect bots and tools" },
 ];
 
-// Legacy: keep INSIGHT_LINKS as the combined set for mobile drawer + search
-const INSIGHT_LINKS = [...GROW_LINKS, ...MORE_LINKS];
+// All links flat — for search + mobile
+const TOOL_LINKS    = [...HOME_LINKS, ...RESUME_LINKS];
+const INSIGHT_LINKS = [...JOB_LINKS, ...GROW_LINKS, ...MORE_LINKS];
 
 /* ── Recruiter nav ───────────────────────────────────────────── */
 const RECRUITER_TOOL_LINKS = [
@@ -71,7 +80,7 @@ const RECRUITER_INSIGHT_LINKS = [
 ];
 
 const ALL_LINKS = [
-  ...TOOL_LINKS, ...INSIGHT_LINKS,
+  ...HOME_LINKS, ...RESUME_LINKS, ...JOB_LINKS, ...GROW_LINKS, ...MORE_LINKS,
   ...RECRUITER_TOOL_LINKS, ...RECRUITER_INSIGHT_LINKS,
 ].filter((l, i, arr) => arr.findIndex(x => x.href === l.href) === i);
 
@@ -379,10 +388,7 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
   };
 
   // Current mode's nav links
-  const toolLinks    = role === "recruiter" ? RECRUITER_TOOL_LINKS    : TOOL_LINKS;
-  const insightLinks = role === "recruiter" ? RECRUITER_INSIGHT_LINKS : INSIGHT_LINKS;
-  const toolLabel    = role === "recruiter" ? "Hiring" : "Tools";
-  const insightLabel = role === "recruiter" ? "Settings" : "Insights";
+  const isRecruiter = role === "recruiter";
 
   /* ── Mobile layout ─────────────────────────────────────────── */
   if (mobile) {
@@ -439,25 +445,46 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
               </button>
             </div>
 
-            {/* Nav links */}
-            {[...toolLinks, ...insightLinks].map(l => {
-              const a = isActive(l.href);
-              return (
-                <Link key={l.href} href={l.href} onClick={closeDrawer} style={{
-                  padding: "10px 14px", borderRadius: 9, fontSize: 13, fontWeight: a ? 700 : 500,
-                  color: a ? "var(--accent)" : "var(--text1)",
-                  textDecoration: "none",
-                  background: a ? "var(--accdim)" : "var(--surface2)",
-                  border: `1px solid ${a ? "var(--accborder)" : "var(--border)"}`,
-                  borderLeft: a ? "3px solid var(--accent)" : `1px solid var(--border)`,
-                  display: "flex", alignItems: "center", gap: 10,
-                }}>
-                  <i className={`ti ${l.icon}`} style={{ fontSize: 15, color: a ? "var(--accent)" : "inherit" }} />
-                  <span style={{ flex: 1 }}>{l.label}</span>
-                  {a && <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--accent)" }} />}
-                </Link>
-              );
-            })}
+            {/* Nav links — grouped by category */}
+            {(isRecruiter
+              ? [
+                  { label: "Hiring", links: RECRUITER_TOOL_LINKS },
+                  { label: "Settings", links: RECRUITER_INSIGHT_LINKS },
+                ]
+              : [
+                  { label: null, links: HOME_LINKS },
+                  { label: "Resume", links: RESUME_LINKS },
+                  { label: "Job Search", links: JOB_LINKS },
+                  { label: "Grow", links: GROW_LINKS },
+                  { label: "More", links: MORE_LINKS },
+                ]
+            ).map(({ label, links }) => (
+              <React.Fragment key={label ?? "home"}>
+                {label && (
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.5px", padding: "8px 4px 3px" }}>
+                    {label}
+                  </div>
+                )}
+                {links.map(l => {
+                  const a = isActive(l.href);
+                  return (
+                    <Link key={l.href} href={l.href} onClick={closeDrawer} style={{
+                      padding: "10px 14px", borderRadius: 9, fontSize: 13, fontWeight: a ? 700 : 500,
+                      color: a ? "var(--accent)" : "var(--text1)",
+                      textDecoration: "none",
+                      background: a ? "var(--accdim)" : "var(--surface2)",
+                      border: `1px solid ${a ? "var(--accborder)" : "var(--border)"}`,
+                      borderLeft: a ? "3px solid var(--accent)" : `1px solid var(--border)`,
+                      display: "flex", alignItems: "center", gap: 10,
+                    }}>
+                      <i className={`ti ${l.icon}`} style={{ fontSize: 15, color: a ? "var(--accent)" : "inherit" }} />
+                      <span style={{ flex: 1 }}>{l.label}</span>
+                      {a && <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--accent)" }} />}
+                    </Link>
+                  );
+                })}
+              </React.Fragment>
+            ))}
 
             {/* Divider */}
             <div style={{ height: 1, background: "var(--border)", margin: "6px 0" }} />
@@ -689,19 +716,50 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
             opacity: navVisible ? 1 : 0,
             transition: "opacity .12s ease",
           }}>
-            <SectionLabel>{toolLabel}</SectionLabel>
-            {toolLinks.map(l => (
-              <NavLink key={l.href} {...l} active={isActive(l.href)} />
-            ))}
-
-            <div style={{ height: 1, background: "var(--border)", margin: "8px 10px" }} />
-
-            <SectionLabel>{insightLabel}</SectionLabel>
-            {role === "candidate" ? (
+            {isRecruiter ? (
+              /* ── Recruiter sidebar ── */
               <>
+                <SectionLabel>Hiring</SectionLabel>
+                {RECRUITER_TOOL_LINKS.map(l => (
+                  <NavLink key={l.href} {...l} active={isActive(l.href)} />
+                ))}
+                <div style={{ height: 1, background: "var(--border)", margin: "8px 10px" }} />
+                <SectionLabel>Settings</SectionLabel>
+                {RECRUITER_INSIGHT_LINKS.map(l => (
+                  <NavLink key={l.href} {...l} active={isActive(l.href)} />
+                ))}
+              </>
+            ) : (
+              /* ── Candidate sidebar — 4 categories ── */
+              <>
+                {/* Home — no label */}
+                {HOME_LINKS.map(l => (
+                  <NavLink key={l.href} {...l} active={isActive(l.href)} />
+                ))}
+
+                <div style={{ height: 1, background: "var(--border)", margin: "6px 10px" }} />
+
+                <SectionLabel>Resume</SectionLabel>
+                {RESUME_LINKS.map(l => (
+                  <NavLink key={l.href} {...l} active={isActive(l.href)} />
+                ))}
+
+                <div style={{ height: 1, background: "var(--border)", margin: "6px 10px" }} />
+
+                <SectionLabel>Job Search</SectionLabel>
+                {JOB_LINKS.map(l => (
+                  <NavLink key={l.href} {...l} active={isActive(l.href)} />
+                ))}
+
+                <div style={{ height: 1, background: "var(--border)", margin: "6px 10px" }} />
+
+                <SectionLabel>Grow</SectionLabel>
                 {GROW_LINKS.map(l => (
                   <NavLink key={l.href} {...l} active={isActive(l.href)} />
                 ))}
+
+                <div style={{ height: 1, background: "var(--border)", margin: "6px 10px" }} />
+
                 <MoreLinksSection
                   links={MORE_LINKS}
                   isActive={isActive}
@@ -709,10 +767,6 @@ export default function AppShell({ children, actions, aiPanel = true, contentFil
                   setMoreOpen={setMoreOpen}
                 />
               </>
-            ) : (
-              insightLinks.map(l => (
-                <NavLink key={l.href} {...l} active={isActive(l.href)} />
-              ))
             )}
 
             <div style={{ flex: 1 }} />
