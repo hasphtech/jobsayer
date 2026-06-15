@@ -272,7 +272,7 @@ export default function InterviewPage() {
   /* ── Setup state ── */
   const [level,           setLevel]           = useState<Level>("Basics");
   const [selectedTopics,  setSelectedTopics]  = useState<string[]>([]);
-  const [topicMeta,       setTopicMeta]       = useState<Record<string, { label:string; icon:string; color:string }>>({});
+  const [topicMeta,       setTopicMeta]       = useState<Record<string, { label:string; icon:string; color:string; level:Level }>>({});
   const [searchQuery,     setSearchQuery]     = useState("");
   const [activeCategory,  setActiveCategory]  = useState("all");
   const [customInput,     setCustomInput]     = useState("");
@@ -338,7 +338,7 @@ export default function InterviewPage() {
     } else if (selectedTopics.length < 5) {
       const color = TOPIC_COLORS[selectedTopics.length % TOPIC_COLORS.length];
       setSelectedTopics(p => [...p, id]);
-      setTopicMeta(p => ({ ...p, [id]: { label, icon, color } }));
+      setTopicMeta(p => ({ ...p, [id]: { label, icon, color, level } }));
     }
   }
 
@@ -347,7 +347,7 @@ export default function InterviewPage() {
     if (!trimmed || selectedTopics.includes(trimmed) || selectedTopics.length >= 5) return;
     const color = TOPIC_COLORS[selectedTopics.length % TOPIC_COLORS.length];
     setSelectedTopics(p => [...p, trimmed]);
-    setTopicMeta(p => ({ ...p, [trimmed]: { label: trimmed, icon: "✨", color } }));
+    setTopicMeta(p => ({ ...p, [trimmed]: { label: trimmed, icon: "✨", color, level } }));
     setCustomInput("");
     setSearchQuery("");
   }
@@ -372,7 +372,7 @@ export default function InterviewPage() {
               targetRole:  meta.label,
               company:     "",
               focusSkill:  meta.label,
-              difficulty:  levelToDifficulty(level),
+              difficulty:  levelToDifficulty(meta.level),
             }),
           });
           const data = await res.json();
@@ -662,13 +662,28 @@ export default function InterviewPage() {
                   const isCustom = !KNOWN_TOPICS.has(id);
                   return (
                     <div key={id} style={{
-                      display:"flex", alignItems:"center", gap:7, padding:"7px 12px", borderRadius:99,
+                      display:"flex", alignItems:"center", gap:6, padding:"6px 10px", borderRadius:99,
                       background:`${m?.color}18`, border:`1.5px solid ${m?.color}`,
                     }}>
                       <span style={{ fontSize:14 }}>{m?.icon}</span>
                       <span style={{ fontSize:12, fontWeight:700, color: m?.color }}>{m?.label}</span>
+                      {/* Per-topic level badge — click to cycle */}
+                      <button
+                        onClick={() => {
+                          const order: Level[] = ["Basics","Intermediate","Professional"];
+                          const next = order[(order.indexOf(m!.level) + 1) % 3];
+                          setTopicMeta(p => ({ ...p, [id]: { ...p[id], level: next } }));
+                        }}
+                        title="Click to change level"
+                        style={{
+                          fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:5, cursor:"pointer",
+                          background: m?.color, color:"#fff", border:"none",
+                          opacity:0.9,
+                        }}>
+                        {m?.level === "Basics" ? "Basic" : m?.level === "Intermediate" ? "Mid" : "Pro"} ↻
+                      </button>
                       {isCustom && (
-                        <span style={{ fontSize:10, color:"#fff", background: m?.color, borderRadius:4, padding:"1px 5px", fontWeight:700 }}>AI</span>
+                        <span style={{ fontSize:10, color:"#fff", background: m?.color, borderRadius:4, padding:"1px 5px", fontWeight:700, opacity:0.7 }}>AI</span>
                       )}
                       <button onClick={() => toggleTopic(id, m?.label ?? "", m?.icon ?? "")} style={{
                         width:16, height:16, borderRadius:"50%", border:"none", cursor:"pointer",
@@ -695,7 +710,12 @@ export default function InterviewPage() {
                   <div style={{ fontSize:10, color:"var(--text3)" }}>topics</div>
                 </div>
                 <div style={{ textAlign:"center" }}>
-                  <div style={{ fontSize:18, fontWeight:900, color:"var(--text1)" }}>{level}</div>
+                  <div style={{ fontSize:18, fontWeight:900, color:"var(--text1)" }}>
+                    {(() => {
+                      const levels = [...new Set(selectedTopics.map(id => topicMeta[id]?.level))];
+                      return levels.length > 1 ? "Mixed" : levels[0] ?? level;
+                    })()}
+                  </div>
                   <div style={{ fontSize:10, color:"var(--text3)" }}>level</div>
                 </div>
                 {selectedTopics.some(id => !KNOWN_TOPICS.has(id)) && (
