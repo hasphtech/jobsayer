@@ -821,7 +821,7 @@ export default function RecruitPage() {
     return (
       <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text1)" }}>
         <PageNav title="Post a Job" />
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "32px 20px" }}>
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: mobile ? "16px 12px" : "32px 20px" }}>
           <div style={{ marginBottom: 24 }}>
             <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 6 }}>Post a Job</h1>
             <p style={{ fontSize: 14, color: "var(--text3)" }}>Posting as <strong>{profile.company_name}</strong> — the more detail, the better the AI matching.</p>

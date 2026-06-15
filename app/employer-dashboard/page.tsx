@@ -4,6 +4,7 @@ import { Suspense, useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import AppShell from "@/components/AppShell";
 import { getSupabaseAsync } from "@/lib/supabase";
+import { useWindowWidth } from "@/lib/useWindowWidth";
 
 /* ── Types ─────────────────────────────────────────────────── */
 type Tab = "overview" | "pipeline" | "candidates" | "bgv" | "team-tools" | "billing" | "team";
@@ -576,6 +577,8 @@ function TeamTab() {
 function EmployerDashboardContent() {
   const searchParams = useSearchParams();
   const tab = (searchParams.get("tab") as Tab) || "overview";
+  const w = useWindowWidth();
+  const mobile = w < 640;
 
   const [currentPlan] = useState<keyof typeof PLAN_FEATURES>("starter");
   const [stages, setStages] = useState<Record<string, Candidate["stage"]>>(
@@ -595,7 +598,7 @@ function EmployerDashboardContent() {
 
   return (
     <AppShell aiPanel={false}>
-      <div style={{ padding: "24px 28px", maxWidth: 1000 }}>
+      <div style={{ padding: mobile ? "16px 12px" : "24px 28px", maxWidth: 1000 }}>
 
         {/* Page header */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
@@ -663,7 +666,7 @@ function EmployerDashboardContent() {
 
         {/* ── PIPELINE ── */}
         {tab === "pipeline" && (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: 12 }}>
             {(["new", "shortlisted", "interview", "offer"] as Candidate["stage"][]).map(stage => (
               <div key={stage} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, padding: "12px" }}>
                 <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--text3)", marginBottom: 12 }}>

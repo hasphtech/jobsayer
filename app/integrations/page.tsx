@@ -271,7 +271,7 @@ export default function IntegrationsPage() {
 
   return (
     <AppShell>
-      <div style={{ padding: "24px 24px 48px" }}>
+      <div style={{ padding: mobile ? "16px 12px 48px" : "24px 24px 48px" }}>
 
         {/* Header */}
         <div style={{ marginBottom: 24 }}>
