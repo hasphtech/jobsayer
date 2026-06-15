@@ -70,92 +70,92 @@ const TOPIC_COLORS = ["#6366f1","#10b981","#f59e0b","#ef4444","#8b5cf6","#06b6d4
 
 const ALL_TOPICS = [
   // Frontend
-  { id:"JavaScript",      icon:"🟨", label:"JavaScript",         cat:"frontend" },
-  { id:"TypeScript",      icon:"🔷", label:"TypeScript",         cat:"frontend" },
-  { id:"React",           icon:"⚛️", label:"React",              cat:"frontend" },
-  { id:"Next.js",         icon:"▲",  label:"Next.js",            cat:"frontend" },
-  { id:"Vue.js",          icon:"💚", label:"Vue.js",             cat:"frontend" },
-  { id:"Angular",         icon:"🔴", label:"Angular",            cat:"frontend" },
-  { id:"CSS & HTML",      icon:"🎨", label:"CSS & HTML",         cat:"frontend" },
-  { id:"Redux",           icon:"🟣", label:"Redux",              cat:"frontend" },
-  { id:"GraphQL",         icon:"🩷", label:"GraphQL",            cat:"frontend" },
-  { id:"Svelte",          icon:"🔥", label:"Svelte",             cat:"frontend" },
-  { id:"Web Performance", icon:"⚡", label:"Web Performance",    cat:"frontend" },
-  { id:"Webpack & Vite",  icon:"📦", label:"Webpack / Vite",     cat:"frontend" },
-  { id:"PWA",             icon:"📱", label:"PWA",                cat:"frontend" },
-  { id:"Frontend Testing",icon:"🧪", label:"Jest / Cypress",     cat:"frontend" },
+  { id:"JavaScript",      icon:"🟨", label:"JavaScript",         cat:"frontend", pop:true  },
+  { id:"TypeScript",      icon:"🔷", label:"TypeScript",         cat:"frontend", pop:true  },
+  { id:"React",           icon:"⚛️", label:"React",              cat:"frontend", pop:true  },
+  { id:"Next.js",         icon:"▲",  label:"Next.js",            cat:"frontend"            },
+  { id:"Vue.js",          icon:"💚", label:"Vue.js",             cat:"frontend"            },
+  { id:"Angular",         icon:"🔴", label:"Angular",            cat:"frontend"            },
+  { id:"CSS & HTML",      icon:"🎨", label:"CSS & HTML",         cat:"frontend", pop:true  },
+  { id:"Redux",           icon:"🟣", label:"Redux",              cat:"frontend"            },
+  { id:"GraphQL",         icon:"🩷", label:"GraphQL",            cat:"frontend"            },
+  { id:"Svelte",          icon:"🔥", label:"Svelte",             cat:"frontend"            },
+  { id:"Web Performance", icon:"⚡", label:"Web Performance",    cat:"frontend"            },
+  { id:"Webpack & Vite",  icon:"📦", label:"Webpack / Vite",     cat:"frontend"            },
+  { id:"PWA",             icon:"📱", label:"PWA",                cat:"frontend"            },
+  { id:"Frontend Testing",icon:"🧪", label:"Jest / Cypress",     cat:"frontend"            },
   // Backend
-  { id:"Node.js",         icon:"🟩", label:"Node.js",            cat:"backend"  },
-  { id:"Python",          icon:"🐍", label:"Python",             cat:"backend"  },
-  { id:"Java",            icon:"☕", label:"Java",               cat:"backend"  },
-  { id:"Go",              icon:"🔵", label:"Go (Golang)",        cat:"backend"  },
-  { id:"REST APIs",       icon:"🔗", label:"REST APIs",          cat:"backend"  },
-  { id:"Microservices",   icon:"🔧", label:"Microservices",      cat:"backend"  },
-  { id:"Django",          icon:"🌿", label:"Django",             cat:"backend"  },
-  { id:"Spring Boot",     icon:"🍃", label:"Spring Boot",        cat:"backend"  },
-  { id:"FastAPI",         icon:"🚀", label:"FastAPI",            cat:"backend"  },
-  { id:"Express.js",      icon:"🖤", label:"Express.js",         cat:"backend"  },
-  { id:".NET / C#",       icon:"💜", label:".NET / C#",          cat:"backend"  },
-  { id:"gRPC",            icon:"📡", label:"gRPC",               cat:"backend"  },
-  { id:"Message Queues",  icon:"📨", label:"Kafka / RabbitMQ",   cat:"backend"  },
-  { id:"Ruby on Rails",   icon:"💎", label:"Ruby on Rails",      cat:"backend"  },
+  { id:"Node.js",         icon:"🟩", label:"Node.js",            cat:"backend",  pop:true  },
+  { id:"Python",          icon:"🐍", label:"Python",             cat:"backend",  pop:true  },
+  { id:"Java",            icon:"☕", label:"Java",               cat:"backend",  pop:true  },
+  { id:"Go",              icon:"🔵", label:"Go (Golang)",        cat:"backend"             },
+  { id:"REST APIs",       icon:"🔗", label:"REST APIs",          cat:"backend"             },
+  { id:"Microservices",   icon:"🔧", label:"Microservices",      cat:"backend"             },
+  { id:"Django",          icon:"🌿", label:"Django",             cat:"backend"             },
+  { id:"Spring Boot",     icon:"🍃", label:"Spring Boot",        cat:"backend"             },
+  { id:"FastAPI",         icon:"🚀", label:"FastAPI",            cat:"backend"             },
+  { id:"Express.js",      icon:"🖤", label:"Express.js",         cat:"backend"             },
+  { id:".NET / C#",       icon:"💜", label:".NET / C#",          cat:"backend"             },
+  { id:"gRPC",            icon:"📡", label:"gRPC",               cat:"backend"             },
+  { id:"Message Queues",  icon:"📨", label:"Kafka / RabbitMQ",   cat:"backend"             },
+  { id:"Ruby on Rails",   icon:"💎", label:"Ruby on Rails",      cat:"backend"             },
   // CS Fundamentals
-  { id:"DSA",             icon:"🧮", label:"DSA",                cat:"cs"       },
-  { id:"System Design",   icon:"🏗️", label:"System Design",      cat:"cs"       },
-  { id:"OOP",             icon:"📦", label:"OOP Concepts",       cat:"cs"       },
-  { id:"OS",              icon:"💻", label:"Operating Systems",  cat:"cs"       },
-  { id:"Networking",      icon:"🌐", label:"Networking",         cat:"cs"       },
-  { id:"Concurrency",     icon:"⚙️", label:"Concurrency",        cat:"cs"       },
-  { id:"Design Patterns", icon:"🧩", label:"Design Patterns",    cat:"cs"       },
-  { id:"Database Design", icon:"🗃️", label:"Database Design",    cat:"cs"       },
-  { id:"Algorithms",      icon:"🔢", label:"Algorithms",         cat:"cs"       },
-  { id:"Computer Architecture",icon:"🖥️",label:"Computer Arch", cat:"cs"       },
+  { id:"DSA",             icon:"🧮", label:"DSA",                cat:"cs",       pop:true  },
+  { id:"System Design",   icon:"🏗️", label:"System Design",      cat:"cs",       pop:true  },
+  { id:"OOP",             icon:"📦", label:"OOP Concepts",       cat:"cs",       pop:true  },
+  { id:"OS",              icon:"💻", label:"Operating Systems",  cat:"cs"                  },
+  { id:"Networking",      icon:"🌐", label:"Networking",         cat:"cs"                  },
+  { id:"Concurrency",     icon:"⚙️", label:"Concurrency",        cat:"cs"                  },
+  { id:"Design Patterns", icon:"🧩", label:"Design Patterns",    cat:"cs"                  },
+  { id:"Database Design", icon:"🗃️", label:"Database Design",    cat:"cs"                  },
+  { id:"Algorithms",      icon:"🔢", label:"Algorithms",         cat:"cs"                  },
+  { id:"Computer Architecture",icon:"🖥️",label:"Computer Arch", cat:"cs"                  },
   // Data
-  { id:"SQL & DB",        icon:"🗄️", label:"SQL & DB",           cat:"data"     },
-  { id:"PostgreSQL",      icon:"🐘", label:"PostgreSQL",         cat:"data"     },
-  { id:"MongoDB",         icon:"🍀", label:"MongoDB",            cat:"data"     },
-  { id:"Redis",           icon:"🔴", label:"Redis",              cat:"data"     },
-  { id:"Data Engineering",icon:"🏭", label:"Data Engineering",   cat:"data"     },
-  { id:"Machine Learning",icon:"🤖", label:"Machine Learning",   cat:"data"     },
-  { id:"Deep Learning",   icon:"🧠", label:"Deep Learning",      cat:"data"     },
-  { id:"Pandas & NumPy",  icon:"🐼", label:"Pandas / NumPy",     cat:"data"     },
-  { id:"Spark",           icon:"💥", label:"Spark / Hadoop",     cat:"data"     },
-  { id:"Power BI",        icon:"📊", label:"Power BI / Tableau", cat:"data"     },
-  { id:"NLP",             icon:"💬", label:"NLP",                cat:"data"     },
+  { id:"SQL & DB",        icon:"🗄️", label:"SQL & DB",           cat:"data",     pop:true  },
+  { id:"PostgreSQL",      icon:"🐘", label:"PostgreSQL",         cat:"data"                },
+  { id:"MongoDB",         icon:"🍀", label:"MongoDB",            cat:"data"                },
+  { id:"Redis",           icon:"🔴", label:"Redis",              cat:"data"                },
+  { id:"Data Engineering",icon:"🏭", label:"Data Engineering",   cat:"data"                },
+  { id:"Machine Learning",icon:"🤖", label:"Machine Learning",   cat:"data",     pop:true  },
+  { id:"Deep Learning",   icon:"🧠", label:"Deep Learning",      cat:"data"                },
+  { id:"Pandas & NumPy",  icon:"🐼", label:"Pandas / NumPy",     cat:"data"                },
+  { id:"Spark",           icon:"💥", label:"Spark / Hadoop",     cat:"data"                },
+  { id:"Power BI",        icon:"📊", label:"Power BI / Tableau", cat:"data"                },
+  { id:"NLP",             icon:"💬", label:"NLP",                cat:"data"                },
   // DevOps / Cloud
-  { id:"Docker",          icon:"🐳", label:"Docker",             cat:"devops"   },
-  { id:"Kubernetes",      icon:"☸️", label:"Kubernetes",         cat:"devops"   },
-  { id:"AWS",             icon:"☁️", label:"AWS",                cat:"devops"   },
-  { id:"Azure",           icon:"🔷", label:"Azure",              cat:"devops"   },
-  { id:"GCP",             icon:"🌤️", label:"GCP",                cat:"devops"   },
-  { id:"CI/CD",           icon:"🔄", label:"CI / CD",            cat:"devops"   },
-  { id:"Linux",           icon:"🐧", label:"Linux",              cat:"devops"   },
-  { id:"Git",             icon:"🌿", label:"Git",                cat:"devops"   },
-  { id:"Terraform",       icon:"🏔️", label:"Terraform",          cat:"devops"   },
-  { id:"Monitoring",      icon:"📈", label:"Monitoring / Observability", cat:"devops" },
-  { id:"Serverless",      icon:"⚡", label:"Serverless",         cat:"devops"   },
+  { id:"Docker",          icon:"🐳", label:"Docker",             cat:"devops",   pop:true  },
+  { id:"Kubernetes",      icon:"☸️", label:"Kubernetes",         cat:"devops"              },
+  { id:"AWS",             icon:"☁️", label:"AWS",                cat:"devops",   pop:true  },
+  { id:"Azure",           icon:"🔷", label:"Azure",              cat:"devops"              },
+  { id:"GCP",             icon:"🌤️", label:"GCP",                cat:"devops"              },
+  { id:"CI/CD",           icon:"🔄", label:"CI / CD",            cat:"devops"              },
+  { id:"Linux",           icon:"🐧", label:"Linux",              cat:"devops"              },
+  { id:"Git",             icon:"🌿", label:"Git",                cat:"devops"              },
+  { id:"Terraform",       icon:"🏔️", label:"Terraform",          cat:"devops"              },
+  { id:"Monitoring",      icon:"📈", label:"Monitoring / Observability", cat:"devops"      },
+  { id:"Serverless",      icon:"⚡", label:"Serverless",         cat:"devops"              },
   // Mobile
-  { id:"React Native",    icon:"📱", label:"React Native",       cat:"mobile"   },
-  { id:"Flutter",         icon:"🐦", label:"Flutter",            cat:"mobile"   },
-  { id:"iOS / Swift",     icon:"🍎", label:"iOS / Swift",        cat:"mobile"   },
-  { id:"Android / Kotlin",icon:"🤖", label:"Android / Kotlin",   cat:"mobile"   },
+  { id:"React Native",    icon:"📱", label:"React Native",       cat:"mobile",   pop:true  },
+  { id:"Flutter",         icon:"🐦", label:"Flutter",            cat:"mobile",   pop:true  },
+  { id:"iOS / Swift",     icon:"🍎", label:"iOS / Swift",        cat:"mobile"              },
+  { id:"Android / Kotlin",icon:"🤖", label:"Android / Kotlin",   cat:"mobile"              },
   // Security
-  { id:"Cybersecurity",   icon:"🔒", label:"Cybersecurity",      cat:"security" },
-  { id:"Web Security",    icon:"🛡️", label:"OWASP / Web Sec",    cat:"security" },
-  { id:"Auth & OAuth",    icon:"🔑", label:"Auth & OAuth",       cat:"security" },
-  { id:"Cryptography",    icon:"🔐", label:"Cryptography",       cat:"security" },
+  { id:"Cybersecurity",   icon:"🔒", label:"Cybersecurity",      cat:"security"            },
+  { id:"Web Security",    icon:"🛡️", label:"OWASP / Web Sec",    cat:"security"            },
+  { id:"Auth & OAuth",    icon:"🔑", label:"Auth & OAuth",       cat:"security"            },
+  { id:"Cryptography",    icon:"🔐", label:"Cryptography",       cat:"security"            },
   // Testing
-  { id:"Unit Testing",    icon:"✅", label:"Unit Testing",       cat:"testing"  },
-  { id:"TDD",             icon:"🔁", label:"TDD",                cat:"testing"  },
-  { id:"Test Automation", icon:"🤖", label:"Test Automation",    cat:"testing"  },
-  { id:"API Testing",     icon:"🔬", label:"API Testing",        cat:"testing"  },
+  { id:"Unit Testing",    icon:"✅", label:"Unit Testing",       cat:"testing"             },
+  { id:"TDD",             icon:"🔁", label:"TDD",                cat:"testing"             },
+  { id:"Test Automation", icon:"🤖", label:"Test Automation",    cat:"testing"             },
+  { id:"API Testing",     icon:"🔬", label:"API Testing",        cat:"testing"             },
   // Soft skills
-  { id:"Behavioral",      icon:"🤝", label:"Behavioral (HR)",    cat:"soft"     },
-  { id:"Leadership",      icon:"🌟", label:"Leadership",         cat:"soft"     },
-  { id:"Problem Solving", icon:"🧩", label:"Problem Solving",    cat:"soft"     },
-  { id:"Communication",   icon:"💬", label:"Communication",      cat:"soft"     },
-  { id:"Agile & Scrum",   icon:"🔄", label:"Agile / Scrum",      cat:"soft"     },
-  { id:"Negotiation",     icon:"🤲", label:"Negotiation",        cat:"soft"     },
+  { id:"Behavioral",      icon:"🤝", label:"Behavioral (HR)",    cat:"soft",     pop:true  },
+  { id:"Leadership",      icon:"🌟", label:"Leadership",         cat:"soft"                },
+  { id:"Problem Solving", icon:"🧩", label:"Problem Solving",    cat:"soft"                },
+  { id:"Communication",   icon:"💬", label:"Communication",      cat:"soft"                },
+  { id:"Agile & Scrum",   icon:"🔄", label:"Agile / Scrum",      cat:"soft"                },
+  { id:"Negotiation",     icon:"🤲", label:"Negotiation",        cat:"soft"                },
 ] as const;
 
 const KNOWN_TOPICS = new Set<string>(ALL_TOPICS.map(t => t.id));
@@ -320,11 +320,7 @@ export default function InterviewPage() {
   const [selectedTopics,  setSelectedTopics]  = useState<string[]>([]);
   const [topicMeta,       setTopicMeta]       = useState<Record<string, { label:string; icon:string; color:string; level:Level }>>({});
   const [searchQuery,     setSearchQuery]     = useState("");
-  const [activeCategory,  setActiveCategory]  = useState("all");
-  const [customInput,     setCustomInput]     = useState("");
   const [aiGenTopic,      setAiGenTopic]      = useState("");
-  // Which topic card is waiting for a level pick before being added
-  const [pendingTopic,    setPendingTopic]    = useState<{ id:string; label:string; icon:string } | null>(null);
 
   /* ── Practice state ── */
   const [questions,  setQuestions]  = useState<QuestionItem[]>([]);
@@ -360,11 +356,12 @@ export default function InterviewPage() {
     ? Math.round(answers.reduce((s, a) => s + (a.feedback?.score ?? 0), 0) / answers.length * 10) / 10
     : 0;
 
-  const filteredTopics = ALL_TOPICS.filter(t => {
-    const matchCat = activeCategory === "all" || t.cat === activeCategory;
-    const matchSrch = searchQuery === "" || t.label.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchCat && matchSrch;
-  });
+  // Search-first: show popular by default, filter by query when typing
+  const filteredTopics = searchQuery.trim()
+    ? (ALL_TOPICS as readonly { id:string; icon:string; label:string; cat:string; pop?:boolean }[])
+        .filter(t => t.label.toLowerCase().includes(searchQuery.toLowerCase()))
+    : (ALL_TOPICS as readonly { id:string; icon:string; label:string; cat:string; pop?:boolean }[])
+        .filter(t => t.pop);
 
   const customTopicAvailable =
     searchQuery.trim() !== "" &&
@@ -395,23 +392,13 @@ export default function InterviewPage() {
   /* ── Topic selection ── */
   function handleTopicClick(id: string, label: string, icon: string) {
     if (selectedTopics.includes(id)) {
-      // Already selected → deselect
       setSelectedTopics(p => p.filter(t => t !== id));
       setTopicMeta(p => { const n = { ...p }; delete n[id]; return n; });
-      if (pendingTopic?.id === id) setPendingTopic(null);
     } else if (selectedTopics.length < 5) {
-      // Not selected → show inline level picker
-      setPendingTopic(pendingTopic?.id === id ? null : { id, label, icon });
+      const color = TOPIC_COLORS[selectedTopics.length % TOPIC_COLORS.length];
+      setSelectedTopics(p => [...p, id]);
+      setTopicMeta(p => ({ ...p, [id]: { label, icon, color, level: "Intermediate" } }));
     }
-  }
-
-  function confirmTopicWithLevel(lv: Level) {
-    if (!pendingTopic) return;
-    const { id, label, icon } = pendingTopic;
-    const color = TOPIC_COLORS[selectedTopics.length % TOPIC_COLORS.length];
-    setSelectedTopics(p => [...p, id]);
-    setTopicMeta(p => ({ ...p, [id]: { label, icon, color, level: lv } }));
-    setPendingTopic(null);
   }
 
   function removeTopic(id: string) {
@@ -426,8 +413,9 @@ export default function InterviewPage() {
   function addCustomTopic(label: string) {
     const trimmed = label.trim();
     if (!trimmed || selectedTopics.includes(trimmed) || selectedTopics.length >= 5) return;
-    setPendingTopic({ id: trimmed, label: trimmed, icon: "✨" });
-    setCustomInput("");
+    const color = TOPIC_COLORS[selectedTopics.length % TOPIC_COLORS.length];
+    setSelectedTopics(p => [...p, trimmed]);
+    setTopicMeta(p => ({ ...p, [trimmed]: { label: trimmed, icon: "✨", color, level: "Intermediate" } }));
     setSearchQuery("");
   }
 
@@ -596,7 +584,7 @@ export default function InterviewPage() {
               Interview Prep
             </h1>
             <p style={{ fontSize:13, color:"var(--text3)", lineHeight:1.7, maxWidth:380, margin:"0 auto" }}>
-              Pick your level and topics — get real interview questions, instant AI feedback.
+              Search or browse topics below — get real interview questions with instant AI feedback.
             </p>
             <button onClick={resetHistory} style={{
               marginTop:10, fontSize:11, color:"var(--text3)", background:"none", border:"none",
@@ -606,171 +594,121 @@ export default function InterviewPage() {
             </button>
           </div>
 
-          {/* Topic picker */}
-          <div style={{ ...card, marginBottom:16 }}>
-            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
-              <div style={{ fontSize:12, fontWeight:700, color:"var(--text3)", textTransform:"uppercase", letterSpacing:".07em" }}>
-                Topics <span style={{ fontWeight:400, textTransform:"none", letterSpacing:0 }}>— tap to pick level</span>
-              </div>
+          {/* ── Search bar ── */}
+          <div style={{ position:"relative", marginBottom:16 }}>
+            <i className="ti ti-search" style={{
+              position:"absolute", left:14, top:"50%", transform:"translateY(-50%)",
+              fontSize:18, color:"var(--text3)", pointerEvents:"none",
+            }} />
+            <input
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter" && customTopicAvailable) addCustomTopic(searchQuery); }}
+              placeholder="e.g. React, System Design, Python…"
+              style={{ ...inp, paddingLeft:44, paddingTop:13, paddingBottom:13, fontSize:15 }}
+              autoFocus
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery("")} style={{
+                position:"absolute", right:12, top:"50%", transform:"translateY(-50%)",
+                background:"none", border:"none", cursor:"pointer", color:"var(--text3)", fontSize:18, lineHeight:1,
+              }}>×</button>
+            )}
+          </div>
+
+          {/* ── Topic pills ── */}
+          <div style={{ marginBottom: selectedTopics.length > 0 ? 16 : 0 }}>
+            {/* Section label */}
+            <div style={{ fontSize:11, fontWeight:700, color:"var(--text3)", textTransform:"uppercase", letterSpacing:".07em", marginBottom:10 }}>
+              {searchQuery.trim() ? "Results" : "Popular topics"}
               {selectedTopics.length > 0 && (
-                <button onClick={() => { setSelectedTopics([]); setTopicMeta({}); setPendingTopic(null); }} style={{
-                  fontSize:11, color:"var(--text3)", background:"none", border:"none",
-                  cursor:"pointer", padding:"2px 6px", borderRadius:5,
+                <button onClick={() => { setSelectedTopics([]); setTopicMeta({}); }} style={{
+                  marginLeft:12, fontSize:11, fontWeight:400, color:"var(--text3)", background:"none",
+                  border:"none", cursor:"pointer", textDecoration:"underline", textTransform:"none", letterSpacing:0,
                 }}>
                   Clear all
                 </button>
               )}
             </div>
 
-            {/* Search */}
-            <div style={{ position:"relative", marginBottom:10 }}>
-              <i className="ti ti-search" style={{
-                position:"absolute", left:11, top:"50%", transform:"translateY(-50%)",
-                fontSize:14, color:"var(--text3)", pointerEvents:"none",
-              }} />
-              <input
-                value={searchQuery}
-                onChange={e => { setSearchQuery(e.target.value); setCustomInput(e.target.value); setPendingTopic(null); }}
-                onKeyDown={e => { if (e.key === "Enter" && customTopicAvailable) addCustomTopic(searchQuery); }}
-                placeholder="Search topics or type a custom one…"
-                style={{ ...inp, paddingLeft:34 }}
-              />
-            </div>
-
-            {/* Category tabs */}
-            <div style={{ display:"flex", gap:6, overflowX:"auto", paddingBottom:4, scrollbarWidth:"none", marginBottom:12 }}>
-              {CATEGORIES.map(cat => (
-                <button key={cat.id} onClick={() => { setActiveCategory(cat.id); setPendingTopic(null); }} style={{
-                  padding:"5px 13px", borderRadius:99, fontSize:12, cursor:"pointer", whiteSpace:"nowrap", flexShrink:0,
-                  border:`1px solid ${activeCategory === cat.id ? "var(--accent)" : "var(--border)"}`,
-                  background: activeCategory === cat.id ? "var(--accdim)" : "var(--surface2)",
-                  color: activeCategory === cat.id ? "var(--accent)" : "var(--text2)",
-                  fontWeight: activeCategory === cat.id ? 700 : 400,
-                }}>{cat.label}</button>
-              ))}
-            </div>
-
-            {/* Topics grid */}
             {filteredTopics.length > 0 ? (
-              <div style={{
-                display:"grid",
-                gridTemplateColumns: mobile ? "repeat(3,1fr)" : "repeat(4,1fr)",
-                gap:6, maxHeight:260, overflowY:"auto", scrollbarWidth:"none",
-              }}>
+              <div style={{ display:"flex", flexWrap:"wrap", gap:9 }}>
                 {filteredTopics.map(t => {
-                  const selected  = selectedTopics.includes(t.id);
-                  const isPending = pendingTopic?.id === t.id;
-                  const meta      = topicMeta[t.id];
-                  const color     = selected ? meta?.color : isPending ? "var(--accent)" : undefined;
-                  const maxed     = !selected && !isPending && selectedTopics.length >= 5;
+                  const selected = selectedTopics.includes(t.id);
+                  const meta     = topicMeta[t.id];
+                  const color    = meta?.color;
+                  const maxed    = !selected && selectedTopics.length >= 5;
                   return (
                     <button key={t.id}
                       onClick={() => handleTopicClick(t.id, t.label, t.icon)}
                       disabled={maxed}
                       style={{
-                        padding:"10px 6px", borderRadius:10, cursor: maxed ? "not-allowed" : "pointer",
-                        textAlign:"center" as const,
-                        border:`1.5px solid ${selected ? color! : isPending ? "var(--accent)" : "var(--border)"}`,
-                        background: selected ? `${color}18` : isPending ? "var(--accdim)" : "var(--surface2)",
-                        opacity: maxed ? 0.4 : 1,
-                        transition:"all .15s",
-                        display:"flex", flexDirection:"column", alignItems:"center", gap:4,
+                        display:"flex", alignItems:"center", gap:8,
+                        padding:"9px 16px", borderRadius:99,
+                        border:`1.5px solid ${selected ? color! : "var(--border)"}`,
+                        background: selected ? `${color}18` : "var(--surface2)",
+                        color: selected ? color : "var(--text1)",
+                        fontSize:13, fontWeight: selected ? 700 : 400,
+                        cursor: maxed ? "not-allowed" : "pointer",
+                        opacity: maxed ? 0.38 : 1,
+                        transition:"all .12s",
                       }}>
-                      <span style={{ fontSize:18, lineHeight:1 }}>{t.icon}</span>
-                      <span style={{ fontSize:10, fontWeight: selected || isPending ? 700 : 400, color: selected ? color : isPending ? "var(--accent)" : "var(--text2)", lineHeight:1.2 }}>
-                        {t.label}
-                      </span>
-                      {selected && (
-                        <span style={{ fontSize:9, color:"#fff", background:color, borderRadius:4, padding:"1px 5px", fontWeight:700 }}>
-                          {meta?.level === "Basics" ? "Easy" : meta?.level === "Intermediate" ? "Mid" : "Pro"} ✓
-                        </span>
-                      )}
-                      {isPending && !selected && (
-                        <span style={{ fontSize:9, color:"var(--accent)", fontWeight:700 }}>pick level ↓</span>
-                      )}
+                      <span style={{ fontSize:16, lineHeight:1 }}>{t.icon}</span>
+                      <span>{t.label}</span>
+                      {selected && <i className="ti ti-check" style={{ fontSize:13, color }} />}
                     </button>
                   );
                 })}
               </div>
-            ) : searchQuery.trim() !== "" ? (
-              <div style={{ padding:"20px 16px", textAlign:"center", borderRadius:12, border:"1.5px dashed var(--border)", background:"var(--surface2)" }}>
-                <div style={{ fontSize:22, marginBottom:8 }}>✨</div>
+            ) : searchQuery.trim() ? (
+              /* No results → custom topic CTA */
+              <div style={{
+                padding:"20px 16px", textAlign:"center", borderRadius:12,
+                border:"1.5px dashed var(--border)", background:"var(--surface2)",
+              }}>
                 <div style={{ fontSize:13, fontWeight:700, color:"var(--text1)", marginBottom:4 }}>
                   "{searchQuery}" not in our library
                 </div>
                 <div style={{ fontSize:12, color:"var(--text3)", marginBottom:14, lineHeight:1.5 }}>
-                  We'll use AI to generate questions — pick a level to add it.
+                  We'll use AI to generate questions for this topic.
                 </div>
-                <button
-                  onClick={() => addCustomTopic(searchQuery)}
-                  disabled={selectedTopics.length >= 5}
-                  style={{
-                    padding:"8px 20px", borderRadius:8, border:"none", cursor: selectedTopics.length >= 5 ? "not-allowed" : "pointer",
-                    background: selectedTopics.length >= 5 ? "var(--surface2)" : "var(--accent)",
-                    color: selectedTopics.length >= 5 ? "var(--text3)" : "#fff",
-                    fontSize:13, fontWeight:700,
-                  }}>
-                  {selectedTopics.length >= 5 ? "Max 5 topics" : `+ Add "${searchQuery}"`}
+                <button onClick={() => addCustomTopic(searchQuery)} disabled={selectedTopics.length >= 5} style={{
+                  padding:"8px 22px", borderRadius:8, border:"none",
+                  cursor: selectedTopics.length >= 5 ? "not-allowed" : "pointer",
+                  background: selectedTopics.length >= 5 ? "var(--surface2)" : "var(--accent)",
+                  color: selectedTopics.length >= 5 ? "var(--text3)" : "#fff",
+                  fontSize:13, fontWeight:700,
+                }}>
+                  {selectedTopics.length >= 5 ? "Max 5 topics" : `✨ Add "${searchQuery}"`}
                 </button>
               </div>
-            ) : (
-              <div style={{ padding:"24px 0", textAlign:"center", color:"var(--text3)", fontSize:13 }}>No topics found.</div>
-            )}
+            ) : null}
 
-            {/* AI custom topic add row */}
-            {searchQuery.trim() !== "" && filteredTopics.length > 0 && !KNOWN_TOPICS.has(searchQuery.trim()) && selectedTopics.length < 5 && (
-              <button
-                onClick={() => addCustomTopic(searchQuery)}
-                style={{
-                  marginTop:10, width:"100%", padding:"9px 14px", borderRadius:9,
-                  border:"1.5px dashed var(--accent)", background:"var(--accdim)",
-                  color:"var(--accent)", fontSize:12, fontWeight:700, cursor:"pointer",
-                  display:"flex", alignItems:"center", gap:7,
-                }}>
-                <span>✨</span> Add "{searchQuery}" as AI-generated topic
+            {/* Custom topic row when search partially matches */}
+            {searchQuery.trim() && filteredTopics.length > 0 && !KNOWN_TOPICS.has(searchQuery.trim()) && selectedTopics.length < 5 && (
+              <button onClick={() => addCustomTopic(searchQuery)} style={{
+                marginTop:10, padding:"8px 16px", borderRadius:99,
+                border:"1.5px dashed var(--accent)", background:"var(--accdim)",
+                color:"var(--accent)", fontSize:12, fontWeight:700, cursor:"pointer",
+                display:"inline-flex", alignItems:"center", gap:6,
+              }}>
+                ✨ Add "{searchQuery}" as custom topic
               </button>
             )}
 
             {selectedTopics.length >= 5 && (
-              <div style={{ marginTop:10, fontSize:12, color:"var(--text3)", textAlign:"center" }}>
-                Max 5 topics selected — remove one to add another.
-              </div>
-            )}
-
-            {/* ── Inline level picker (appears when a topic is tapped) ── */}
-            {pendingTopic && !selectedTopics.includes(pendingTopic.id) && (
-              <div style={{
-                marginTop:12, padding:"14px 16px", borderRadius:12,
-                background:"var(--accdim)", border:"1.5px solid var(--accborder)",
-                animation:"fadeSlideIn .2s ease",
-              }}>
-                <div style={{ fontSize:12, fontWeight:700, color:"var(--accent)", marginBottom:10 }}>
-                  {pendingTopic.icon} {pendingTopic.label} — pick difficulty:
-                </div>
-                <div style={{ display:"flex", gap:8 }}>
-                  {LEVELS.map(lv => (
-                    <button key={lv.key} onClick={() => confirmTopicWithLevel(lv.key)} style={{
-                      flex:1, padding:"10px 6px", borderRadius:10, cursor:"pointer", textAlign:"center" as const,
-                      border:"1.5px solid var(--accborder)",
-                      background:"var(--surface)", transition:"all .1s",
-                    }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "var(--accent)"; (e.currentTarget as HTMLButtonElement).style.color = "#fff"; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "var(--surface)"; (e.currentTarget as HTMLButtonElement).style.color = ""; }}
-                    >
-                      <div style={{ fontSize:13, fontWeight:700 }}>{lv.label}</div>
-                      <div style={{ fontSize:10, color:"var(--text3)", marginTop:2 }}>{lv.desc}</div>
-                    </button>
-                  ))}
-                </div>
+              <div style={{ marginTop:10, fontSize:12, color:"var(--text3)" }}>
+                Max 5 topics — remove one to add another.
               </div>
             )}
           </div>
 
-          {/* Selected topics — each chip shows level as 3 direct buttons */}
+          {/* ── Selected topics (chips with level buttons) ── */}
           {selectedTopics.length > 0 && (
             <div style={{ ...card, marginBottom:16, padding:"14px 16px" }}>
-              <div style={{ fontSize:12, fontWeight:700, color:"var(--text3)", textTransform:"uppercase", letterSpacing:".07em", marginBottom:12 }}>
+              <div style={{ fontSize:11, fontWeight:700, color:"var(--text3)", textTransform:"uppercase", letterSpacing:".07em", marginBottom:12 }}>
                 Your session — {selectedTopics.length} topic{selectedTopics.length > 1 ? "s" : ""}
+                <span style={{ marginLeft:8, fontWeight:400, textTransform:"none", letterSpacing:0 }}>· ~{sessionQCount} questions</span>
               </div>
               <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                 {selectedTopics.map(id => {
@@ -779,22 +717,20 @@ export default function InterviewPage() {
                   return (
                     <div key={id} style={{
                       display:"flex", alignItems:"center", gap:8, padding:"10px 12px", borderRadius:12,
-                      background:"var(--surface2)", border:`1.5px solid ${m?.color}`,
+                      background:"var(--surface2)", borderLeft:`3px solid ${m?.color}`,
                     }}>
-                      {/* Icon + label */}
                       <span style={{ fontSize:18, flexShrink:0 }}>{m?.icon}</span>
                       <span style={{ fontSize:13, fontWeight:700, color: m?.color, flex:1, minWidth:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
                         {m?.label}
                         {isCustom && <span style={{ marginLeft:6, fontSize:10, opacity:0.7 }}>✨AI</span>}
                       </span>
-                      {/* 3-button direct level picker */}
                       <div style={{ display:"flex", gap:3, flexShrink:0 }}>
                         {LEVELS.map(lv => {
                           const active = m?.level === lv.key;
                           return (
                             <button key={lv.key} onClick={() => setTopicLevel(id, lv.key)} style={{
-                              padding:"3px 8px", borderRadius:6, border:"none", cursor:"pointer",
-                              fontSize:10, fontWeight:700,
+                              padding:"3px 9px", borderRadius:6, border:"none", cursor:"pointer",
+                              fontSize:11, fontWeight: active ? 700 : 400,
                               background: active ? m?.color : "var(--surface)",
                               color: active ? "#fff" : "var(--text3)",
                               transition:"all .1s",
@@ -804,38 +740,21 @@ export default function InterviewPage() {
                           );
                         })}
                       </div>
-                      {/* Remove */}
                       <button onClick={() => removeTopic(id)} style={{
-                        width:20, height:20, borderRadius:"50%", border:"none", cursor:"pointer",
-                        background:`${m?.color}25`, color: m?.color, fontSize:12, fontWeight:700, flexShrink:0,
+                        width:22, height:22, borderRadius:"50%", border:"none", cursor:"pointer",
+                        background:`${m?.color}22`, color: m?.color, fontSize:14, fontWeight:700, flexShrink:0,
                         display:"flex", alignItems:"center", justifyContent:"center", padding:0,
                       }}>×</button>
                     </div>
                   );
                 })}
               </div>
-
-              {/* Session summary */}
-              <div style={{
-                marginTop:12, padding:"10px 14px", borderRadius:10,
-                background:"var(--surface2)", border:"1px solid var(--border)",
-                display:"flex", gap: mobile ? 14 : 24, flexWrap:"wrap", alignItems:"center",
-              }}>
-                <div style={{ textAlign:"center" }}>
-                  <div style={{ fontSize:18, fontWeight:900, color:"var(--accent)" }}>~{sessionQCount}</div>
-                  <div style={{ fontSize:10, color:"var(--text3)" }}>questions</div>
+              {selectedTopics.some(id => !KNOWN_TOPICS.has(id)) && (
+                <div style={{ marginTop:10, display:"flex", alignItems:"center", gap:5, padding:"6px 10px", borderRadius:7, background:"rgba(99,102,241,.07)", border:"1px solid var(--accborder)", width:"fit-content" }}>
+                  <span>✨</span>
+                  <span style={{ fontSize:11, color:"var(--accent)", fontWeight:600 }}>AI generation included</span>
                 </div>
-                <div style={{ textAlign:"center" }}>
-                  <div style={{ fontSize:18, fontWeight:900, color:"var(--text1)" }}>{selectedTopics.length}</div>
-                  <div style={{ fontSize:10, color:"var(--text3)" }}>topics</div>
-                </div>
-                {selectedTopics.some(id => !KNOWN_TOPICS.has(id)) && (
-                  <div style={{ display:"flex", alignItems:"center", gap:5, padding:"4px 10px", borderRadius:7, background:"rgba(99,102,241,.08)", border:"1px solid var(--accborder)" }}>
-                    <span>✨</span>
-                    <span style={{ fontSize:11, color:"var(--accent)", fontWeight:600 }}>AI generation included</span>
-                  </div>
-                )}
-              </div>
+              )}
             </div>
           )}
 
@@ -1350,7 +1269,6 @@ export default function InterviewPage() {
               setSelectedTopics([]);
               setTopicMeta({});
               setSearchQuery("");
-              setActiveCategory("all");
               setStage("setup");
             }} style={{
               padding:15, borderRadius:12, border:"none",
