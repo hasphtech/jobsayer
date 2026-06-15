@@ -323,8 +323,6 @@ export default function InterviewPage() {
   const [activeCategory,  setActiveCategory]  = useState("all");
   const [customInput,     setCustomInput]     = useState("");
   const [aiGenTopic,      setAiGenTopic]      = useState("");
-  // Which topic card is waiting for a level pick before being added
-  const [pendingTopic,    setPendingTopic]    = useState<{ id:string; label:string; icon:string } | null>(null);
 
   /* ── Practice state ── */
   const [questions,  setQuestions]  = useState<QuestionItem[]>([]);
@@ -395,23 +393,14 @@ export default function InterviewPage() {
   /* ── Topic selection ── */
   function handleTopicClick(id: string, label: string, icon: string) {
     if (selectedTopics.includes(id)) {
-      // Already selected → deselect
       setSelectedTopics(p => p.filter(t => t !== id));
       setTopicMeta(p => { const n = { ...p }; delete n[id]; return n; });
-      if (pendingTopic?.id === id) setPendingTopic(null);
     } else if (selectedTopics.length < 5) {
-      // Not selected → show inline level picker
-      setPendingTopic(pendingTopic?.id === id ? null : { id, label, icon });
+      // Add immediately with default "Intermediate" — user can adjust on the chip
+      const color = TOPIC_COLORS[selectedTopics.length % TOPIC_COLORS.length];
+      setSelectedTopics(p => [...p, id]);
+      setTopicMeta(p => ({ ...p, [id]: { label, icon, color, level: "Intermediate" } }));
     }
-  }
-
-  function confirmTopicWithLevel(lv: Level) {
-    if (!pendingTopic) return;
-    const { id, label, icon } = pendingTopic;
-    const color = TOPIC_COLORS[selectedTopics.length % TOPIC_COLORS.length];
-    setSelectedTopics(p => [...p, id]);
-    setTopicMeta(p => ({ ...p, [id]: { label, icon, color, level: lv } }));
-    setPendingTopic(null);
   }
 
   function removeTopic(id: string) {
@@ -426,7 +415,9 @@ export default function InterviewPage() {
   function addCustomTopic(label: string) {
     const trimmed = label.trim();
     if (!trimmed || selectedTopics.includes(trimmed) || selectedTopics.length >= 5) return;
-    setPendingTopic({ id: trimmed, label: trimmed, icon: "✨" });
+    const color = TOPIC_COLORS[selectedTopics.length % TOPIC_COLORS.length];
+    setSelectedTopics(p => [...p, trimmed]);
+    setTopicMeta(p => ({ ...p, [trimmed]: { label: trimmed, icon: "✨", color, level: "Intermediate" } }));
     setCustomInput("");
     setSearchQuery("");
   }
@@ -613,7 +604,7 @@ export default function InterviewPage() {
                 Topics <span style={{ fontWeight:400, textTransform:"none", letterSpacing:0 }}>— tap to pick level</span>
               </div>
               {selectedTopics.length > 0 && (
-                <button onClick={() => { setSelectedTopics([]); setTopicMeta({}); setPendingTopic(null); }} style={{
+                <button onClick={() => { setSelectedTopics([]); setTopicMeta({}); }} style={{
                   fontSize:11, color:"var(--text3)", background:"none", border:"none",
                   cursor:"pointer", padding:"2px 6px", borderRadius:5,
                 }}>
@@ -630,7 +621,7 @@ export default function InterviewPage() {
               }} />
               <input
                 value={searchQuery}
-                onChange={e => { setSearchQuery(e.target.value); setCustomInput(e.target.value); setPendingTopic(null); }}
+                onChange={e => { setSearchQuery(e.target.value); setCustomInput(e.target.value); }}
                 onKeyDown={e => { if (e.key === "Enter" && customTopicAvailable) addCustomTopic(searchQuery); }}
                 placeholder="Search topics or type a custom one…"
                 style={{ ...inp, paddingLeft:34 }}
@@ -640,7 +631,7 @@ export default function InterviewPage() {
             {/* Category tabs */}
             <div style={{ display:"flex", gap:6, overflowX:"auto", paddingBottom:4, scrollbarWidth:"none", marginBottom:12 }}>
               {CATEGORIES.map(cat => (
-                <button key={cat.id} onClick={() => { setActiveCategory(cat.id); setPendingTopic(null); }} style={{
+                <button key={cat.id} onClick={() => setActiveCategory(cat.id)} style={{
                   padding:"5px 13px", borderRadius:99, fontSize:12, cursor:"pointer", whiteSpace:"nowrap", flexShrink:0,
                   border:`1px solid ${activeCategory === cat.id ? "var(--accent)" : "var(--border)"}`,
                   background: activeCategory === cat.id ? "var(--accdim)" : "var(--surface2)",
@@ -658,11 +649,10 @@ export default function InterviewPage() {
                 gap:6, maxHeight:260, overflowY:"auto", scrollbarWidth:"none",
               }}>
                 {filteredTopics.map(t => {
-                  const selected  = selectedTopics.includes(t.id);
-                  const isPending = pendingTopic?.id === t.id;
-                  const meta      = topicMeta[t.id];
-                  const color     = selected ? meta?.color : isPending ? "var(--accent)" : undefined;
-                  const maxed     = !selected && !isPending && selectedTopics.length >= 5;
+                  const selected = selectedTopics.includes(t.id);
+                  const meta     = topicMeta[t.id];
+                  const color    = meta?.color;
+                  const maxed    = !selected && selectedTopics.length >= 5;
                   return (
                     <button key={t.id}
                       onClick={() => handleTopicClick(t.id, t.label, t.icon)}
@@ -670,23 +660,20 @@ export default function InterviewPage() {
                       style={{
                         padding:"10px 6px", borderRadius:10, cursor: maxed ? "not-allowed" : "pointer",
                         textAlign:"center" as const,
-                        border:`1.5px solid ${selected ? color! : isPending ? "var(--accent)" : "var(--border)"}`,
-                        background: selected ? `${color}18` : isPending ? "var(--accdim)" : "var(--surface2)",
+                        border:`1.5px solid ${selected ? color! : "var(--border)"}`,
+                        background: selected ? `${color}18` : "var(--surface2)",
                         opacity: maxed ? 0.4 : 1,
                         transition:"all .15s",
                         display:"flex", flexDirection:"column", alignItems:"center", gap:4,
                       }}>
                       <span style={{ fontSize:18, lineHeight:1 }}>{t.icon}</span>
-                      <span style={{ fontSize:10, fontWeight: selected || isPending ? 700 : 400, color: selected ? color : isPending ? "var(--accent)" : "var(--text2)", lineHeight:1.2 }}>
+                      <span style={{ fontSize:10, fontWeight: selected ? 700 : 400, color: selected ? color : "var(--text2)", lineHeight:1.2 }}>
                         {t.label}
                       </span>
                       {selected && (
                         <span style={{ fontSize:9, color:"#fff", background:color, borderRadius:4, padding:"1px 5px", fontWeight:700 }}>
                           {meta?.level === "Basics" ? "Easy" : meta?.level === "Intermediate" ? "Mid" : "Pro"} ✓
                         </span>
-                      )}
-                      {isPending && !selected && (
-                        <span style={{ fontSize:9, color:"var(--accent)", fontWeight:700 }}>pick level ↓</span>
                       )}
                     </button>
                   );
@@ -737,33 +724,6 @@ export default function InterviewPage() {
               </div>
             )}
 
-            {/* ── Inline level picker (appears when a topic is tapped) ── */}
-            {pendingTopic && !selectedTopics.includes(pendingTopic.id) && (
-              <div style={{
-                marginTop:12, padding:"14px 16px", borderRadius:12,
-                background:"var(--accdim)", border:"1.5px solid var(--accborder)",
-                animation:"fadeSlideIn .2s ease",
-              }}>
-                <div style={{ fontSize:12, fontWeight:700, color:"var(--accent)", marginBottom:10 }}>
-                  {pendingTopic.icon} {pendingTopic.label} — pick difficulty:
-                </div>
-                <div style={{ display:"flex", gap:8 }}>
-                  {LEVELS.map(lv => (
-                    <button key={lv.key} onClick={() => confirmTopicWithLevel(lv.key)} style={{
-                      flex:1, padding:"10px 6px", borderRadius:10, cursor:"pointer", textAlign:"center" as const,
-                      border:"1.5px solid var(--accborder)",
-                      background:"var(--surface)", transition:"all .1s",
-                    }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "var(--accent)"; (e.currentTarget as HTMLButtonElement).style.color = "#fff"; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "var(--surface)"; (e.currentTarget as HTMLButtonElement).style.color = ""; }}
-                    >
-                      <div style={{ fontSize:13, fontWeight:700 }}>{lv.label}</div>
-                      <div style={{ fontSize:10, color:"var(--text3)", marginTop:2 }}>{lv.desc}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Selected topics — each chip shows level as 3 direct buttons */}
