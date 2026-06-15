@@ -252,7 +252,7 @@ export default function InterviewPage() {
   ══════════════════════════════════════════════════════════ */
   if (stage === "profile") return (
     <AppShell>
-      <div style={{ padding: "24px 24px 48px" }}>
+      <div style={{ padding: mobile ? "16px 12px 48px" : "24px 24px 48px" }}>
 
         <div style={{ textAlign: "center", marginBottom: 36 }}>
           <div style={{ fontSize: 44, marginBottom: 12 }}><i className="ti ti-compass"/></div>
@@ -405,7 +405,7 @@ export default function InterviewPage() {
           <button onClick={() => setStage("profile")} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 7, color: "var(--text3)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}><i className="ti ti-arrow-left"/> Re-analyse
           </button>
         }>
-        <div style={{ padding: "24px 24px 48px" }}>
+        <div style={{ padding: mobile ? "16px 12px 48px" : "24px 24px 48px" }}>
 
           {/* Readiness score */}
           <div style={{ ...card, marginBottom: 24, background: `${scColor}08`, borderColor: `${scColor}28`, textAlign: "center", padding: "32px 24px" }}>
@@ -556,7 +556,7 @@ export default function InterviewPage() {
           </div>
         }>
 
-        <div style={{ padding: "24px 24px 48px" }}>
+        <div style={{ padding: mobile ? "16px 12px 48px" : "24px 24px 48px" }}>
 
           {/* Progress */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
@@ -728,7 +728,7 @@ export default function InterviewPage() {
           <button onClick={() => setStage("gaps")} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 7, color: "var(--text3)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}><i className="ti ti-arrow-left"/> Gap Plan
           </button>
         }>
-        <div style={{ padding: "24px 24px 48px" }}>
+        <div style={{ padding: mobile ? "16px 12px 48px" : "24px 24px 48px" }}>
 
           {/* Score hero */}
           <div style={{ ...card, textAlign: "center", marginBottom: 24, background: `${c}08`, borderColor: `${c}28`, padding: "36px 24px" }}>

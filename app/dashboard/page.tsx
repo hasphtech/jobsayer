@@ -736,7 +736,7 @@ export default function DashboardPage() {
 
   return (
     <AppShell actions={actions}>
-      <div style={{ padding: "24px 24px 48px" }}>
+      <div style={{ padding: mobile ? "16px 12px 48px" : "24px 24px 48px" }}>
 
         {/* ── Greeting ── */}
         <div style={{ marginBottom: 18 }}>

@@ -654,7 +654,7 @@ export default function ApplicationsPage() {
         </button>
       }>
 
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "32px 20px 80px" }}>
+      <div style={{ maxWidth: 960, margin: "0 auto", padding: mobile ? "16px 12px 80px" : "32px 20px 80px" }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
           <div>

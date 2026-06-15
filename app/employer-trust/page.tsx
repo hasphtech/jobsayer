@@ -7,6 +7,7 @@
 import React, { useState, useMemo } from "react";
 import AppShell from "@/components/AppShell";
 import Link from "next/link";
+import { useWindowWidth } from "@/lib/useWindowWidth";
 
 /* ── Types ───────────────────────────────────────────────────── */
 interface EmployerRating {
@@ -126,6 +127,8 @@ function MiniRing({ score, size = 52 }: { score: number; size?: number }) {
 
 /* ── Page ────────────────────────────────────────────────────── */
 export default function EmployerTrustPage() {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const [industry, setIndustry] = useState("All industries");
   const [country,  setCountry]  = useState("All countries");
   const [search,   setSearch]   = useState("");
@@ -155,21 +158,21 @@ export default function EmployerTrustPage() {
 
   return (
     <AppShell>
-      <div style={{ maxWidth: 980, margin: "0 auto", padding: "32px 20px 80px" }}>
+      <div style={{ maxWidth: 980, margin: "0 auto", padding: mobile ? "16px 12px 80px" : "32px 20px 80px" }}>
 
         {/* Header */}
         <div style={{ marginBottom: 28 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 99, background: "var(--accdim)", border: "1px solid var(--accborder)", fontSize: 11, fontWeight: 700, color: "var(--accent)", marginBottom: 12 }}>
             <i className="ti ti-world"/> Global · Candidate-reported
           </div>
-          <h1 style={{ fontSize: 28, fontWeight: 800, marginBottom: 8, letterSpacing: "-.02em" }}>Employer Trust Ratings</h1>
+          <h1 style={{ fontSize: mobile ? 22 : 28, fontWeight: 800, marginBottom: 8, letterSpacing: "-.02em" }}>Employer Trust Ratings</h1>
           <p style={{ fontSize: 14, color: "var(--text3)", lineHeight: 1.7, maxWidth: 580 }}>
             Accountability goes both ways. See which employers ghost candidates, respond fast, and run fair interviews — before you apply.
           </p>
         </div>
 
         {/* Top/Worst callouts */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 28 }}>
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 16, marginBottom: 28 }}>
           <div style={{ ...card, padding: "16px 20px", borderColor: "rgba(34,197,94,.25)", background: "rgba(34,197,94,.04)" }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: "var(--success)", marginBottom: 12 }}><i className="ti ti-circle-check"/> Most trusted employers</div>
             {topTrusted.map(e => (

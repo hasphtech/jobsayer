@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import AppShell from "@/components/AppShell";
 import { useAuth } from "@/lib/useAuth";
+import { useWindowWidth } from "@/lib/useWindowWidth";
 
 /* ── Affiliate link helper ───────────────────────────────────────
  * For Udemy + Coursera: fetches a tracked URL from impact.com.
@@ -1291,6 +1292,8 @@ function ProgressTab({ logs, onRefresh }: { logs: LearningLog[]; onRefresh: () =
 /* ── Page ────────────────────────────────────────────────────── */
 export default function LearnPage() {
   const { user } = useAuth();
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const [activeTab, setActiveTab] = useState<"suggested" | "progress" | "browse">(user ? "suggested" : "browse");
   const [logs, setLogs]           = useState<LearningLog[]>([]);
   const [logsLoaded, setLogsLoaded] = useState(false);
@@ -1379,7 +1382,7 @@ export default function LearnPage() {
 
   return (
     <AppShell aiPanel={false}>
-      <div style={{ padding: "24px 28px", maxWidth: 1000 }}>
+      <div style={{ padding: mobile ? "16px 14px" : "24px 28px", maxWidth: 1000 }}>
 
         {/* Header */}
         <div style={{ marginBottom: 20 }}>
@@ -1393,7 +1396,7 @@ export default function LearnPage() {
         </div>
 
         {/* Tab nav */}
-        <div style={{ display: "flex", gap: 4, borderBottom: "2px solid var(--border)", marginBottom: 24 }}>
+        <div style={{ display: "flex", gap: 4, borderBottom: "2px solid var(--border)", marginBottom: 24, overflowX: "auto", scrollbarWidth: "none" }}>
           {([
             { key: "suggested", label: "✦ Suggested", show: !!user },
             { key: "progress",  label: `My Progress${inProgressCount + completedCount > 0 ? ` (${inProgressCount + completedCount})` : ""}`, show: !!user },
@@ -1567,7 +1570,7 @@ export default function LearnPage() {
             No courses match your filters. Try widening the search.
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 280px), 1fr))", gap: 10 }}>
             {visible.map(c => <CourseCard key={c.id} c={c} />)}
           </div>
         )}

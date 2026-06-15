@@ -127,7 +127,7 @@ export default function TailorPage() {
 
   return (
     <AppShell>
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 20px 80px" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: mobile ? "16px 12px 80px" : "32px 20px 80px" }}>
 
         {/* Header */}
         <div style={{ marginBottom: 28 }}>

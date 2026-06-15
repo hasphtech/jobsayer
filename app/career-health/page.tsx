@@ -9,6 +9,7 @@ import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import type { ResumeData } from "@/lib/types";
 import { trackAction } from "@/lib/activityTracker";
+import { useWindowWidth } from "@/lib/useWindowWidth";
 
 /* ── Scoring engine ──────────────────────────────────────────── */
 interface HealthDimension {
@@ -229,6 +230,8 @@ function recordCheckin() {
 
 /* ── Page ────────────────────────────────────────────────────── */
 export default function CareerHealthPage() {
+  const w = useWindowWidth();
+  const mobile = w < 640;
   const [resume, setResume]             = useState<ResumeData | null>(null);
   const [lastUpdatedDays, setLastUpdated] = useState(999);
   const [streak, setStreak]             = useState(0);
@@ -300,14 +303,14 @@ export default function CareerHealthPage() {
 
   return (
     <AppShell>
-      <div style={{ padding: "24px 24px 48px" }}>
+      <div style={{ padding: mobile ? "16px 14px 48px" : "24px 24px 48px" }}>
 
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 99, background: "var(--accdim)", border: "1px solid var(--accborder)", fontSize: 11, fontWeight: 700, color: "var(--accent)", marginBottom: 12 }}>
             <i className="ti ti-stethoscope"/> Monthly Career Checkup
           </div>
-          <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 8, letterSpacing: "-.02em" }}>Career Health Score</h1>
+          <h1 style={{ fontSize: mobile ? 20 : 26, fontWeight: 800, marginBottom: 8, letterSpacing: "-.02em" }}>Career Health Score</h1>
           <p style={{ fontSize: 14, color: "var(--text3)", lineHeight: 1.6, maxWidth: 540 }}>
             Your career fitness report — not just when you're job hunting. Professionals who check monthly earn 23% more over 5 years.
           </p>
@@ -321,7 +324,7 @@ export default function CareerHealthPage() {
         )}
 
         {/* Hero score */}
-        <div style={{ ...card, padding: "28px 32px", marginBottom: 24, display: "flex", gap: 28, alignItems: "center", flexWrap: "wrap", background: "linear-gradient(135deg,rgba(99,102,241,.06),rgba(99,102,241,.02))", borderColor: "var(--accborder)" }}>
+        <div style={{ ...card, padding: mobile ? "20px 16px" : "28px 32px", marginBottom: 24, display: "flex", gap: mobile ? 16 : 28, alignItems: "center", flexWrap: "wrap", background: "linear-gradient(135deg,rgba(99,102,241,.06),rgba(99,102,241,.02))", borderColor: "var(--accborder)" }}>
           <ScoreRing score={overallScore} size={130} />
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 28, fontWeight: 900, color: overallColor, marginBottom: 4 }}>{overallLabel}</div>
