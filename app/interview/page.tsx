@@ -66,53 +66,96 @@ export const PROG_LANGUAGES = [
 export type ProgLanguageKey = typeof PROG_LANGUAGES[number]["key"];
 
 /* ── Topics catalogue ────────────────────────────────────── */
-const TOPIC_COLORS = ["#6366f1","#10b981","#f59e0b","#ef4444","#8b5cf6","#06b6d4","#ec4899","#14b8a6"];
+const TOPIC_COLORS = ["#6366f1","#10b981","#f59e0b","#ef4444","#8b5cf6","#06b6d4","#ec4899","#14b8a6","#f97316","#84cc16"];
 
 const ALL_TOPICS = [
   // Frontend
-  { id:"JavaScript",    icon:"🟨", label:"JavaScript",       cat:"frontend" },
-  { id:"TypeScript",    icon:"🔷", label:"TypeScript",       cat:"frontend" },
-  { id:"React",         icon:"⚛️", label:"React",            cat:"frontend" },
-  { id:"Next.js",       icon:"▲",  label:"Next.js",          cat:"frontend" },
-  { id:"Vue.js",        icon:"💚", label:"Vue.js",           cat:"frontend" },
-  { id:"Angular",       icon:"🔴", label:"Angular",          cat:"frontend" },
-  { id:"CSS & HTML",    icon:"🎨", label:"CSS & HTML",       cat:"frontend" },
-  { id:"Redux",         icon:"🟣", label:"Redux",            cat:"frontend" },
-  { id:"GraphQL",       icon:"🩷", label:"GraphQL",          cat:"frontend" },
+  { id:"JavaScript",      icon:"🟨", label:"JavaScript",         cat:"frontend" },
+  { id:"TypeScript",      icon:"🔷", label:"TypeScript",         cat:"frontend" },
+  { id:"React",           icon:"⚛️", label:"React",              cat:"frontend" },
+  { id:"Next.js",         icon:"▲",  label:"Next.js",            cat:"frontend" },
+  { id:"Vue.js",          icon:"💚", label:"Vue.js",             cat:"frontend" },
+  { id:"Angular",         icon:"🔴", label:"Angular",            cat:"frontend" },
+  { id:"CSS & HTML",      icon:"🎨", label:"CSS & HTML",         cat:"frontend" },
+  { id:"Redux",           icon:"🟣", label:"Redux",              cat:"frontend" },
+  { id:"GraphQL",         icon:"🩷", label:"GraphQL",            cat:"frontend" },
+  { id:"Svelte",          icon:"🔥", label:"Svelte",             cat:"frontend" },
+  { id:"Web Performance", icon:"⚡", label:"Web Performance",    cat:"frontend" },
+  { id:"Webpack & Vite",  icon:"📦", label:"Webpack / Vite",     cat:"frontend" },
+  { id:"PWA",             icon:"📱", label:"PWA",                cat:"frontend" },
+  { id:"Frontend Testing",icon:"🧪", label:"Jest / Cypress",     cat:"frontend" },
   // Backend
-  { id:"Node.js",       icon:"🟩", label:"Node.js",          cat:"backend"  },
-  { id:"Python",        icon:"🐍", label:"Python",           cat:"backend"  },
-  { id:"Java",          icon:"☕", label:"Java",             cat:"backend"  },
-  { id:"Go",            icon:"🔵", label:"Go (Golang)",      cat:"backend"  },
-  { id:"REST APIs",     icon:"🔗", label:"REST APIs",        cat:"backend"  },
-  { id:"Microservices", icon:"🔧", label:"Microservices",    cat:"backend"  },
-  { id:"Django",        icon:"🌿", label:"Django",           cat:"backend"  },
-  { id:"Spring Boot",   icon:"🍃", label:"Spring Boot",      cat:"backend"  },
+  { id:"Node.js",         icon:"🟩", label:"Node.js",            cat:"backend"  },
+  { id:"Python",          icon:"🐍", label:"Python",             cat:"backend"  },
+  { id:"Java",            icon:"☕", label:"Java",               cat:"backend"  },
+  { id:"Go",              icon:"🔵", label:"Go (Golang)",        cat:"backend"  },
+  { id:"REST APIs",       icon:"🔗", label:"REST APIs",          cat:"backend"  },
+  { id:"Microservices",   icon:"🔧", label:"Microservices",      cat:"backend"  },
+  { id:"Django",          icon:"🌿", label:"Django",             cat:"backend"  },
+  { id:"Spring Boot",     icon:"🍃", label:"Spring Boot",        cat:"backend"  },
+  { id:"FastAPI",         icon:"🚀", label:"FastAPI",            cat:"backend"  },
+  { id:"Express.js",      icon:"🖤", label:"Express.js",         cat:"backend"  },
+  { id:".NET / C#",       icon:"💜", label:".NET / C#",          cat:"backend"  },
+  { id:"gRPC",            icon:"📡", label:"gRPC",               cat:"backend"  },
+  { id:"Message Queues",  icon:"📨", label:"Kafka / RabbitMQ",   cat:"backend"  },
+  { id:"Ruby on Rails",   icon:"💎", label:"Ruby on Rails",      cat:"backend"  },
   // CS Fundamentals
-  { id:"DSA",           icon:"🧮", label:"DSA",              cat:"cs"       },
-  { id:"System Design", icon:"🏗️", label:"System Design",    cat:"cs"       },
-  { id:"OOP",           icon:"📦", label:"OOP Concepts",     cat:"cs"       },
-  { id:"OS",            icon:"💻", label:"Operating Systems",cat:"cs"       },
-  { id:"Networking",    icon:"🌐", label:"Networking",       cat:"cs"       },
-  { id:"Concurrency",   icon:"⚙️", label:"Concurrency",      cat:"cs"       },
+  { id:"DSA",             icon:"🧮", label:"DSA",                cat:"cs"       },
+  { id:"System Design",   icon:"🏗️", label:"System Design",      cat:"cs"       },
+  { id:"OOP",             icon:"📦", label:"OOP Concepts",       cat:"cs"       },
+  { id:"OS",              icon:"💻", label:"Operating Systems",  cat:"cs"       },
+  { id:"Networking",      icon:"🌐", label:"Networking",         cat:"cs"       },
+  { id:"Concurrency",     icon:"⚙️", label:"Concurrency",        cat:"cs"       },
+  { id:"Design Patterns", icon:"🧩", label:"Design Patterns",    cat:"cs"       },
+  { id:"Database Design", icon:"🗃️", label:"Database Design",    cat:"cs"       },
+  { id:"Algorithms",      icon:"🔢", label:"Algorithms",         cat:"cs"       },
+  { id:"Computer Architecture",icon:"🖥️",label:"Computer Arch", cat:"cs"       },
   // Data
-  { id:"SQL & DB",      icon:"🗄️", label:"SQL & DB",         cat:"data"     },
-  { id:"PostgreSQL",    icon:"🐘", label:"PostgreSQL",       cat:"data"     },
-  { id:"MongoDB",       icon:"🍃", label:"MongoDB",          cat:"data"     },
-  { id:"Redis",         icon:"🔴", label:"Redis",            cat:"data"     },
-  { id:"Data Engineering",icon:"🏭",label:"Data Engineering",cat:"data"     },
-  { id:"Machine Learning",icon:"🤖",label:"Machine Learning",cat:"data"     },
-  // DevOps
-  { id:"Docker",        icon:"🐳", label:"Docker",           cat:"devops"   },
-  { id:"Kubernetes",    icon:"☸️", label:"Kubernetes",       cat:"devops"   },
-  { id:"AWS",           icon:"☁️", label:"AWS",              cat:"devops"   },
-  { id:"CI/CD",         icon:"🔄", label:"CI / CD",          cat:"devops"   },
-  { id:"Linux",         icon:"🐧", label:"Linux",            cat:"devops"   },
-  { id:"Git",           icon:"🌿", label:"Git",              cat:"devops"   },
+  { id:"SQL & DB",        icon:"🗄️", label:"SQL & DB",           cat:"data"     },
+  { id:"PostgreSQL",      icon:"🐘", label:"PostgreSQL",         cat:"data"     },
+  { id:"MongoDB",         icon:"🍀", label:"MongoDB",            cat:"data"     },
+  { id:"Redis",           icon:"🔴", label:"Redis",              cat:"data"     },
+  { id:"Data Engineering",icon:"🏭", label:"Data Engineering",   cat:"data"     },
+  { id:"Machine Learning",icon:"🤖", label:"Machine Learning",   cat:"data"     },
+  { id:"Deep Learning",   icon:"🧠", label:"Deep Learning",      cat:"data"     },
+  { id:"Pandas & NumPy",  icon:"🐼", label:"Pandas / NumPy",     cat:"data"     },
+  { id:"Spark",           icon:"💥", label:"Spark / Hadoop",     cat:"data"     },
+  { id:"Power BI",        icon:"📊", label:"Power BI / Tableau", cat:"data"     },
+  { id:"NLP",             icon:"💬", label:"NLP",                cat:"data"     },
+  // DevOps / Cloud
+  { id:"Docker",          icon:"🐳", label:"Docker",             cat:"devops"   },
+  { id:"Kubernetes",      icon:"☸️", label:"Kubernetes",         cat:"devops"   },
+  { id:"AWS",             icon:"☁️", label:"AWS",                cat:"devops"   },
+  { id:"Azure",           icon:"🔷", label:"Azure",              cat:"devops"   },
+  { id:"GCP",             icon:"🌤️", label:"GCP",                cat:"devops"   },
+  { id:"CI/CD",           icon:"🔄", label:"CI / CD",            cat:"devops"   },
+  { id:"Linux",           icon:"🐧", label:"Linux",              cat:"devops"   },
+  { id:"Git",             icon:"🌿", label:"Git",                cat:"devops"   },
+  { id:"Terraform",       icon:"🏔️", label:"Terraform",          cat:"devops"   },
+  { id:"Monitoring",      icon:"📈", label:"Monitoring / Observability", cat:"devops" },
+  { id:"Serverless",      icon:"⚡", label:"Serverless",         cat:"devops"   },
+  // Mobile
+  { id:"React Native",    icon:"📱", label:"React Native",       cat:"mobile"   },
+  { id:"Flutter",         icon:"🐦", label:"Flutter",            cat:"mobile"   },
+  { id:"iOS / Swift",     icon:"🍎", label:"iOS / Swift",        cat:"mobile"   },
+  { id:"Android / Kotlin",icon:"🤖", label:"Android / Kotlin",   cat:"mobile"   },
+  // Security
+  { id:"Cybersecurity",   icon:"🔒", label:"Cybersecurity",      cat:"security" },
+  { id:"Web Security",    icon:"🛡️", label:"OWASP / Web Sec",    cat:"security" },
+  { id:"Auth & OAuth",    icon:"🔑", label:"Auth & OAuth",       cat:"security" },
+  { id:"Cryptography",    icon:"🔐", label:"Cryptography",       cat:"security" },
+  // Testing
+  { id:"Unit Testing",    icon:"✅", label:"Unit Testing",       cat:"testing"  },
+  { id:"TDD",             icon:"🔁", label:"TDD",                cat:"testing"  },
+  { id:"Test Automation", icon:"🤖", label:"Test Automation",    cat:"testing"  },
+  { id:"API Testing",     icon:"🔬", label:"API Testing",        cat:"testing"  },
   // Soft skills
-  { id:"Behavioral",    icon:"🤝", label:"Behavioral (HR)",  cat:"soft"     },
-  { id:"Leadership",    icon:"🌟", label:"Leadership",       cat:"soft"     },
-  { id:"Problem Solving",icon:"🧩",label:"Problem Solving",  cat:"soft"     },
+  { id:"Behavioral",      icon:"🤝", label:"Behavioral (HR)",    cat:"soft"     },
+  { id:"Leadership",      icon:"🌟", label:"Leadership",         cat:"soft"     },
+  { id:"Problem Solving", icon:"🧩", label:"Problem Solving",    cat:"soft"     },
+  { id:"Communication",   icon:"💬", label:"Communication",      cat:"soft"     },
+  { id:"Agile & Scrum",   icon:"🔄", label:"Agile / Scrum",      cat:"soft"     },
+  { id:"Negotiation",     icon:"🤲", label:"Negotiation",        cat:"soft"     },
 ] as const;
 
 const KNOWN_TOPICS = new Set<string>(ALL_TOPICS.map(t => t.id));
@@ -123,7 +166,10 @@ const CATEGORIES = [
   { id:"backend",  label:"Backend"        },
   { id:"cs",       label:"CS Fundamentals"},
   { id:"data",     label:"Data"           },
-  { id:"devops",   label:"DevOps"         },
+  { id:"devops",   label:"DevOps / Cloud" },
+  { id:"mobile",   label:"Mobile"         },
+  { id:"security", label:"Security"       },
+  { id:"testing",  label:"Testing"        },
   { id:"soft",     label:"Soft Skills"    },
 ];
 
@@ -143,6 +189,7 @@ function levelToDifficulty(level: Level): Difficulty {
 function scoreColor(n: number) {
   return n >= 75 ? "var(--success)" : n >= 50 ? "var(--warn)" : "var(--danger)";
 }
+function normalize(q: string) { return q.trim().toLowerCase().replace(/\s+/g, " "); }
 function qScoreColor(n: number) {
   return n >= 8 ? "var(--success)" : n >= 6 ? "var(--warn)" : "var(--danger)";
 }
@@ -270,13 +317,14 @@ export default function InterviewPage() {
   const [stage, setStage] = useState<Stage>("setup");
 
   /* ── Setup state ── */
-  const [level,           setLevel]           = useState<Level>("Basics");
   const [selectedTopics,  setSelectedTopics]  = useState<string[]>([]);
   const [topicMeta,       setTopicMeta]       = useState<Record<string, { label:string; icon:string; color:string; level:Level }>>({});
   const [searchQuery,     setSearchQuery]     = useState("");
   const [activeCategory,  setActiveCategory]  = useState("all");
   const [customInput,     setCustomInput]     = useState("");
   const [aiGenTopic,      setAiGenTopic]      = useState("");
+  // Which topic card is waiting for a level pick before being added
+  const [pendingTopic,    setPendingTopic]    = useState<{ id:string; label:string; icon:string } | null>(null);
 
   /* ── Practice state ── */
   const [questions,  setQuestions]  = useState<QuestionItem[]>([]);
@@ -289,8 +337,22 @@ export default function InterviewPage() {
   const [expandedQ,  setExpandedQ]  = useState<number | null>(null);
   const [resultsTab, setResultsTab] = useState<"overview" | "improve">("overview");
 
-  const recognitionRef = useRef<any>(null);
-  const textareaRef    = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef  = useRef<any>(null);
+  const textareaRef     = useRef<HTMLTextAreaElement>(null);
+  // Per-topic seen questions — persisted in localStorage so same Q never repeats across sessions
+  const seenRef = useRef<Record<string, Set<string>>>({});
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("jobsayer-interview-seen");
+      if (raw) {
+        const parsed: Record<string, string[]> = JSON.parse(raw);
+        seenRef.current = Object.fromEntries(
+          Object.entries(parsed).map(([k, v]) => [k, new Set(v)])
+        );
+      }
+    } catch { /* ignore */ }
+  }, []);
 
   /* ── Derived ── */
   const allAnswered = answers.length > 0 && answers.every(a => a.submitted);
@@ -330,24 +392,41 @@ export default function InterviewPage() {
     };
   });
 
-  /* ── Topic toggle ── */
-  function toggleTopic(id: string, label: string, icon: string) {
+  /* ── Topic selection ── */
+  function handleTopicClick(id: string, label: string, icon: string) {
     if (selectedTopics.includes(id)) {
+      // Already selected → deselect
       setSelectedTopics(p => p.filter(t => t !== id));
       setTopicMeta(p => { const n = { ...p }; delete n[id]; return n; });
+      if (pendingTopic?.id === id) setPendingTopic(null);
     } else if (selectedTopics.length < 5) {
-      const color = TOPIC_COLORS[selectedTopics.length % TOPIC_COLORS.length];
-      setSelectedTopics(p => [...p, id]);
-      setTopicMeta(p => ({ ...p, [id]: { label, icon, color, level } }));
+      // Not selected → show inline level picker
+      setPendingTopic(pendingTopic?.id === id ? null : { id, label, icon });
     }
+  }
+
+  function confirmTopicWithLevel(lv: Level) {
+    if (!pendingTopic) return;
+    const { id, label, icon } = pendingTopic;
+    const color = TOPIC_COLORS[selectedTopics.length % TOPIC_COLORS.length];
+    setSelectedTopics(p => [...p, id]);
+    setTopicMeta(p => ({ ...p, [id]: { label, icon, color, level: lv } }));
+    setPendingTopic(null);
+  }
+
+  function removeTopic(id: string) {
+    setSelectedTopics(p => p.filter(t => t !== id));
+    setTopicMeta(p => { const n = { ...p }; delete n[id]; return n; });
+  }
+
+  function setTopicLevel(id: string, lv: Level) {
+    setTopicMeta(p => ({ ...p, [id]: { ...p[id], level: lv } }));
   }
 
   function addCustomTopic(label: string) {
     const trimmed = label.trim();
     if (!trimmed || selectedTopics.includes(trimmed) || selectedTopics.length >= 5) return;
-    const color = TOPIC_COLORS[selectedTopics.length % TOPIC_COLORS.length];
-    setSelectedTopics(p => [...p, trimmed]);
-    setTopicMeta(p => ({ ...p, [trimmed]: { label: trimmed, icon: "✨", color, level } }));
+    setPendingTopic({ id: trimmed, label: trimmed, icon: "✨" });
     setCustomInput("");
     setSearchQuery("");
   }
@@ -387,11 +466,19 @@ export default function InterviewPage() {
         })
       );
 
+      // Filter out previously seen questions per topic
+      const deduped = perTopicResults.map(t => {
+        const seen = seenRef.current[t.topicId] ?? new Set<string>();
+        const fresh = t.qs.filter(q => !seen.has(normalize(q)));
+        // If all were seen, reset and use all (better than empty set)
+        return { ...t, qs: fresh.length > 0 ? fresh : t.qs };
+      });
+
       // Round-robin interleave
       const merged: QuestionItem[] = [];
-      const maxLen = Math.max(...perTopicResults.map(t => t.qs.length));
+      const maxLen = Math.max(...deduped.map(t => t.qs.length));
       for (let i = 0; i < maxLen; i++) {
-        perTopicResults.forEach(t => {
+        deduped.forEach(t => {
           if (t.qs[i]) {
             merged.push({ text: t.qs[i], topicId: t.topicId, topicLabel: t.topicLabel, topicColor: t.topicColor, isAI: t.isAI });
           }
@@ -455,9 +542,25 @@ export default function InterviewPage() {
   /* ── Finish ── */
   function finishPractice() {
     trackAction("interview_practiced");
+    // Persist seen questions so they won't repeat next session
+    questions.forEach(q => {
+      if (!seenRef.current[q.topicId]) seenRef.current[q.topicId] = new Set();
+      seenRef.current[q.topicId].add(normalize(q.text));
+    });
+    try {
+      const serializable = Object.fromEntries(
+        Object.entries(seenRef.current).map(([k, v]) => [k, [...v]])
+      );
+      localStorage.setItem("jobsayer-interview-seen", JSON.stringify(serializable));
+    } catch { /* ignore */ }
     setExpandedQ(null);
     setResultsTab("overview");
     setStage("results");
+  }
+
+  function resetHistory() {
+    seenRef.current = {};
+    try { localStorage.removeItem("jobsayer-interview-seen"); } catch { /* ignore */ }
   }
 
   /* ── Shared styles ── */
@@ -495,41 +598,22 @@ export default function InterviewPage() {
             <p style={{ fontSize:13, color:"var(--text3)", lineHeight:1.7, maxWidth:380, margin:"0 auto" }}>
               Pick your level and topics — get real interview questions, instant AI feedback.
             </p>
-          </div>
-
-          {/* Level picker */}
-          <div style={{ ...card, marginBottom:16 }}>
-            <div style={{ fontSize:12, fontWeight:700, color:"var(--text3)", textTransform:"uppercase", letterSpacing:".07em", marginBottom:12 }}>
-              Difficulty Level
-            </div>
-            <div style={{ display:"flex", gap:8 }}>
-              {LEVELS.map(lv => {
-                const active = level === lv.key;
-                return (
-                  <button key={lv.key} onClick={() => setLevel(lv.key)} style={{
-                    flex:1, padding:"12px 8px", borderRadius:10, cursor:"pointer", textAlign:"center" as const,
-                    border:`1.5px solid ${active ? "var(--accent)" : "var(--border)"}`,
-                    background: active ? "var(--accdim)" : "var(--surface2)",
-                    transition:"all .15s",
-                  }}>
-                    <div style={{ fontSize:13, fontWeight:700, color: active ? "var(--accent)" : "var(--text1)" }}>
-                      {lv.label}
-                    </div>
-                    <div style={{ fontSize:11, color:"var(--text3)", marginTop:2 }}>{lv.desc}</div>
-                  </button>
-                );
-              })}
-            </div>
+            <button onClick={resetHistory} style={{
+              marginTop:10, fontSize:11, color:"var(--text3)", background:"none", border:"none",
+              cursor:"pointer", textDecoration:"underline", opacity:0.7,
+            }}>
+              Reset question history
+            </button>
           </div>
 
           {/* Topic picker */}
           <div style={{ ...card, marginBottom:16 }}>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
               <div style={{ fontSize:12, fontWeight:700, color:"var(--text3)", textTransform:"uppercase", letterSpacing:".07em" }}>
-                Topics
+                Topics <span style={{ fontWeight:400, textTransform:"none", letterSpacing:0 }}>— tap to pick level</span>
               </div>
               {selectedTopics.length > 0 && (
-                <button onClick={() => { setSelectedTopics([]); setTopicMeta({}); }} style={{
+                <button onClick={() => { setSelectedTopics([]); setTopicMeta({}); setPendingTopic(null); }} style={{
                   fontSize:11, color:"var(--text3)", background:"none", border:"none",
                   cursor:"pointer", padding:"2px 6px", borderRadius:5,
                 }}>
@@ -546,7 +630,7 @@ export default function InterviewPage() {
               }} />
               <input
                 value={searchQuery}
-                onChange={e => { setSearchQuery(e.target.value); setCustomInput(e.target.value); }}
+                onChange={e => { setSearchQuery(e.target.value); setCustomInput(e.target.value); setPendingTopic(null); }}
                 onKeyDown={e => { if (e.key === "Enter" && customTopicAvailable) addCustomTopic(searchQuery); }}
                 placeholder="Search topics or type a custom one…"
                 style={{ ...inp, paddingLeft:34 }}
@@ -556,7 +640,7 @@ export default function InterviewPage() {
             {/* Category tabs */}
             <div style={{ display:"flex", gap:6, overflowX:"auto", paddingBottom:4, scrollbarWidth:"none", marginBottom:12 }}>
               {CATEGORIES.map(cat => (
-                <button key={cat.id} onClick={() => setActiveCategory(cat.id)} style={{
+                <button key={cat.id} onClick={() => { setActiveCategory(cat.id); setPendingTopic(null); }} style={{
                   padding:"5px 13px", borderRadius:99, fontSize:12, cursor:"pointer", whiteSpace:"nowrap", flexShrink:0,
                   border:`1px solid ${activeCategory === cat.id ? "var(--accent)" : "var(--border)"}`,
                   background: activeCategory === cat.id ? "var(--accdim)" : "var(--surface2)",
@@ -571,47 +655,51 @@ export default function InterviewPage() {
               <div style={{
                 display:"grid",
                 gridTemplateColumns: mobile ? "repeat(3,1fr)" : "repeat(4,1fr)",
-                gap:6, maxHeight:280, overflowY:"auto", scrollbarWidth:"none",
+                gap:6, maxHeight:260, overflowY:"auto", scrollbarWidth:"none",
               }}>
                 {filteredTopics.map(t => {
-                  const selected = selectedTopics.includes(t.id);
-                  const meta     = topicMeta[t.id];
-                  const color    = selected ? meta?.color : undefined;
-                  const maxed    = !selected && selectedTopics.length >= 5;
+                  const selected  = selectedTopics.includes(t.id);
+                  const isPending = pendingTopic?.id === t.id;
+                  const meta      = topicMeta[t.id];
+                  const color     = selected ? meta?.color : isPending ? "var(--accent)" : undefined;
+                  const maxed     = !selected && !isPending && selectedTopics.length >= 5;
                   return (
-                    <button key={t.id} onClick={() => toggleTopic(t.id, t.label, t.icon)}
+                    <button key={t.id}
+                      onClick={() => handleTopicClick(t.id, t.label, t.icon)}
                       disabled={maxed}
                       style={{
                         padding:"10px 6px", borderRadius:10, cursor: maxed ? "not-allowed" : "pointer",
                         textAlign:"center" as const,
-                        border:`1.5px solid ${selected ? color! : "var(--border)"}`,
-                        background: selected ? `${color}18` : "var(--surface2)",
+                        border:`1.5px solid ${selected ? color! : isPending ? "var(--accent)" : "var(--border)"}`,
+                        background: selected ? `${color}18` : isPending ? "var(--accdim)" : "var(--surface2)",
                         opacity: maxed ? 0.4 : 1,
                         transition:"all .15s",
                         display:"flex", flexDirection:"column", alignItems:"center", gap:4,
                       }}>
                       <span style={{ fontSize:18, lineHeight:1 }}>{t.icon}</span>
-                      <span style={{ fontSize:10, fontWeight: selected ? 700 : 400, color: selected ? color : "var(--text2)", lineHeight:1.2 }}>
+                      <span style={{ fontSize:10, fontWeight: selected || isPending ? 700 : 400, color: selected ? color : isPending ? "var(--accent)" : "var(--text2)", lineHeight:1.2 }}>
                         {t.label}
                       </span>
                       {selected && (
                         <span style={{ fontSize:9, color:"#fff", background:color, borderRadius:4, padding:"1px 5px", fontWeight:700 }}>
-                          ✓
+                          {meta?.level === "Basics" ? "Easy" : meta?.level === "Intermediate" ? "Mid" : "Pro"} ✓
                         </span>
+                      )}
+                      {isPending && !selected && (
+                        <span style={{ fontSize:9, color:"var(--accent)", fontWeight:700 }}>pick level ↓</span>
                       )}
                     </button>
                   );
                 })}
               </div>
             ) : searchQuery.trim() !== "" ? (
-              /* No results — custom topic CTA */
               <div style={{ padding:"20px 16px", textAlign:"center", borderRadius:12, border:"1.5px dashed var(--border)", background:"var(--surface2)" }}>
                 <div style={{ fontSize:22, marginBottom:8 }}>✨</div>
                 <div style={{ fontSize:13, fontWeight:700, color:"var(--text1)", marginBottom:4 }}>
                   "{searchQuery}" not in our library
                 </div>
                 <div style={{ fontSize:12, color:"var(--text3)", marginBottom:14, lineHeight:1.5 }}>
-                  We'll use AI to generate {level}-level questions for this topic.
+                  We'll use AI to generate questions — pick a level to add it.
                 </div>
                 <button
                   onClick={() => addCustomTopic(searchQuery)}
@@ -629,7 +717,7 @@ export default function InterviewPage() {
               <div style={{ padding:"24px 0", textAlign:"center", color:"var(--text3)", fontSize:13 }}>No topics found.</div>
             )}
 
-            {/* Custom input row (visible when search has text but topics exist) */}
+            {/* AI custom topic add row */}
             {searchQuery.trim() !== "" && filteredTopics.length > 0 && !KNOWN_TOPICS.has(searchQuery.trim()) && selectedTopics.length < 5 && (
               <button
                 onClick={() => addCustomTopic(searchQuery)}
@@ -648,46 +736,78 @@ export default function InterviewPage() {
                 Max 5 topics selected — remove one to add another.
               </div>
             )}
+
+            {/* ── Inline level picker (appears when a topic is tapped) ── */}
+            {pendingTopic && !selectedTopics.includes(pendingTopic.id) && (
+              <div style={{
+                marginTop:12, padding:"14px 16px", borderRadius:12,
+                background:"var(--accdim)", border:"1.5px solid var(--accborder)",
+                animation:"fadeSlideIn .2s ease",
+              }}>
+                <div style={{ fontSize:12, fontWeight:700, color:"var(--accent)", marginBottom:10 }}>
+                  {pendingTopic.icon} {pendingTopic.label} — pick difficulty:
+                </div>
+                <div style={{ display:"flex", gap:8 }}>
+                  {LEVELS.map(lv => (
+                    <button key={lv.key} onClick={() => confirmTopicWithLevel(lv.key)} style={{
+                      flex:1, padding:"10px 6px", borderRadius:10, cursor:"pointer", textAlign:"center" as const,
+                      border:"1.5px solid var(--accborder)",
+                      background:"var(--surface)", transition:"all .1s",
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "var(--accent)"; (e.currentTarget as HTMLButtonElement).style.color = "#fff"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "var(--surface)"; (e.currentTarget as HTMLButtonElement).style.color = ""; }}
+                    >
+                      <div style={{ fontSize:13, fontWeight:700 }}>{lv.label}</div>
+                      <div style={{ fontSize:10, color:"var(--text3)", marginTop:2 }}>{lv.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Selected chips */}
+          {/* Selected topics — each chip shows level as 3 direct buttons */}
           {selectedTopics.length > 0 && (
             <div style={{ ...card, marginBottom:16, padding:"14px 16px" }}>
-              <div style={{ fontSize:12, fontWeight:700, color:"var(--text3)", textTransform:"uppercase", letterSpacing:".07em", marginBottom:10 }}>
+              <div style={{ fontSize:12, fontWeight:700, color:"var(--text3)", textTransform:"uppercase", letterSpacing:".07em", marginBottom:12 }}>
                 Your session — {selectedTopics.length} topic{selectedTopics.length > 1 ? "s" : ""}
               </div>
-              <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                 {selectedTopics.map(id => {
                   const m = topicMeta[id];
                   const isCustom = !KNOWN_TOPICS.has(id);
                   return (
                     <div key={id} style={{
-                      display:"flex", alignItems:"center", gap:6, padding:"6px 10px", borderRadius:99,
-                      background:`${m?.color}18`, border:`1.5px solid ${m?.color}`,
+                      display:"flex", alignItems:"center", gap:8, padding:"10px 12px", borderRadius:12,
+                      background:"var(--surface2)", border:`1.5px solid ${m?.color}`,
                     }}>
-                      <span style={{ fontSize:14 }}>{m?.icon}</span>
-                      <span style={{ fontSize:12, fontWeight:700, color: m?.color }}>{m?.label}</span>
-                      {/* Per-topic level badge — click to cycle */}
-                      <button
-                        onClick={() => {
-                          const order: Level[] = ["Basics","Intermediate","Professional"];
-                          const next = order[(order.indexOf(m!.level) + 1) % 3];
-                          setTopicMeta(p => ({ ...p, [id]: { ...p[id], level: next } }));
-                        }}
-                        title="Click to change level"
-                        style={{
-                          fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:5, cursor:"pointer",
-                          background: m?.color, color:"#fff", border:"none",
-                          opacity:0.9,
-                        }}>
-                        {m?.level === "Basics" ? "Basic" : m?.level === "Intermediate" ? "Mid" : "Pro"} ↻
-                      </button>
-                      {isCustom && (
-                        <span style={{ fontSize:10, color:"#fff", background: m?.color, borderRadius:4, padding:"1px 5px", fontWeight:700, opacity:0.7 }}>AI</span>
-                      )}
-                      <button onClick={() => toggleTopic(id, m?.label ?? "", m?.icon ?? "")} style={{
-                        width:16, height:16, borderRadius:"50%", border:"none", cursor:"pointer",
-                        background:`${m?.color}30`, color: m?.color, fontSize:10, fontWeight:700,
+                      {/* Icon + label */}
+                      <span style={{ fontSize:18, flexShrink:0 }}>{m?.icon}</span>
+                      <span style={{ fontSize:13, fontWeight:700, color: m?.color, flex:1, minWidth:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+                        {m?.label}
+                        {isCustom && <span style={{ marginLeft:6, fontSize:10, opacity:0.7 }}>✨AI</span>}
+                      </span>
+                      {/* 3-button direct level picker */}
+                      <div style={{ display:"flex", gap:3, flexShrink:0 }}>
+                        {LEVELS.map(lv => {
+                          const active = m?.level === lv.key;
+                          return (
+                            <button key={lv.key} onClick={() => setTopicLevel(id, lv.key)} style={{
+                              padding:"3px 8px", borderRadius:6, border:"none", cursor:"pointer",
+                              fontSize:10, fontWeight:700,
+                              background: active ? m?.color : "var(--surface)",
+                              color: active ? "#fff" : "var(--text3)",
+                              transition:"all .1s",
+                            }}>
+                              {lv.label === "Basics" ? "Easy" : lv.label === "Intermediate" ? "Mid" : "Pro"}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {/* Remove */}
+                      <button onClick={() => removeTopic(id)} style={{
+                        width:20, height:20, borderRadius:"50%", border:"none", cursor:"pointer",
+                        background:`${m?.color}25`, color: m?.color, fontSize:12, fontWeight:700, flexShrink:0,
                         display:"flex", alignItems:"center", justifyContent:"center", padding:0,
                       }}>×</button>
                     </div>
@@ -697,9 +817,9 @@ export default function InterviewPage() {
 
               {/* Session summary */}
               <div style={{
-                marginTop:14, padding:"10px 14px", borderRadius:10,
+                marginTop:12, padding:"10px 14px", borderRadius:10,
                 background:"var(--surface2)", border:"1px solid var(--border)",
-                display:"flex", gap: mobile ? 14 : 24, flexWrap:"wrap",
+                display:"flex", gap: mobile ? 14 : 24, flexWrap:"wrap", alignItems:"center",
               }}>
                 <div style={{ textAlign:"center" }}>
                   <div style={{ fontSize:18, fontWeight:900, color:"var(--accent)" }}>~{sessionQCount}</div>
@@ -708,15 +828,6 @@ export default function InterviewPage() {
                 <div style={{ textAlign:"center" }}>
                   <div style={{ fontSize:18, fontWeight:900, color:"var(--text1)" }}>{selectedTopics.length}</div>
                   <div style={{ fontSize:10, color:"var(--text3)" }}>topics</div>
-                </div>
-                <div style={{ textAlign:"center" }}>
-                  <div style={{ fontSize:18, fontWeight:900, color:"var(--text1)" }}>
-                    {(() => {
-                      const levels = [...new Set(selectedTopics.map(id => topicMeta[id]?.level))];
-                      return levels.length > 1 ? "Mixed" : levels[0] ?? level;
-                    })()}
-                  </div>
-                  <div style={{ fontSize:10, color:"var(--text3)" }}>level</div>
                 </div>
                 {selectedTopics.some(id => !KNOWN_TOPICS.has(id)) && (
                   <div style={{ display:"flex", alignItems:"center", gap:5, padding:"4px 10px", borderRadius:7, background:"rgba(99,102,241,.08)", border:"1px solid var(--accborder)" }}>
@@ -757,7 +868,12 @@ export default function InterviewPage() {
     return (
       <AppShell>
         {aiGenTopic ? (
-          <AIGenerationLoader topic={aiGenTopic} level={level} />
+          <AIGenerationLoader topic={aiGenTopic} level={
+            (() => {
+              const id = selectedTopics.find(t => !KNOWN_TOPICS.has(t)) ?? selectedTopics[0];
+              return (id ? topicMeta[id]?.level : undefined) ?? "Intermediate";
+            })()
+          } />
         ) : (
           <LoadingScreen messages={[
             "Generating your questions…",
