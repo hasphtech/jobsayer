@@ -550,7 +550,7 @@ export default function SalaryPage() {
                 </button>
               ) : (
                 <div style={{ padding: "12px 16px", background: "var(--accdim)", borderRadius: 9, border: "1px solid var(--accborder)", fontSize: 13, color: "var(--text2)" }}>
-                  <Link href="/sign-in" style={{ color: "var(--accent)", fontWeight: 700 }}>Sign in</Link> to get personalised AI counter-offer scripts and coaching.
+                  <Link href="/login" style={{ color: "var(--accent)", fontWeight: 700 }}>Sign in</Link> to get personalised AI counter-offer scripts and coaching.
                 </div>
               )}
               {negAiError && <div style={{ marginTop: 10, fontSize: 13, color: "var(--danger)" }}>{negAiError}</div>}

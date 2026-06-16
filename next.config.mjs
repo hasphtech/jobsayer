@@ -32,6 +32,28 @@ const securityHeaders = [
 const nextConfig = {
   poweredByHeader: false,
   compress: true,
+  async redirects() {
+    return [
+      // /sign-in was never a valid route — /login is the correct page.
+      // 308 so POST requests (if any) also redirect correctly.
+      {
+        source: "/sign-in",
+        destination: "/login",
+        permanent: true,
+      },
+      // Common variants people might type or link to
+      {
+        source: "/signup",
+        destination: "/login",
+        permanent: true,
+      },
+      {
+        source: "/register",
+        destination: "/login",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

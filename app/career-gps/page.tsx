@@ -549,7 +549,7 @@ export default function CareerGpsPage() {
             {resumeLoaded && resumeSource === "local" && (
               <div style={{ marginTop: 12, padding: "8px 14px", borderRadius: 8, background: "var(--surface2)", border: "1px solid var(--border)", fontSize: 12, color: "var(--text3)", display: "flex", alignItems: "center", gap: 8, width: "fit-content" }}>
                 <CheckCircle2 size={13} />
-                Skills loaded from local draft · <Link href="/sign-in" style={{ color: "var(--accent)" }}>Sign in</Link> to sync across devices
+                Skills loaded from local draft · <Link href="/login" style={{ color: "var(--accent)" }}>Sign in</Link> to sync across devices
               </div>
             )}
             {!resumeLoaded && (
