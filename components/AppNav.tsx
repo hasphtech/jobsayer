@@ -24,6 +24,9 @@ function useWidth() {
   return w;
 }
 
+// Career GPS / Growth Plan is intentionally NOT in the nav —
+// it lives as a persistent card on /dashboard, not a one-off tool.
+// The /career-gps route still works; users reach it from the dashboard card.
 const NAV_LINKS = [
   { href: "/dashboard",      label: "Dashboard",      icon: "ti-layout-dashboard" },
   { href: "/builder",        label: "Builder",        icon: "✏️" },
@@ -35,7 +38,6 @@ const NAV_LINKS = [
   { href: "/interview",      label: "Interview",      icon: "ti-microphone" },
   { href: "/tailor",         label: "JD Tailor",      icon: "✂️" },
   { href: "/linkedin",       label: "LinkedIn",       icon: "ti-briefcase" },
-  { href: "/career-gps",     label: "Career GPS",     icon: "ti-compass" },
   { href: "/career-health",  label: "Health",         icon: "ti-stethoscope" },
   { href: "/bgv",            label: "BGV",            icon: "ti-shield-check" },
   { href: "/salary",         label: "Salaries",       icon: "ti-coin" },

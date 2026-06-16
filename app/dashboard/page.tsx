@@ -6,6 +6,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import { useAuth } from "@/lib/auth";
+import { createBrowserClient } from "@supabase/ssr";
 import {
   getXPState, getLevelInfo, getDerivedStats, BADGES, LEVELS,
   type XPState, type ActivityEntry,
@@ -684,6 +685,140 @@ function OnboardingBanner() {
   );
 }
 
+/* ── Growth Plan card ────────────────────────────────────────── */
+// Reads target_role from Supabase profiles + skill gap state from
+// localStorage (written by /career-gps after a run). If no GPS data
+// yet, shows an upsell state with a CTA to /career-gps.
+
+const GPS_KEY = "jobsayer-career-gps";
+
+interface GpsSnapshot {
+  targetRole: string;
+  skills: { name: string; status: "done" | "progress" | "todo" }[];
+  runAt: string;
+}
+
+function GrowthPlanCard() {
+  const { user } = useAuth();
+  const [targetRole, setTargetRole] = useState<string>("");
+  const [gps, setGps] = useState<GpsSnapshot | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    // Read GPS snapshot from localStorage
+    try {
+      const raw = localStorage.getItem(GPS_KEY);
+      if (raw) setGps(JSON.parse(raw) as GpsSnapshot);
+    } catch { /* ignore */ }
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    // Pull target_role from Supabase profiles
+    if (!user) return;
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    );
+    supabase
+      .from("profiles")
+      .select("target_role")
+      .eq("id", user.id)
+      .single()
+      .then(({ data }) => { if (data?.target_role) setTargetRole(data.target_role); });
+  }, [user]);
+
+  if (!mounted) return null;
+
+  const displayRole = gps?.targetRole || targetRole;
+  const skills = gps?.skills ?? [];
+  const done = skills.filter(s => s.status === "done").length;
+  const pct  = skills.length ? Math.round((done / skills.length) * 100) : 0;
+
+  return (
+    <div style={{
+      background: "var(--surface)", border: "1px solid var(--border)",
+      borderRadius: 12, padding: "16px", marginBottom: 14,
+    }}>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ width: 28, height: 28, borderRadius: 7, background: "var(--accdim)", border: "1px solid var(--accborder)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <i className="ti ti-map-2" style={{ fontSize: 14, color: "var(--accent)" }} />
+          </div>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase" as const, letterSpacing: "0.5px" }}>
+              Growth plan
+            </div>
+            {displayRole && (
+              <div style={{ fontSize: 12, color: "var(--text2)", marginTop: 1 }}>
+                Target: <strong style={{ color: "var(--text1)" }}>{displayRole}</strong>
+              </div>
+            )}
+          </div>
+        </div>
+        <Link href="/career-gps" style={{ fontSize: 12, color: "var(--accent)", textDecoration: "none", fontWeight: 600, display: "flex", alignItems: "center", gap: 3 }}>
+          {gps ? "Update" : "Set up"} <i className="ti ti-arrow-right" style={{ fontSize: 11 }} />
+        </Link>
+      </div>
+
+      {gps && skills.length > 0 ? (
+        <>
+          {/* Progress bar */}
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
+              <span style={{ fontSize: 11, color: "var(--text3)" }}>{done} of {skills.length} skills complete</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--accent)" }}>{pct}%</span>
+            </div>
+            <div style={{ height: 5, background: "var(--surface2)", borderRadius: 3, overflow: "hidden" }}>
+              <div style={{ height: "100%", width: `${pct}%`, background: "var(--accent)", borderRadius: 3, transition: "width .4s ease" }} />
+            </div>
+          </div>
+
+          {/* Skill rows — show up to 5 */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {skills.slice(0, 5).map((sk, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
+                {sk.status === "done" && <i className="ti ti-circle-check" style={{ fontSize: 14, color: "var(--success)", flexShrink: 0 }} />}
+                {sk.status === "progress" && <i className="ti ti-circle-half-2" style={{ fontSize: 14, color: "var(--accent)", flexShrink: 0 }} />}
+                {sk.status === "todo"     && <i className="ti ti-circle-dashed" style={{ fontSize: 14, color: "var(--text3)", flexShrink: 0 }} />}
+                <span style={{ color: sk.status === "done" ? "var(--text3)" : "var(--text1)", textDecoration: sk.status === "done" ? "line-through" : "none" }}>
+                  {sk.name}
+                </span>
+                {sk.status === "todo" && (
+                  <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--text3)" }}>not started</span>
+                )}
+                {sk.status === "progress" && (
+                  <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--accent)", fontWeight: 600 }}>in progress</span>
+                )}
+              </div>
+            ))}
+            {skills.length > 5 && (
+              <Link href="/career-gps" style={{ fontSize: 11, color: "var(--accent)", textDecoration: "none", paddingLeft: 22 }}>
+                +{skills.length - 5} more skills →
+              </Link>
+            )}
+          </div>
+        </>
+      ) : (
+        /* No GPS data yet — upsell */
+        <div style={{ padding: "14px 0 2px" }}>
+          <p style={{ fontSize: 13, color: "var(--text2)", margin: "0 0 12px", lineHeight: 1.6 }}>
+            Find out exactly which skills separate you from your target role — and get a personalised roadmap to close the gaps.
+          </p>
+          <Link href="/career-gps" style={{
+            display: "inline-flex", alignItems: "center", gap: 6,
+            padding: "8px 16px", borderRadius: 8, textDecoration: "none",
+            background: "var(--accent)", color: "#fff", fontSize: 13, fontWeight: 600,
+          }}>
+            <i className="ti ti-map-2" /> Run growth plan
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── Page ────────────────────────────────────────────────────── */
 export default function DashboardPage() {
   const w = useWindowWidth();
@@ -787,6 +922,9 @@ export default function DashboardPage() {
             href="/career-health"
           />
         </div>
+
+        {/* ── Growth Plan ── */}
+        <GrowthPlanCard />
 
         {/* ── Quick access ── */}
         <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "16px", marginBottom: 14 }}>

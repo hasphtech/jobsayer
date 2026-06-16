@@ -127,6 +127,94 @@ function analyseJd(jdText: string, resumeText: string): ScanResult {
   return { trustScore: clampedScore, verdict, signals, resumeMatch, matchFound, matchMissing, salaryReality, redFlags };
 }
 
+/* ── Growth Plan nudge (Jobs page) ─────────────────────────────── */
+// Reads Career GPS snapshot from localStorage and surfaces the skill
+// gap count inline — teaches users the difference between "Jobs" and
+// "Growth Plan" by making the connection visible in context.
+
+const GPS_LS_KEY = "jobsayer-career-gps";
+
+interface GpsSnapshotJob {
+  targetRole: string;
+  skills: { name: string; status: "done" | "progress" | "todo" }[];
+}
+
+function GrowthPlanNudge() {
+  const [gps, setGps] = useState<GpsSnapshotJob | null>(null);
+  const [dismissed, setDismissed] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(GPS_LS_KEY);
+      if (raw) setGps(JSON.parse(raw) as GpsSnapshotJob);
+      if (localStorage.getItem("jobsayer-jobs-gps-nudge-dismissed") === "1") setDismissed(true);
+    } catch { /* ignore */ }
+    setMounted(true);
+  }, []);
+
+  if (!mounted || dismissed) return null;
+
+  function dismiss() {
+    try { localStorage.setItem("jobsayer-jobs-gps-nudge-dismissed", "1"); } catch { /* ignore */ }
+    setDismissed(true);
+  }
+
+  const gapCount = gps ? gps.skills.filter(s => s.status !== "done").length : null;
+  const targetRole = gps?.targetRole ?? "";
+  const topGaps = gps ? gps.skills.filter(s => s.status === "todo").slice(0, 3).map(s => s.name) : [];
+
+  return (
+    <div style={{
+      padding: "10px 20px",
+      background: "var(--accdim)",
+      borderBottom: "1px solid var(--accborder)",
+      display: "flex", alignItems: "center", gap: 12, position: "relative",
+    }}>
+      <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <i className="ti ti-map-2" style={{ fontSize: 15, color: "#fff" }} />
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        {gapCount !== null ? (
+          <>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)" }}>
+              You&apos;re{" "}
+              <span style={{ color: "var(--accent)" }}>{gapCount} skill{gapCount !== 1 ? "s" : ""}</span>
+              {" "}away from{targetRole ? ` ${targetRole}` : " your target role"} roles
+            </div>
+            {topGaps.length > 0 && (
+              <div style={{ fontSize: 12, color: "var(--text2)", marginTop: 2 }}>
+                Gaps: {topGaps.join(", ")} — close them to unlock more matches
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)" }}>
+              Know which skills are blocking your next role
+            </div>
+            <div style={{ fontSize: 12, color: "var(--text2)", marginTop: 2 }}>
+              Run your Growth Plan to see the exact gaps — and close them faster
+            </div>
+          </>
+        )}
+      </div>
+      <Link href="/career-gps" style={{
+        padding: "6px 14px", borderRadius: 7, textDecoration: "none",
+        background: "var(--accent)", color: "#fff", fontSize: 12, fontWeight: 600,
+        whiteSpace: "nowrap", flexShrink: 0,
+      }}>
+        {gapCount !== null ? "View growth plan" : "Run growth plan"} →
+      </Link>
+      <button
+        onClick={dismiss}
+        aria-label="Dismiss"
+        style={{ background: "none", border: "none", fontSize: 15, color: "var(--text3)", cursor: "pointer", padding: 0, flexShrink: 0, lineHeight: 1 }}
+      >×</button>
+    </div>
+  );
+}
+
 function JdScannerTab({ resumeText }: { resumeText: string }) {
   const [jdText, setJdText] = useState("");
   const [result, setResult] = useState<ScanResult | null>(null);
@@ -793,6 +881,9 @@ export default function JobsPage() {
               >Show matches →</button>
             </div>
           )}
+
+          {/* ── Growth Plan nudge ── */}
+          <GrowthPlanNudge />
 
           {/* Pill filters strip */}
           <div style={{ padding: "10px 20px", borderBottom: "1px solid var(--border)", display: "flex", gap: 6, alignItems: "center", overflowX: "auto", scrollbarWidth: "none" as const }}>
