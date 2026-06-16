@@ -1,3 +1,17 @@
+// ── User identity / recruiter trust ───────────────────────────────────────
+/** What the user signed up to do */
+export type UserIntent = "candidate" | "recruiter" | "both";
+
+/** Recruiter trust tier — upgradeable from the profile page */
+export type RecruiterLevel = "basic" | "verified_recruiter" | "verified_company";
+
+export const RECRUITER_LEVEL_LABELS: Record<RecruiterLevel, string> = {
+  basic:              "Basic Recruiter",
+  verified_recruiter: "Verified Recruiter",
+  verified_company:   "Verified Company",
+};
+
+// ── Resume data ───────────────────────────────────────────────────────────
 export interface WorkEntry {
   id: string;
   company: string;
