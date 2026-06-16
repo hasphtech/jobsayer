@@ -28,7 +28,12 @@ interface AdminJob {
   expires_at: string | null;
 }
 
-type View = "add" | "scrape" | "queue" | "manage" | "bgv" | "companies" | "users" | "flags" | "audit" | "metrics";
+type View =
+  | "add" | "scrape" | "queue" | "manage" | "taxonomy"
+  | "employers" | "recruiter-levels" | "credits"
+  | "bgv" | "companies"
+  | "users" | "subscriptions" | "promos"
+  | "flags" | "notifications" | "support" | "health" | "audit" | "metrics";
 
 const EMPTY_FORM: Omit<AdminJob, "id" | "posted_at" | "is_active" | "is_approved"> = {
   title: "", company: "", location: "Bengaluru", mode: "hybrid",
@@ -126,96 +131,152 @@ export default function AdminPage() {
     </div>
   );
 
-  // ── Stats ─────────────────────────────────────────────────
   const pending  = jobs.filter(j => !j.is_approved && j.is_active).length;
-  const active   = jobs.filter(j =>  j.is_approved && j.is_active).length;
-  const sources  = [...new Set(jobs.map(j => j.source))].join(", ") || "—";
+
+  // ── Sidebar nav definition ───────────────────────────────────
+  type NavItem = { view: View; label: string; icon: string; badge?: number };
+  type NavSection = { title: string; items: NavItem[] };
+
+  const NAV: NavSection[] = [
+    {
+      title: "Jobs",
+      items: [
+        { view: "add",       label: "Add job",          icon: "ti-plus" },
+        { view: "scrape",    label: "Scrape",           icon: "ti-robot" },
+        { view: "queue",     label: "Review queue",     icon: "ti-list-search", badge: pending || undefined },
+        { view: "manage",    label: "Manage",           icon: "ti-layout-list" },
+        { view: "taxonomy",  label: "Skills & categories", icon: "ti-tag" },
+      ],
+    },
+    {
+      title: "Employers",
+      items: [
+        { view: "employers",        label: "Employer accounts",  icon: "ti-building-store" },
+        { view: "recruiter-levels", label: "Recruiter levels",   icon: "ti-star" },
+        { view: "credits",          label: "Job post credits",   icon: "ti-coin" },
+      ],
+    },
+    {
+      title: "Trust & Verification",
+      items: [
+        { view: "bgv",       label: "BGV queue",   icon: "ti-shield-check" },
+        { view: "companies", label: "Companies",   icon: "ti-building" },
+      ],
+    },
+    {
+      title: "Users & Billing",
+      items: [
+        { view: "users",         label: "Users",         icon: "ti-users" },
+        { view: "subscriptions", label: "Subscriptions", icon: "ti-credit-card" },
+        { view: "promos",        label: "Promo codes",   icon: "ti-discount-2" },
+      ],
+    },
+    {
+      title: "Platform",
+      items: [
+        { view: "flags",         label: "Feature flags",  icon: "ti-flag" },
+        { view: "notifications", label: "Notifications",  icon: "ti-bell" },
+        { view: "support",       label: "Support queue",  icon: "ti-headset" },
+        { view: "health",        label: "System health",  icon: "ti-activity" },
+        { view: "audit",         label: "Audit log",      icon: "ti-file-text" },
+        { view: "metrics",       label: "Metrics",        icon: "ti-chart-bar" },
+      ],
+    },
+  ];
+
+  const navBtn = (active: boolean): React.CSSProperties => ({
+    display: "flex", alignItems: "center", gap: 9, width: "100%", padding: "8px 12px",
+    borderRadius: 8, border: "none", cursor: "pointer", fontFamily: "inherit",
+    fontSize: 13, fontWeight: active ? 700 : 500, textAlign: "left" as const,
+    background: active ? "var(--accdim)" : "none",
+    color: active ? "var(--accent)" : "var(--text2)",
+  });
+
+  function go(v: View) {
+    setView(v);
+    if (v === "queue")  loadJobs("pending");
+    if (v === "manage") loadJobs("all");
+  }
 
   return (
-    <div style={bg}>
-      {/* Top bar */}
-      <div style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)", padding: "12px 24px", display: "flex", alignItems: "center", gap: 16 }}>
-        <a href="/" style={{ color: "var(--text3)", textDecoration: "none", fontSize: 13 }}>← Home</a>
-        <span style={{ fontSize: 15, fontWeight: 800, color: "var(--text1)", display: "flex", alignItems: "center", gap: 6 }}><i className="ti ti-settings" style={{ fontSize: 15 }} /> Admin Panel</span>
-        {msg && <span style={{ fontSize: 12, color: msg.startsWith("✓") ? "var(--success)" : "var(--danger)", marginLeft: "auto" }}>{msg}</span>}
-      </div>
+    <div style={{ ...bg, display: "flex", height: "100vh", overflow: "hidden" }}>
 
-      <div style={{ padding: "20px 24px", maxWidth: 1100 }}>
-        {/* Stats */}
-        <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
-          {[
-            { label: "Total", val: jobs.length, color: "var(--accent)" },
-            { label: "Pending review", val: pending, color: "var(--warn)" },
-            { label: "Active / live", val: active, color: "var(--success)" },
-            { label: "Sources", val: sources, color: "var(--text3)" },
-          ].map(s => (
-            <div key={s.label} style={{ ...card, padding: "12px 18px", minWidth: 130 }}>
-              <div style={{ fontSize: 20, fontWeight: 800, color: s.color }}>{s.val}</div>
-              <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>{s.label}</div>
+      {/* ── Sidebar ── */}
+      <div style={{
+        width: 210, flexShrink: 0, background: "var(--surface)",
+        borderRight: "1px solid var(--border)", display: "flex", flexDirection: "column",
+        overflowY: "auto",
+      }}>
+        {/* Sidebar header */}
+        <div style={{ padding: "16px 16px 12px", borderBottom: "1px solid var(--border)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+            <i className="ti ti-settings" style={{ fontSize: 16, color: "var(--accent)" }} />
+            <span style={{ fontSize: 14, fontWeight: 800, color: "var(--text1)" }}>Admin Panel</span>
+          </div>
+          <a href="/" style={{ fontSize: 11, color: "var(--text3)", textDecoration: "none" }}>← Back to app</a>
+        </div>
+
+        {/* Nav sections */}
+        <div style={{ padding: "10px 8px", flex: 1 }}>
+          {NAV.map(section => (
+            <div key={section.title} style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".07em", padding: "0 8px 6px" }}>
+                {section.title}
+              </div>
+              {section.items.map(item => (
+                <button key={item.view} onClick={() => go(item.view)} style={navBtn(view === item.view)}>
+                  <i className={`ti ${item.icon}`} style={{ fontSize: 14, flexShrink: 0 }} />
+                  <span style={{ flex: 1 }}>{item.label}</span>
+                  {item.badge != null && item.badge > 0 && (
+                    <span style={{ fontSize: 10, fontWeight: 700, minWidth: 18, height: 18, borderRadius: 9, background: "var(--warn)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 5px" }}>
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+              ))}
             </div>
           ))}
         </div>
+      </div>
 
-        {/* Tabs — Jobs section */}
-        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>Jobs</div>
-        <div style={{ display: "flex", gap: 2, marginBottom: 16, borderBottom: "1px solid var(--border)", flexWrap: "wrap" }}>
-          {(["add", "scrape", "queue", "manage"] as View[]).map(v => (
-            <button key={v} onClick={() => { setView(v); if (v === "queue") loadJobs("pending"); if (v === "manage") loadJobs("all"); }}
-              style={{ padding: "9px 16px", fontSize: 13, fontWeight: 700, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
-                color: view === v ? "var(--accent)" : "var(--text3)",
-                borderBottom: view === v ? "2px solid var(--accent)" : "2px solid transparent",
-              }}>
-              {v === "add"    && <><i className="ti ti-plus" style={{ marginRight: 5 }} />Add</>}
-              {v === "scrape" && <><i className="ti ti-robot" style={{ marginRight: 5 }} />Scrape</>}
-              {v === "queue"  && <><i className="ti ti-list-search" style={{ marginRight: 5 }} />Queue{pending > 0 ? ` (${pending})` : ""}</>}
-              {v === "manage" && <><i className="ti ti-layout-list" style={{ marginRight: 5 }} />Manage</>}
-            </button>
+      {/* ── Main content ── */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        {/* Topbar */}
+        <div style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)", padding: "0 24px", height: 50, display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+          {NAV.flatMap(s => s.items).filter(i => i.view === view).map(i => (
+            <span key={i.view} style={{ fontSize: 14, fontWeight: 700, color: "var(--text1)", display: "flex", alignItems: "center", gap: 7 }}>
+              <i className={`ti ${i.icon}`} style={{ color: "var(--accent)" }} />{i.label}
+            </span>
           ))}
+          {msg && (
+            <span style={{ fontSize: 12, fontWeight: 600, color: msg.startsWith("✓") ? "var(--success)" : "var(--danger)", marginLeft: "auto", padding: "4px 10px", borderRadius: 6, background: msg.startsWith("✓") ? "rgba(34,197,94,.08)" : "rgba(239,68,68,.08)" }}>
+              {msg}
+            </span>
+          )}
         </div>
 
-        {/* Tabs — Trust section */}
-        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>Trust & Verification</div>
-        <div style={{ display: "flex", gap: 2, marginBottom: 16, borderBottom: "1px solid var(--border)", flexWrap: "wrap" }}>
-          {(["bgv", "companies"] as View[]).map(v => (
-            <button key={v} onClick={() => setView(v)}
-              style={{ padding: "9px 16px", fontSize: 13, fontWeight: 700, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
-                color: view === v ? "var(--accent)" : "var(--text3)",
-                borderBottom: view === v ? "2px solid var(--accent)" : "2px solid transparent",
-              }}>
-              {v === "bgv"       && <><i className="ti ti-shield-check" style={{ marginRight: 5 }} />BGV</>}
-              {v === "companies" && <><i className="ti ti-building" style={{ marginRight: 5 }} />Companies</>}
-            </button>
-          ))}
+        {/* Scrollable content */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "24px" }}>
+          {view === "add"            && <AddView         token={token!} onSaved={() => { loadJobs("all"); flash("✓ Job added — go to Review Queue to approve."); }} />}
+          {view === "scrape"         && <ScrapeView      token={token!} onImported={() => { loadJobs("all"); flash("✓ Jobs added to review queue."); go("queue"); }} />}
+          {view === "queue"          && <QueueView       jobs={jobs.filter(j => !j.is_approved && j.is_active)} token={token!} loading={loading} onRefresh={() => loadJobs("pending")} flash={flash} />}
+          {view === "manage"         && <ManageView      jobs={jobs} token={token!} loading={loading} onRefresh={() => loadJobs("all")} flash={flash} />}
+          {view === "taxonomy"       && <TaxonomyView    token={token!} flash={flash} />}
+          {view === "employers"      && <EmployersView   token={token!} flash={flash} />}
+          {view === "recruiter-levels" && <RecruiterVerifyView token={token!} flash={flash} />}
+          {view === "credits"        && <JobPostCreditsView   token={token!} flash={flash} />}
+          {view === "bgv"            && <BgvAdminView    token={token!} flash={flash} />}
+          {view === "companies"      && <CompanyVerifyAdminView token={token!} flash={flash} />}
+          {view === "users"          && <UsersAdminView  token={token!} flash={flash} />}
+          {view === "subscriptions"  && <SubscriptionsView token={token!} flash={flash} />}
+          {view === "promos"         && <PromosView      token={token!} flash={flash} />}
+          {view === "flags"          && <FeatureFlagsView token={token!} flash={flash} />}
+          {view === "notifications"  && <NotificationsView token={token!} flash={flash} />}
+          {view === "support"        && <SupportView     token={token!} flash={flash} />}
+          {view === "health"         && <SystemHealthView token={token!} />}
+          {view === "audit"          && <AuditLogView    token={token!} />}
+          {view === "metrics"        && <MetricsView     token={token!} />}
         </div>
-
-        {/* Tabs — Platform section */}
-        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>Platform</div>
-        <div style={{ display: "flex", gap: 2, marginBottom: 20, borderBottom: "1px solid var(--border)", flexWrap: "wrap" }}>
-          {(["users", "flags", "audit", "metrics"] as View[]).map(v => (
-            <button key={v} onClick={() => setView(v)}
-              style={{ padding: "9px 16px", fontSize: 13, fontWeight: 700, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
-                color: view === v ? "var(--accent)" : "var(--text3)",
-                borderBottom: view === v ? "2px solid var(--accent)" : "2px solid transparent",
-              }}>
-              {v === "users"   && <><i className="ti ti-users" style={{ marginRight: 5 }} />Users</>}
-              {v === "flags"   && <><i className="ti ti-flag" style={{ marginRight: 5 }} />Feature Flags</>}
-              {v === "audit"   && <><i className="ti ti-file-text" style={{ marginRight: 5 }} />Audit Log</>}
-              {v === "metrics" && <><i className="ti ti-chart-bar" style={{ marginRight: 5 }} />Metrics</>}
-            </button>
-          ))}
-        </div>
-
-        {/* Views */}
-        {view === "add"       && <AddView       token={token!} onSaved={() => { loadJobs("all"); flash("✓ Job added — go to Review Queue to approve."); }} />}
-        {view === "scrape"    && <ScrapeView    token={token!} onImported={() => { loadJobs("all"); flash("✓ Jobs added to review queue."); setView("queue"); loadJobs("pending"); }} />}
-        {view === "queue"     && <QueueView     jobs={jobs.filter(j => !j.is_approved && j.is_active)} token={token!} loading={loading} onRefresh={() => loadJobs("pending")} flash={flash} />}
-        {view === "manage"    && <ManageView    jobs={jobs} token={token!} loading={loading} onRefresh={() => loadJobs("all")} flash={flash} />}
-        {view === "bgv"       && <BgvAdminView  token={token!} flash={flash} />}
-        {view === "companies" && <CompanyVerifyAdminView token={token!} flash={flash} />}
-        {view === "users"     && <UsersAdminView    token={token!} flash={flash} />}
-        {view === "flags"     && <FeatureFlagsView  token={token!} flash={flash} />}
-        {view === "audit"     && <AuditLogView      token={token!} />}
-        {view === "metrics"   && <MetricsView       token={token!} />}
       </div>
     </div>
   );
@@ -615,7 +676,7 @@ function ManageView({ jobs, token, loading, onRefresh, flash }: {
                   </td>
                   <td style={{ padding: "10px 10px" }}>
                     <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 4, fontWeight: 600,
-                      background: j.is_approved && j.is_active ? "#14532d" : "#7f1d1d",
+                      background: j.is_approved && j.is_active ? "rgba(22,163,74,.12)" : "rgba(239,68,68,.1)",
                       color: j.is_approved && j.is_active ? "var(--success)" : "var(--danger)",
                     }}>
                       {j.is_approved && j.is_active ? "Live" : !j.is_active ? "Inactive" : "Pending"}
@@ -1728,6 +1789,789 @@ function MetricsView({ token }: { token: string }) {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+// ── Taxonomy View ─────────────────────────────────────────────────────────────
+
+function TaxonomyView({ token: _token, flash }: { token: string; flash: (m: string) => void }) {
+  const [skills, setSkills] = useState<{ id: string; name: string; category: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [newSkill, setNewSkill] = useState({ name: "", category: "" });
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const { createBrowserClient } = await import("@supabase/ssr");
+        const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+        const { data } = await sb.from("skill_taxonomy").select("id,name,category").order("category").order("name");
+        setSkills(data ?? []);
+      } catch { /* table may not exist yet */ }
+      setLoading(false);
+    })();
+  }, []);
+
+  async function addSkill() {
+    if (!newSkill.name.trim()) { flash("Skill name required"); return; }
+    setSaving(true);
+    try {
+      const { createBrowserClient } = await import("@supabase/ssr");
+      const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      const { error } = await sb.from("skill_taxonomy").insert({ name: newSkill.name.trim(), category: newSkill.category.trim() || "General" });
+      if (error) throw error;
+      flash("✓ Skill added");
+      setNewSkill({ name: "", category: "" });
+      const { data } = await sb.from("skill_taxonomy").select("id,name,category").order("category").order("name");
+      setSkills(data ?? []);
+    } catch { flash("Failed to add skill"); }
+    setSaving(false);
+  }
+
+  const byCategory = skills.reduce<Record<string, typeof skills>>((acc, s) => {
+    if (!acc[s.category]) acc[s.category] = [];
+    acc[s.category].push(s);
+    return acc;
+  }, {});
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      {/* Add skill */}
+      <div style={{ ...card }}>
+        <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14 }}>Add skill / category</div>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <input style={{ ...input, flex: "1 1 200px" }} placeholder="Skill name (e.g. React)" value={newSkill.name} onChange={e => setNewSkill(s => ({ ...s, name: e.target.value }))} />
+          <input style={{ ...input, flex: "1 1 160px" }} placeholder="Category (e.g. Frontend)" value={newSkill.category} onChange={e => setNewSkill(s => ({ ...s, category: e.target.value }))} />
+          <button style={btn(true)} onClick={addSkill} disabled={saving}>{saving ? "Saving…" : "Add"}</button>
+        </div>
+      </div>
+
+      {/* Skill list */}
+      {loading ? (
+        <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>Loading…</div>
+      ) : skills.length === 0 ? (
+        <div style={{ ...card, textAlign: "center", padding: 40, color: "var(--text3)" }}>
+          <i className="ti ti-tag" style={{ fontSize: 28, display: "block", marginBottom: 8 }} />
+          No skills yet. Create a <code>skill_taxonomy</code> table and add skills above.
+        </div>
+      ) : (
+        Object.entries(byCategory).map(([cat, items]) => (
+          <div key={cat} style={{ ...card }}>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: "var(--accent)" }}>{cat} <span style={{ color: "var(--text3)", fontWeight: 400 }}>({items.length})</span></div>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              {items.map(s => (
+                <span key={s.id} style={{ fontSize: 12, padding: "4px 10px", borderRadius: 6, background: "var(--surface2)", border: "1px solid var(--border)", color: "var(--text2)" }}>{s.name}</span>
+              ))}
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+
+// ── Employers View ────────────────────────────────────────────────────────────
+
+interface EmployerRow {
+  id: string; email: string; full_name: string | null; plan: string;
+  is_suspended: boolean; created_at: string;
+  company_name: string | null; job_posts_used: number; job_posts_limit: number;
+}
+
+function EmployersView({ token, flash }: { token: string; flash: (m: string) => void }) {
+  const [rows, setRows]       = useState<EmployerRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch]   = useState("");
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const { createBrowserClient } = await import("@supabase/ssr");
+        const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+        const { data } = await sb
+          .from("profiles")
+          .select("id, email, full_name, plan, is_suspended, created_at, company_name, job_posts_used, job_posts_limit")
+          .eq("user_intent", "hire")
+          .order("created_at", { ascending: false });
+        setRows((data ?? []) as EmployerRow[]);
+      } catch { flash("Failed to load employers"); }
+      setLoading(false);
+    })();
+  }, []); // eslint-disable-line
+
+  const filtered = rows.filter(r => {
+    const q = search.toLowerCase();
+    return !q || r.email.toLowerCase().includes(q) || (r.company_name ?? "").toLowerCase().includes(q) || (r.full_name ?? "").toLowerCase().includes(q);
+  });
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+        <input style={{ ...input, maxWidth: 280 }} placeholder="Search name, company, email…" value={search} onChange={e => setSearch(e.target.value)} />
+        <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--text3)" }}>{filtered.length} employers</span>
+      </div>
+
+      {loading ? (
+        <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>Loading…</div>
+      ) : filtered.length === 0 ? (
+        <div style={{ ...card, textAlign: "center", padding: 40, color: "var(--text3)" }}>No employer accounts yet.</div>
+      ) : (
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <thead>
+              <tr style={{ borderBottom: "1px solid var(--border)", color: "var(--text3)" }}>
+                {["Email", "Company", "Plan", "Posts used", "Status", "Joined"].map(h => (
+                  <th key={h} style={{ padding: "8px 10px", fontWeight: 600, fontSize: 11, textAlign: "left" }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(r => (
+                <tr key={r.id} style={{ borderBottom: "1px solid var(--border)", opacity: r.is_suspended ? 0.5 : 1 }}>
+                  <td style={{ padding: "10px 10px", fontWeight: 600 }}>{r.email}</td>
+                  <td style={{ padding: "10px 10px", color: "var(--text2)" }}>{r.company_name || "—"}</td>
+                  <td style={{ padding: "10px 10px" }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 6, background: "var(--surface2)", color: r.plan === "free" ? "var(--text3)" : "var(--accent)" }}>{r.plan}</span>
+                  </td>
+                  <td style={{ padding: "10px 10px", color: "var(--text2)" }}>{r.job_posts_used ?? 0} / {r.job_posts_limit ?? "∞"}</td>
+                  <td style={{ padding: "10px 10px" }}>
+                    <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 6, fontWeight: 600, background: r.is_suspended ? "rgba(239,68,68,.1)" : "rgba(34,197,94,.1)", color: r.is_suspended ? "var(--danger)" : "var(--success)" }}>
+                      {r.is_suspended ? "Suspended" : "Active"}
+                    </span>
+                  </td>
+                  <td style={{ padding: "10px 10px", color: "var(--text3)", fontSize: 12 }}>
+                    {new Date(r.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "2-digit" })}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Recruiter Verify View ─────────────────────────────────────────────────────
+
+function RecruiterVerifyView({ token: _token, flash }: { token: string; flash: (m: string) => void }) {
+  const [rows, setRows]       = useState<{ id: string; email: string; full_name: string | null; recruiter_level: string | null; created_at: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const { createBrowserClient } = await import("@supabase/ssr");
+        const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+        const { data } = await sb
+          .from("profiles")
+          .select("id, email, full_name, recruiter_level, created_at")
+          .eq("user_intent", "hire")
+          .order("created_at", { ascending: false });
+        setRows(data ?? []);
+      } catch { flash("Failed to load recruiter data"); }
+      setLoading(false);
+    })();
+  }, []); // eslint-disable-line
+
+  const LEVELS = ["unverified", "basic", "verified", "premium", "agency"];
+  const levelColor: Record<string, string> = {
+    unverified: "var(--text3)", basic: "var(--text2)", verified: "var(--accent)",
+    premium: "var(--success)", agency: "#a855f7",
+  };
+
+  async function setLevel(id: string, level: string) {
+    setUpdating(id);
+    try {
+      const { createBrowserClient } = await import("@supabase/ssr");
+      const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      const { error } = await sb.from("profiles").update({ recruiter_level: level }).eq("id", id);
+      if (error) throw error;
+      setRows(r => r.map(u => u.id === id ? { ...u, recruiter_level: level } : u));
+      flash(`✓ Level updated to ${level}`);
+    } catch { flash("Update failed"); }
+    setUpdating(null);
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ fontSize: 13, color: "var(--text3)", padding: "10px 14px", background: "rgba(99,102,241,.06)", borderRadius: 10, border: "1px solid rgba(99,102,241,.15)" }}>
+        <i className="ti ti-info-circle" style={{ marginRight: 6 }} />
+        Recruiter levels control job post limits, badge visibility, and featured employer placement.
+      </div>
+
+      {loading ? (
+        <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>Loading…</div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {rows.length === 0 && <div style={{ ...card, textAlign: "center", padding: 40, color: "var(--text3)" }}>No recruiter accounts yet.</div>}
+          {rows.map(r => (
+            <div key={r.id} style={{ ...card, display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 700, fontSize: 13 }}>{r.email}</div>
+                <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 2 }}>{r.full_name || "—"} · Joined {new Date(r.created_at).toLocaleDateString("en-IN")}</div>
+              </div>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {LEVELS.map(l => (
+                  <button key={l} disabled={updating === r.id} onClick={() => setLevel(r.id, l)}
+                    style={{ padding: "5px 12px", borderRadius: 8, border: `1px solid ${r.recruiter_level === l ? levelColor[l] : "var(--border)"}`, background: r.recruiter_level === l ? `${levelColor[l]}22` : "none", color: r.recruiter_level === l ? levelColor[l] : "var(--text3)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Job Post Credits View ─────────────────────────────────────────────────────
+
+function JobPostCreditsView({ token: _token, flash }: { token: string; flash: (m: string) => void }) {
+  const [rows, setRows]     = useState<{ id: string; email: string; company_name: string | null; job_posts_used: number; job_posts_limit: number }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [newLimit, setNewLimit] = useState(10);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const { createBrowserClient } = await import("@supabase/ssr");
+        const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+        const { data } = await sb.from("profiles").select("id, email, company_name, job_posts_used, job_posts_limit").eq("user_intent", "hire").order("job_posts_used", { ascending: false });
+        setRows(data ?? []);
+      } catch { flash("Failed to load credits"); }
+      setLoading(false);
+    })();
+  }, []); // eslint-disable-line
+
+  async function saveLimit(id: string) {
+    setSaving(true);
+    try {
+      const { createBrowserClient } = await import("@supabase/ssr");
+      const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      await sb.from("profiles").update({ job_posts_limit: newLimit }).eq("id", id);
+      setRows(r => r.map(u => u.id === id ? { ...u, job_posts_limit: newLimit } : u));
+      flash("✓ Limit updated");
+      setEditId(null);
+    } catch { flash("Update failed"); }
+    setSaving(false);
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {loading ? (
+        <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>Loading…</div>
+      ) : (
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <thead>
+              <tr style={{ borderBottom: "1px solid var(--border)", color: "var(--text3)" }}>
+                {["Employer", "Company", "Posts used", "Posts limit", "Usage", "Actions"].map(h => (
+                  <th key={h} style={{ padding: "8px 10px", fontWeight: 600, fontSize: 11, textAlign: "left" }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map(r => {
+                const pct = r.job_posts_limit > 0 ? Math.min(100, Math.round((r.job_posts_used / r.job_posts_limit) * 100)) : 0;
+                const color = pct >= 90 ? "var(--danger)" : pct >= 70 ? "var(--warn)" : "var(--success)";
+                return (
+                  <tr key={r.id} style={{ borderBottom: "1px solid var(--border)" }}>
+                    <td style={{ padding: "10px 10px", fontWeight: 600 }}>{r.email}</td>
+                    <td style={{ padding: "10px 10px", color: "var(--text2)" }}>{r.company_name || "—"}</td>
+                    <td style={{ padding: "10px 10px", color: "var(--text1)", fontWeight: 700 }}>{r.job_posts_used ?? 0}</td>
+                    <td style={{ padding: "10px 10px", color: "var(--text2)" }}>
+                      {editId === r.id ? (
+                        <input type="number" style={{ ...input, width: 80 }} value={newLimit} onChange={e => setNewLimit(Number(e.target.value))} />
+                      ) : (r.job_posts_limit ?? "—")}
+                    </td>
+                    <td style={{ padding: "10px 10px" }}>
+                      <div style={{ width: 80, height: 6, background: "var(--surface2)", borderRadius: 3, overflow: "hidden" }}>
+                        <div style={{ height: "100%", width: `${pct}%`, background: color, borderRadius: 3 }} />
+                      </div>
+                      <div style={{ fontSize: 10, color, marginTop: 2 }}>{pct}%</div>
+                    </td>
+                    <td style={{ padding: "10px 10px" }}>
+                      {editId === r.id ? (
+                        <div style={{ display: "flex", gap: 6 }}>
+                          <button style={btn(true)} onClick={() => saveLimit(r.id)} disabled={saving}>Save</button>
+                          <button style={btn()} onClick={() => setEditId(null)}>Cancel</button>
+                        </div>
+                      ) : (
+                        <button style={{ ...btn(), fontSize: 11, padding: "4px 10px" }} onClick={() => { setEditId(r.id); setNewLimit(r.job_posts_limit ?? 10); }}>Edit limit</button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          {rows.length === 0 && <div style={{ textAlign: "center", padding: 40, color: "var(--text3)" }}>No employer accounts yet.</div>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Subscriptions View ────────────────────────────────────────────────────────
+
+function SubscriptionsView({ token: _token, flash }: { token: string; flash: (m: string) => void }) {
+  const [rows, setRows]       = useState<{ id: string; email: string; plan: string; plan_expires_at: string | null; created_at: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const { createBrowserClient } = await import("@supabase/ssr");
+        const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+        const { data } = await sb.from("profiles").select("id, email, plan, plan_expires_at, created_at").neq("plan", "free").order("plan_expires_at", { ascending: false });
+        setRows(data ?? []);
+      } catch { flash("Failed to load subscriptions"); }
+      setLoading(false);
+    })();
+  }, []); // eslint-disable-line
+
+  const planColor: Record<string, string> = { pro: "var(--accent)", team: "var(--success)", enterprise: "#a855f7" };
+
+  const now = Date.now();
+  const active  = rows.filter(r => !r.plan_expires_at || new Date(r.plan_expires_at).getTime() > now).length;
+  const expired = rows.length - active;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {/* Stats */}
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+        {[
+          { label: "Paying users", val: rows.length, color: "var(--accent)" },
+          { label: "Active",       val: active,       color: "var(--success)" },
+          { label: "Expired",      val: expired,       color: "var(--warn)" },
+        ].map(s => (
+          <div key={s.label} style={{ ...card, padding: "12px 18px" }}>
+            <div style={{ fontSize: 24, fontWeight: 800, color: s.color }}>{s.val}</div>
+            <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {loading ? (
+        <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>Loading…</div>
+      ) : (
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <thead>
+              <tr style={{ borderBottom: "1px solid var(--border)", color: "var(--text3)" }}>
+                {["Email", "Plan", "Expires", "Status"].map(h => (
+                  <th key={h} style={{ padding: "8px 10px", fontWeight: 600, fontSize: 11, textAlign: "left" }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map(r => {
+                const isExp = r.plan_expires_at ? new Date(r.plan_expires_at).getTime() < now : false;
+                return (
+                  <tr key={r.id} style={{ borderBottom: "1px solid var(--border)", opacity: isExp ? 0.6 : 1 }}>
+                    <td style={{ padding: "10px 10px", fontWeight: 600 }}>{r.email}</td>
+                    <td style={{ padding: "10px 10px" }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 6, background: "var(--surface2)", color: planColor[r.plan] ?? "var(--text3)" }}>{r.plan}</span>
+                    </td>
+                    <td style={{ padding: "10px 10px", color: "var(--text3)", fontSize: 12 }}>
+                      {r.plan_expires_at ? new Date(r.plan_expires_at).toLocaleDateString("en-IN") : "—"}
+                    </td>
+                    <td style={{ padding: "10px 10px" }}>
+                      <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 6, fontWeight: 600, background: isExp ? "rgba(239,68,68,.1)" : "rgba(34,197,94,.1)", color: isExp ? "var(--danger)" : "var(--success)" }}>
+                        {isExp ? "Expired" : "Active"}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          {rows.length === 0 && <div style={{ textAlign: "center", padding: 40, color: "var(--text3)" }}>No paying users yet.</div>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Promos View ───────────────────────────────────────────────────────────────
+
+interface PromoRow { id: string; code: string; discount_pct: number; max_uses: number | null; used_count: number; expires_at: string | null; active: boolean; }
+
+function PromosView({ token, flash }: { token: string; flash: (m: string) => void }) {
+  const [rows, setRows]       = useState<PromoRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [form, setForm]       = useState({ code: "", discount_pct: 20, max_uses: "" });
+  const [saving, setSaving]   = useState(false);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const { createBrowserClient } = await import("@supabase/ssr");
+      const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      const { data } = await sb.from("promo_codes").select("*").order("created_at", { ascending: false });
+      setRows(data ?? []);
+    } catch { /* table may not exist */ }
+    setLoading(false);
+  }
+  useEffect(() => { load(); }, []); // eslint-disable-line
+
+  async function create() {
+    if (!form.code.trim()) { flash("Code required"); return; }
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/promos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ code: form.code.toUpperCase(), discount_pct: form.discount_pct, max_uses: form.max_uses ? Number(form.max_uses) : null }),
+      });
+      if (res.ok) { flash("✓ Promo created"); setForm({ code: "", discount_pct: 20, max_uses: "" }); await load(); }
+      else flash("Failed to create promo");
+    } catch { flash("Network error"); }
+    setSaving(false);
+  }
+
+  async function toggleActive(id: string, active: boolean) {
+    try {
+      const { createBrowserClient } = await import("@supabase/ssr");
+      const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      await sb.from("promo_codes").update({ active }).eq("id", id);
+      setRows(r => r.map(p => p.id === id ? { ...p, active } : p));
+      flash(`✓ Promo ${active ? "enabled" : "disabled"}`);
+    } catch { flash("Failed"); }
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ ...card }}>
+        <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14 }}>Create promo code</div>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <div style={{ flex: "1 1 160px" }}>
+            <label style={label}>Code</label>
+            <input style={input} value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))} placeholder="LAUNCH50" />
+          </div>
+          <div style={{ flex: "0 1 110px" }}>
+            <label style={label}>Discount %</label>
+            <input type="number" style={input} value={form.discount_pct} min={1} max={100} onChange={e => setForm(f => ({ ...f, discount_pct: Number(e.target.value) }))} />
+          </div>
+          <div style={{ flex: "0 1 110px" }}>
+            <label style={label}>Max uses</label>
+            <input type="number" style={input} value={form.max_uses} onChange={e => setForm(f => ({ ...f, max_uses: e.target.value }))} placeholder="∞" />
+          </div>
+          <div style={{ flex: "0 1 auto", paddingTop: 21 }}>
+            <button style={btn(true)} onClick={create} disabled={saving}>{saving ? "Creating…" : "Create"}</button>
+          </div>
+        </div>
+      </div>
+
+      {loading ? (
+        <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>Loading…</div>
+      ) : (
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <thead>
+              <tr style={{ borderBottom: "1px solid var(--border)", color: "var(--text3)" }}>
+                {["Code", "Discount", "Used", "Max uses", "Expires", "Active"].map(h => (
+                  <th key={h} style={{ padding: "8px 10px", fontWeight: 600, fontSize: 11, textAlign: "left" }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map(p => (
+                <tr key={p.id} style={{ borderBottom: "1px solid var(--border)", opacity: p.active ? 1 : 0.5 }}>
+                  <td style={{ padding: "10px 10px", fontWeight: 700, fontFamily: "monospace" }}>{p.code}</td>
+                  <td style={{ padding: "10px 10px", color: "var(--success)", fontWeight: 700 }}>{p.discount_pct}%</td>
+                  <td style={{ padding: "10px 10px", color: "var(--text2)" }}>{p.used_count}</td>
+                  <td style={{ padding: "10px 10px", color: "var(--text3)" }}>{p.max_uses ?? "∞"}</td>
+                  <td style={{ padding: "10px 10px", color: "var(--text3)", fontSize: 12 }}>{p.expires_at ? new Date(p.expires_at).toLocaleDateString("en-IN") : "Never"}</td>
+                  <td style={{ padding: "10px 10px" }}>
+                    <button onClick={() => toggleActive(p.id, !p.active)} style={{ width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer", background: p.active ? "var(--success)" : "var(--surface2)", position: "relative", transition: "background .2s" }}>
+                      <span style={{ position: "absolute", top: 2, width: 18, height: 18, borderRadius: 9, background: "#fff", transition: "left .2s", left: p.active ? 20 : 2 }} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {rows.length === 0 && <div style={{ textAlign: "center", padding: 40, color: "var(--text3)" }}>No promo codes yet.</div>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Notifications View ────────────────────────────────────────────────────────
+
+function NotificationsView({ token, flash }: { token: string; flash: (m: string) => void }) {
+  const [form, setForm]   = useState({ title: "", body: "", target: "all" });
+  const [sending, setSending] = useState(false);
+  const [sent, setSent]   = useState<{ title: string; body: string; target: string; sent_at: string }[]>([]);
+
+  async function send() {
+    if (!form.title.trim() || !form.body.trim()) { flash("Title and body required"); return; }
+    setSending(true);
+    try {
+      const res = await fetch("/api/admin/notifications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(form),
+      });
+      if (res.ok) {
+        flash("✓ Notification sent");
+        setSent(s => [{ ...form, sent_at: new Date().toISOString() }, ...s]);
+        setForm({ title: "", body: "", target: "all" });
+      } else flash("Failed to send");
+    } catch { flash("Network error"); }
+    setSending(false);
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ ...card }}>
+        <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14 }}><i className="ti ti-bell" style={{ marginRight: 6 }} />Broadcast notification</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div>
+            <label style={label}>Target audience</label>
+            <select style={input} value={form.target} onChange={e => setForm(f => ({ ...f, target: e.target.value }))}>
+              <option value="all">All users</option>
+              <option value="free">Free plan only</option>
+              <option value="pro">Pro plan only</option>
+              <option value="employers">Employers only</option>
+            </select>
+          </div>
+          <div>
+            <label style={label}>Title</label>
+            <input style={input} value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="e.g. New feature: AI Interview Coach" />
+          </div>
+          <div>
+            <label style={label}>Message body</label>
+            <textarea style={{ ...input, minHeight: 80, resize: "vertical" }} value={form.body} onChange={e => setForm(f => ({ ...f, body: e.target.value }))} placeholder="Notification body text…" />
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <button style={btn(true)} onClick={send} disabled={sending}>{sending ? "Sending…" : <><i className="ti ti-send" style={{ marginRight: 5 }} />Send</>}</button>
+          </div>
+        </div>
+      </div>
+
+      {sent.length > 0 && (
+        <div style={{ ...card }}>
+          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>Sent this session</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {sent.map((n, i) => (
+              <div key={i} style={{ padding: "10px 12px", background: "var(--surface2)", borderRadius: 8, fontSize: 13 }}>
+                <div style={{ fontWeight: 700 }}>{n.title}</div>
+                <div style={{ color: "var(--text3)", fontSize: 12, marginTop: 2 }}>→ {n.target} · {new Date(n.sent_at).toLocaleTimeString()}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Support View ──────────────────────────────────────────────────────────────
+
+interface SupportTicket {
+  id: string; subject: string; email: string; status: string; priority: string; created_at: string; message: string;
+}
+
+function SupportView({ token: _token, flash }: { token: string; flash: (m: string) => void }) {
+  const [rows, setRows]           = useState<SupportTicket[]>([]);
+  const [loading, setLoading]     = useState(true);
+  const [selected, setSelected]   = useState<SupportTicket | null>(null);
+  const [statusFilter, setStatusFilter] = useState("open");
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const { createBrowserClient } = await import("@supabase/ssr");
+        const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+        const { data } = await sb.from("support_tickets").select("*").order("created_at", { ascending: false });
+        setRows(data ?? []);
+      } catch { /* table may not exist */ }
+      setLoading(false);
+    })();
+  }, []); // eslint-disable-line
+
+  async function updateStatus(id: string, status: string) {
+    try {
+      const { createBrowserClient } = await import("@supabase/ssr");
+      const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      await sb.from("support_tickets").update({ status }).eq("id", id);
+      setRows(r => r.map(t => t.id === id ? { ...t, status } : t));
+      if (selected?.id === id) setSelected(s => s ? { ...s, status } : s);
+      flash(`✓ Ticket marked ${status}`);
+    } catch { flash("Update failed"); }
+  }
+
+  const filtered = statusFilter === "all" ? rows : rows.filter(r => r.status === statusFilter);
+  const open = rows.filter(r => r.status === "open").length;
+
+  const priorityColor: Record<string, string> = { urgent: "var(--danger)", high: "var(--warn)", normal: "var(--text3)", low: "var(--text3)" };
+  const statusBg: Record<string, string> = { open: "rgba(234,179,8,.1)", in_progress: "rgba(99,102,241,.1)", resolved: "rgba(34,197,94,.1)", closed: "var(--surface2)" };
+  const statusCol: Record<string, string> = { open: "var(--warn)", in_progress: "var(--accent)", resolved: "var(--success)", closed: "var(--text3)" };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {/* Filter bar */}
+      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+        {["all", "open", "in_progress", "resolved", "closed"].map(s => (
+          <button key={s} onClick={() => setStatusFilter(s)} style={{ padding: "5px 14px", borderRadius: 99, border: `1px solid ${statusFilter === s ? "var(--accent)" : "var(--border)"}`, background: statusFilter === s ? "var(--accdim)" : "none", color: statusFilter === s ? "var(--accent)" : "var(--text3)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+            {s === "all" ? `All (${rows.length})` : `${s.replace("_", " ")} ${s === "open" ? `(${open})` : ""}`}
+          </button>
+        ))}
+      </div>
+
+      {loading ? (
+        <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>Loading…</div>
+      ) : filtered.length === 0 ? (
+        <div style={{ ...card, textAlign: "center", padding: 40, color: "var(--text3)" }}>
+          <i className="ti ti-headset" style={{ fontSize: 28, display: "block", marginBottom: 8 }} />
+          {rows.length === 0 ? "No support tickets yet. Create a support_tickets table to enable this." : "No tickets in this category."}
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {filtered.map(t => (
+            <div key={t.id} style={{ ...card, display: "flex", alignItems: "flex-start", gap: 14, flexWrap: "wrap", cursor: "pointer" }} onClick={() => setSelected(t)}>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
+                  <span style={{ fontWeight: 700, fontSize: 13 }}>{t.subject}</span>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: priorityColor[t.priority] ?? "var(--text3)", textTransform: "uppercase" }}>{t.priority}</span>
+                  <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 7px", borderRadius: 6, background: statusBg[t.status], color: statusCol[t.status] }}>{t.status}</span>
+                </div>
+                <div style={{ fontSize: 12, color: "var(--text3)" }}>{t.email} · {new Date(t.created_at).toLocaleDateString("en-IN")}</div>
+              </div>
+              <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                {t.status === "open" && <button style={{ ...btn(true), fontSize: 11, padding: "4px 10px" }} onClick={e => { e.stopPropagation(); updateStatus(t.id, "in_progress"); }}>Take</button>}
+                {t.status !== "resolved" && <button style={{ ...btn(), fontSize: 11, padding: "4px 10px" }} onClick={e => { e.stopPropagation(); updateStatus(t.id, "resolved"); }}>Resolve</button>}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Ticket detail modal */}
+      {selected && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.65)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+          onClick={e => { if (e.target === e.currentTarget) setSelected(null); }}>
+          <div style={{ ...card, width: "100%", maxWidth: 520, display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <div>
+                <div style={{ fontSize: 15, fontWeight: 800 }}>{selected.subject}</div>
+                <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 2 }}>{selected.email} · {new Date(selected.created_at).toLocaleDateString()}</div>
+              </div>
+              <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18 }}><i className="ti ti-x" /></button>
+            </div>
+            <div style={{ background: "var(--surface2)", borderRadius: 10, padding: "14px 16px", fontSize: 13, color: "var(--text2)", lineHeight: 1.6 }}>{selected.message}</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {["open", "in_progress", "resolved", "closed"].map(s => (
+                <button key={s} onClick={() => updateStatus(selected.id, s)}
+                  style={{ padding: "7px 14px", borderRadius: 8, border: `1px solid ${selected.status === s ? "var(--accent)" : "var(--border)"}`, background: selected.status === s ? "var(--accdim)" : "none", color: selected.status === s ? "var(--accent)" : "var(--text2)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                  {s.replace("_", " ")}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── System Health View ────────────────────────────────────────────────────────
+
+function SystemHealthView({ token: _token }: { token: string }) {
+  const [checks, setChecks] = useState<{ name: string; status: "ok" | "warn" | "error"; latencyMs?: number; detail?: string }[]>([]);
+  const [running, setRunning] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      setRunning(true);
+      const results: typeof checks = [];
+
+      // Supabase ping
+      try {
+        const t0 = Date.now();
+        const { createBrowserClient } = await import("@supabase/ssr");
+        const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+        await sb.from("profiles").select("id", { count: "exact", head: true });
+        results.push({ name: "Supabase DB", status: "ok", latencyMs: Date.now() - t0 });
+      } catch (e) {
+        results.push({ name: "Supabase DB", status: "error", detail: String(e) });
+      }
+
+      // Groq API
+      try {
+        const t0 = Date.now();
+        const res = await fetch("/api/health/groq");
+        results.push({ name: "Groq AI", status: res.ok ? "ok" : "warn", latencyMs: Date.now() - t0, detail: res.ok ? undefined : `HTTP ${res.status}` });
+      } catch {
+        results.push({ name: "Groq AI", status: "warn", detail: "Ping endpoint not found" });
+      }
+
+      // Env vars check
+      const missingEnv = [];
+      if (!process.env.NEXT_PUBLIC_SUPABASE_URL) missingEnv.push("SUPABASE_URL");
+      if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) missingEnv.push("ANON_KEY");
+      results.push({
+        name: "Environment vars",
+        status: missingEnv.length ? "error" : "ok",
+        detail: missingEnv.length ? `Missing: ${missingEnv.join(", ")}` : "All required vars present",
+      });
+
+      setChecks(results);
+      setRunning(false);
+    })();
+  }, []); // eslint-disable-line
+
+  const iconFor = (s: string) => s === "ok" ? "ti-circle-check" : s === "warn" ? "ti-alert-triangle" : "ti-x";
+  const colorFor = (s: string) => s === "ok" ? "var(--success)" : s === "warn" ? "var(--warn)" : "var(--danger)";
+  const bgFor = (s: string) => s === "ok" ? "rgba(34,197,94,.08)" : s === "warn" ? "rgba(234,179,8,.08)" : "rgba(239,68,68,.08)";
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ fontSize: 14, fontWeight: 700 }}><i className="ti ti-activity" style={{ marginRight: 6, color: "var(--accent)" }} />System Health</div>
+
+      {running ? (
+        <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}><i className="ti ti-loader" style={{ marginRight: 6 }} />Running checks…</div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {checks.map(c => (
+            <div key={c.name} style={{ ...card, display: "flex", alignItems: "center", gap: 14, background: bgFor(c.status) }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: "var(--surface)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <i className={`ti ${iconFor(c.status)}`} style={{ fontSize: 20, color: colorFor(c.status) }} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 700, fontSize: 14 }}>{c.name}</div>
+                {c.detail && <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 2 }}>{c.detail}</div>}
+              </div>
+              {c.latencyMs != null && (
+                <div style={{ fontSize: 13, fontWeight: 700, color: c.latencyMs < 200 ? "var(--success)" : c.latencyMs < 600 ? "var(--warn)" : "var(--danger)" }}>
+                  {c.latencyMs}ms
+                </div>
+              )}
+              <span style={{ fontSize: 12, fontWeight: 700, color: colorFor(c.status), textTransform: "uppercase", letterSpacing: ".04em" }}>{c.status}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div style={{ padding: 12, background: "var(--surface2)", borderRadius: 10, fontSize: 12, color: "var(--text3)" }}>
+        Checks run on page load. Refresh to re-run. For continuous monitoring connect Grafana, Sentry, or UptimeRobot.
+      </div>
     </div>
   );
 }
