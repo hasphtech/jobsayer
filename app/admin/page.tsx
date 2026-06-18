@@ -31,9 +31,10 @@ interface AdminJob {
 type View =
   | "add" | "scrape" | "queue" | "manage" | "taxonomy"
   | "employers" | "recruiter-levels" | "credits"
-  | "bgv" | "companies"
-  | "users" | "subscriptions" | "promos"
-  | "flags" | "notifications" | "support" | "health" | "audit" | "metrics";
+  | "bgv" | "companies" | "reports"
+  | "users" | "subscriptions" | "promos" | "payments"
+  | "interview-bank" | "salary-data"
+  | "flags" | "notifications" | "support" | "rate-limits" | "health" | "audit" | "metrics";
 
 const EMPTY_FORM: Omit<AdminJob, "id" | "posted_at" | "is_active" | "is_approved"> = {
   title: "", company: "", location: "Bengaluru", mode: "hybrid",
@@ -159,8 +160,9 @@ export default function AdminPage() {
     {
       title: "Trust & Verification",
       items: [
-        { view: "bgv",       label: "BGV queue",   icon: "ti-shield-check" },
-        { view: "companies", label: "Companies",   icon: "ti-building" },
+        { view: "bgv",       label: "BGV queue",          icon: "ti-shield-check" },
+        { view: "companies", label: "Companies",          icon: "ti-building" },
+        { view: "reports",   label: "Content reports",    icon: "ti-flag-2" },
       ],
     },
     {
@@ -169,6 +171,14 @@ export default function AdminPage() {
         { view: "users",         label: "Users",         icon: "ti-users" },
         { view: "subscriptions", label: "Subscriptions", icon: "ti-credit-card" },
         { view: "promos",        label: "Promo codes",   icon: "ti-discount-2" },
+        { view: "payments",      label: "Payments",      icon: "ti-receipt" },
+      ],
+    },
+    {
+      title: "Content",
+      items: [
+        { view: "interview-bank", label: "Interview bank", icon: "ti-brain" },
+        { view: "salary-data",    label: "Salary data",    icon: "ti-chart-line" },
       ],
     },
     {
@@ -177,6 +187,7 @@ export default function AdminPage() {
         { view: "flags",         label: "Feature flags",  icon: "ti-flag" },
         { view: "notifications", label: "Notifications",  icon: "ti-bell" },
         { view: "support",       label: "Support queue",  icon: "ti-headset" },
+        { view: "rate-limits",   label: "Rate limits",    icon: "ti-shield-bolt" },
         { view: "health",        label: "System health",  icon: "ti-activity" },
         { view: "audit",         label: "Audit log",      icon: "ti-file-text" },
         { view: "metrics",       label: "Metrics",        icon: "ti-chart-bar" },
@@ -267,12 +278,17 @@ export default function AdminPage() {
           {view === "credits"        && <JobPostCreditsView   token={token!} flash={flash} />}
           {view === "bgv"            && <BgvAdminView    token={token!} flash={flash} />}
           {view === "companies"      && <CompanyVerifyAdminView token={token!} flash={flash} />}
+          {view === "reports"        && <ContentReportsView token={token!} flash={flash} />}
           {view === "users"          && <UsersAdminView  token={token!} flash={flash} />}
           {view === "subscriptions"  && <SubscriptionsView token={token!} flash={flash} />}
           {view === "promos"         && <PromosView      token={token!} flash={flash} />}
+          {view === "payments"       && <PaymentsView    token={token!} flash={flash} />}
+          {view === "interview-bank" && <InterviewBankView token={token!} flash={flash} />}
+          {view === "salary-data"    && <SalaryDataView  token={token!} flash={flash} />}
           {view === "flags"          && <FeatureFlagsView token={token!} flash={flash} />}
           {view === "notifications"  && <NotificationsView token={token!} flash={flash} />}
           {view === "support"        && <SupportView     token={token!} flash={flash} />}
+          {view === "rate-limits"    && <RateLimitsView  token={token!} />}
           {view === "health"         && <SystemHealthView token={token!} />}
           {view === "audit"          && <AuditLogView    token={token!} />}
           {view === "metrics"        && <MetricsView     token={token!} />}
@@ -2572,6 +2588,812 @@ function SystemHealthView({ token: _token }: { token: string }) {
       <div style={{ padding: 12, background: "var(--surface2)", borderRadius: 10, fontSize: 12, color: "var(--text3)" }}>
         Checks run on page load. Refresh to re-run. For continuous monitoring connect Grafana, Sentry, or UptimeRobot.
       </div>
+    </div>
+  );
+}
+
+// ── Content Reports View ──────────────────────────────────────────────────────
+
+interface ContentReport {
+  id: string; reporter_id: string | null; target_type: "job" | "profile" | "review" | "message";
+  target_id: string; reason: string; detail: string | null; status: "open" | "reviewed" | "dismissed";
+  created_at: string;
+}
+
+function ContentReportsView({ token: _token, flash }: { token: string; flash: (m: string) => void }) {
+  const [rows, setRows]           = useState<ContentReport[]>([]);
+  const [loading, setLoading]     = useState(true);
+  const [statusFilter, setFilter] = useState<"open" | "reviewed" | "dismissed" | "all">("open");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [selected, setSelected]   = useState<ContentReport | null>(null);
+  const [actioning, setActioning] = useState(false);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const { createBrowserClient } = await import("@supabase/ssr");
+      const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      const { data } = await sb.from("content_reports").select("*").order("created_at", { ascending: false });
+      setRows((data ?? []) as ContentReport[]);
+    } catch { /* table may not exist yet */ }
+    setLoading(false);
+  }
+  useEffect(() => { load(); }, []); // eslint-disable-line
+
+  async function act(id: string, status: "reviewed" | "dismissed") {
+    setActioning(true);
+    try {
+      const { createBrowserClient } = await import("@supabase/ssr");
+      const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      await sb.from("content_reports").update({ status, reviewed_at: new Date().toISOString() }).eq("id", id);
+      setRows(r => r.map(x => x.id === id ? { ...x, status } : x));
+      if (selected?.id === id) setSelected(s => s ? { ...s, status } : s);
+      flash(`✓ Report ${status}`);
+    } catch { flash("Update failed"); }
+    setActioning(false);
+  }
+
+  const filtered = rows.filter(r => {
+    const matchStatus = statusFilter === "all" || r.status === statusFilter;
+    const matchType   = typeFilter   === "all" || r.target_type === typeFilter;
+    return matchStatus && matchType;
+  });
+
+  const openCount = rows.filter(r => r.status === "open").length;
+
+  const typeIcon: Record<string, string> = { job: "ti-briefcase", profile: "ti-user", review: "ti-star", message: "ti-message" };
+  const reasonColors: Record<string, string> = {
+    spam: "var(--warn)", harassment: "var(--danger)", misleading: "var(--warn)",
+    inappropriate: "var(--danger)", fake: "var(--danger)", other: "var(--text3)",
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {/* Summary bar */}
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+        {[
+          { label: "Open",      val: openCount,                                    color: "var(--danger)" },
+          { label: "Reviewed",  val: rows.filter(r => r.status === "reviewed").length,  color: "var(--success)" },
+          { label: "Dismissed", val: rows.filter(r => r.status === "dismissed").length, color: "var(--text3)" },
+        ].map(s => (
+          <div key={s.label} style={{ ...card, padding: "12px 18px" }}>
+            <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.val}</div>
+            <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Filters */}
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        {(["all", "open", "reviewed", "dismissed"] as const).map(s => (
+          <button key={s} onClick={() => setFilter(s)} style={{ padding: "5px 14px", borderRadius: 99, fontSize: 12, fontWeight: 600, cursor: "pointer", border: `1px solid ${statusFilter === s ? "var(--accent)" : "var(--border)"}`, background: statusFilter === s ? "var(--accdim)" : "none", color: statusFilter === s ? "var(--accent)" : "var(--text3)" }}>
+            {s}
+          </button>
+        ))}
+        <div style={{ width: 1, height: 20, background: "var(--border)", margin: "0 4px" }} />
+        {(["all", "job", "profile", "review", "message"] as const).map(t => (
+          <button key={t} onClick={() => setTypeFilter(t)} style={{ padding: "5px 14px", borderRadius: 99, fontSize: 12, fontWeight: 600, cursor: "pointer", border: `1px solid ${typeFilter === t ? "var(--accent)" : "var(--border)"}`, background: typeFilter === t ? "var(--accdim)" : "none", color: typeFilter === t ? "var(--accent)" : "var(--text3)" }}>
+            {t === "all" ? "All types" : t}
+          </button>
+        ))}
+        <button style={{ ...btn(), marginLeft: "auto", fontSize: 12 }} onClick={load}><i className="ti ti-refresh" style={{ marginRight: 4 }} />Refresh</button>
+      </div>
+
+      {loading ? (
+        <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>Loading…</div>
+      ) : filtered.length === 0 ? (
+        <div style={{ ...card, textAlign: "center", padding: 40, color: "var(--text3)" }}>
+          <i className="ti ti-flag-2" style={{ fontSize: 28, display: "block", marginBottom: 8 }} />
+          {rows.length === 0 ? "No content reports yet. Create a content_reports table to enable this." : "No reports in this category."}
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {filtered.map(r => (
+            <div key={r.id} style={{ ...card, display: "flex", gap: 14, alignItems: "flex-start", cursor: "pointer" }} onClick={() => setSelected(r)}>
+              {/* Type icon */}
+              <div style={{ width: 36, height: 36, borderRadius: 9, background: "var(--surface2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <i className={`ti ${typeIcon[r.target_type] ?? "ti-alert"}`} style={{ fontSize: 16, color: "var(--text3)" }} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <span style={{ fontWeight: 700, fontSize: 13, textTransform: "capitalize" }}>{r.target_type} reported</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: reasonColors[r.reason] ?? "var(--text3)", padding: "2px 7px", borderRadius: 6, background: `${reasonColors[r.reason] ?? "var(--surface2)"}18`, border: `1px solid ${reasonColors[r.reason] ?? "var(--border)"}44` }}>
+                    {r.reason}
+                  </span>
+                  {r.status !== "open" && (
+                    <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 7px", borderRadius: 6, background: r.status === "reviewed" ? "rgba(34,197,94,.1)" : "var(--surface2)", color: r.status === "reviewed" ? "var(--success)" : "var(--text3)" }}>
+                      {r.status}
+                    </span>
+                  )}
+                </div>
+                <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 3 }}>
+                  Target ID: <code style={{ fontFamily: "monospace", fontSize: 11 }}>{r.target_id.slice(0, 12)}…</code>
+                  {" · "}{new Date(r.created_at).toLocaleDateString("en-IN")}
+                </div>
+                {r.detail && <div style={{ fontSize: 12, color: "var(--text2)", marginTop: 4, fontStyle: "italic" }}>"{r.detail.slice(0, 100)}{r.detail.length > 100 ? "…" : ""}"</div>}
+              </div>
+              {r.status === "open" && (
+                <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                  <button disabled={actioning} onClick={e => { e.stopPropagation(); act(r.id, "reviewed"); }} style={{ ...btn(true), fontSize: 11, padding: "4px 10px" }}>Act</button>
+                  <button disabled={actioning} onClick={e => { e.stopPropagation(); act(r.id, "dismissed"); }} style={{ ...btn(), fontSize: 11, padding: "4px 10px" }}>Dismiss</button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Detail modal */}
+      {selected && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.65)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+          onClick={e => { if (e.target === e.currentTarget) setSelected(null); }}>
+          <div style={{ ...card, width: "100%", maxWidth: 500, display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <div>
+                <div style={{ fontSize: 15, fontWeight: 800, textTransform: "capitalize" }}>{selected.target_type} report — {selected.reason}</div>
+                <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 2 }}>{new Date(selected.created_at).toLocaleString("en-IN")}</div>
+              </div>
+              <button onClick={() => setSelected(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: 18 }}><i className="ti ti-x" /></button>
+            </div>
+            <div style={{ background: "var(--surface2)", borderRadius: 10, padding: "14px 16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, fontSize: 13 }}>
+              {[
+                ["Target type",  selected.target_type],
+                ["Target ID",    selected.target_id],
+                ["Reason",       selected.reason],
+                ["Reporter",     selected.reporter_id?.slice(0, 8) + "…" || "Anonymous"],
+              ].map(([k, v]) => (
+                <div key={k}>
+                  <div style={{ fontSize: 10, color: "var(--text3)", fontWeight: 700, textTransform: "uppercase", marginBottom: 2 }}>{k}</div>
+                  <div style={{ fontFamily: "monospace", fontSize: 12 }}>{v}</div>
+                </div>
+              ))}
+            </div>
+            {selected.detail && (
+              <div style={{ background: "rgba(234,179,8,.06)", border: "1px solid rgba(234,179,8,.2)", borderRadius: 10, padding: "12px 14px", fontSize: 13, color: "var(--text2)", lineHeight: 1.6 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--warn)", marginBottom: 6 }}>Reporter's note</div>
+                {selected.detail}
+              </div>
+            )}
+            <div style={{ display: "flex", gap: 8 }}>
+              <button disabled={actioning || selected.status !== "open"} onClick={() => act(selected.id, "reviewed")} style={{ ...btn(true), flex: 1 }}>
+                <i className="ti ti-check" style={{ marginRight: 5 }} />Mark reviewed
+              </button>
+              <button disabled={actioning || selected.status !== "open"} onClick={() => act(selected.id, "dismissed")} style={{ ...btn(), flex: 1 }}>
+                <i className="ti ti-x" style={{ marginRight: 5 }} />Dismiss
+              </button>
+              <a href={`/jobs`} target="_blank" rel="noreferrer" style={{ ...btn(), textDecoration: "none", display: "flex", alignItems: "center" }}>
+                View target ↗
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Payments View ─────────────────────────────────────────────────────────────
+
+interface PaymentRow {
+  id: string; user_id: string; email: string | null; amount: number; currency: string;
+  status: "captured" | "failed" | "refunded" | "pending"; plan: string;
+  razorpay_order_id: string | null; razorpay_payment_id: string | null;
+  created_at: string;
+}
+
+function PaymentsView({ token: _token, flash }: { token: string; flash: (m: string) => void }) {
+  const [rows, setRows]           = useState<PaymentRow[]>([]);
+  const [loading, setLoading]     = useState(true);
+  const [statusFilter, setFilter] = useState("all");
+  const [search, setSearch]       = useState("");
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const { createBrowserClient } = await import("@supabase/ssr");
+        const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+        const { data } = await sb
+          .from("payments")
+          .select("id, user_id, email, amount, currency, status, plan, razorpay_order_id, razorpay_payment_id, created_at")
+          .order("created_at", { ascending: false })
+          .limit(500);
+        setRows((data ?? []) as PaymentRow[]);
+      } catch { /* table may not exist */ }
+      setLoading(false);
+    })();
+  }, []); // eslint-disable-line
+
+  const filtered = rows.filter(r => {
+    const q = search.toLowerCase();
+    const matchSearch = !q || (r.email ?? "").toLowerCase().includes(q) || (r.razorpay_payment_id ?? "").toLowerCase().includes(q);
+    const matchStatus = statusFilter === "all" || r.status === statusFilter;
+    return matchSearch && matchStatus;
+  });
+
+  const total    = rows.filter(r => r.status === "captured").reduce((a, r) => a + r.amount, 0);
+  const refunded = rows.filter(r => r.status === "refunded").reduce((a, r) => a + r.amount, 0);
+  const failed   = rows.filter(r => r.status === "failed").length;
+
+  const statusColor: Record<string, string> = { captured: "var(--success)", failed: "var(--danger)", refunded: "var(--warn)", pending: "var(--text3)" };
+  const statusBg:    Record<string, string> = { captured: "rgba(34,197,94,.1)", failed: "rgba(239,68,68,.1)", refunded: "rgba(234,179,8,.1)", pending: "var(--surface2)" };
+
+  function fmtAmount(amt: number, cur: string) {
+    return new Intl.NumberFormat("en-IN", { style: "currency", currency: cur.toUpperCase(), maximumFractionDigits: 0 }).format(amt / 100);
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {/* Stats */}
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+        {[
+          { label: "Total revenue",    val: fmtAmount(total, "INR"),    color: "var(--success)" },
+          { label: "Refunded",         val: fmtAmount(refunded, "INR"), color: "var(--warn)" },
+          { label: "Failed payments",  val: failed,                     color: "var(--danger)" },
+          { label: "Total transactions", val: rows.length,              color: "var(--accent)" },
+        ].map(s => (
+          <div key={s.label} style={{ ...card, padding: "12px 18px", minWidth: 140 }}>
+            <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.val}</div>
+            <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Filters */}
+      <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+        <input style={{ ...input, maxWidth: 260 }} placeholder="Search email or payment ID…" value={search} onChange={e => setSearch(e.target.value)} />
+        {(["all", "captured", "failed", "refunded", "pending"] as const).map(s => (
+          <button key={s} onClick={() => setFilter(s)} style={{ padding: "5px 14px", borderRadius: 99, fontSize: 12, fontWeight: 600, cursor: "pointer", border: `1px solid ${statusFilter === s ? "var(--accent)" : "var(--border)"}`, background: statusFilter === s ? "var(--accdim)" : "none", color: statusFilter === s ? "var(--accent)" : "var(--text3)" }}>
+            {s}
+          </button>
+        ))}
+        <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--text3)" }}>{filtered.length} transactions</span>
+      </div>
+
+      {loading ? (
+        <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>Loading…</div>
+      ) : filtered.length === 0 ? (
+        <div style={{ ...card, textAlign: "center", padding: 40, color: "var(--text3)" }}>
+          <i className="ti ti-receipt" style={{ fontSize: 28, display: "block", marginBottom: 8 }} />
+          {rows.length === 0 ? "No payments yet. Transactions will appear here once your Razorpay webhook writes to a payments table." : "No results for this filter."}
+        </div>
+      ) : (
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <thead>
+              <tr style={{ borderBottom: "1px solid var(--border)", color: "var(--text3)" }}>
+                {["Date", "Email", "Plan", "Amount", "Status", "Payment ID"].map(h => (
+                  <th key={h} style={{ padding: "8px 10px", fontWeight: 600, fontSize: 11, textAlign: "left" }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(r => (
+                <tr key={r.id} style={{ borderBottom: "1px solid var(--border)" }}>
+                  <td style={{ padding: "10px 10px", color: "var(--text3)", fontSize: 12, whiteSpace: "nowrap" }}>
+                    {new Date(r.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "2-digit" })}
+                  </td>
+                  <td style={{ padding: "10px 10px", fontWeight: 600 }}>{r.email || "—"}</td>
+                  <td style={{ padding: "10px 10px" }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 6, background: "var(--surface2)", color: "var(--accent)" }}>{r.plan}</span>
+                  </td>
+                  <td style={{ padding: "10px 10px", fontWeight: 700, color: "var(--text1)" }}>{fmtAmount(r.amount, r.currency)}</td>
+                  <td style={{ padding: "10px 10px" }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 6, background: statusBg[r.status], color: statusColor[r.status] }}>
+                      {r.status}
+                    </span>
+                  </td>
+                  <td style={{ padding: "10px 10px", color: "var(--text3)", fontSize: 11, fontFamily: "monospace" }}>
+                    {r.razorpay_payment_id ? (
+                      <a href={`https://dashboard.razorpay.com/app/payments/${r.razorpay_payment_id}`} target="_blank" rel="noreferrer" style={{ color: "var(--accent)", textDecoration: "none" }}>
+                        {r.razorpay_payment_id.slice(0, 16)}… ↗
+                      </a>
+                    ) : "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Interview Bank View ───────────────────────────────────────────────────────
+
+interface IQRow {
+  id: string; question: string; category: string; difficulty: "easy" | "medium" | "hard";
+  answer_hint: string | null; tags: string[]; active: boolean; created_at: string;
+}
+
+function InterviewBankView({ token: _token, flash }: { token: string; flash: (m: string) => void }) {
+  const [rows, setRows]       = useState<IQRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [catFilter, setCat]   = useState("all");
+  const [diffFilter, setDiff] = useState("all");
+  const [search, setSearch]   = useState("");
+  const [form, setForm]       = useState({ question: "", category: "", difficulty: "medium" as IQRow["difficulty"], answer_hint: "", tags: "" });
+  const [saving, setSaving]   = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const { createBrowserClient } = await import("@supabase/ssr");
+      const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      const { data } = await sb.from("interview_questions").select("*").order("category").order("difficulty");
+      setRows((data ?? []) as IQRow[]);
+    } catch { /* table may not exist */ }
+    setLoading(false);
+  }
+  useEffect(() => { load(); }, []); // eslint-disable-line
+
+  async function save() {
+    if (!form.question.trim() || !form.category.trim()) { flash("Question and category required"); return; }
+    setSaving(true);
+    try {
+      const { createBrowserClient } = await import("@supabase/ssr");
+      const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      const { error } = await sb.from("interview_questions").insert({
+        question: form.question.trim(), category: form.category.trim(),
+        difficulty: form.difficulty, answer_hint: form.answer_hint.trim() || null,
+        tags: form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : [],
+        active: true,
+      });
+      if (error) throw error;
+      flash("✓ Question added");
+      setForm({ question: "", category: "", difficulty: "medium", answer_hint: "", tags: "" });
+      setShowAdd(false);
+      await load();
+    } catch { flash("Failed to save"); }
+    setSaving(false);
+  }
+
+  async function toggleActive(id: string, active: boolean) {
+    try {
+      const { createBrowserClient } = await import("@supabase/ssr");
+      const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      await sb.from("interview_questions").update({ active }).eq("id", id);
+      setRows(r => r.map(q => q.id === id ? { ...q, active } : q));
+    } catch { flash("Update failed"); }
+  }
+
+  async function del(id: string) {
+    if (!confirm("Delete this question?")) return;
+    try {
+      const { createBrowserClient } = await import("@supabase/ssr");
+      const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      await sb.from("interview_questions").delete().eq("id", id);
+      setRows(r => r.filter(q => q.id !== id));
+      flash("✓ Deleted");
+    } catch { flash("Delete failed"); }
+  }
+
+  const cats = ["all", ...Array.from(new Set(rows.map(r => r.category)))];
+  const filtered = rows.filter(r => {
+    const q = search.toLowerCase();
+    return (catFilter === "all" || r.category === catFilter)
+      && (diffFilter === "all" || r.difficulty === diffFilter)
+      && (!q || r.question.toLowerCase().includes(q) || r.category.toLowerCase().includes(q));
+  });
+
+  const diffColor: Record<string, string> = { easy: "var(--success)", medium: "var(--warn)", hard: "var(--danger)" };
+  const diffBg:    Record<string, string> = { easy: "rgba(34,197,94,.1)", medium: "rgba(234,179,8,.1)", hard: "rgba(239,68,68,.1)" };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {/* Toolbar */}
+      <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+        <input style={{ ...input, maxWidth: 240 }} placeholder="Search questions…" value={search} onChange={e => setSearch(e.target.value)} />
+        <select style={{ ...input, width: 150 }} value={catFilter} onChange={e => setCat(e.target.value)}>
+          {cats.map(c => <option key={c} value={c}>{c === "all" ? "All categories" : c}</option>)}
+        </select>
+        {(["all", "easy", "medium", "hard"] as const).map(d => (
+          <button key={d} onClick={() => setDiff(d)} style={{ padding: "5px 12px", borderRadius: 99, fontSize: 12, fontWeight: 600, cursor: "pointer", border: `1px solid ${diffFilter === d ? "var(--accent)" : "var(--border)"}`, background: diffFilter === d ? "var(--accdim)" : "none", color: diffFilter === d ? "var(--accent)" : "var(--text3)" }}>
+            {d}
+          </button>
+        ))}
+        <button style={{ ...btn(true), marginLeft: "auto" }} onClick={() => setShowAdd(s => !s)}>
+          <i className="ti ti-plus" style={{ marginRight: 5 }} />{showAdd ? "Cancel" : "Add question"}
+        </button>
+      </div>
+
+      {/* Add form */}
+      {showAdd && (
+        <div style={{ ...card, display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ fontSize: 14, fontWeight: 700 }}>New question</div>
+          <div style={row}>
+            <div style={{ flex: "1 1 280px" }}>
+              <label style={label}>Question *</label>
+              <textarea style={{ ...input, minHeight: 70, resize: "vertical" }} value={form.question} onChange={e => setForm(f => ({ ...f, question: e.target.value }))} placeholder="e.g. Explain the difference between useEffect and useLayoutEffect" />
+            </div>
+          </div>
+          <div style={row}>
+            <div style={{ flex: "1 1 160px" }}>
+              <label style={label}>Category *</label>
+              <input style={input} value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} placeholder="e.g. React, System Design" />
+            </div>
+            <div style={{ flex: "0 1 130px" }}>
+              <label style={label}>Difficulty</label>
+              <select style={input} value={form.difficulty} onChange={e => setForm(f => ({ ...f, difficulty: e.target.value as IQRow["difficulty"] }))}>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </div>
+            <div style={{ flex: "1 1 200px" }}>
+              <label style={label}>Tags (comma-separated)</label>
+              <input style={input} value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))} placeholder="hooks, lifecycle, performance" />
+            </div>
+          </div>
+          <div>
+            <label style={label}>Answer hint / model answer</label>
+            <textarea style={{ ...input, minHeight: 60, resize: "vertical" }} value={form.answer_hint} onChange={e => setForm(f => ({ ...f, answer_hint: e.target.value }))} placeholder="Brief answer guidance for interviewers…" />
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button style={btn(true)} onClick={save} disabled={saving}>{saving ? "Saving…" : "Save question"}</button>
+            <button style={btn()} onClick={() => setShowAdd(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* Stats row */}
+      <div style={{ display: "flex", gap: 10, fontSize: 12, color: "var(--text3)", flexWrap: "wrap" }}>
+        {(["easy", "medium", "hard"] as const).map(d => (
+          <span key={d} style={{ padding: "4px 10px", borderRadius: 6, background: diffBg[d], color: diffColor[d], fontWeight: 600 }}>
+            {rows.filter(r => r.difficulty === d).length} {d}
+          </span>
+        ))}
+        <span style={{ marginLeft: "auto" }}>{filtered.length} / {rows.length} questions</span>
+      </div>
+
+      {loading ? (
+        <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>Loading…</div>
+      ) : filtered.length === 0 ? (
+        <div style={{ ...card, textAlign: "center", padding: 40, color: "var(--text3)" }}>
+          <i className="ti ti-brain" style={{ fontSize: 28, display: "block", marginBottom: 8 }} />
+          {rows.length === 0 ? "No questions yet. Create an interview_questions table and add some." : "No questions match this filter."}
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {filtered.map(q => (
+            <div key={q.id} style={{ ...card, opacity: q.active ? 1 : 0.5, padding: "14px 18px" }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 6 }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 6, background: diffBg[q.difficulty], color: diffColor[q.difficulty] }}>{q.difficulty}</span>
+                    <span style={{ fontSize: 10, fontWeight: 600, color: "var(--accent)", padding: "2px 8px", borderRadius: 6, background: "var(--accdim)" }}>{q.category}</span>
+                    {(q.tags ?? []).slice(0, 3).map(t => <span key={t} style={{ fontSize: 10, padding: "2px 6px", borderRadius: 4, background: "var(--surface2)", color: "var(--text3)" }}>{t}</span>)}
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)", lineHeight: 1.5 }}>{q.question}</div>
+                  {q.answer_hint && <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 6, lineHeight: 1.5, fontStyle: "italic" }}>{q.answer_hint.slice(0, 120)}{q.answer_hint.length > 120 ? "…" : ""}</div>}
+                </div>
+                <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                  <button onClick={() => toggleActive(q.id, !q.active)} style={{ ...btn(), fontSize: 11, padding: "4px 10px" }}>{q.active ? "Disable" : "Enable"}</button>
+                  <button onClick={() => del(q.id)} style={{ ...btn(), fontSize: 11, padding: "4px 10px", color: "var(--danger)" }}>Delete</button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Salary Data View ──────────────────────────────────────────────────────────
+
+interface SalaryBenchmark {
+  id: string; role: string; level: string; location: string; industry: string | null;
+  min_lpa: number; median_lpa: number; max_lpa: number; sample_size: number;
+  currency: string; source: string | null; updated_at: string;
+}
+
+function SalaryDataView({ token: _token, flash }: { token: string; flash: (m: string) => void }) {
+  const [rows, setRows]       = useState<SalaryBenchmark[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch]   = useState("");
+  const [form, setForm]       = useState({ role: "", level: "mid", location: "", industry: "", min_lpa: "", median_lpa: "", max_lpa: "", sample_size: "10", currency: "INR", source: "" });
+  const [saving, setSaving]   = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
+  const [editing, setEditing] = useState<string | null>(null);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const { createBrowserClient } = await import("@supabase/ssr");
+      const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      const { data } = await sb.from("salary_benchmarks").select("*").order("role").order("level");
+      setRows((data ?? []) as SalaryBenchmark[]);
+    } catch { /* table may not exist */ }
+    setLoading(false);
+  }
+  useEffect(() => { load(); }, []); // eslint-disable-line
+
+  async function save() {
+    if (!form.role.trim() || !form.location.trim() || !form.median_lpa) { flash("Role, location, and median LPA required"); return; }
+    setSaving(true);
+    try {
+      const { createBrowserClient } = await import("@supabase/ssr");
+      const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      const payload = {
+        role: form.role.trim(), level: form.level, location: form.location.trim(),
+        industry: form.industry.trim() || null, currency: form.currency,
+        min_lpa: Number(form.min_lpa) || 0, median_lpa: Number(form.median_lpa),
+        max_lpa: Number(form.max_lpa) || 0, sample_size: Number(form.sample_size) || 10,
+        source: form.source.trim() || null, updated_at: new Date().toISOString(),
+      };
+      if (editing) {
+        await sb.from("salary_benchmarks").update(payload).eq("id", editing);
+        flash("✓ Benchmark updated");
+        setEditing(null);
+      } else {
+        await sb.from("salary_benchmarks").insert(payload);
+        flash("✓ Benchmark added");
+      }
+      setForm({ role: "", level: "mid", location: "", industry: "", min_lpa: "", median_lpa: "", max_lpa: "", sample_size: "10", currency: "INR", source: "" });
+      setShowAdd(false);
+      await load();
+    } catch { flash("Save failed"); }
+    setSaving(false);
+  }
+
+  async function del(id: string) {
+    if (!confirm("Delete this benchmark?")) return;
+    try {
+      const { createBrowserClient } = await import("@supabase/ssr");
+      const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      await sb.from("salary_benchmarks").delete().eq("id", id);
+      setRows(r => r.filter(b => b.id !== id));
+      flash("✓ Deleted");
+    } catch { flash("Delete failed"); }
+  }
+
+  function editRow(b: SalaryBenchmark) {
+    setForm({ role: b.role, level: b.level, location: b.location, industry: b.industry ?? "", min_lpa: String(b.min_lpa), median_lpa: String(b.median_lpa), max_lpa: String(b.max_lpa), sample_size: String(b.sample_size), currency: b.currency, source: b.source ?? "" });
+    setEditing(b.id);
+    setShowAdd(true);
+  }
+
+  const filtered = rows.filter(r => {
+    const q = search.toLowerCase();
+    return !q || r.role.toLowerCase().includes(q) || r.location.toLowerCase().includes(q) || (r.industry ?? "").toLowerCase().includes(q);
+  });
+
+  const levelColor: Record<string, string> = { junior: "var(--text3)", mid: "var(--accent)", senior: "var(--success)", lead: "#a855f7", director: "var(--warn)" };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+        <input style={{ ...input, maxWidth: 260 }} placeholder="Search role, location, industry…" value={search} onChange={e => setSearch(e.target.value)} />
+        <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--text3)" }}>{filtered.length} benchmarks</span>
+        <button style={btn(true)} onClick={() => { setEditing(null); setShowAdd(s => !s); }}>
+          <i className="ti ti-plus" style={{ marginRight: 5 }} />{showAdd && !editing ? "Cancel" : "Add benchmark"}
+        </button>
+      </div>
+
+      {/* Add / edit form */}
+      {showAdd && (
+        <div style={{ ...card, display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ fontSize: 14, fontWeight: 700 }}>{editing ? "Edit benchmark" : "New salary benchmark"}</div>
+          <div style={row}>
+            <div style={{ flex: "1 1 180px" }}><label style={label}>Role *</label><input style={input} value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))} placeholder="e.g. Senior React Developer" /></div>
+            <div style={{ flex: "0 1 120px" }}>
+              <label style={label}>Level</label>
+              <select style={input} value={form.level} onChange={e => setForm(f => ({ ...f, level: e.target.value }))}>
+                {["junior", "mid", "senior", "lead", "director"].map(l => <option key={l} value={l}>{l}</option>)}
+              </select>
+            </div>
+            <div style={{ flex: "1 1 150px" }}><label style={label}>Location *</label><input style={input} value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))} placeholder="Bengaluru / Remote / Global" /></div>
+            <div style={{ flex: "1 1 130px" }}><label style={label}>Industry</label><input style={input} value={form.industry} onChange={e => setForm(f => ({ ...f, industry: e.target.value }))} placeholder="SaaS, Fintech…" /></div>
+          </div>
+          <div style={row}>
+            <div style={{ flex: "0 1 110px" }}><label style={label}>Min LPA</label><input type="number" style={input} value={form.min_lpa} onChange={e => setForm(f => ({ ...f, min_lpa: e.target.value }))} placeholder="8" /></div>
+            <div style={{ flex: "0 1 120px" }}><label style={label}>Median LPA *</label><input type="number" style={input} value={form.median_lpa} onChange={e => setForm(f => ({ ...f, median_lpa: e.target.value }))} placeholder="18" /></div>
+            <div style={{ flex: "0 1 110px" }}><label style={label}>Max LPA</label><input type="number" style={input} value={form.max_lpa} onChange={e => setForm(f => ({ ...f, max_lpa: e.target.value }))} placeholder="28" /></div>
+            <div style={{ flex: "0 1 100px" }}><label style={label}>Sample size</label><input type="number" style={input} value={form.sample_size} onChange={e => setForm(f => ({ ...f, sample_size: e.target.value }))} /></div>
+            <div style={{ flex: "0 1 90px" }}>
+              <label style={label}>Currency</label>
+              <select style={input} value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
+                {["INR", "USD", "GBP", "EUR", "AED", "SGD"].map(c => <option key={c}>{c}</option>)}
+              </select>
+            </div>
+            <div style={{ flex: "1 1 160px" }}><label style={label}>Source</label><input style={input} value={form.source} onChange={e => setForm(f => ({ ...f, source: e.target.value }))} placeholder="Levels.fyi, Glassdoor…" /></div>
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button style={btn(true)} onClick={save} disabled={saving}>{saving ? "Saving…" : editing ? "Update" : "Add"}</button>
+            <button style={btn()} onClick={() => { setShowAdd(false); setEditing(null); }}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {loading ? (
+        <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>Loading…</div>
+      ) : filtered.length === 0 ? (
+        <div style={{ ...card, textAlign: "center", padding: 40, color: "var(--text3)" }}>
+          <i className="ti ti-chart-line" style={{ fontSize: 28, display: "block", marginBottom: 8 }} />
+          {rows.length === 0 ? "No benchmarks yet. Create a salary_benchmarks table and add data." : "No results."}
+        </div>
+      ) : (
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <thead>
+              <tr style={{ borderBottom: "1px solid var(--border)", color: "var(--text3)" }}>
+                {["Role", "Level", "Location", "Min", "Median", "Max", "n", "Source", ""].map(h => (
+                  <th key={h} style={{ padding: "8px 10px", fontWeight: 600, fontSize: 11, textAlign: "left" }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(b => (
+                <tr key={b.id} style={{ borderBottom: "1px solid var(--border)" }}>
+                  <td style={{ padding: "10px 10px", fontWeight: 600 }}>{b.role}{b.industry && <span style={{ fontSize: 10, color: "var(--text3)", marginLeft: 6 }}>{b.industry}</span>}</td>
+                  <td style={{ padding: "10px 10px" }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: levelColor[b.level] ?? "var(--text3)" }}>{b.level}</span>
+                  </td>
+                  <td style={{ padding: "10px 10px", color: "var(--text2)", fontSize: 12 }}>{b.location}</td>
+                  <td style={{ padding: "10px 10px", color: "var(--text3)", fontSize: 12 }}>{b.min_lpa > 0 ? `${b.min_lpa}L` : "—"}</td>
+                  <td style={{ padding: "10px 10px", fontWeight: 700, color: "var(--success)" }}>{b.median_lpa}L</td>
+                  <td style={{ padding: "10px 10px", color: "var(--text3)", fontSize: 12 }}>{b.max_lpa > 0 ? `${b.max_lpa}L` : "—"}</td>
+                  <td style={{ padding: "10px 10px", color: "var(--text3)", fontSize: 12 }}>{b.sample_size}</td>
+                  <td style={{ padding: "10px 10px", color: "var(--text3)", fontSize: 11 }}>{b.source || "—"}</td>
+                  <td style={{ padding: "10px 10px" }}>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <button onClick={() => editRow(b)} style={{ ...btn(), fontSize: 11, padding: "4px 10px" }}>Edit</button>
+                      <button onClick={() => del(b.id)} style={{ ...btn(), fontSize: 11, padding: "4px 10px", color: "var(--danger)" }}>Delete</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Rate Limits View ──────────────────────────────────────────────────────────
+
+function RateLimitsView({ token: _token }: { token: string }) {
+  const [rows, setRows]       = useState<{ user_id: string | null; ip_address: string | null; action: string; meta: Record<string, unknown> | null; created_at: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [window, setWindow]   = useState<"1h" | "24h" | "7d">("24h");
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const { createBrowserClient } = await import("@supabase/ssr");
+        const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+        const since = new Date(Date.now() - (window === "1h" ? 3600000 : window === "24h" ? 86400000 : 604800000)).toISOString();
+        const { data } = await sb
+          .from("audit_logs")
+          .select("user_id, ip_address, action, meta, created_at")
+          .eq("action", "api.rate_limited")
+          .gte("created_at", since)
+          .order("created_at", { ascending: false })
+          .limit(500);
+        setRows(data ?? []);
+      } catch { /* audit_logs may not have rate limit events */ }
+      setLoading(false);
+    })();
+  }, [window]); // eslint-disable-line
+
+  // Aggregate by IP or user
+  const byIp = rows.reduce<Record<string, { count: number; lastSeen: string; endpoints: Set<string> }>>((acc, r) => {
+    const key = r.ip_address ?? r.user_id ?? "unknown";
+    if (!acc[key]) acc[key] = { count: 0, lastSeen: r.created_at, endpoints: new Set() };
+    acc[key].count++;
+    if (r.created_at > acc[key].lastSeen) acc[key].lastSeen = r.created_at;
+    const ep = (r.meta as { endpoint?: string } | null)?.endpoint;
+    if (ep) acc[key].endpoints.add(ep);
+    return acc;
+  }, {});
+
+  const sorted = Object.entries(byIp).sort((a, b) => b[1].count - a[1].count);
+  const totalHits = rows.length;
+  const uniqueIPs = sorted.length;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {/* Header + window selector */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+        <div style={{ fontSize: 14, fontWeight: 700 }}><i className="ti ti-shield-bolt" style={{ marginRight: 6, color: "var(--accent)" }} />Rate limit hits</div>
+        <div style={{ display: "flex", gap: 6 }}>
+          {(["1h", "24h", "7d"] as const).map(w => (
+            <button key={w} onClick={() => setWindow(w)} style={{ padding: "5px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", border: `1px solid ${window === w ? "var(--accent)" : "var(--border)"}`, background: window === w ? "var(--accdim)" : "none", color: window === w ? "var(--accent)" : "var(--text3)" }}>
+              {w}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Summary */}
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+        {[
+          { label: "Total hits",  val: totalHits,  color: totalHits > 100 ? "var(--danger)" : totalHits > 20 ? "var(--warn)" : "var(--success)" },
+          { label: "Unique IPs",  val: uniqueIPs,  color: "var(--accent)" },
+          { label: "Top abuser", val: sorted[0]?.[1].count ?? 0, sub: sorted[0]?.[0].slice(0, 12) ?? "—", color: "var(--danger)" },
+        ].map(s => (
+          <div key={s.label} style={{ ...card, padding: "12px 18px", minWidth: 130 }}>
+            <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.val}</div>
+            <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>{s.label}</div>
+            {"sub" in s && s.sub && <div style={{ fontSize: 10, color: "var(--text3)", fontFamily: "monospace", marginTop: 2 }}>{s.sub}</div>}
+          </div>
+        ))}
+      </div>
+
+      {loading ? (
+        <div style={{ color: "var(--text3)", fontSize: 13, textAlign: "center", padding: 40 }}>Loading…</div>
+      ) : sorted.length === 0 ? (
+        <div style={{ ...card, textAlign: "center", padding: 40, color: "var(--text3)" }}>
+          <i className="ti ti-shield-check" style={{ fontSize: 28, color: "var(--success)", display: "block", marginBottom: 8 }} />
+          No rate limit hits in the last {window}. All clear.
+        </div>
+      ) : (
+        <>
+          {/* Per-IP breakdown */}
+          <div style={{ ...card }}>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>Top offenders — last {window}</div>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                <thead>
+                  <tr style={{ borderBottom: "1px solid var(--border)", color: "var(--text3)" }}>
+                    {["IP / User", "Hits", "Last seen", "Endpoints hit"].map(h => (
+                      <th key={h} style={{ padding: "8px 10px", fontWeight: 600, fontSize: 11, textAlign: "left" }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {sorted.slice(0, 30).map(([key, data]) => (
+                    <tr key={key} style={{ borderBottom: "1px solid var(--border)" }}>
+                      <td style={{ padding: "10px 10px", fontFamily: "monospace", fontSize: 12, fontWeight: 600 }}>{key.slice(0, 20)}{key.length > 20 ? "…" : ""}</td>
+                      <td style={{ padding: "10px 10px" }}>
+                        <span style={{ fontWeight: 800, color: data.count > 50 ? "var(--danger)" : data.count > 10 ? "var(--warn)" : "var(--text2)" }}>{data.count}</span>
+                      </td>
+                      <td style={{ padding: "10px 10px", color: "var(--text3)", fontSize: 12 }}>
+                        {new Date(data.lastSeen).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                      </td>
+                      <td style={{ padding: "10px 10px" }}>
+                        <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                          {[...data.endpoints].slice(0, 4).map(ep => (
+                            <span key={ep} style={{ fontSize: 10, padding: "2px 6px", borderRadius: 4, background: "var(--surface2)", color: "var(--text3)", fontFamily: "monospace" }}>{ep}</span>
+                          ))}
+                          {data.endpoints.size > 4 && <span style={{ fontSize: 10, color: "var(--text3)" }}>+{data.endpoints.size - 4}</span>}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Raw event timeline (last 20) */}
+          <div style={{ ...card }}>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>Recent events</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {rows.slice(0, 20).map((r, i) => (
+                <div key={i} style={{ display: "flex", gap: 10, fontSize: 12, alignItems: "center", padding: "6px 0", borderBottom: i < 19 ? "1px solid var(--border)" : "none" }}>
+                  <span style={{ color: "var(--text3)", fontSize: 11, whiteSpace: "nowrap" }}>
+                    {new Date(r.created_at).toLocaleTimeString("en-IN")}
+                  </span>
+                  <span style={{ fontFamily: "monospace", color: "var(--text2)", fontSize: 11 }}>
+                    {(r.ip_address ?? r.user_id ?? "—").slice(0, 18)}
+                  </span>
+                  {(r.meta as { endpoint?: string } | null)?.endpoint && (
+                    <span style={{ fontSize: 10, padding: "2px 7px", borderRadius: 4, background: "rgba(239,68,68,.08)", color: "var(--danger)", fontFamily: "monospace" }}>
+                      {(r.meta as { endpoint?: string })!.endpoint}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
