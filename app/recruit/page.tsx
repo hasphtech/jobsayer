@@ -10,6 +10,7 @@ import Link from "next/link";
 import { ArrowLeft, Plus, Search, Users, Check, Star } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useWindowWidth } from "@/lib/useWindowWidth";
+import { useTheme } from "@/lib/useTheme";
 
 /* ═══════════════════════════════════════════════════════════════
    EMPLOYER AUTH MODAL
@@ -712,6 +713,7 @@ export default function RecruitPage() {
   const w = useWindowWidth();
   const mobile = w < 640;
   const { user } = useAuth();
+  const { dark } = useTheme();
   const [view, setView]               = useState<View>("landing");
   const [showAuthModal, setAuthModal] = useState(false);
   const [profile, setProfile]         = useState<EmployerProfile | null>(null);
@@ -919,7 +921,7 @@ export default function RecruitPage() {
           </div>
           <h1 style={{ fontSize: 44, fontWeight: 900, lineHeight: 1.1, marginBottom: 20, letterSpacing: "-.02em" }}>
             Hire top Indian tech talent<br />
-            <span style={{ background: "linear-gradient(135deg,var(--accent),#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            <span style={dark ? { background: "linear-gradient(135deg,var(--accent),#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" } : { color: "var(--accent)" }}>
               AI-matched, not spam-filtered
             </span>
           </h1>

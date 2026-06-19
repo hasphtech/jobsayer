@@ -3259,7 +3259,7 @@ function SalaryDataView({ token: _token, flash }: { token: string; flash: (m: st
 function RateLimitsView({ token: _token }: { token: string }) {
   const [rows, setRows]       = useState<{ user_id: string | null; ip_address: string | null; action: string; meta: Record<string, unknown> | null; created_at: string }[]>([]);
   const [loading, setLoading] = useState(true);
-  const [window, setWindow]   = useState<"1h" | "24h" | "7d">("24h");
+  const [timeRange, setTimeRange] = useState<"1h" | "24h" | "7d">("24h");
 
   useEffect(() => {
     (async () => {
@@ -3267,7 +3267,7 @@ function RateLimitsView({ token: _token }: { token: string }) {
       try {
         const { createBrowserClient } = await import("@supabase/ssr");
         const sb = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
-        const since = new Date(Date.now() - (window === "1h" ? 3600000 : window === "24h" ? 86400000 : 604800000)).toISOString();
+        const since = new Date(Date.now() - (timeRange === "1h" ? 3600000 : timeRange === "24h" ? 86400000 : 604800000)).toISOString();
         const { data } = await sb
           .from("audit_logs")
           .select("user_id, ip_address, action, meta, created_at")
@@ -3279,7 +3279,7 @@ function RateLimitsView({ token: _token }: { token: string }) {
       } catch { /* audit_logs may not have rate limit events */ }
       setLoading(false);
     })();
-  }, [window]); // eslint-disable-line
+  }, [timeRange]); // eslint-disable-line
 
   // Aggregate by IP or user
   const byIp = rows.reduce<Record<string, { count: number; lastSeen: string; endpoints: Set<string> }>>((acc, r) => {
@@ -3303,7 +3303,7 @@ function RateLimitsView({ token: _token }: { token: string }) {
         <div style={{ fontSize: 14, fontWeight: 700 }}><i className="ti ti-shield-bolt" style={{ marginRight: 6, color: "var(--accent)" }} />Rate limit hits</div>
         <div style={{ display: "flex", gap: 6 }}>
           {(["1h", "24h", "7d"] as const).map(w => (
-            <button key={w} onClick={() => setWindow(w)} style={{ padding: "5px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", border: `1px solid ${window === w ? "var(--accent)" : "var(--border)"}`, background: window === w ? "var(--accdim)" : "none", color: window === w ? "var(--accent)" : "var(--text3)" }}>
+            <button key={w} onClick={() => setTimeRange(w)} style={{ padding: "5px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", border: `1px solid ${timeRange === w ? "var(--accent)" : "var(--border)"}`, background: timeRange === w ? "var(--accdim)" : "none", color: timeRange === w ? "var(--accent)" : "var(--text3)" }}>
               {w}
             </button>
           ))}
@@ -3330,13 +3330,13 @@ function RateLimitsView({ token: _token }: { token: string }) {
       ) : sorted.length === 0 ? (
         <div style={{ ...card, textAlign: "center", padding: 40, color: "var(--text3)" }}>
           <i className="ti ti-shield-check" style={{ fontSize: 28, color: "var(--success)", display: "block", marginBottom: 8 }} />
-          No rate limit hits in the last {window}. All clear.
+          No rate limit hits in the last {timeRange}. All clear.
         </div>
       ) : (
         <>
           {/* Per-IP breakdown */}
           <div style={{ ...card }}>
-            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>Top offenders — last {window}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>Top offenders — last {timeRange}</div>
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                 <thead>

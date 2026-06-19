@@ -678,7 +678,7 @@ function computeAts(data: ResumeData): { score: number; tips: string[]; scoreCol
   if (data.projects?.some(p => p.name))       score += 5;
 
   const capped = Math.min(score, 100);
-  const scoreColor = capped >= 75 ? "#16a34a" : capped >= 50 ? "#d97706" : "#dc2626";
+  const scoreColor = capped >= 75 ? "var(--success)" : capped >= 50 ? "var(--warn)" : "var(--danger)";
   return { score: capped, tips, scoreColor };
 }
 
@@ -837,7 +837,7 @@ function atsEdu(d: ResumeData) {
 }
 function sectionColor(score: number, max: number) {
   const pct = score / max;
-  return pct >= 1 ? "#16a34a" : pct >= 0.6 ? "#d97706" : "#dc2626";
+  return pct >= 1 ? "var(--success)" : pct >= 0.6 ? "var(--warn)" : "var(--danger)";
 }
 
 /* ── Section ATS bar ─────────────────────────────────────── */
@@ -863,7 +863,7 @@ function SectionAtsBar({ label, score, max, hints }: {
         </div>
       ))}
       {score === max && (
-        <div style={{ fontSize: 11, color: "#16a34a", marginTop: 2 }}>✓ Section complete</div>
+        <div style={{ fontSize: 11, color: "var(--success)", marginTop: 2 }}>✓ Section complete</div>
       )}
     </div>
   );
@@ -873,7 +873,7 @@ function SectionAtsBar({ label, score, max, hints }: {
 function InlineAtsHint({ value, max, unit, label }: {
   value: number; max: number; unit: string; label?: string;
 }) {
-  const color = value >= max ? "#16a34a" : value >= max * 0.6 ? "#d97706" : "#dc2626";
+  const color = value >= max ? "var(--success)" : value >= max * 0.6 ? "var(--warn)" : "var(--danger)";
   const pct   = Math.min(100, Math.round((value / max) * 100));
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -1863,7 +1863,7 @@ export default function BuilderPage() {
             {/* Quick tool chips */}
             {([
               { label: "ATS",      s: STEP_ATS,      badge: String(ats.score), badgeColor: ats.scoreColor },
-              { label: "Match",    s: STEP_JD,        badge: jdResult ? `${jdResult.score}%` : undefined,  badgeColor: jdResult ? (jdResult.score >= 75 ? "#16a34a" : jdResult.score >= 50 ? "#d97706" : "#dc2626") : undefined },
+              { label: "Match",    s: STEP_JD,        badge: jdResult ? `${jdResult.score}%` : undefined,  badgeColor: jdResult ? (jdResult.score >= 75 ? "var(--success)" : jdResult.score >= 50 ? "var(--warn)" : "var(--danger)") : undefined },
               { label: "Template", s: STEP_TEMPLATE,  badge: undefined, badgeColor: undefined },
               { label: "Customize", s: STEP_STYLE,    badge: undefined, badgeColor: undefined },
             ] as { label: string; s: number; badge?: string; badgeColor?: string }[]).map(({ label, s, badge, badgeColor }) => (
@@ -1897,7 +1897,7 @@ export default function BuilderPage() {
                     borderColor: active ? "var(--text1)" : (done ? "var(--border)" : "var(--border)"),
                     background:  active ? "var(--text1)" : "var(--surface2)",
                     color:       active ? "var(--bg)"   : "var(--text2)" }}>
-                  {done && <span style={{ fontSize: 10, fontWeight: 800, color: active ? "var(--bg)" : "#16a34a" }}>✓</span>}
+                  {done && <span style={{ fontSize: 10, fontWeight: 800, color: active ? "var(--bg)" : "var(--success)" }}>✓</span>}
                   {modeLabel(idx)}
                 </button>
               );
@@ -2178,7 +2178,7 @@ export default function BuilderPage() {
                         <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)" }}>{s.label}</div>
                         <div style={{ fontSize: 10, color: "var(--text3)" }}>{hidden ? "Hidden from resume" : s.subtitle}</div>
                       </div>
-                      {done && !hidden && <span style={{ fontSize: 10, color: "#16a34a", fontWeight: 700 }}>✓</span>}
+                      {done && !hidden && <span style={{ fontSize: 10, color: "var(--success)", fontWeight: 700 }}>✓</span>}
                       {canHide && (
                         <button onClick={e => { e.stopPropagation(); toggleSectionVisibility(s.key); }}
                           title={hidden ? "Show section" : "Hide section"}
@@ -2232,7 +2232,7 @@ export default function BuilderPage() {
               <span style={{ fontSize: 16, color: "var(--text3)", fontWeight: 600 }}>/100</span>
             </div>
             <div style={{ height: 8, borderRadius: 99, background: "var(--surface2)", overflow: "hidden", marginBottom: 10 }}>
-              <div style={{ height: "100%", width: `${ats.score}%`, background: `linear-gradient(90deg, ${ats.score < 50 ? "#ef4444, #f97316" : ats.score < 75 ? "#f97316, #eab308" : "#22c55e, #16a34a"})`, borderRadius: 99, transition: "width .5s ease" }} />
+              <div style={{ height: "100%", width: `${ats.score}%`, background: ats.score < 50 ? "linear-gradient(90deg,var(--danger),#f97316)" : ats.score < 75 ? "linear-gradient(90deg,#f97316,#eab308)" : "linear-gradient(90deg,#22c55e,var(--success))", borderRadius: 99, transition: "width .5s ease" }} />
             </div>
             <div style={{ fontSize: 12, color: "var(--text3)" }}>
               {ats.score >= 75 ? "Strong — good ATS compatibility" :
@@ -2424,7 +2424,7 @@ export default function BuilderPage() {
                 {data.photo && <>
                   <span style={{ fontSize: 10, color: "var(--border)" }}>·</span>
                   <button onClick={() => set("photo", "")}
-                    style={{ fontSize: 11, fontWeight: 700, color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0 }}>
+                    style={{ fontSize: 11, fontWeight: 700, color: "var(--danger)", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0 }}>
                     Remove
                   </button>
                 </>}
@@ -3140,7 +3140,7 @@ export default function BuilderPage() {
                         <span style={{ fontSize: 9, color: "var(--text3)", lineHeight: 1.3, maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {TEMPLATE_META[t].bestFor}
                         </span>
-                        <span style={{ fontSize: 9, fontWeight: 700, color: TEMPLATE_META[t].ats >= 90 ? "#16a34a" : TEMPLATE_META[t].ats >= 80 ? "#d97706" : "#9ca3af" }}>
+                        <span style={{ fontSize: 9, fontWeight: 700, color: TEMPLATE_META[t].ats >= 90 ? "var(--success)" : TEMPLATE_META[t].ats >= 80 ? "var(--warn)" : "var(--text3)" }}>
                           ATS {TEMPLATE_META[t].ats}%
                         </span>
                       </div>
@@ -3157,9 +3157,9 @@ export default function BuilderPage() {
     /* ── Job Description Matching step ─────── */
     if (step === STEP_JD) {
       const scoreColor = !jdResult ? "var(--text3)"
-        : jdResult.score >= 75 ? "#16a34a"
-        : jdResult.score >= 50 ? "#d97706"
-        : "#dc2626";
+        : jdResult.score >= 75 ? "var(--success)"
+        : jdResult.score >= 50 ? "var(--warn)"
+        : "var(--danger)";
 
       return (
         <div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: "100%" }}>
@@ -3205,7 +3205,7 @@ export default function BuilderPage() {
                   </div>
                 </div>
                 <div style={{ height: 7, borderRadius: 99, background: "var(--surface2)", overflow: "hidden" }}>
-                  <div style={{ height: "100%", width: `${jdResult.score}%`, borderRadius: 99, background: `linear-gradient(90deg, ${jdResult.score < 50 ? "#ef4444, #f97316" : jdResult.score < 75 ? "#f97316, #eab308" : "#22c55e, #16a34a"})`, transition: "width .5s ease" }} />
+                  <div style={{ height: "100%", width: `${jdResult.score}%`, borderRadius: 99, background: jdResult.score < 50 ? "linear-gradient(90deg,var(--danger),#f97316)" : jdResult.score < 75 ? "linear-gradient(90deg,#f97316,#eab308)" : "linear-gradient(90deg,#22c55e,var(--success))", transition: "width .5s ease" }} />
                 </div>
                 <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 8 }}>
                   {jdResult.score >= 75 ? "Strong match — you're well aligned with this role"
@@ -3499,7 +3499,7 @@ export default function BuilderPage() {
                     <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)" }}>{s.label}</div>
                     <div style={{ fontSize: 10, color: "var(--text3)" }}>{s.subtitle}</div>
                   </div>
-                  {done && <span style={{ fontSize: 10, color: "#16a34a", fontWeight: 700 }}>✓</span>}
+                  {done && <span style={{ fontSize: 10, color: "var(--success)", fontWeight: 700 }}>✓</span>}
                 </div>
               );
             })}
@@ -4414,7 +4414,7 @@ export default function BuilderPage() {
                   </div>
                   <div style={{ textAlign: "right" as const }}>
                     <div style={{ fontSize: 10, color: "var(--text3)" }}>ATS score</div>
-                    <div style={{ fontSize: 16, fontWeight: 900, color: (TEMPLATE_META[template]?.ats ?? 80) >= 90 ? "#16a34a" : (TEMPLATE_META[template]?.ats ?? 80) >= 82 ? "#d97706" : "#dc2626" }}>
+                    <div style={{ fontSize: 16, fontWeight: 900, color: (TEMPLATE_META[template]?.ats ?? 80) >= 90 ? "var(--success)" : (TEMPLATE_META[template]?.ats ?? 80) >= 82 ? "var(--warn)" : "var(--danger)" }}>
                       {TEMPLATE_META[template]?.ats ?? "—"}%
                     </div>
                   </div>
@@ -4428,7 +4428,7 @@ export default function BuilderPage() {
                     const active    = template === t;
                     const hover     = tplHover === t;
                     const isRec     = recommendedSet.has(t.toLowerCase());
-                    const atsColor  = meta.ats >= 90 ? "#16a34a" : meta.ats >= 82 ? "#d97706" : "#dc2626";
+                    const atsColor  = meta.ats >= 90 ? "var(--success)" : meta.ats >= 82 ? "var(--warn)" : "var(--danger)";
                     return (
                       <div key={t}
                         onClick={() => setTemplate(t)}
@@ -4510,7 +4510,7 @@ export default function BuilderPage() {
                         <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text1)" }}>{s.label}</div>
                         <div style={{ fontSize: 10, color: "var(--text3)" }}>{hidden ? "Hidden from resume" : s.subtitle}</div>
                       </div>
-                      {done && !hidden && <span style={{ fontSize: 10, color: "#16a34a", fontWeight: 700 }}>✓</span>}
+                      {done && !hidden && <span style={{ fontSize: 10, color: "var(--success)", fontWeight: 700 }}>✓</span>}
                       {canHide && (
                         <button onClick={e => { e.stopPropagation(); toggleSectionVisibility(s.key); }} title={hidden ? "Show" : "Hide"}
                           style={{ display: "flex", alignItems: "center", padding: "3px 5px", borderRadius: 5, borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", background: hidden ? "var(--accdim)" : "var(--surface2)", color: hidden ? "var(--accent)" : "var(--text3)", cursor: "pointer" }}>
@@ -4555,10 +4555,10 @@ export default function BuilderPage() {
                 <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 12 }}>
                   {/* Score gauge */}
                   <div style={{ textAlign: "center" as const, padding: "16px 12px", background: "var(--bg)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--border)", borderRadius: 10 }}>
-                    <div style={{ fontSize: 40, fontWeight: 900, color: jdResult.score >= 75 ? "#16a34a" : jdResult.score >= 50 ? "#d97706" : "#dc2626", lineHeight: 1 }}>{jdResult.score}%</div>
+                    <div style={{ fontSize: 40, fontWeight: 900, color: jdResult.score >= 75 ? "var(--success)" : jdResult.score >= 50 ? "var(--warn)" : "var(--danger)", lineHeight: 1 }}>{jdResult.score}%</div>
                     <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 4 }}>JD match score</div>
                     <div style={{ height: 5, borderRadius: 99, background: "var(--surface2)", overflow: "hidden", margin: "10px 0 0" }}>
-                      <div style={{ height: "100%", width: `${jdResult.score}%`, borderRadius: 99, background: jdResult.score >= 75 ? "#16a34a" : jdResult.score >= 50 ? "#d97706" : "#dc2626", transition: "width .4s" }} />
+                      <div style={{ height: "100%", width: `${jdResult.score}%`, borderRadius: 99, background: jdResult.score >= 75 ? "var(--success)" : jdResult.score >= 50 ? "var(--warn)" : "var(--danger)", transition: "width .4s" }} />
                     </div>
                   </div>
                   {/* Keyword groups */}
